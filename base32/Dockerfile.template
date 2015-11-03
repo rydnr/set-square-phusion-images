@@ -1,4 +1,4 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
 FROM ${ROOT_IMAGE}
 
 MAINTAINER ${MAINTAINER}

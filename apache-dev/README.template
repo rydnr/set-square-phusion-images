@@ -1,0 +1,9 @@
+Apache image useful when developing Apache modules.
+
+It allows to work on an Apache module, compile it, let the container automatically notice the
+changes and run an Apache instance with that module(s) enabled.
+
+Examples:
+
+- Run Apache monitoring changes in a development folder:
+> docker run -d -p [port]:80 -v [dev-folder]:/usr/local/lib/apache2 ${NAMESPACE}/${IMAGE}:${TAG}

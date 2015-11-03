@@ -1,19 +1,22 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
 FROM ${BASE_IMAGE}:${TAG}
 MAINTAINER ${MAINTAINER}
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-COPY help /usr/local/bin/help
 
 RUN ${APTGET_INSTALL} apache2 && \
     ${APTGET_CLEANUP} && \
-    chmod +x /etc/service/${IMAGE}/run && \
-    chmod +x /usr/local/bin/help
+    chmod +x /etc/service/${IMAGE}/run
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
+COPY README /README
 COPY Dockerfile /Dockerfiles/Dockerfile
+COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
-# Run with
-# docker run -d -p [port]:80 ${NAMESPACE}/${REPO}${STACK_SUFFIX}:${TAG}
+EXPOSE 80
+
+VOLUME /var/www
+
+# For instructions on how to use this image, please run
+# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help

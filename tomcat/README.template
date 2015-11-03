@@ -1,0 +1,25 @@
+This image is meant to provide a common Tomcat ${TOMCAT_VERSION} environment
+for Java web applications, and to easily choose among different Tomcat releases.
+
+It also enables Tomcat-Native for increased performance, out of the box.
+
+A default Logstash configuration may not be enough for your specific needs.
+You can provide yours when launching the image, but volume-mounting
+/etc/logstash/conf.d/${IMAGE}.conf
+
+Examples:
+
+- Run a war-packaged application:
+> docker run -it -p [port]:8080 -v [war-file]:${TOMCAT_HOME}/webapps/[app-name].war ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run an exploded war application:
+> docker run -it -p [port]:8080 -v [war-folder]:${TOMCAT_HOME}/webapps/[app-name] ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a war-packaged application, with specific context file:
+> docker run -it -p [port]:8080 -v [context-file]:/${TOMCAT_HOME}/contexts/[context-name].xml -v [war-file]:${TOMCAT_HOME}/webapps/[my-app].war ${NAMESPACE}/${IMAGE}:${TAG}
+
+- To customize how Logstash processes Tomcat logs:
+> docker run .. -v [my-logstash-conf]:/etc/logstash/conf.d/${IMAGE}.conf ..
+
+- Of course, you can disable Logstash altogether if you so wish:
+> docker run .. -e ENABLE_LOGSTASH=false ..

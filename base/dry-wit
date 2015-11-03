@@ -1599,6 +1599,8 @@ function _setup() {
       source "${DRY_WIT_SCRIPT_FOLDER}/$(basename ${DRY_WIT_SCRIPT_PATH} .sh).inc.sh"
   [ -e "${DRY_WIT_SCRIPT_FOLDER}/.$(basename ${DRY_WIT_SCRIPT_PATH} .sh).inc.sh" ] && \
       source "${DRY_WIT_SCRIPT_FOLDER}/.$(basename ${DRY_WIT_SCRIPT_PATH} .sh).inc.sh"
+  [ -e "./.$(basename ${DRY_WIT_SCRIPT_PATH} .sh).inc.sh" ] && \
+      source "./.$(basename ${DRY_WIT_SCRIPT_PATH} .sh).inc.sh"
   evalEnvVars;
 }
 

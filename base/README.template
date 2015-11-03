@@ -1,6 +1,27 @@
 This image is only meant to be used to isolate other images
-from phusion-baseimage changes, and to provide a common
+from ${ROOT_IMAGE}, and to provide a common
 style when writing Dockerfiles.
 
-If you're interested, you can run me with
-docker run -it --link [loghost]:logger ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+This image also injects (and enables by default) rsnapshot [1],
+and Monit [2], which can be configured specifically for any
+child image.
+
+Examples:
+
+- For taking a look:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+
+- If there's a loghost already accepting input logs:
+> docker run -it --link [loghost]:logger ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+
+- To disable Monit (for child images as well):
+> docker run .. -e ENABLE_MONIT=false ..
+
+- To disable cron (for child images as well):
+> docker run .. -e ENABLE_CRON=false ..
+
+- To disable rsnapshot (for child images as well):
+> docker run .. -e ENABLE_RSNAPSHOT=false ..
+
+[1] http://www.rsnapshot.org
+[2] http://www.mmonit.com

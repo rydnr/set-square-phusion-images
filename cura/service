@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec cura 2>&1

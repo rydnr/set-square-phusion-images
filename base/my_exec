@@ -1,8 +1,11 @@
 #!/bin/bash
 
-function run_help() {
-  /usr/local/bin/help
-}
+if [ ! -e /README ]; then
+    echo "Error: This image should include a README file."
+    exit 1
+fi
+
+source /etc/my_exec.d/*
 
 trap 'run_help' ERR
 

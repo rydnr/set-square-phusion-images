@@ -1,4 +1,16 @@
 Base image for applications running within a JVM.
 
-If you're interested, you can run me with
-docker run -it --link loghost:logger ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+It also injects Logstash and enables it by default,
+but it can be disabled just by running
+the image with the environment variable ENABLE_LOGSTASH=false
+
+Examples:
+
+- To run and take a look:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+
+- If there's a loghost already accepting input logs:
+> docker run -it --link [loghost]:logger ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+
+- To disable Logstash (in children images as well):
+> docker run -it -e ENABLE_LOGSTASH=false ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash

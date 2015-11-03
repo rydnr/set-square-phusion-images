@@ -1,19 +1,24 @@
 # ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
 FROM ${BASE_IMAGE}:${TAG}
-
 MAINTAINER ${MAINTAINER}
-
-ENV DISPLAY :0
 
 ENV ENABLE_CRON false
 ENV ENABLE_MONIT false
 ENV ENABLE_RSNAPSHOT false
 
-RUN ${APTGET_INSTALL} x11-apps
+COPY service /etc/rc.local
+COPY service.inc.sh /etc/rc.local.inc.sh
+
+RUN ${APTGET_INSTALL} mariadb-client && \
+    ${APTGET_CLEANUP} && \
+    chmod +x /etc/rc.local && \
+    chmod -x /etc/rc.local.inc.sh
 
 COPY README /README
 COPY Dockerfile /Dockerfiles/Dockerfile
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
+
+VOLUME /sql
 
 # For instructions on how to use this image, please run
 # docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help

@@ -1,4 +1,4 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${TIME})
+# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME})
 FROM ${ROOT_IMAGE}
 
 MAINTAINER ${MAINTAINER}
@@ -9,7 +9,8 @@ COPY dry-wit /usr/local/bin/
 COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
 COPY display-help.sh /usr/local/bin/help
-COPY README /README
+
+ENV ENABLE_MONIT false
 
 RUN chmod +x /usr/local/bin/dry-wit && \
     chmod +x /usr/local/bin/show && \
@@ -20,20 +21,22 @@ RUN chmod +x /usr/local/bin/dry-wit && \
     ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
     ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
+COPY README /README
 COPY Dockerfile /Dockerfiles/Dockerfile
+COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
 VOLUME ${DATA_VOLUMES}
 
-# Children should provide:
-# - README: to describe the image.
+# For instructions on how to use this image, please run
+# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
 #
-# And then add steps in their Dockerfile such as the following:
-# COPY README /README
-# RUN mkdir /etc/service/${REPO} && cp -r /etc/service/.template/* /etc/service/${REPO}
+# This image can be used as the basis for data-only containers.
+# Any child image must provide:
+# - /README: to describe the image.
 #
 # Additionaly, every Dockerfile should add its own Dockerfile to the /Dockerfiles
 # folder:
-# COPY Dockerfile /Dockerfiles/${DOLLAR}{NAMESPACE}-${DOLLAR}{REPO}.${DOLLAR}{TAG}
+# COPY Dockerfile /Dockerfiles/Dockerfile
+# COPY Dockerfile /Dockerfiles/${DOLLAR}{NAMESPACE}-${DOLLAR}{IMAGE}.${DOLLAR}{TAG}
 #
 # And last, adding comments on how to run the image is very helpful.

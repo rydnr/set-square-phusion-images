@@ -1,0 +1,26 @@
+This image runs Artifactory ${ARTIFACTORY_VERSION}
+within a Tomcat instance.
+
+You can customize how Artifactory logs are processed
+by providing a Logstash config file (overriding
+/etc/logstash/conf.d/tomcat.conf)
+
+Examples:
+
+- Running an instance:
+> docker run -d -p [port]:8080 ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Running Artifactory with specific Logstash configuration:
+> docker run -d -p [port]:8080 -v [my-logstash-config]:/etc/logstash/conf.d/tomcat.conf ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Running Artifactory disabling Logstash altogether:
+> docker run .. -e ENABLE_LOGSTASH=false ..
+
+- Running Artifactory disabling Monit checks:
+> docker run .. -e ENABLE_MONIT=false ..
+
+- Running Artifactory disabling cron jobs:
+> docker run .. -e ENABLE_CRON=false ..
+
+- Running Artifactory disabling backup for Artifactory configuration:
+> docker run .. -e ENABLE_RSNAPSHOT=false ..

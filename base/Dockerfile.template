@@ -5,6 +5,11 @@ MAINTAINER ${MAINTAINER}
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
+ENV ENABLE_CRON true
+ENV ENABLE_MONIT true
+ENV ENABLE_RSNAPSHOT true
+ENV ENABLE_SSH false
+ENV ENABLE_SYSLOG true
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
      /usr/local/bin/
@@ -17,13 +22,13 @@ COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
 COPY display-help.sh /usr/local/bin/help
 COPY my_exec /sbin/my_exec
-COPY README /README
 COPY rsnapshot.daily /etc/cron.daily/rsnapshot.daily
 COPY rsnapshot.weekly /etc/cron.weekly/rsnapshot.weekly
 COPY rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
 COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
 
-RUN mkdir -p /etc/service/.template/log && \
+RUN mkdir -p /etc/my_exec.d && \
+    mkdir -p /etc/service/.template/log && \
     mkdir -p /etc/service/monit/log && \
     mkdir -p /etc/service/cron/log && \
     touch /var/local/docker-installed-packages.txt && \
@@ -41,6 +46,12 @@ RUN mkdir -p /etc/service/.template/log && \
     chmod +x /etc/cron.daily/rsnapshot.daily && \
     chmod +x /etc/cron.weekly/rsnapshot.weekly && \
     chmod +x /etc/cron.monthly/rsnapshot.monthly    
+
+COPY my_exec.cron /etc/my_exec.d/cron
+COPY my_exec.monit /etc/my_exec.d/monit
+COPY my_exec.rsnapshot /etc/my_exec.d/rsnapshot
+COPY my_exec.ssh /etc/my_exec.d/ssh
+COPY my_exec.syslog /etc/my_exec.d/syslog
 
 COPY logger /etc/service/.template/log/run
 COPY service.cron /etc/service/cron/run
@@ -72,23 +83,29 @@ CMD ["/sbin/my_init"]
 COPY monit-syslog.conf /etc/monit/conf.d/syslog.conf
 COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
+COPY README /README
+COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 COPY Dockerfile /Dockerfiles/Dockerfile
 COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 
-# Children should provide:
+# For instructions on how to use this image, please run
+# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
+
+# Children must provide:
 # - README: to describe the image.
+
+# Children should provide:
 # - service: to run the process (letting runit handling forking it).
-# - monit.conf: how to monitor the process.
+# - monit.conf: how to monitor the process (or disable monit via declaring ENABLE_MONIT=false).
 # - backup.sh: a custom backup script, if necessary.
 #
 # And then add steps in their Dockerfile such as the following:
 # COPY README /README
-# RUN mkdir /etc/service/${REPO} && cp -r /etc/service/.template/* /etc/service/${REPO}
-# COPY service /etc/service/${REPO}/run
-# RUN chmod +x /etc/service/${REPO}/run
-# COPY monit.conf /etc/monit/monitrc.d/${DOLLAR}{REPO}.conf
-# COPY backup.sh /usr/local/bin/backup-${DOLLAR}{NAMESPACE}-${DOLLAR}{REPO}_${DOLLAR}{TAG}.sh
+# RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+# COPY service /etc/service/${IMAGE}/run
+# RUN chmod +x /etc/service/${IMAGE}/run
+# COPY monit.conf /etc/monit/monitrc.d/${DOLLAR}{IMAGE}.conf
+# COPY backup.sh /usr/local/bin/backup-${DOLLAR}{NAMESPACE}-${DOLLAR}{IMAGE}_${DOLLAR}{TAG}.sh
 
 # If the process is itself a daemon which cannot be run in foreground,
 # then provide a LSB-like script and call it from within /etc/rc.local:
@@ -100,6 +117,6 @@ COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 #
 # Additionaly, every Dockerfile should add its own Dockerfile to the /Dockerfiles
 # folder:
-# COPY Dockerfile /Dockerfiles/${DOLLAR}{NAMESPACE}-${DOLLAR}{REPO}.${DOLLAR}{TAG}
+# COPY Dockerfile /Dockerfiles/${DOLLAR}{NAMESPACE}-${DOLLAR}{IMAGE}.${DOLLAR}{TAG}
 #
 # And last, adding comments on how to run the image is very helpful.

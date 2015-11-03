@@ -14,7 +14,6 @@ the rsnapshot configuration, for auto-configuring backup.
 
 Common flags:
     * -h | --help: Display this message.
-    * -X:e | --X:eval-defaults: whether to eval all default values, which potentially slows down the script unnecessarily.
     * -v: Increase the verbosity.
     * -vv: Increase the verbosity further.
     * -q | --quiet: Be silent.
@@ -46,7 +45,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
+      -h | --help | -v | -vv | -q)
          shift;
          ;;
       *) logDebugResult FAILURE "failed";
@@ -70,7 +69,7 @@ function parseInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
+      -h | --help | -v | -vv | -q)
          shift;
          ;;
     esac

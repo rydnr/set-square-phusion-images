@@ -1,22 +1,20 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
-FROM ${BASE_IMAGE}:${TAG}
+# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+FROM ${NAMESPACE}/apache:${TAG}
 MAINTAINER ${MAINTAINER}
 
-COPY rc.local /etc/rc.local
+COPY enable-local-modules.sh /etc/my_init.d/50_enable_apache_extra_modules.sh
 COPY watch_module_changes.sh /usr/local/bin/watch_module_changes.sh
 
-RUN \
-  DEBIAN_FRONTEND=noninteractive \
-  apt-get install -y apache2 apache2-dev apache2-utils libtool && \
-  mkdir /usr/local/lib/apache2 && \
-  chmod +x /etc/rc.local /usr/local/bin/watch_module_changes.sh
+RUN ${APTGET_INSTALL} apache2-dev apache2-utils libtool && \
+    mkdir /usr/local/lib/apache2 && \
+    chmod +x /usr/local/bin/watch_module_changes.sh && \
+    chmod +x /etc/my_init.d/50_enable_apache_extra_modules.sh
 
 VOLUME ["/var/www", "/usr/local/lib/apache2"]
 
-EXPOSE 80
+COPY README /README
+COPY Dockerfile /Dockerfiles/Dockerfile
+COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
-
-# Run with
-# cd [apache-module-workdir];
-# docker run -d -p [port]:80 -v $PWD:/usr/local/lib/apache2 ${NAMESPACE}/${REPO}-${STACK}
+# For instructions on how to use this image, please run
+# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help

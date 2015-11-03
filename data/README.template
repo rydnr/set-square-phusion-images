@@ -1,6 +1,16 @@
-This image is only meant to be used to isolate other images
-from phusion-baseimage changes, and to provide a common
-style when writing Dockerfiles.
+This image is only meant to be used to use data-only containers.
+It doesn't need to run anything when launched. It's useful
+since it provides some persistent volumes other containers
+can rely upon.
 
-If you're interested, you can run me with
-docker run -it --link loghost:logger ${NAMESPACE}/${REPO}:${TAG} /bin/bash
+It also provides some limited capabilities for performing
+remote backups of the volumes, using rsnapshot. That can
+be customized or even disabled.
+
+Examples:
+- Run this image with default values.
+> docker run --name data ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run this image only to hold persistence volumes,
+but no remote backup is required.
+> docker run --name data -e ENABLE_RSNAPSHOT=false ${NAMESPACE}/${IMAGE}:${TAG}

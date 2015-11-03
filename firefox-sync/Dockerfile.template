@@ -2,19 +2,24 @@
 FROM ${BASE_IMAGE}:${TAG}
 MAINTAINER ${MAINTAINER}
 
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+COPY service /etc/service/${IMAGE}/run
+#COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
 COPY syncserver.ini /usr/local/src/syncserver/syncserver.ini.tpl
-COPY setup.sql /usr/local/src/setup.sql.tpl
-COPY rc.local /etc/rc.local
 
 # From https://docs.services.mozilla.com/howtos/run-sync-1.5.html
 # RUN add-apt-repository ppa:kernel-ppa/ppa
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python-dev git-core python-virtualenv mariadb-client && \
+RUN ${APTGET_INSTALL} python-dev git-core python-virtualenv mariadb-client && \
     cd /usr/local/src && git clone https://github.com/mozilla-services/syncserver && cd syncserver && make build && \
-    chmod +x /etc/rc.local
+    ${APTGET_CLEANUP} && \
+    chmod +x /etc/service/${IMAGE}/run
 
 EXPOSE 5000
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
+COPY README /README
+COPY Dockerfile /Dockerfiles/Dockerfile
+COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
-# Run with
-# docker run -d -p [port]:5000 ${NAMESPACE}/${REPO}-${STACK}
+# For instructions on how to use this image, please run
+# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help

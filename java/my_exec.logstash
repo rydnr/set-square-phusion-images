@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ "${ENABLE_LOGSTASH}" -ne "true" ]; then
+  echo "Disabling Logstash"
+  chmod -x /etc/service/.template/log/run > /dev/null 2>&1
+  chmod -x /etc/service/*/log/run  > /dev/null 2>&1
+fi

@@ -1,13 +1,10 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
-FROM ${BASE_IMAGE}:${TAG}
-
-MAINTAINER ${MAINTAINER}
+# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+FROM ${NAMESPACE}/java:${TAG}
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-COPY help /usr/local/bin/help
 
 RUN groupadd ${TOMCAT_GROUP} && \
     /usr/sbin/useradd -d ${TOMCAT_HOME} -g ${TOMCAT_GROUP} -G ${TOMCAT_GROUP} -s /bin/bash -c "Apache Tomcat user" ${TOMCAT_USER} && \
@@ -27,15 +24,15 @@ RUN groupadd ${TOMCAT_GROUP} && \
     cd /usr/local/src && wget -O ${TOMCAT_NATIVE_FILE} ${TOMCAT_NATIVE_DOWNLOAD_URL} && \
     tar xvfz ${TOMCAT_NATIVE_FILE} && cd ${TOMCAT_NATIVE_FOLDER}/jni/native && \
     ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java && make && make install && \
-    ${APTGET_CLEANUP} && \
-    chmod +x /usr/local/bin/help
+    ${APTGET_CLEANUP}
 
 COPY setenv.sh ${TOMCAT_HOME}/bin/setenv.sh
 
 EXPOSE 8080
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
+COPY README /README
 COPY Dockerfile /Dockerfiles/Dockerfile
+COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
-# Run with
-# docker run -d -p [port]:8080 ${NAMESPACE}/${IMAGE}${STACK_SUFFIX}:${TAG}
+# For instructions on how to use this image, please run
+# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help

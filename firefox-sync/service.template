@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd /usr/local/src/syncserver/
+mv syncserver.ini syncserver.ini.master
+db_port="${DB_PORT#tcp://}";
+db="${db_port%:*}";
+ip="$(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}')";
+sed "s ___DB___ ${db_port} g" syncserver.ini.tpl > syncserver.ini
+
+exec local/bin/pserve syncserver.ini

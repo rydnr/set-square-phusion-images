@@ -1,0 +1,12 @@
+This image runs a Firefox Sync server,
+using a MariaDB/MySQL database.
+
+Keep in mind that it requires a database
+and a database user to connect with.
+It doesn't do it by itself.
+
+The recommended approach is to use
+the following images:
+
+- ${NAMESPACE}/mariadb-bootstrap
+- ${NAMESPACE}/liquibase-mariadb

@@ -1,4 +1,13 @@
-This image runs MariaDB.
+This image runs MariaDB with minimal configuration,
+after removing unneeded objects and applying some safe practices.
 
-You can run this image with
-docker run -d --name mariadb ${NAMESPACE}/${REPO}
+Examples:
+
+- Run a MariaDB stand-alone instance:
+> docker run -d --name db ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MariaDB instance, to be used outside Docker containers:
+> docker run -d -p [port]:3306 ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MariaDB instance with specific configuration:
+> docker run -d --name db -v [my-db-conf]:/etc/mysql/my.cnf ${NAMESPACE}/${IMAGE}:${TAG}
