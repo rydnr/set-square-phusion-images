@@ -87,8 +87,8 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 COPY README /README
 COPY ${LICENSE_FILE} /LICENSE
 COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 COPY Dockerfile /Dockerfiles/Dockerfile
+COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
 # For instructions on how to use this image, please run
 # docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help

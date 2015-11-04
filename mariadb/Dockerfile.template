@@ -19,16 +19,21 @@ RUN ${APTGET_INSTALL} mariadb-server && \
     rm -f /etc/init.d/mysql && \
     mkdir /var/lib/mysql-sql && \
     chown -R mysql:mysql /var/lib/mysql /var/lib/mysql-sql && \
-    chmod +x /etc/service/${IMAGE}/run
+    chmod +x /etc/service/${IMAGE}/run && \
+    chmod +x /usr/local/bin/bootstrap-db.sh
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
 EXPOSE 3306
 
 COPY README /README
+COPY ${LICENSE_FILE} /LICENSE
+COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 COPY Dockerfile /Dockerfiles/Dockerfile
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
 VOLUME /var/lib/mysql
 VOLUME /var/lib/mysql-sql
 
+# For instructions on how to use this image, please run
+# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help

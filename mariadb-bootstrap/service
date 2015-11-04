@@ -78,7 +78,7 @@ function parseInput() {
   done
 
   if [[ -z ${DB_USER} ]]; then
-    DB_USER="{DEFAULT_DB_USER}";
+    DB_USER="${DEFAULT_DB_USER}";
   fi
   
   # Parameters
