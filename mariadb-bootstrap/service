@@ -187,7 +187,7 @@ function process_sql_file() {
     /usr/bin/mysql -h ${DB_HOST} -u ${DB_USER} --password="${DB_PASSWORD}" < ${_file} 2>&1 > ${_logFile}
   fi
   if [ $? -eq 0 ]; then
-    if ! mark_file_as_processed "${_file}"; then
+    if ! mark_sql_file_as_processed "${_file}"; then
       logInfoResult SUCCESS "warning";
       logInfo "Cannot mark ${_file} as processed";
     else
