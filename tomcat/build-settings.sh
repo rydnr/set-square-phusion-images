@@ -47,3 +47,9 @@ defineEnvVar TOMCAT_NATIVE_FILE \
 defineEnvVar TOMCAT_NATIVE_DOWNLOAD_URL \
              "The url to download Tomcat Native" \
              'http://www.us.apache.org/dist/tomcat/tomcat-connectors/native/${TOMCAT_NATIVE_VERSION}/source/${TOMCAT_NATIVE_FILE}';
+defineEnvVar LICENSE_FILE \
+             "The file with the license details" \
+             'LICENSE.gpl3';
+defineEnvVar COPYRIGHT_PREAMBLE_FILE \
+             "The file with the copyright preamble" \
+             'copyright-preamble.default.txt';

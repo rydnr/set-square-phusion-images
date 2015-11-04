@@ -2,8 +2,6 @@
 
 if    [ "${ENABLE_MONIT}" == "false" ] \
    || [ -z "${DISABLE_ALL}" ]; then
-  echo "monit disabled"
-  chmod -x /etc/my_init.d/*monit*.sh > /dev/null 2>&1
-  chmod -x /etc/service/monit/run > /dev/null 2>&1
-  chmod -x /etc/my_init.d/*monit* > /dev/null 2>&1
+  rm -rf /etc/service/monit > /dev/null 2>&1
+  rm -f /etc/my_init.d/*monit*.sh > /dev/null 2>&1
 fi

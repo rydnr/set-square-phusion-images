@@ -2,7 +2,6 @@
 
 if    [ "${ENABLE_RSNAPSHOT}" == "false" ] \
    || [ -z "${DISABLE_ALL}" ]; then
-  echo "rsnapshot disabled";
-  chmod -x /etc/cron.*/rsnapshot* > /dev/null 2>&1
-  chmod -x /etc/my_init.d/*rsnapshot* > /dev/null 2>&1
+  rm -f /etc/cron.*/rsnapshot* > /dev/null 2>&1
+  rm -f /etc/my_init.d/*rsnapshot* > /dev/null 2>&1
 fi

@@ -5,7 +5,9 @@ if [ ! -e /README ]; then
     exit 1
 fi
 
-source /etc/my_exec.d/*
+for s in /etc/my_exec.d/*; do
+    source $s
+done
 
 trap 'run_help' ERR
 

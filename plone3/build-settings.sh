@@ -12,3 +12,9 @@ defineEnvVar PLONE3_DOWNLOAD_URL \
 defineEnvVar PLONE3_HOME \
              "The home directory of the Plone installation" \
              '/opt/${PLONE3_FOLDER}';
+defineEnvVar LICENSE_FILE \
+             "The file with the license details" \
+             'LICENSE.gpl3';
+defineEnvVar COPYRIGHT_PREAMBLE_FILE \
+             "The file with the copyright preamble" \
+             'copyright-preamble.default.txt';

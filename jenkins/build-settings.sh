@@ -30,3 +30,9 @@ defineEnvVar JENKINS_MAVEN_FILE \
 defineEnvVar JENKINS_MAVEN_DOWNLOAD_URL \
              "The url to download Maven" \
              'https://www.eu.apache.org/dist/maven/maven-3/${JENKINS_MAVEN_VERSION}/binaries/${JENKINS_MAVEN_FILE}';
+defineEnvVar LICENSE_FILE \
+             "The file with the license details" \
+             'LICENSE.gpl3';
+defineEnvVar COPYRIGHT_PREAMBLE_FILE \
+             "The file with the copyright preamble" \
+             'copyright-preamble.default.txt';

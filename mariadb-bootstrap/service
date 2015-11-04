@@ -36,12 +36,14 @@ function defineErrors() {
   export AWK_NOT_INSTALLED="awk is not installed";
   export NO_DB_USER_SPECIFIED="The database user cannot be empty";
   export NO_SQL_FOLDER_SPECIFIED="The SQL folder is mandatory";
+  export NO_SQL_FILES_FOUND="No SQL files found in ${SQL_FOLDER}";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
     AWK_NOT_INSTALLED \
     NO_DB_USER_SPECIFIED \
     NO_SQL_FOLDER_SPECIFIED \
+    NO_SQL_FILES_FOUND \
   );
 
   export ERROR_MESSAGES;
@@ -201,10 +203,15 @@ function process_sql_file() {
 ## dry-wit hook
 function main() {
   local _sqlFiles;
+  local _atLeastOneFile=1;
   find_sql_files "${SQL_FOLDER}";
   _sqlFiles="${RESULT}";
   for _file in ${_sqlFiles}; do
-    process_file "${_file}";
+    _atLeastOneFile=0;
+    process_sql_file "${SQL_FOLDER}/${_file}";
   done
+  if [ ${_atLeastOneFile} -ne 0 ]; then
+    exitWithErrorCode NO_SQL_FILES_FOUND;
+  fi
 }
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

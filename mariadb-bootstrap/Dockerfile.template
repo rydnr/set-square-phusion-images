@@ -5,18 +5,24 @@ MAINTAINER ${MAINTAINER}
 ENV ENABLE_CRON false
 ENV ENABLE_MONIT false
 ENV ENABLE_RSNAPSHOT false
+ENV ENABLE_SYSLOG false
 
-COPY service /etc/rc.local
-COPY service.inc.sh /etc/rc.local.inc.sh
+COPY my_exec /sbin/my_exec
+
+COPY service /usr/local/bin/${IMAGE}
+COPY service.inc.sh /usr/local/bin/${IMAGE}.inc.sh
 
 RUN ${APTGET_INSTALL} mariadb-client && \
     ${APTGET_CLEANUP} && \
-    chmod +x /etc/rc.local && \
-    chmod -x /etc/rc.local.inc.sh
+    chmod +x /sbin/my_exec && \
+    chmod +x /usr/local/bin/${IMAGE} && \
+    chmod -x /usr/local/bin/${IMAGE}.inc.sh
 
 COPY README /README
+COPY ${LICENSE_FILE} /LICENSE
 COPY Dockerfile /Dockerfiles/Dockerfile
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
+COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 
 VOLUME /sql
 

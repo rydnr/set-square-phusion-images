@@ -48,6 +48,7 @@ RUN mkdir -p /etc/my_exec.d && \
     chmod +x /etc/cron.monthly/rsnapshot.monthly    
 
 COPY my_exec.cron /etc/my_exec.d/cron
+COPY my_exec.help /etc/my_exec.d/help
 COPY my_exec.monit /etc/my_exec.d/monit
 COPY my_exec.rsnapshot /etc/my_exec.d/rsnapshot
 COPY my_exec.ssh /etc/my_exec.d/ssh
@@ -84,15 +85,19 @@ COPY monit-syslog.conf /etc/monit/conf.d/syslog.conf
 COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 
 COPY README /README
+COPY ${LICENSE_FILE} /LICENSE
+COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 COPY Dockerfile /Dockerfiles/Dockerfile
-COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 
 # For instructions on how to use this image, please run
 # docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
 
 # Children must provide:
-# - README: to describe the image.
+# - /README: to describe the image.
+# - /LICENSE: rights and restrictions on how to use, inspect, modify and distribute this image.
+# - /Dockerfiles/copyright-preamble.txt: A short summary of the license. It's included, as well
+#   as the README, when displaying the help to the user.
 
 # Children should provide:
 # - service: to run the process (letting runit handling forking it).
