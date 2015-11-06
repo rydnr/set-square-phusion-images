@@ -33,7 +33,6 @@ COPY Dockerfile /Dockerfiles/Dockerfile
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
 VOLUME /var/lib/mysql
-VOLUME /var/lib/mysql-sql
 
 # For instructions on how to use this image, please run
 # docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
