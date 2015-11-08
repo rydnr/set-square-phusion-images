@@ -40,6 +40,7 @@ mariadb-bootstrap/my_exec
 postgresql/bootstrap-db
 postgresql/process-sqls.sh
 postgresql/setup.sql
+postgresql-bootstrap/my_exec
 sdkman/setup.sql
 tomcat/entrypoint.sh
 tt-rss/apache-vhost.conf
@@ -49,3 +50,6 @@ tt-rss/create-ttrss-database.sql
 tt-rss/create-ttrss-user.sql
 tt-rss/setup.sql
 firefox-sync/rc.local
+*/LICENSE.*
+*/copyright-preamble.*
+.build.inc.sh*
