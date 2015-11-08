@@ -14,7 +14,7 @@ base/10_append_backup_to_etc_hosts.inc.sh
 base/20_create_rsnapshot_conf.inc.sh
 base/logger
 base/remote-rsyslogd.conf
-.firefox-sync/rc.local
+firefox-sync/rc.local
 firefox-sync/service
 firefox-sync/setup.sql
 firefox-sync/syncserver.ini
@@ -40,6 +40,7 @@ mariadb-bootstrap/my_exec
 postgresql/bootstrap-db
 postgresql/process-sqls.sh
 postgresql/setup.sql
+postgresql-bootstrap/my_exec
 sdkman/setup.sql
 tomcat/entrypoint.sh
 tt-rss/apache-vhost.conf
@@ -48,4 +49,3 @@ tt-rss/create-db.inc.sh
 tt-rss/create-ttrss-database.sql
 tt-rss/create-ttrss-user.sql
 tt-rss/setup.sql
-firefox-sync/rc.local
