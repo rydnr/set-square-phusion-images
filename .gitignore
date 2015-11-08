@@ -14,7 +14,7 @@ base/10_append_backup_to_etc_hosts.inc.sh
 base/20_create_rsnapshot_conf.inc.sh
 base/logger
 base/remote-rsyslogd.conf
-.firefox-sync/rc.local
+firefox-sync/rc.local
 firefox-sync/service
 firefox-sync/setup.sql
 firefox-sync/syncserver.ini
