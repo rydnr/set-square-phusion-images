@@ -185,14 +185,10 @@ function replace_placeholders() {
   local _rescode;
   createTempFile;
   local _output="${RESULT}";
-  local _env="$(env)";
+  local _env="$(IFS=" \t" env | awk -F'=' '{printf("%s=\"%s\" ", $1, $2);}')";
+  local _envsubstDecl=$(echo -n "'"; IFS=" \t" env | cut -d'=' -f 1 | awk '{printf("${%s} ", $0);}'; echo -n "'";);
 
-  local _envsubstDecl=$(echo -n "'"; echo -n "$"; echo -n "{TAG} $"; echo -n "{DATE} $"; echo -n "{AUTHOR} $"; echo -n "{AUTHOR_EMAIL} $"; echo -n "{IMAGE} $"; echo -n "{DOLLAR}"; echo ${ENV_VARIABLES[*]} | tr ' ' '\n' | awk '{printf("${%s} ", $0);}'; echo -n "'";);
-
-  echo "${_env} \
-        envsubst \
-          ${_envsubstDecl} \
-      < ${_file} > ${_output}" | sh 2> /dev/null;
+  echo "${_env} envsubst ${_envsubstDecl} < ${_file} > ${_output}" | sh;
   _rescode=$?;
   export RESULT="${_output}";
   return ${_rescode};
@@ -202,7 +198,7 @@ function replace_placeholders() {
 ## -> 1: The SQL file to process.
 ## <- 0 if the file is processed, 1 otherwise.
 ## Example:
-##   if process_sql_file /tmp/my.dll; then echo "Done"; else echo "Failed"; fi
+##   if process_sql_file /tmp/my.sql; then echo "Done"; else echo "Failed"; fi
 function process_sql_file() {
   local _file="${1}";
   local _inputFile;
@@ -221,7 +217,7 @@ function process_sql_file() {
     PGPASSWORD="${DB_PASSWORD}" /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} 2>&1
   fi
   if [ $? -eq 0 ]; then
-    if ! mark_file_as_processed "${_file}"; then
+    if ! mark_sql_file_as_processed "$(dirname "${_file}")" "$(basename "${_file}")"; then
       logInfoResult SUCCESS "warning";
       logInfo "Cannot mark ${_file} as processed";
     else

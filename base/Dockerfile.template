@@ -5,11 +5,12 @@ MAINTAINER ${MAINTAINER}
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
-ENV ENABLE_CRON true
-ENV ENABLE_MONIT true
-ENV ENABLE_RSNAPSHOT true
-ENV ENABLE_SSH false
-ENV ENABLE_SYSLOG true
+
+ENV ENABLE_CRON ${ENABLE_CRON}
+ENV ENABLE_MONIT ${ENABLE_MONIT}
+ENV ENABLE_RSNAPSHOT ${ENABLE_RSNAPSHOT}
+ENV ENABLE_SSH false ${ENABLE_SSH}
+ENV ENABLE_SYSLOG true ${ENABLE_SYSLOG}
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
      /usr/local/bin/

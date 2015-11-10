@@ -1,8 +1,8 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME})
 FROM ${BASE_IMAGE}:${TAG}
 MAINTAINER ${MAINTAINER}
 
-ENV ENABLE_LOGSTASH true
+ENV ENABLE_LOGSTASH ${ENABLE_LOGSTASH}
 
 COPY logstash /etc/service/.template/log/run
 COPY logstash-cron.sh /etc/service/cron/log/run
@@ -27,6 +27,8 @@ COPY my_exec.logstash /etc/my_exec.d/logstash
 COPY logstash-cron.conf /etc/logstash/conf.d/cron.conf
 
 COPY README /README
+COPY ${LICENSE_FILE} /LICENSE
+COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 COPY Dockerfile /Dockerfiles/Dockerfile
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 

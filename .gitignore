@@ -39,6 +39,7 @@ mariadb/watch-ddls
 mariadb-bootstrap/my_exec
 postgresql/bootstrap-db
 postgresql/process-sqls.sh
+postgresql/service
 postgresql/setup.sql
 postgresql-bootstrap/my_exec
 sdkman/setup.sql
