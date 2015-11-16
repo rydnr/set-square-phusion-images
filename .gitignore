@@ -54,3 +54,4 @@ firefox-sync/rc.local
 */LICENSE.*
 */copyright-preamble.*
 .build.inc.sh*
+.templates/maintainer

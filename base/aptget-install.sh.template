@@ -4,10 +4,9 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME [-np|--no-pin] package [package]*
+$SCRIPT_NAME [-nu|--no-update] [-np|--no-pin] package [package]*
 $SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
+@include("${COPYRIGHT_PREAMBLE_FILE}")
 
 Installs packages via apt-get, so that their impact in the
 overall image size is better. It requires the Dockerfile to install
@@ -16,10 +15,10 @@ to remove unnecessary dependencies.
 
 Where:
   * package: the package(s) to install.
+  * -nu | --no-update: Do not update the system.
   * -np | --no-pin: Do not pin the package.
 Common flags:
     * -h | --help: Display this message.
-    * -X:e | --X:eval-defaults: whether to eval all default values, which potentially slows down the script unnecessarily.
     * -v: Increase the verbosity.
     * -vv: Increase the verbosity further.
     * -q | --quiet: Be silent.
@@ -70,7 +69,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults | -np | --no-pin)
+      -h | --help | -v | -vv | -q | -nu | --no-update | -np | --no-pin)
          shift;
          ;;
       *) logDebugResult FAILURE "failed";
@@ -84,7 +83,7 @@ function checkInput() {
     exitWithErrorCode NO_PACKAGES_SPECIFIED;
   else
     logDebugResult SUCCESS "valid";
-  fi 
+  fi
 }
 
 ## Parses the input.
@@ -99,32 +98,42 @@ function parseInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
+      -h | --help | -v | -vv | -q )
         shift;
         ;;
-      -np | --no-pin)
-        export NO_PIN=0;
+      -nu | --no-update)
+        export NO_UPDATE=0;
         shift
         ;;
+      -np | --no-pin)
+          export NO_PIN=0;
+          shift
+          ;;
     esac
   done
 
   if [[ -z ${PACKAGES} ]]; then
     PACKAGES="$@";
-  fi  
+  fi
 }
 
 ## Updates the system via apt-get update
+## <- 0 if the system gets updated; 1 otherwise.
 ## Example:
-##   update_system
+##   if ! update_system; then
+##     echo "Error updating system"
+##   fi
 function update_system() {
+  local _rescode;
   logInfo -n "Updating system (this can take some time)";
   ${APTGET_UPDATE} > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  _rescode=$?;
+  if [ ${_rescode} -eq 0 ]; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
   fi
+  return ${_rescode};
 }
 
 ## Checks the ${INSTALLED_PACKAGES_FILE} is writeable
@@ -185,15 +194,17 @@ function pin_package() {
     exitWithErrorCode ERROR_PINNING_PACKAGE "${_package}";
   fi
 }
-    
+
 ## Main logic
 ## dry-wit hook
 function main() {
   local _package;
-  update_system;
+  if [ "${NO_UPDATE}" != "0" ]; then
+    update_system;
+  fi
 
   check_packages_file_writeable;
-  
+
   for _package in ${PACKAGES}; do
     install_package "${_package}";
     if ! no_pin_enabled; then

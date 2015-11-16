@@ -1,7 +1,7 @@
 # ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME})
 FROM ${ROOT_IMAGE}
 
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
@@ -9,8 +9,8 @@ ENV TERM linux
 ENV ENABLE_CRON ${ENABLE_CRON}
 ENV ENABLE_MONIT ${ENABLE_MONIT}
 ENV ENABLE_RSNAPSHOT ${ENABLE_RSNAPSHOT}
-ENV ENABLE_SSH false ${ENABLE_SSH}
-ENV ENABLE_SYSLOG true ${ENABLE_SYSLOG}
+ENV ENABLE_SSH ${ENABLE_SSH}
+ENV ENABLE_SYSLOG ${ENABLE_SYSLOG}
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
      /usr/local/bin/
@@ -61,22 +61,24 @@ COPY service.monit /etc/service/monit/run
 
 RUN mkdir /Dockerfiles && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    ${APTGET_INSTALL} wget rsnapshot monit mailutils gettext && \
+    ${APTGET_INSTALL} wget mailutils gettext && \
+    ([ "${ENABLE_MONIT}" == "true" ] && ${APTGET_INSTALL} --no-update monit) && \
+    ([ "${ENABLE_RSNAPSHOT}" == "true" ] && ${APTGET_INSTALL} --no-update rsnapshot) && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
     chmod +x /etc/service/.template/log/run && \
-    cp /etc/service/.template/log/run /etc/service/cron/log/run && \
-    cp /etc/service/.template/log/run /etc/service/monit/log/run && \
-    chmod +x /etc/service/cron/run  && \
-    chmod +x /etc/service/monit/run  && \
-    chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show && \    
+    chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show && \
     ln -s -- /usr/local/bin/help /usr/local/bin/-h && \
     ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
     ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile && \
-    sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
-    sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
-    sed -i 's|^#ssh_args.*|ssh_args\t-i /etc/ssh/ssh_host_dsa_key|g' /etc/rsnapshot.conf && \
-    sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc && \
+    ([ "${ENABLE_CRON}" == "true" ] && cp /etc/service/.template/log/run /etc/service/cron/log/run) && \
+    ([ "${ENABLE_CRON}" == "true" ] && chmod +x /etc/service/cron/run) && \
+    ([ "${ENABLE_MONIT}" == "true" ] && cp /etc/service/.template/log/run /etc/service/monit/log/run) && \
+    ([ "${ENABLE_MONIT}" == "true" ] && chmod +x /etc/service/monit/run) && \
+    ([ "${ENABLE_MONIT}" == "true" ] && sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc) && \
+    ([ "${ENABLE_RSNAPSHOT}" == "true" ] && sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf) && \
+    ([ "${ENABLE_RSNAPSHOT}" == "true" ] && sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf) && \
+    ([ "${ENABLE_RSNAPSHOT}" == "true" ] && sed -i 's|^#ssh_args.*|ssh_args\t-i /etc/ssh/ssh_host_dsa_key|g' /etc/rsnapshot.conf) && \
     ${APTGET_CLEANUP}
 
 ENTRYPOINT ["/sbin/my_exec"]
