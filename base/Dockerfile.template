@@ -1,4 +1,4 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME})
+@include("preamble")
 FROM ${ROOT_IMAGE}
 
 @include("maintainer")
