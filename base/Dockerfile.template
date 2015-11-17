@@ -1,16 +1,11 @@
 @include("preamble")
 FROM ${ROOT_IMAGE}
-
 @include("maintainer")
 
 ENV DEBIAN_FRONTEND noninteractive
 ENV TERM linux
 
-ENV ENABLE_CRON ${ENABLE_CRON}
-ENV ENABLE_MONIT ${ENABLE_MONIT}
-ENV ENABLE_RSNAPSHOT ${ENABLE_RSNAPSHOT}
-ENV ENABLE_SSH ${ENABLE_SSH}
-ENV ENABLE_SYSLOG ${ENABLE_SYSLOG}
+@include("addon-toggles")
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
      /usr/local/bin/
@@ -87,14 +82,9 @@ CMD ["/sbin/my_init"]
 COPY monit-syslog.conf /etc/monit/conf.d/syslog.conf
 COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 
-COPY README /README
-COPY ${LICENSE_FILE} /LICENSE
-COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
+@include("copy-metadata")
 
-# For instructions on how to use this image, please run
-# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
+@include("instructions")
 
 # Children must provide:
 # - /README: to describe the image.
