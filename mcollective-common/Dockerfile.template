@@ -1,12 +1,15 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/java:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
-# From Learning MCollective
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y puppet-common puppet mcollective-common
+@include("addon-toggles")
+
+RUN ${APTGET_INSTALL} puppet-common puppet mcollective-common && \
+    ${APTGET_CLEANUP}
 
 COPY facts.sh /usr/local/bin/facts.sh
 RUN chmod +x /usr/local/bin/facts.sh
 COPY facts.cron /etc/cron.d/facts.sh
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
+@include("copy-metadata")
+@include("instructions")

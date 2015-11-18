@@ -1,18 +1,15 @@
-This image runs SQL scripts in a given MariaDB / MySQL server.
+This image runs SQL scripts in a given PostgreSQL server.
 
 It's useful to create database users, updating user permissions,
 create databases, etc.
 
 Examples:
 
-- Connect to [dbhost] server to run the SQL scripts located in a certain folder, using the
-"root" user, and no password.
+- Connect to [dbhost] server to run the SQL scripts located in a certain folder, using the "root" user, and no password.
 > docker run -it -v [my-sql-folder]:/sql --link [dbhost]:db ${NAMESPACE}/${IMAGE}:${TAG}
 
-- Connect to [dbhost] server to run the SQL scripts located in a certain folder, connecting with
-user and password.
+- Connect to [dbhost] server to run the SQL scripts located in a certain folder, connecting with user and password.
 > docker run -it -v [my-sql-folder]:/sql --link [dbhost]:db ${NAMESPACE}/${IMAGE}:${TAG} -u [dbuser] -p [password]
 
-- Run the image in interactive mode to manually connect to a server and perform
-custom operations or tuning:
+- Run the image in interactive mode to manually connect to a server and perform custom operations or tuning:
 > docker run -it --link [dbhost]:db --entrypoint=/bin/bash ${NAMESPACE}/${IMAGE}:${TAG}

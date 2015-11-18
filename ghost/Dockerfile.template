@@ -1,12 +1,12 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/nodejs:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-
-COPY README /README
 
 RUN ${APTGET_INSTALL} -np unzip && \
     mkdir -p /var/www/ghost && \
@@ -20,10 +20,7 @@ RUN ${APTGET_INSTALL} -np unzip && \
 
 COPY config.js /var/www/ghost/config.js
 
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
 EXPOSE 2368
 
-# Run with
-# docker run -d -p [host-port]:2368 ${NAMESPACE}/${IMAGE}:${TAG}
+@include("copy-metadata")
+@include("instructions")

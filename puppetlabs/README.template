@@ -1,0 +1,7 @@
+Minimal image that adds the Puppetlabs repository
+to the system.
+
+Examples:
+- Launch an interactive shell to perform some manual
+tests:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash

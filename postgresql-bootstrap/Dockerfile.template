@@ -1,11 +1,8 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
-ENV ENABLE_CRON false
-ENV ENABLE_MONIT false
-ENV ENABLE_RSNAPSHOT false
-ENV ENABLE_SYSLOG false
+@include("addon-toggles")
 
 COPY my_exec /sbin/my_exec
 
@@ -18,13 +15,7 @@ RUN ${APTGET_INSTALL} postgresql-client && \
     chmod +x /usr/local/bin/${IMAGE} && \
     chmod -x /usr/local/bin/${IMAGE}.inc.sh
 
-COPY README /README
-COPY ${LICENSE_FILE} /LICENSE
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
-
 VOLUME /sql
 
-# For instructions on how to use this image, please run
-# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
+@include("copy-metadata")
+@include("instructions")

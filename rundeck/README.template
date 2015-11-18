@@ -1,0 +1,5 @@
+Runs Rundeck as a Docker container.
+
+Examples:
+- Run Rundeck with default settings.
+> docker run -d -p [port]:8080 -e VIRTUAL_HOST=[r-vhost] ${NAMESPACE}/${IMAGE}:${TAG}

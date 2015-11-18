@@ -1,0 +1,6 @@
+This image is meant to be used as the basis
+for Flask-based applications.
+
+Examples:
+- Run this image to test your web app.
+> docker run -it -v [my-dev-folder]:/var/www -e TERM="${TERM} ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash

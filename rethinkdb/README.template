@@ -1,0 +1,9 @@
+Runs RethinkDB as a Docker container.
+
+Examples:
+- Run a RethinkDB instance with default settings:
+> docker run -d --name rdb -p [port]:8080 --name db ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run RethinkDB mapping its data to a host folder.
+> docker run -d --name rdb -p [port]:8080 -v [host-path]:/var/lib/rethinkdb ${NAMESPACE}/${IMAGE}:${TAG}
+

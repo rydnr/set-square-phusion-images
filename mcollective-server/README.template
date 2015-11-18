@@ -1,0 +1,5 @@
+This image runs MCollective Server as a Docker container.
+
+Examples:
+- TODO Run MCollective Server with default settings:
+> docker run -d ${NAMESPACE}/${IMAGE}:${TAG}

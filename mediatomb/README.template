@@ -1,0 +1,5 @@
+This image runs MediaTomb as a Docker container.
+
+Examples:
+- Run MediaTomb to serve content located in a host folder:
+> docker run -d -p [port]:49152 -v [host-folder]:/media -e VIRTUAL_HOST=[mt-vhost] ${NAMESPACE}/${IMAGE}:${TAG}

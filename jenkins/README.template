@@ -1,0 +1,8 @@
+This image runs Jenkins, expecting the configuration
+to be provided in a volume.
+
+Examples:
+- Run Jenkins whose configuration is located in
+a host folder:
+> docker run -d -p [port]:8080 -v [host-path]:/home/jenkins -e VIRTUAL_HOST=[my-jenkins-vhost] ${NAMESPACE}/${IMAGE}:${TAG}
+

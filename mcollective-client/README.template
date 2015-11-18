@@ -1,0 +1,5 @@
+Runs the MCollective Client with the help of Docker.
+
+Examples:
+- Run MCollective Client with default settings:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} [mc args]

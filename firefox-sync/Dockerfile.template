@@ -1,6 +1,8 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -17,9 +19,5 @@ RUN ${APTGET_INSTALL} python-dev git-core python-virtualenv mariadb-client && \
 
 EXPOSE 5000
 
-COPY README /README
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
-# For instructions on how to use this image, please run
-# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
+@include("copy-metadata")
+@include("instructions")

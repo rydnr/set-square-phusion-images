@@ -1,10 +1,12 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 COPY rc.local /etc/rc.local
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get -y install python2.7 git-core python-m2crypto && \
+RUN ${APTGET_INSTALL} install python2.7 git-core python-m2crypto && \
     mkdir /var/www && \
     cd /var/www && git clone https://github.com/learningequality/ka-lite.git && \
     cd ka-lite && scripts/runatboot.sh && \
@@ -14,8 +16,6 @@ VOLUME /var/www/ka-lite
 
 EXPOSE 8008
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
-
-# Run with
-# docker run -d -p [port]:8008 -v [host-path]:/var/www/ka-lite ${NAMESPACE}/${REPO}-${STACK}:${TAG}
+@include("copy-metadata")
+@include("instructions")
 

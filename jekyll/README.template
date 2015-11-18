@@ -1,0 +1,7 @@
+This image runs Jekyll to serve content provided
+externally.
+
+Examples:
+- Run Jekyll to serve content in a host folder:
+> docker run -d -p [port]:4000 -v [host-path]:/var/www/jekyll ${NAMESPACE}/${IMAGE}:${TAG}
+

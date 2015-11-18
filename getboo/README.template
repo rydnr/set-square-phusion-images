@@ -1,0 +1,8 @@
+This image runs GetBoo (to store bookmarks).
+
+It requires a MySQL/MariaDB server, which must
+be prepared beforehand.
+
+Examples:
+- Assuming the database is available as "db" container:
+> docker run -d --name getboo -e VIRTUAL_HOST=[my-virtual-host] --link db:db ${NAMESPACE}/${IMAGE}:${TAG}

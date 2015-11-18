@@ -1,15 +1,16 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
-RUN mkdir -p /etc/service/${REPO}
-COPY service /etc/service/${REPO}/run
+@include("addon-toggles")
 
-RUN apt-get -y update && \
-    apt-get install -y mediatomb && \
+RUN mkdir -p /etc/service/${IMAGE}
+COPY service /etc/service/${IMAGE}/run
+
+RUN ${APTGET_INSTALL} -y mediatomb && \
     cd /etc/mediatomb && \
     mv config.xml config.xml.official && \
-    chmod +x /etc/service/${REPO}/run
+    chmod +x /etc/service/${IMAGE}/run
 
 COPY config.xml /etc/mediatomb/config.xml
 
@@ -19,7 +20,5 @@ VOLUME /media
 
 EXPOSE 49152
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
-
-# Run with
-# docker run -d -p [port]:49152 -v [host-folder]:/media ${NAMESPACE}/${REPO}${STACK_SUFFIX}:${TAG}
+@include("copy-metadata")
+@include("instructions")

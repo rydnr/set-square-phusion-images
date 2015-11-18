@@ -1,6 +1,8 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/sdkman:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 USER ${NAMESPACE}
 
@@ -13,17 +15,11 @@ USER root
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
-COPY README /README
 
 VOLUME /home/${NAMESPACE}/.gradle
 VOLUME /home/${NAMESPACE}/work
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-COPY Dockerfile /Dockerfiles/Dockerfile
-
 EXPOSE 8080
 
-# Run with
-# docker run -d -e PROJECT_NAME=[project-folder-name] -v [root-folder]:/home/${NAMESPACE}/work -p [host-port]:8080 ${NAMESPACE}/${IMAGE}:${TAG}
-# or
-# docker run -d -v [project-folder]:/home/${NAMESPACE}/work -p [host-port]:8080 ${NAMESPACE}/${IMAGE}:${TAG}
+@include("copy-metadata")
+@include("instructions")

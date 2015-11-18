@@ -1,0 +1,5 @@
+Base image for MCollective tools.
+
+Examples:
+- Run this image to check configuration or tests:
+> docker run -it -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" ${NAMESPACE}/${IMAGE}:${TAG}

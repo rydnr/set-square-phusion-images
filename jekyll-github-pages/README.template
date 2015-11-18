@@ -1,0 +1,6 @@
+This image runs Jekyll to serve github pages from github
+(at the moment the image is built).
+
+Examples:
+- Run Jekyll to serve github pages:
+> docker run -d -p [port]:4000 ${NAMESPACE}/${IMAGE}:${TAG}

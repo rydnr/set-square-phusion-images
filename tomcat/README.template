@@ -8,7 +8,6 @@ You can provide yours when launching the image, but volume-mounting
 /etc/logstash/conf.d/${IMAGE}.conf
 
 Examples:
-
 - Run a war-packaged application:
 > docker run -it -p [port]:8080 -v [war-file]:${TOMCAT_HOME}/webapps/[app-name].war ${NAMESPACE}/${IMAGE}:${TAG}
 

@@ -1,11 +1,13 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-COPY README /README
+
 COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
 COPY process-sqls.sh /usr/local/bin/process-sqls.sh
 COPY ${IMAGE}-cron.sh /usr/local/bin/${IMAGE}-cron.sh
@@ -16,8 +18,8 @@ COPY ${IMAGE}-sqls.cron /etc/cron.d/${IMAGE}-sqls
 # Add the PostgreSQL PGP key to verify their Debian packages.
 # It should be the same key as https://www.postgresql.org/media/keys/ACCC4CF8.asc
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 && \
-    echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list
-RUN ${APTGET_INSTALL} python-software-properties software-properties-common postgresql-${POSTGRESQL_VERSION} postgresql-client-${POSTGRESQL_VERSION} postgresql-contrib-${POSTGRESQL_VERSION} daemontools && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    ${APTGET_INSTALL} python-software-properties software-properties-common postgresql-${POSTGRESQL_VERSION} postgresql-client-${POSTGRESQL_VERSION} postgresql-contrib-${POSTGRESQL_VERSION} daemontools && \
     ${APTGET_CLEANUP} && \
     update-rc.d postgresql disable && \
     gpasswd -a postgres crontab && \
@@ -40,8 +42,5 @@ EXPOSE 5432
 # See http://stackoverflow.com/questions/27377876/docker-postgres-with-initial-data-is-not-persisted-over-commits
 #VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
 
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
-# You can run this image with
-# docker run -d --[loghost]:logger --name ${IMAGE} -p 5432:5432 ${NAMESPACE}/${IMAGE}
+@include("copy-metadata")
+@include("instructions")

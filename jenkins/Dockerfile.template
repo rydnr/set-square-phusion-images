@@ -1,8 +1,9 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${TIME})
+@include("preamble")
 FROM ${NAMESPACE}/tomcat:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
-COPY help /usr/local/bin/help
+@include("addon-toggles")
+
 COPY logstash.conf /etc/logstash/conf.d/${REPO}.conf
 
 RUN groupadd ${JENKINS_GROUP} && \
@@ -26,8 +27,7 @@ RUN groupadd ${JENKINS_GROUP} && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && \
     gpasswd -a ${TOMCAT_USER} ${JENKINS_GROUP} && \
-    ${APTGET_CLEANUP} && \
-    chmod +x /usr/local/bin/help
+    ${APTGET_CLEANUP}
 
 # TODO: add cron job for mvn versions:update-properties
 # TODO: gem install bouncy-castle-java
@@ -43,8 +43,5 @@ VOLUME /home/jenkins
 
 EXPOSE 8080
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
-
-# Run with
-# docker run -d -p [port]:8080 -v [host-path]:/home/jenkins ${NAMESPACE}/${REPO}${STACK_SUFFIX}:${TAG}
-
+@include("copy-metadata")
+@include("instructions")

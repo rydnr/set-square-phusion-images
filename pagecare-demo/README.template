@@ -1,0 +1,5 @@
+Runs PageCare-demo as a Docker container.
+
+Examples:
+- Run PageCare-Demo application with default settings:
+> docker run -d -e VIRTUAL_HOST=[pcd-vhost] -d [port]:80 ${NAMESPACE}/${IMAGE}:${TAG}

@@ -23,9 +23,5 @@ COPY config /etc/default/tomcat
 
 VOLUME /home/artifactory
 
-COPY README /README
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
 @include("copy-metadata")
 @include("instructions")

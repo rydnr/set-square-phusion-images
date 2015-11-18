@@ -1,9 +1,10 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
+
 VOLUME /var/www
 
 EXPOSE 80
 EXPOSE 443
-
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}

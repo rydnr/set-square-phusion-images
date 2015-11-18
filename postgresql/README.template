@@ -1,4 +1,9 @@
-This image runs ${IMAGE}.
+This image runs PostgreSQL as a Docker container.
 
-You can run this image with
-docker run -d --[loghost]:logger --name ${IMAGE} -p 5432:5432 ${NAMESPACE}/${IMAGE}
+Examples:
+- Run PostgreSQL with default settings:
+# docker run -d --name db -p 5432:5432 ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run PostgreSQL with default settings, redirecting logs
+to an external service.
+# docker run -d --[loghost]:logger --name db -p 5432:5432 ${NAMESPACE}/${IMAGE}:${TAG}
