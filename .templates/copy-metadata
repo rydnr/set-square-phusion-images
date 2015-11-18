@@ -1,0 +1,5 @@
+
+COPY README /README
+COPY LICENSE.osoco /LICENSE
+COPY copyright-preamble.osoco /Dockerfiles/copyright-preamble.txt
+COPY Dockerfile /Dockerfiles/Dockerfile

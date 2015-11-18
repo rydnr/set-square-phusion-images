@@ -4,7 +4,7 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME [-nu|--no-update] [-np|--no-pin] package [package]*
+$SCRIPT_NAME [-u|--update] [-np|--no-pin] package [package]*
 $SCRIPT_NAME [-h|--help]
 (c) 2015-today ACM-SL
     Distributed this under the GNU General Public License v3.
@@ -12,11 +12,11 @@ $SCRIPT_NAME [-h|--help]
 Installs packages via apt-get, so that their impact in the
 overall image size is better. It requires the Dockerfile to install
 packages using this script, and afterwards call aptget-cleanup.sh
-to remove unnecessary dependencies. 
+to remove unnecessary dependencies.
 
 Where:
   * package: the package(s) to install.
-  * -nu | --no-update: Do not update the system.
+  * -u | --update: Update the system before installing anything.
   * -np | --no-pin: Do not pin the package.
 Common flags:
     * -h | --help: Display this message.
@@ -70,7 +70,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | -nu | --no-update | -np | --no-pin)
+      -h | --help | -v | -vv | -q | -u | --update | -np | --no-pin)
          shift;
          ;;
       *) logDebugResult FAILURE "failed";
@@ -102,12 +102,12 @@ function parseInput() {
       -h | --help | -v | -vv | -q )
         shift;
         ;;
-      -nu | --no-update)
-        export NO_UPDATE=0;
+      -u | --update)
+        export UPDATE=TRUE;
         shift
         ;;
       -np | --no-pin)
-          export NO_PIN=0;
+          export NO_PIN=TRUE;
           shift
           ;;
     esac
@@ -168,7 +168,7 @@ function install_package() {
   if [ $? -eq 0 ]; then
     logInfoResult SUCCESS "skipped";
   else
-    /usr/local/bin/aptget-install.sh -v  ${_package} > /dev/null 2>&1
+    runCommandLongOutput "apt-get install -y ${_package}"
     if [ $? -eq 0 ]; then
       echo "${_package}" >> ${INSTALLED_PACKAGES_FILE}
       logInfoResult SUCCESS "done";
@@ -200,7 +200,7 @@ function pin_package() {
 ## dry-wit hook
 function main() {
   local _package;
-  if [ "${NO_UPDATE}" != "0" ]; then
+  if isTrue ${UPDATE}; then
     update_system;
   fi
 
