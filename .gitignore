@@ -27,6 +27,7 @@ gradle-daemon/service
 gradle-pharo/service
 grails/service
 grails/setup.sql
+java/my_exec
 jenkins/prepare-release.sh
 jenkins/settings.xml
 mariadb/bootstrap-db
