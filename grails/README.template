@@ -6,3 +6,6 @@ Examples:
 
 - If the Grails project belongs to a bigger project, you need to specify the project name explicitly
 > docker run -d -e PROJECT_NAME=[project-folder-name] -v [root-folder]:/home/${NAMESPACE}/work -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Grails with custom options:
+> docker run -d -e GRAILS_OPTS="run-app -Dmyvar=value1"  -e PROJECT_NAME=[project-folder-name] -v [root-folder]:/home/${NAMESPACE}/work -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}

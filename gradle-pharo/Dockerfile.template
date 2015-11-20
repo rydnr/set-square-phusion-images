@@ -10,7 +10,7 @@ RUN mkdir /opt/pharo-${PHARO_VERSION} && \
     ln -s /opt/pharo-${PHARO_VERSION} /opt/pharo && \
     add-apt-repository ppa:pharo/stable && \
     dpkg --add-architecture i386 && \
-    ${APTGET_INSTALL} pharo-vm-core pharo-launcher && \
+    ${APTGET_INSTALL} --update pharo-vm-core pharo-launcher && \
     cd /opt/pharo && \
     curl get.pharo.org/${PHARO_VERSION_ZEROCONF} | bash && \
     ln -s /opt/pharo/pharo /usr/local/bin/pharo && \
