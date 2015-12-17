@@ -6,13 +6,13 @@ FROM ${BASE_IMAGE}:${TAG}
 
 COPY logstash /etc/service/.template/log/run
 COPY logstash-cron.sh /etc/service/cron/log/run
-
+COPY logstash-cron.sh /etc/service/cron/log/
 # From https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get
 RUN wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo apt-key add - && \
     echo "deb http://packages.elasticsearch.org/logstash/1.5/debian stable main" | sudo tee -a /etc/apt/sources.list && \
-    ${APTGET_INSTALL} logstash python-software-properties && \
     yes | add-apt-repository ppa:webupd8team/java && \
     echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections && \
+    ${APTGET_INSTALL} --update logstash python-software-properties && \
    (${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer libXtst6 libxi6 oracle-java8-set-default || \
     ${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer libXtst6 libxi6 oracle-java8-set-default ) && \
     wget -nv --no-check-certificate --no-cookies --header "Cookie: oraclelicense=accept-securebackup-cookie;gpw_e24=http://edelivery.oracle.com" http://download.oracle.com/otn-pub/java/jce/8/jce_policy-8.zip -O /opt/UnlimitedJCEPolicyJDK${JAVA_VERSION}.zip && \
@@ -24,6 +24,7 @@ RUN wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo a
 
 COPY my_exec.logstash /etc/my_exec.d/logstash
 COPY logstash-cron.conf /etc/logstash/conf.d/cron.conf
+COPY logstash-default.conf /etc/logstash/conf.d/default.conf
 
 @include("copy-metadata")
 @include("instructions")

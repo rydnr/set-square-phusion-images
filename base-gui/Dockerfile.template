@@ -1,13 +1,11 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
 ENV DISPLAY :0
 
-ENV ENABLE_CRON false
-ENV ENABLE_MONIT false
-ENV ENABLE_RSNAPSHOT false
+@include("addon-toggles")
+
 
 RUN ${APTGET_INSTALL} x11-apps
 

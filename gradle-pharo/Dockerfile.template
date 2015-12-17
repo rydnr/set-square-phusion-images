@@ -1,6 +1,8 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/gradle:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 USER root
 
@@ -8,18 +10,11 @@ RUN mkdir /opt/pharo-${PHARO_VERSION} && \
     ln -s /opt/pharo-${PHARO_VERSION} /opt/pharo && \
     add-apt-repository ppa:pharo/stable && \
     dpkg --add-architecture i386 && \
-    ${APTGET_INSTALL} pharo-vm-core pharo-launcher && \
+    ${APTGET_INSTALL} --update pharo-vm-core pharo-launcher && \
     cd /opt/pharo && \
     curl get.pharo.org/${PHARO_VERSION_ZEROCONF} | bash && \
     ln -s /opt/pharo/pharo /usr/local/bin/pharo && \
     ln -s /opt/pharo/pharo-ui /usr/local/bin/pharo-ui 
     
-COPY README /README
-
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-COPY Dockerfile /Dockerfiles/Dockerfile
-
-# Run with
-# docker run -d -e PROJECT_NAME=[project-folder-name] -v [root-folder]:/home/${NAMESPACE}/work -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
-# or
-# docker run -d -v [project-folder]:/home/${NAMESPACE}/work -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
+@include("copy-metadata")
+@include("instructions")

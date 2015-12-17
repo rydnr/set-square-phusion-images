@@ -4,3 +4,6 @@ defineEnvVar LICENSE_FILE \
 defineEnvVar COPYRIGHT_PREAMBLE_FILE \
              "The file with the copyright preamble" \
              'copyright-preamble.default.txt';
+overrideEnvVar ENABLE_CRON "false";
+overrideEnvVar ENABLE_MONIT "false";
+overrideEnvVar ENABLE_RSNAPSHOT "false";

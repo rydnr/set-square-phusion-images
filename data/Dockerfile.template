@@ -1,7 +1,6 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME})
+@include("preamble")
 FROM ${ROOT_IMAGE}
-
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -10,7 +9,7 @@ COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
 COPY display-help.sh /usr/local/bin/help
 
-ENV ENABLE_MONIT false
+@include("addon-toggles")
 
 RUN chmod +x /usr/local/bin/dry-wit && \
     chmod +x /usr/local/bin/show && \
@@ -21,14 +20,8 @@ RUN chmod +x /usr/local/bin/dry-wit && \
     ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
     ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile
 
-COPY README /README
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
-VOLUME ${DATA_VOLUMES}
-
-# For instructions on how to use this image, please run
-# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
+@include("copy-metadata")
+@include("instructions")
 #
 # This image can be used as the basis for data-only containers.
 # Any child image must provide:

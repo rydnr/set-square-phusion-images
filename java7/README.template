@@ -1,0 +1,8 @@
+Java7-only base image.
+
+It's pretty much useless by itself, only makes
+sure the JVM is installed.
+
+Examples:
+- Run a container with a shell:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash

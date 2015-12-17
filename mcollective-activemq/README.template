@@ -1,0 +1,5 @@
+Runs MCollective as a Docker container.
+
+Examples:
+- Run MCollective exposing the internal ActiveMQ port:
+> docker run -d --name mc -p [port]:${MCOLLECTIVE_ACTIVEMQ_PORT} ${NAMESPACE}/${IMAGE}:${TAG}

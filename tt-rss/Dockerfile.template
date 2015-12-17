@@ -1,9 +1,10 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/apache:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 RUN  mkdir -p /usr/local/share/sql/${TTRSS_DB_USER}
-COPY README /README
 COPY apache-vhost.conf /etc/apache2/sites-available/001-${TTRSS_VIRTUAL_HOST}.conf
 COPY create-db.sh /etc/my_init.d/50-create-db.sh
 COPY create-db.inc.sh /etc/my_init.d/50-create-db.inc.sh
@@ -25,12 +26,10 @@ RUN ${APTGET_INSTALL} -np git && \
     chmod +x /etc/my_init.d/50-create-db.sh
 
 COPY config.php /opt/tt-rss/config.php
-VOLUME /var/lib/mysql-sql
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-COPY Dockerfile /Dockerfiles/Dockerfile
+VOLUME /var/lib/mysql-sql
 
 EXPOSE 80
 
-# Run with
-# docker run -d -p [port]:80 --link [db-container]:mariadb --volumes-from [db-container] ${NAMESPACE}/${IMAGE}:${TAG}
+@include("copy-metadata")
+@include("instructions")

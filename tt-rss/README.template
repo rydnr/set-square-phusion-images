@@ -1,4 +1,7 @@
-This image runs Tiny Tiny RSS.
+This image runs Tiny Tiny RSS. By default,
+it requires a MariaDB/MySQL instance with the TTRSS
+schema and authentication already in place.
 
-You can run me with
-docker run -it -p [port]:80 --link [db-container]:db --volumes-from [db-container] ${NAMESPACE}/${IMAGE}:${TAG}
+Examples:
+- Run TTRSS accessing a MariaDB/MySQL instance:
+> docker run -it -p [port]:80 --link [db-container]:db --volumes-from [db-container] ${NAMESPACE}/${IMAGE}:${TAG}

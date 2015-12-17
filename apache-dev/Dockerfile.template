@@ -1,6 +1,8 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/apache:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 COPY enable-local-modules.sh /etc/my_init.d/50_enable_apache_extra_modules.sh
 COPY watch_module_changes.sh /usr/local/bin/watch_module_changes.sh
@@ -12,9 +14,5 @@ RUN ${APTGET_INSTALL} apache2-dev apache2-utils libtool && \
 
 VOLUME ["/var/www", "/usr/local/lib/apache2"]
 
-COPY README /README
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
-# For instructions on how to use this image, please run
-# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
+@include("copy-metadata")
+@include("instructions")

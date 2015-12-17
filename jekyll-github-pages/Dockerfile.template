@@ -1,6 +1,8 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/jekyll:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
+
+@include("addon-toggles")
 
 USER jekyll
 WORKDIR /var/www/jekyll
@@ -10,12 +12,5 @@ COPY _config.yml /var/www/jekyll/_config.yml
 COPY rc.local /etc/rc.local
 RUN chmod +x /etc/rc.local
 
-VOLUME /var/www/jekyll
-
-EXPOSE 4000
-
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
-
-# Run with
-# docker run -d -p [port]:4000 -v [host-path]:/var/www/jekyll ${NAMESPACE}/${REPO}-${STACK}:${TAG}
-
+@include("copy-metadata")
+@include("instructions")

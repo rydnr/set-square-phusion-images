@@ -1,4 +1,5 @@
 Base image for NodeJS applications.
 
-If you're interested, you can run me with
-> docker run -it --link loghost:logger ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+Examples:
+- Run this image to review NodeJS installation and settings:
+> docker run -it -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash

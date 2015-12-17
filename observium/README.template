@@ -1,0 +1,5 @@
+Runs Observium application as a Docker container.
+
+Examples:
+- Run Observium with default settings:
+> docker run --name observium -e VIRTUAL_HOST=[ob-vhost] -p [host]:80 ${NAMESPACE}/${IMAGE}:${TAG}

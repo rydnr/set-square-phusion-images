@@ -1,8 +1,8 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${BASE_IMAGE}:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y wget python python-pip python-dev build-essential && \
+RUN ${APTGET_INSTALL} wget python python-pip python-dev build-essential && \
     pip install --upgrade pip && \
     pip install --upgrade virtualenv && \
     pip install --upgrade flask-restful && \
@@ -18,14 +18,12 @@ RUN DEBIAN_FRONTEND=noninteractive apt-get install -y wget python python-pip pyt
     pip install --upgrade flipflop && \
     pip install --upgrade coverage && \
     groupadd flask && \
-    useradd -s /bin/bash -g flask -G flask,www-data -m -d /var/www -c "Flask user running /var/www/run.py" flask
+    useradd -s /bin/bash -g flask -G flask,www-data -m -d /var/www -c "Flask user running /var/www/run.py" flask && \
+    ${APTGET_CLEANUP}
 
 VOLUME /var/www
 
 EXPOSE 8080
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
-
-# Run with
-# docker run -d -p [port]:8080 -v [host-path]:/var/www ${NAMESPACE}/${REPO}-${STACK}:${TAG}
-
+@include("copy-metadata")
+@include("instructions")

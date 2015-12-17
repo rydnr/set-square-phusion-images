@@ -1,7 +1,8 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME})
+@include("preamble")
 FROM ${NAMESPACE}/tomcat:${TAG}
+@include("maintainer")
 
-MAINTAINER ${MAINTAINER}
+@include("addon-toggles")
 
 RUN groupadd artifactory && \
     useradd -s /bin/bash -g artifactory -G artifactory,tomcat -m -c "Artifactory user" artifactory && \
@@ -22,10 +23,5 @@ COPY config /etc/default/tomcat
 
 VOLUME /home/artifactory
 
-COPY README /README
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
-# For instructions on how to use this image, please run
-# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
-
+@include("copy-metadata")
+@include("instructions")

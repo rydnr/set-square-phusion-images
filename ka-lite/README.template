@@ -1,0 +1,6 @@
+This image runs Khan Academy Lite.
+
+Examples:
+> Run KA-Lite whose configuration is located in a
+host folder:
+> docker run -d -p [port]:8008 -v [host-path]:/var/www/ka-lite -e VIRTUAL_HOST=[my-kalite-vhost] ${NAMESPACE}/${IMAGE}:${TAG}

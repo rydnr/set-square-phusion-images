@@ -1,8 +1,9 @@
-# ${NAMESPACE}/${REPO}:${TAG} Dockerfile (generated at ${TIME})
+@include("preamble")
 FROM ${NAMESPACE}/apache:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
-COPY README /README
+@include("addon-toggles")
+
 COPY graphite-vhost.conf /etc/apache2/sites-available/001-graphite-vhost.conf
 
 RUN ${APTGET_INSTALL} python python-cairo libapache2-mod-wsgi python-django python-memcache python-sqlite python-pip && \
@@ -13,14 +14,8 @@ RUN ${APTGET_INSTALL} python python-cairo libapache2-mod-wsgi python-django pyth
     pip install "django-tagging<0.4" && \
     a2ensite 001-graphite-vhost && \
     a2dissite 000-default-vhost && \
-    a2enmod wsgi
+    a2enmod wsgi && \
+    ${APTGET_CLEANUP}
 
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${REPO}.${TAG}
-COPY Dockerfile /Dockerfiles/Dockerfile
-
-EXPOSE 80
-
-# Preferably run with
-# docker run -d --name graphite ${NAMESPACE}/${REPO}:${TAG}
-# otherwise with
-# docker run -d -p [port]:3306 ${NAMESPACE}/${REPO}:${TAG}
+@include("copy-metadata")
+@include("instructions")

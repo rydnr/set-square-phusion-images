@@ -1,13 +1,11 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${DATE})
+@include("preamble")
 FROM ${NAMESPACE}/java:${TAG}
-MAINTAINER ${MAINTAINER}
+@include("maintainer")
 
-COPY README /README
+@include("addon-toggles")
 
 RUN ${APTGET_INSTALL} zip && \
     ${APTGET_CLEANUP} && \
-    chmod +x /etc/service/monit/run && \
-    chmod +x /etc/service/cron/run && \
     rm -f /etc/my_init.d/* && \
     useradd -m -u ${DEVELOPMENT_USER_ID} -c "Development user" -U ${NAMESPACE}
 
@@ -17,10 +15,5 @@ RUN cd /home/${NAMESPACE} && \
     wget -q -O- http://get.sdkman.io | bash && \
     chmod +x /home/${NAMESPACE}/.sdkman/bin/sdkman-init.sh
 
-USER root
-
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-COPY Dockerfile /Dockerfiles/Dockerfile
-
-# Run with
-# docker run -d -v [my-development-folder]:/home/${NAMESPACE}/work ${NAMESPACE}/${IMAGE}:${TAG}
+@include("copy-metadata")
+@include("instructions")

@@ -4,17 +4,14 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME [-v[v]|-q|--quiet|-p=pass|--password=pass|-u=user|--user=user] [sql-folder]?
+docker run -it --link [postgres]:db -v [folder]:/sql [-v[v]|-q|--quiet|-p pass|--password pass|-u user|--user user]
 $SCRIPT_NAME [-h|--help]
-(c) 2014-today Automated Computing Machinery S.L.
+(c) 2015-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
  
-Connects to a PostgreSQL server and processes the SQL files in sql-folder.
+Connects to a PostgreSQL server and processes the SQL files in a volume.
 
 Where:
-  * sql-folder: the folder where the SQL files are located. Can be overridden
-with the SQL_FOLDER environment variable.
-Flags:
   * -u | --user: the database user. Defaults to "root"
   * -p | --password: the database password.
 Common flags:
@@ -212,9 +209,9 @@ function process_sql_file() {
   createTempFile;
   _logFile="${RESULT}";
   if [[ -z ${DB_PASSWORD} ]]; then
-    /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} -w 2>&1
+    /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} -w postgres 2>&1
   else
-    PGPASSWORD="${DB_PASSWORD}" /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} 2>&1
+    PGPASSWORD="${DB_PASSWORD}" /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} postgres 2>&1
   fi
   if [ $? -eq 0 ]; then
     if ! mark_sql_file_as_processed "$(dirname "${_file}")" "$(basename "${_file}")"; then
