@@ -3,7 +3,7 @@ defineEnvVar TOMCAT_MAJOR_VERSION \
              "8";
 defineEnvVar TOMCAT_VERSION \
              "The version of the Apache Tomcat server" \
-             "8.0.28" \
+             "8.0.30" \
              "curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-8/ | grep folder.gif | tail -n 1 | cut -d '>' -f 3 | cut -d '/' -f 1 | sed 's_^v__g'";
 defineEnvVar APR_VERSION \
              "The version of Apache Portable Runtime" \
@@ -37,7 +37,7 @@ defineEnvVar APR_DOWNLOAD_URL \
              'http://www.us.apache.org/dist//apr/${APR_FILE}';
 defineEnvVar TOMCAT_NATIVE_VERSION \
              "The version of Tomcat Native" \
-             "1.1.33";
+             "1.1.34";
 defineEnvVar TOMCAT_NATIVE_FOLDER \
              "The Tomcat Native folder" \
              'tomcat-native-${TOMCAT_NATIVE_VERSION}-src';

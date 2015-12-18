@@ -3,8 +3,10 @@
 *#
 */README
 */help
+*.log
 build*
 .build.inc.sh
+.build.sh.*
 */.build*
 */.build-settings.sh
 */copyright-preamble.acmsl.txt
@@ -57,3 +59,13 @@ firefox-sync/rc.local
 .build.inc.sh*
 .templates/maintainer
 .templates/preamble
+rabbitmq/rc.local
+postgresql/setup.sh
+java/remote-syslogd.conf
+java/my_exec
+.templates/preamble
+.templates/copy-metadata
+getboo/rc.local
+ghost/config.js
+graphite/local_settings.py
+observium/setup.sql
