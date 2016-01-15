@@ -1,0 +1,26 @@
+#!/bin/bash
+
+set -a
+SONATYPE_WORK=/sonatype-work
+SONATYPE_USER="nexus"
+CONTEXT_PATH=/
+MAX_HEAP="768m"
+MIN_HEAP="256m"
+JAVA_OPTS="-server -XX:MaxPermSize=192m -Djava.net.preferIPv4Stack=true -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError"
+LAUNCHER_CONF="${SONATYPE_WORK}/conf/jetty.xml ${SONATYPE_WORK}/conf/jetty-requestlog.xml"
+LANG="en_US.UTF-8"
+JAVA_HOME="/usr/lib/jvm/java"
+JSSE_HOME="${JAVA_HOME}/jre/"
+
+cd ${SONATYPE_WORK}
+chown -R ${SONATYPE_USER} ${SONATYPE_WORK}
+
+exec 2>&1
+exec setuser ${SONATYPE_USER} ${JAVA_HOME}/bin/java \
+     -Dnexus-work=${SONATYPE_WORK} -Dnexus-webapp-context-path=${CONTEXT_PATH} \
+     -Xms${MIN_HEAP} -Xmx${MAX_HEAP} \
+     -cp "{SONATYPE_WORK}/conf/:${SONATYPE_WORK}/lib/*" \
+     ${JAVA_OPTS} \
+     org.sonatype.nexus.bootstrap.Launcher ${LAUNCHER_CONF}
+
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
