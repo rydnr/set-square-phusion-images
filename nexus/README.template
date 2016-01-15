@@ -1,0 +1,21 @@
+This image runs Nexus ${NEXUS_VERSION}
+
+A default Logstash configuration may not be enough for your specific needs.
+You can provide yours when launching the image, by volume-mounting
+/etc/logstash/conf.d/${IMAGE}.conf
+
+Examples:
+- Run Nexus stand-alone:
+> docker run -it -p [port]:8081 ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Nexus, mounting its persistent data to a host volume
+> docker run -it -p [port]:8081 -v [host-folder]:/${SONATYPE_WORK} ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Nexus, using a data container to store its persistent data (which declares ${SONATYPE_WORK} as volume}:
+> docker run -it -p [port]:8081 --volumes-from [data-container] ${NAMESPACE}/${IMAGE}:${TAG}
+
+- To customize how Logstash processes Nexus logs:
+> docker run .. -v [my-logstash-conf]:/etc/logstash/conf.d/${IMAGE}.conf ..
+
+- Of course, you can disable Logstash altogether if you so wish:
+> docker run .. -e ENABLE_LOGSTASH=false ..

@@ -1,0 +1,24 @@
+@include("preamble")
+FROM ${NAMESPACE}/java:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+COPY service /etc/service/${IMAGE}/run
+RUN chmod +x /etc/service/${IMAGE}/run
+COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
+RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false nexus && \
+    cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
+    cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
+    mkdir /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
+    rm -rf /tmp/nexus-${NEXUS_VERSION} /var/tmp/${NEXUS_ARTIFACT} && \
+    chown -R nexus /opt/sonatype
+
+VOLUME /sonatype-work
+
+EXPOSE 8081
+
+@include("copy-metadata")
+@include("instructions")

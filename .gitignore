@@ -4,6 +4,7 @@
 */README
 */help
 *.log
+*/Dockerfile
 build*
 .build.inc.sh
 .build.sh.*
@@ -69,3 +70,4 @@ getboo/rc.local
 ghost/config.js
 graphite/local_settings.py
 observium/setup.sql
+nexus/service
