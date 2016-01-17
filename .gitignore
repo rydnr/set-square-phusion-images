@@ -6,7 +6,7 @@
 *.log
 */Dockerfile
 build*
-.build.inc.sh
+.build.inc.sh*
 .build.sh.*
 */.build*
 */.build-settings.sh
@@ -57,7 +57,6 @@ tt-rss/setup.sql
 firefox-sync/rc.local
 */LICENSE.*
 */copyright-preamble.*
-.build.inc.sh*
 .templates/maintainer
 .templates/preamble
 rabbitmq/rc.local
