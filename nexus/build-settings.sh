@@ -1,3 +1,4 @@
+overrideEnvVar ENABLE_LOGSTASH "true";
 defineEnvVar NEXUS_VERSION \
              "The version of Nexus" \
              "3.0.0-m5";
