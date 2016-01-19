@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rsync -avz /graphite-carbon-conf/ /etc/carbon/
+rsync -avz /graphite-webapp/ /opt/graphite/webapp/graphite/
+
+/etc/service/apache/run-apache
