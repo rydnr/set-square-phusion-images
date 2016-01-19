@@ -4,5 +4,5 @@ Examples:
 - Run Graphite with the default settings (SQLite database):
 > docker run -d -p [host-port]:80 -e VIRTUAL_HOST=[graphite-vhost] --name graphite ${NAMESPACE}/${IMAGE}:${TAG}
 
-- TODO Run Graphite using an external MySQL/MariaDB database:
-> docker run -d -p [host-port]:80 -e VIRTUAL_HOST=[graphite-vhost] --name graphite --link db:db ${NAMESPACE}/${IMAGE}:${TAG}
+- Run Graphite using an external MySQL/MariaDB database:
+> docker run -d -p [host-port]:80 -e VIRTUAL_HOST=[graphite-vhost] --name graphite --link [mariadb-container]:${GRAPHITE_DB_HOST} ${NAMESPACE}/${IMAGE}:${TAG}
