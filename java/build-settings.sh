@@ -8,10 +8,4 @@ defineEnvVar BOUNCY_CASTLE_ARTIFACT \
 defineEnvVar BOUNCY_CASTLE_DOWNLOAD_URL \
              "The Bouncy Castle download URL" \
              'http://www.bouncycastle.org/download/${BOUNCY_CASTLE_ARTIFACT}';
-defineEnvVar LICENSE_FILE \
-             "The file with the license details" \
-             'LICENSE.gpl3';
-defineEnvVar COPYRIGHT_PREAMBLE_FILE \
-             "The file with the copyright preamble" \
-             'copyright-preamble.default.txt';
 overrideEnvVar ENABLE_LOGSTASH true;
