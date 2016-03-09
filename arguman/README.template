@@ -1,0 +1,6 @@
+This image runs an Arguman server.
+it requires a MongoDB and a Redis servers.
+
+Examples:
+- Run Arguman linked to already-existing MongoDB and Redis containers:
+> docker run -it -p [port]:80 --link [mongodb-container]:mongodb --link [redis-container]:redis --volumes-from [db-container] ${NAMESPACE}/${IMAGE}:${TAG}

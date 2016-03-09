@@ -168,7 +168,7 @@ function install_package() {
   if [ $? -eq 0 ]; then
     logInfoResult SUCCESS "skipped";
   else
-    runCommandLongOutput "apt-get install -y ${_package}"
+    runCommandLongOutput "apt-get install -y --no-install-recommends ${_package}"
     if [ $? -eq 0 ]; then
       echo "${_package}" >> ${INSTALLED_PACKAGES_FILE}
       logInfoResult SUCCESS "done";

@@ -4,4 +4,4 @@ schema and authentication already in place.
 
 Examples:
 - Run TTRSS accessing a MariaDB/MySQL instance:
-> docker run -it -p [port]:80 --link [db-container]:db --volumes-from [db-container] ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -it -p [port]:8000 --link [db-container]:db --volumes-from [db-container] ${NAMESPACE}/${IMAGE}:${TAG}

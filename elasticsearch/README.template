@@ -1,0 +1,7 @@
+ElasticSearch image.
+
+Runs ElasticSearch on port 9200.
+Examples:
+
+- Run a ElasticSearch
+> docker run -d -p [port]:9200 ${NAMESPACE}/${IMAGE}:${TAG}

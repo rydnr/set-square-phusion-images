@@ -9,13 +9,14 @@ COPY service /etc/service/apache/run-graphite
 
 RUN ${APTGET_INSTALL} --update python python-cairo libapache2-mod-wsgi python-django python-memcache python-sqlite python-pip && \
     ${APTGET_INSTALL} -np python-dev && \
-    mv /etc/service/apache/run-graphite /etc/service/apache/run && \
     mv /etc/service/apache/run /etc/service/apache/run-apache && \
+    mv /etc/service/apache/run-graphite /etc/service/apache/run && \
     chmod +x /etc/service/apache/run && \
     mkdir /etc/apache2/run && \
     pip install carbon && \
     pip install whisper && \
-    pip install graphite-web graphite-carbon && \
+    pip install graphite-web && \
+    pip install graphite-carbon && \
     pip install "django-tagging<0.4" && \
     cp /opt/graphite/conf/graphite.conf.example /opt/graphite/conf/graphite.conf && \
     a2ensite 001-graphite-vhost && \

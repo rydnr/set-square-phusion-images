@@ -8,11 +8,13 @@ RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/$
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
-RUN ${APTGET_INSTALL} --update apache2 && \
+RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
+    echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list && \
+    ${APTGET_INSTALL} --update elasticsearch && \
     ${APTGET_CLEANUP} && \
     chmod +x /etc/service/${IMAGE}/run
 
-EXPOSE 80
+EXPOSE 9200
 
 VOLUME /var/www
 

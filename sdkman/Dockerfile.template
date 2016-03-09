@@ -4,7 +4,7 @@ FROM ${NAMESPACE}/java:${TAG}
 
 @include("addon-toggles")
 
-RUN ${APTGET_INSTALL} zip && \
+RUN ${APTGET_INSTALL} zip unzip && \
     ${APTGET_CLEANUP} && \
     rm -f /etc/my_init.d/* && \
     useradd -m -u ${DEVELOPMENT_USER_ID} -c "Development user" -U ${NAMESPACE}

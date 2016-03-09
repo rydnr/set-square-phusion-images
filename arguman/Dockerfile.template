@@ -1,0 +1,20 @@
+@include("preamble")
+FROM ${NAMESPACE}/apache:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+COPY requirements.txt /opt/requirements.txt
+
+RUN ${APTGET_INSTALL} python python-pip python-dev build-essential && \
+    pip install --upgrade pip && \
+    pip install --upgrade virtualenv && \
+    cd /opt && \
+    virtualenv virtualenv && \
+    . virtualenv/bin/activate && \
+    pip install -r requirements.txt
+
+EXPOSE 8000
+
+@include("copy-metadata")
+@include("instructions")
