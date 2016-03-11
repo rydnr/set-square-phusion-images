@@ -1,0 +1,14 @@
+#!/bin/bash
+
+[ -z ${VIRTUAL_HOST} ] && echo "VIRTUAL_HOST environment variable is mandatory" && exit 1
+
+cd /opt/phabricator
+bin/config set mysql.host ${PHABRICATOR_DB_CONTAINER}
+bin/config set mysql.user ${PHABRICATOR_DB_USER}
+bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
+
+/usr/local/bin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
+
+a2ensite 001-phabricator.conf && /etc/service/apache/run-apache
+
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

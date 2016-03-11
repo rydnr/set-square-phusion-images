@@ -4,14 +4,15 @@ FROM ${NAMESPACE}/apache:${TAG}
 
 @include("addon-toggles")
 
-RUN  mkdir -p /usr/local/share/sql/${PHABRICATOR_DB_USER}
-#COPY apache-vhost.conf /etc/apache2/sites-available/001-${PHABRICATOR_VIRTUAL_HOST}.conf
-#COPY create-db.sh /etc/my_init.d/50-create-db.sh
-#COPY create-db.inc.sh /etc/my_init.d/50-create-db.inc.sh
+RUN mv /etc/service/apache/run /etc/service/apache/run-apache
+COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
+COPY service /etc/service/apache/run
+COPY bootstrap /usr/local/bin/bootstrap
 
 RUN ${APTGET_INSTALL} \
         git libapache2-mod-php5 dpkg-dev \
         php5 php5-mysql php5-gd php5-dev php5-curl php-apc php5-cli php5-json && \
+    chmod +x /etc/service/apache/run && \
     cd /opt && \
     git clone https://github.com/phacility/libphutil.git && \
     git clone https://github.com/phacility/arcanist.git && \
@@ -22,14 +23,11 @@ RUN ${APTGET_INSTALL} \
     apt-get source php5 && \
     cd $(ls -1F | grep '^php5-.*/$')/ext/pcntl && phpize && ./configure && make && make install && \
     chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} && \
-    ${APTGET_CLEANUP} && \
-    echo "${PHABRICATOR_DB_PASSWORD}" >> /usr/local/share/sql/${PHABRICATOR_DB_USER}/.${PHABRICATOR_DB_USER}
-#    a2ensite 001-${PHABRICATOR_VIRTUAL_HOST} && \
-#    chmod +x /etc/my_init.d/50-create-db.sh
+    sed -i 's/^Listen 80$/Listen 8000/g' /etc/apache2/ports.conf && \
+    chmod +x /usr/local/bin/bootstrap && \
+    ${APTGET_CLEANUP}
 
-VOLUME /var/lib/mysql-sql
-
-EXPOSE 80
+EXPOSE 8000
 
 @include("copy-metadata")
 @include("instructions")

@@ -1,0 +1,15 @@
+This image runs Phabricator.
+It requires a MariaDB/MySQL instance with the Phabricator
+schemas already in place.
+
+Examples:
+- Run Phabricator accessing a MariaDB/MySQL instance:
+> docker run -it -p [port]:8000 --link [db-container]:db --volumes-from [data-container] ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Phabricator to generate the required instructions
+to prepare a MySQL/MariaDB instance as required by Phabricator:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap mysql
+
+- Run Phabricator to generate the required changeLog files
+for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap liquibase

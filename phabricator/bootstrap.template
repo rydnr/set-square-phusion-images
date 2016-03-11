@@ -1,0 +1,75 @@
+#!/bin/bash
+
+if [ "x${1}" == "xmysql" ]; then
+
+  cat <<EOF
+create user ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_almanac.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_audit.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_auth.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_badges.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_cache.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_calendar.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_chatlog.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_conduit.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_config.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_conpherence.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_countdown.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_daemon.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_dashboard.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_differential.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_diviner.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_doorkeeper.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_draft.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_drydock.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_fact.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_feed.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_file.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_flag.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_fund.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_harbormaster.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_herald.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_legalpad.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_maniphest.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_meta_data.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_metamta.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_multimeter.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_nuance.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_oauth_server.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_owners.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_passphrase.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_pastebin.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_phame.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_phlux.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_pholio.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_phortune.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_phragment.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_phrequent.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_phriction.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_phurl.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_policy.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_ponder.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_project.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_releeph.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_repository.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_search.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_slowvote.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_spaces.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_system.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_token.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_user.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_worker.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_xhpast.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+grant all on phabricator_xhprof.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+EOF
+
+elif [ "x${1}" == "xliquibase" ]; then
+  echo "TODO: liquibase";
+else
+  cat <<EOF
+  Usage: bootstrap [mysql|liquibase]
+  Where:
+    - mysql: Generates the initial SQL required for MySQL/MariaDB databases.
+    - liquibase: Generates the Liquibase changeLogs for Phabricator.
+EOF
+fi
