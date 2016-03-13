@@ -1,75 +1,253 @@
-#!/bin/bash
+#!/bin/bash /usr/local/bin/dry-wit
+# Copyright 2016-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
 
-if [ "x${1}" == "xmysql" ]; then
+function usage() {
+cat <<EOF
+$SCRIPT_NAME [-d|--database=vendor]? user
+$SCRIPT_NAME [-d|--database=vendor]? grants
+$SCRIPT_NAME [-d|--database=vendor]? databases
+$SCRIPT_NAME [-d|--database=vendor]? sql [dbName]?
+$SCRIPT_NAME [-d|--database=vendor]? liquibase [dbName]
+$SCRIPT_NAME [-h|--help]
+(c) 2016-today Automated Computing Machinery S.L.
+    Distributed under the terms of the GNU General Public License v3
 
-  cat <<EOF
-create user ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_almanac.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_audit.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_auth.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_badges.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_cache.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_calendar.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_chatlog.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_conduit.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_config.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_conpherence.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_countdown.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_daemon.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_dashboard.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_differential.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_diviner.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_doorkeeper.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_draft.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_drydock.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_fact.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_feed.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_file.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_flag.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_fund.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_harbormaster.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_herald.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_legalpad.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_maniphest.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_meta_data.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_metamta.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_multimeter.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_nuance.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_oauth_server.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_owners.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_passphrase.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_pastebin.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_phame.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_phlux.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_pholio.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_phortune.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_phragment.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_phrequent.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_phriction.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_phurl.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_policy.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_ponder.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_project.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_releeph.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_repository.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_search.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_slowvote.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_spaces.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_system.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_token.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_user.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_worker.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_xhpast.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
-grant all on phabricator_xhprof.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';
+Prints the bootstrap information required to prepare a database
+to be used by Phabricator.
+
+Where:
+    * vendor: mysql or mariadb. It's optional, and defaults to mariadb.
+    * dbName: the database name.
+Common flags:
+    * -h | --help: Display this message.
+    * -v: Increase the verbosity.
+    * -vv: Increase the verbosity further.
+    * -q | --quiet: Be silent.
 EOF
+}
 
-elif [ "x${1}" == "xliquibase" ]; then
-  echo "TODO: liquibase";
-else
-  cat <<EOF
-  Usage: bootstrap [mysql|liquibase]
-  Where:
-    - mysql: Generates the initial SQL required for MySQL/MariaDB databases.
-    - liquibase: Generates the Liquibase changeLogs for Phabricator.
-EOF
-fi
+# Requirements
+function checkRequirements() {
+  checkReq cat CAT_DOES_NOT_EXIST;
+}
+
+# Error messages
+function defineErrors() {
+  export INVALID_OPTION="Unrecognized option";
+  export CAT_DOES_NOT_EXIST="cat does not exist";
+  export NO_COMMAND_SPECIFIED="No command specified";
+  export NO_DB_VENDOR_SPECIFIED="No database vendor specified";
+  export UNSUPPORTED_DB_VENDOR="Unsupported database vendor";
+  export NO_LIQUIBASE_CHANGELOGS_FOLDER_SPECIFIED="No Liquibase changeLogs folder specified";
+  export LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND="The specified liquibase changeLogs folder is not found";
+  export DB_NAME_DOES_NOT_EXIST="The database does not exist";
+  export INVALID_COMMAND="Invalid command";
+  export DB_NAME_IS_MANDATORY="The database name is mandatory";
+
+  ERROR_MESSAGES=(\
+    INVALID_OPTION \
+    CAT_DOES_NOT_EXIST \
+    NO_COMMAND_SPECIFIED \
+    NO_DB_VENDOR_SPECIFIED \
+    UNSUPPORTED_DB_VENDOR \
+    NO_LIQUIBASE_CHANGELOGS_FOLDER_SPECIFIED \
+    LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND \
+    DB_NAME_DOES_NOT_EXIST \
+    INVALID_COMMAND \
+    DB_NAME_IS_MANDATORY \
+  );
+
+  export ERROR_MESSAGES;
+}
+
+## Parses the input
+## dry-wit hook
+function parseInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q)
+         shift;
+         ;;
+      -d | --db)
+        shift;
+        DB_VENDOR="${1}";
+        shift;
+        ;;
+    esac
+  done
+
+  if [[ -z ${DB_VENDOR} ]]; then
+    export DB_VENDOR="${DEFAULT_DB_VENDOR}";
+  fi
+
+  if [[ -z ${COMMAND} ]]; then
+    export COMMAND="${1}";
+    shift;
+  fi
+
+  if    [[ -z ${DB_NAME} ]] \
+     && [[ "x${COMMAND}" == "xliquibase" ]]; then
+    DB_NAME="${1}";
+    shift;
+  fi
+}
+
+## Checking input
+## dry-wit hook
+function checkInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  logDebug -n "Checking input";
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q | --quiet | -d | --db)
+         ;;
+      *) logDebugResult FAILURE "fail";
+         exitWithErrorCode INVALID_OPTION ${_flag};
+         ;;
+    esac
+  done
+
+  if [[ -z ${DB_VENDOR} ]]; then
+    logDebugResult FAILURE "fail";
+    exitWithErrorCode NO_DB_VENDOR_SPECIFIED;
+  fi
+
+  case "${DB_VENDOR}" in
+    "mysql" | "mariadb")
+    ;;
+    *) logDebugResult FAILURE "fail";
+       exitWithErrorCode UNSUPPORTED_DB_VENDOR "${DB_VENDOR}";
+       ;;
+  esac
+
+  if [[ -z ${LIQUIBASE_CHANGELOGS_FOLDER} ]]; then
+    logDebugResult FAILURE "fail";
+    exitWithErrorCode NO_LIQUIBASE_CHANGELOGS_FOLDER_SPECIFIED;
+  fi
+
+  if [[ ! -e ${LIQUIBASE_CHANGELOGS_FOLDER} ]]; then
+    logDebugResult FAILURE "fail";
+    exitWithErrorCode LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND;
+  fi
+
+  if [[ -z ${COMMAND} ]]; then
+    logDebugResult FAILURE "fail";
+    exitWithErrorCode NO_COMMAND_SPECIFIED;
+  fi
+
+  case "${COMMAND}" in
+    "user" | "grants" | "databases")
+      logDebugResult SUCCESS "done";
+      ;;
+    "sql")
+      if    [[ -n ${DB_NAME} ]] \
+         && [[ ! -e "${SQL_DDL_FOLDER}/${DB_NAME}.sql" ]] \
+         && [[ ! -e "${SQL_DDL_FOLDER}/phabricator_${DB_NAME}.sql" ]]; then \
+        logDebugResult FAILURE "fail";
+        exitWithErrorCode DB_NAME_DOES_NOT_EXIST;
+      fi
+      ;;
+    "liquibase")
+      if [[ -z ${DB_NAME} ]]; then
+        logDebugResult FAILURE "fail";
+        exitWithErrorCode DB_NAME_IS_MANDATORY;
+      fi
+      if    [[ ! -e "${LIQUIBASE_CHANGELOGS_FOLDER}/${DB_NAME}/changelog.yml" ]] \
+         && [[ ! -e "${LIQUIBASE_CHANGELOGS_FOLDER}/phabricator_${DB_NAME}/changelog.yml" ]]; then \
+        logDebugResult FAILURE "fail";
+        exitWithErrorCode DB_NAME_DOES_NOT_EXIST;
+      fi
+      ;;
+    *)
+      logDebugResult FAILURE "fail";
+      exitWithErrorCode INVALID_COMMAND "${COMMAND}";
+      ;;
+  esac
+}
+
+## Prints the bootstrap SQL to create the Phabricator database user.
+function print_user_bootstrap() {
+  echo "create user ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';";
+}
+
+## Prints the bootstrap SQL to add the required grants to the Phabricator database user.
+function print_grants_bootstrap() {
+  for _s in ${PHABRICATOR_DB_SCHEMAS[*]}; do
+    echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';";
+  done
+}
+
+## Prints the database names.
+function print_database_names() {
+  echo ${PHABRICATOR_DB_SCHEMAS[*]}
+}
+
+## Prints the DDL SQL for all databases.
+function print_databases_ddl() {
+  cat "${SQL_DDL_FOLDER}/phabricator.sql";
+  echo;
+}
+
+## Prints the DDL SQL for given database.
+## -> 1: The database name.
+function print_database_ddl() {
+  local _dbName="${1}";
+  local _file;
+  if [[ -e ${SQL_DDL_FOLDER}/databases/${_dbName}.sql ]]; then
+    _file="${SQL_DDL_FOLDER}/databases/${_dbName}";
+  elif [[ -e ${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}.sql ]]; then
+    _file="${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}";
+  fi
+  cat "${_file}";
+  echo;
+}
+
+## Prints the Liquibase changeLog file for given database.
+## -> 1: The database name.
+function print_liquibase_changeLog() {
+  local _dbName="${1}";
+  if [[ ! -e ${LIQUIBASE_CHANGELOGS_FOLDER}/${_dbName}/changelog.yml ]]; then
+    _dbName="phabricator_${_dbName}";
+  fi
+  cat "${LIQUIBASE_CHANGELOGS_FOLDER}/${_dbName}/changelog.yml"
+  echo;
+}
+
+## Main logic
+## dry-wit hook
+function main() {
+  case "${COMMAND}" in
+    "user")
+      print_user_bootstrap "${DB_VENDOR}";
+      ;;
+    "grants")
+      print_grants_bootstrap "${DB_VENDOR}";
+      ;;
+    "databases")
+      print_database_names;
+      ;;
+    "sql")
+      if [[ -z ${DB_NAME} ]]; then
+        print_databases_ddl;
+      else
+        print_database_ddl "${DB_NAME}";
+      fi
+      ;;
+    "liquibase")
+      print_liquibase_changeLog "${DB_NAME}";
+      ;;
+  esac
+}
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

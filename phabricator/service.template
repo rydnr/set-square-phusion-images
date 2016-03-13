@@ -2,10 +2,21 @@
 
 [ -z ${VIRTUAL_HOST} ] && echo "VIRTUAL_HOST environment variable is mandatory" && exit 1
 
+if [ -z ${TIMEZONE} ]; then
+  _timezone="${TIMEZONE}";
+else
+  _timezone="${DEFAULT_TIMEZONE}";
+fi
+
 cd /opt/phabricator
-bin/config set mysql.host ${PHABRICATOR_DB_CONTAINER}
+bin/config set mysql.host db
 bin/config set mysql.user ${PHABRICATOR_DB_USER}
 bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
+bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
+sed -i "s/^;date.timezone=$/date.timezone = ${_timezone}/g" /etc/php5/apache2/php.ini
+
+echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
+bin/phd restart
 
 /usr/local/bin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
 

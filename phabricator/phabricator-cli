@@ -1,0 +1,4 @@
+#!/bin/bash
+
+cd /opt/phabricator
+bin/$(basename $0) $@

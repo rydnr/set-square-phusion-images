@@ -1,0 +1,59 @@
+* Phabricator Docker image
+
+** Introduction
+
+Phabricator is a LAMP application, and to run properly it expects a MySQL/MariaDB server already prepared with its database model.
+
+In order to run Phabricator as a Docker image, we need to make sure we can setup the database correctly, prior to launching
+the container.
+The image itself includes all that information itself, extracted when the image is built.
+
+** Installation
+
+- Run a MariaDB instance if it's not running already.
+
+#+BEGIN_SRC shell
+docker run -d --name db ${NAMESPACE}/mariadb:${TAG}
+#+END_SRC
+
+- Run Phabricator to retrieve the required SQL to bootstrap it.
+
+#+BEGIN_SRC shell
+rm -f ~/sql/*
+docker run -it ${NAMESPACE}/phabricator:${TAG} bootstrap user > ~/sql/user.sql
+docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
+#+END_SRC
+
+#+BEGIN_SRC shell
+rm -f ~/sql/*
+docker run -it ${NAMESPACE}/phabricator:${TAG} bootstrap grants > ~/sql/grants.sql
+docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
+#+END_SRC
+
+#+BEGIN_SRC shell
+rm -f ~/sql/*
+for d in $(docker run -it ${NAMESPACE}/phabricator:${TAG} bootstrap databases); do docker run -it ${NAMESPACE}/phabricator:${TAG} bootstrap sql ${d} > ~/sql/${d}.sql; done
+docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
+#+END_SRC
+
+** Launch the container
+
+As described in the README, running Phabricator is easy:
+#+BEGIN_SRC shell
+fdocker run -d --link [db-container]:db -e VIRTUAL_HOST=${PHABRICATOR_VIRTUAL_HOST} -p [port]:8000  --link [loghost]:logger ${NAMESPACE}/phabricator:${TAG}
+#+END_SRC
+
+** Upgrading an existing database
+
+- Build a new Phabricator image (to ensure it has the latest version)
+#+BEGIN_SRC shell
+cd set-square-phusion-images
+./build -f phabricator
+#+END_SRC
+
+- Run the *upgrade* tool
+
+#+BEGIN_SRC shell
+> docker run -it --link db:db ${NAMESPACE}/phabricator:${TAG} upgrade
+#+END_SRC
+

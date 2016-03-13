@@ -8,11 +8,20 @@ RUN mv /etc/service/apache/run /etc/service/apache/run-apache
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/apache/run
 COPY bootstrap /usr/local/bin/bootstrap
+COPY bootstrap.defaults /usr/local/bin/bootstrap.inc.sh
+COPY runme /usr/local/bin/runme
+COPY phabricator-cli /usr/local/bin/phabricator-cli
+COPY upgrade /usr/local/bin/upgrade
 
 RUN ${APTGET_INSTALL} \
         git libapache2-mod-php5 dpkg-dev \
         php5 php5-mysql php5-gd php5-dev php5-curl php-apc php5-cli php5-json && \
+    ${APTGET_INSTALL} --no-pin mysql-server python-pip openjdk-7-jre-headless && \
+    mysql_install_db && \
+    service mysql start && \
+    mysqladmin -u root password 'secret' && \
     chmod +x /etc/service/apache/run && \
+    mkdir /usr/local/share/liquibase && \
     cd /opt && \
     git clone https://github.com/phacility/libphutil.git && \
     git clone https://github.com/phacility/arcanist.git && \
@@ -22,12 +31,57 @@ RUN ${APTGET_INSTALL} \
     php5enmod mcrypt && \
     apt-get source php5 && \
     cd $(ls -1F | grep '^php5-.*/$')/ext/pcntl && phpize && ./configure && make && make install && \
-    chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} && \
+    mkdir -p /var/repo /var/local/phabricator && \
+    chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} /var/local/phabricator /var/repo && \
     sed -i 's/^Listen 80$/Listen 8000/g' /etc/apache2/ports.conf && \
-    chmod +x /usr/local/bin/bootstrap && \
-    ${APTGET_CLEANUP}
+    sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php5/apache2/php.ini && \
+    sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php5/apache2/php.ini && \
+    pip install pygments && \
+    cd /opt/phabricator && \
+    bin/config set mysql.host localhost && \
+    bin/config set mysql.user root && \
+    bin/config set mysql.pass secret && \
+    bin/config set pygments.enabled true && \
+    bin/storage upgrade --force && \
+    bin/config set storage.local-disk.path /var/local/phabricator && \
+    cd /usr/local/bin && \
+    chmod +x bootstrap runme phabricator-cli && \
+    ln -s runme user && \
+    ln -s runme grants && \
+    ln -s runme databases && \
+    ln -s runme sql && \
+    ln -s runme liquibase && \
+    for f in /opt/phabricator/bin/*; do ln -s phabricator-cli $(basename ${f}); done && \
+    mkdir -p /usr/local/share/liquibase && \
+    mkdir -p /usr/local/share/sql && \
+    echo "select schema_name from information_schema.schemata where schema_name like 'phabricator_%'" | mysql -N -u root --password=secret >> /usr/local/share/liquibase/phabricator-schemas.txt && \
+    mkdir /opt/liquibase-${LIQUIBASE_VERSION} && \
+    cd /opt && \
+    ln -s liquibase-${LIQUIBASE_VERSION} liquibase && \
+    wget ${LIQUIBASE_URL} && \
+    tar xvf ${LIQUIBASE_ARTIFACT} -C /opt/liquibase && \
+    cd /opt/liquibase/lib && \
+    wget ${MARIADB_JDBC_DRIVER_URL} && \
+    mkdir -p /usr/local/share/sql/databases && \
+    for s in $(cat /usr/local/share/liquibase/phabricator-schemas.txt); do \
+      mkdir -p /usr/local/share/liquibase/${s} && \
+      echo "Extracting database ${s}"; \
+      /opt/liquibase/liquibase --driver=org.mariadb.jdbc.Driver --username=root --password=secret --url="jdbc:mysql://localhost/${s}?user=root" --changeLogFile=/usr/local/share/liquibase/${s}/changelog.yml generateChangeLog; \
+      mysqldump -d -u root -psecret -h localhost --create-options --add-drop-database -B --events --routines --triggers ${s} > /usr/local/share/sql/databases/${s}.sql; \
+    done && \
+    mysqldump -u root -psecret -h localhost --create-options --all-databases --add-drop-database -B --events --routines --triggers > /usr/local/share/sql/phabricator.sql && \
+    service mysql stop && \
+    ${APTGET_CLEANUP} && \
+    rm -rf /var/lib/mysql && \
+    rm -rf /opt/liquibase* && \
+    rm -rf /opt/php5*
 
 EXPOSE 8000
+
+VOLUME /usr/local/share/liquibase
+VOLUME /usr/local/share/sql
+VOLUME /var/local/phabricator
+VOLUME /var/repo
 
 @include("copy-metadata")
 @include("instructions")

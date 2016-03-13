@@ -1,15 +1,50 @@
-This image runs Phabricator.
-It requires a MariaDB/MySQL instance with the Phabricator
-schemas already in place.
+This image runs Phabricator as a Docker container.
 
 Examples:
+
 - Run Phabricator accessing a MariaDB/MySQL instance:
-> docker run -it -p [port]:8000 --link [db-container]:db --volumes-from [data-container] ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -p [port]:8000 --link [db-container]:db -e VIRTUAL_HOST=${PHABRICATOR_VIRTUAL_HOST} --volumes-from [data-container]  --link [loghost]:logger ${NAMESPACE}/${IMAGE}:${TAG}
 
-- Run Phabricator to generate the required instructions
-to prepare a MySQL/MariaDB instance as required by Phabricator:
-> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap mysql
+- Run Phabricator to retrieve the required SQL to bootstrap it.
 
-- Run Phabricator to generate the required changeLog files
+> rm -f ~/sql/*
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap user > ~/sql/user.sql
+> docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
+> rm -f ~/sql/*
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap grants > ~/sql/grants.sql
+> docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
+
+You can create the databases looping through each of them:
+
+> rm -f ~/sql/*
+> for d in $(docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap databases); do docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap sql ${d} > ~/sql/${d}.sql; done
+docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
+
+Otherwise you can let Phabricator provide all the DDL in one single step:
+
+> rm -f ~/sql/*
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql > ~/sql/phabricator.sql
+> docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
+
+- Run Phabricator to provide the SQL required to create the database user:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} user
+
+- Run Phabricator to provide the SQL required to grant the correct permissions to the database user:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} grants
+
+- Run Phabricator to provide the names of all Phabricator databases:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} databases
+
+- Run Phabricator to print the SQL required to deploy all Phabricator databases:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql
+
+- Run Phabricator to print the SQL required to deploy a single database:
 for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
-> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap liquibase
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql [dbName]
+
+- Run Phabricator to print the Liquibase changeLog file for a given database:
+for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} liquibase [dbName]
+
+- Upgrade a previous Phabricator database:
+> docker run -it --link [db-container]:db ${NAMESPACE}/${IMAGE}:${TAG} upgrade
