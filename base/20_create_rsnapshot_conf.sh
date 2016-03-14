@@ -145,7 +145,7 @@ function extract_volumes() {
     fi
   done
   export RESULT=${_result[@]}
-}                
+}
 
 ## Checks whether backups are enabled as a whole.
 ## <- RESULT: 0 if so, 1 otherwise.

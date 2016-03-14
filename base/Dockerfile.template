@@ -8,7 +8,7 @@ ENV TERM linux
 @include("addon-toggles")
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
-     process-file.sh \
+     process-file.sh data \
      /usr/local/bin/
 COPY 20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
@@ -30,7 +30,7 @@ RUN mkdir -p /etc/my_exec.d && \
     mkdir -p /etc/service/cron/log && \
     touch /var/local/docker-installed-packages.txt && \
     chmod +x /usr/local/bin/dry-wit /usr/local/bin/aptget-install.sh /usr/local/bin/aptget-cleanup.sh && \
-    chmod +x /usr/local/bin/process-file.sh && \
+    chmod +x /usr/local/bin/process-file.sh /usr/local/bin/data && \
     chmod +x /etc/my_init.d/20_create_rsnapshot_conf.sh && \
     chmod -x /etc/my_init.d/20_create_rsnapshot_conf.inc.sh && \
     chmod +x /etc/my_init.d/30_create_monit_filesystem_check.sh && \

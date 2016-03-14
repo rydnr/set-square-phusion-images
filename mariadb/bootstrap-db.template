@@ -22,6 +22,6 @@ while ps -ef | grep mysql | grep -v grep > /dev/null; do
   echo "Waiting ${_SLEEP}s for MariaDB to shut down"
   sleep ${_SLEEP}
 done
-chown -R mysql:mysql /var/lib/mysql /var/lib/mysql/* && \
+chown -R mysql:mysql /var/lib/mysql /var/lib/mysql/*
 touch /var/lib/mysql/.bootstrapped
 service monit start

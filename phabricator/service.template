@@ -13,7 +13,7 @@ bin/config set mysql.host db
 bin/config set mysql.user ${PHABRICATOR_DB_USER}
 bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
 bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
-sed -i "s/^;date.timezone=$/date.timezone = ${_timezone}/g" /etc/php5/apache2/php.ini
+sed -i "s/^;date.timezone =$/date.timezone = ${_timezone}/g" /etc/php5/apache2/php.ini
 
 echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
 bin/phd restart
