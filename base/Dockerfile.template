@@ -43,7 +43,7 @@ RUN mkdir -p /etc/my_exec.d && \
     chmod +x /sbin/my_exec && \
     chmod +x /etc/cron.daily/rsnapshot.daily && \
     chmod +x /etc/cron.weekly/rsnapshot.weekly && \
-    chmod +x /etc/cron.monthly/rsnapshot.monthly    
+    chmod +x /etc/cron.monthly/rsnapshot.monthly
 
 COPY my_exec.cron /etc/my_exec.d/cron
 COPY my_exec.help /etc/my_exec.d/help
@@ -85,7 +85,6 @@ COPY monit-syslog.conf /etc/monit/conf.d/syslog.conf
 COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 
 @include("copy-metadata")
-
 @include("instructions")
 
 # Children must provide:

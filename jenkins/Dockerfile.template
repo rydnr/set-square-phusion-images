@@ -6,8 +6,16 @@ FROM ${NAMESPACE}/tomcat:${TAG}
 
 COPY logstash.conf /etc/logstash/conf.d/${REPO}.conf
 
-RUN groupadd ${JENKINS_GROUP} && \
-    useradd -s /bin/bash -g ${JENKINS_GROUP} -G ${JENKINS_GROUP},${TOMCAT_GROUP} -m -c "Jenkins user" ${JENKINS_USER} && \
+ENV JENKINS_HOME /var/jenkins_home
+ENV JENKINS_SLAVE_AGENT_PORT 50000
+
+RUN mkdir -p ${JENKINS_HOME}
+
+VOLUME /var/jenkins_home
+
+RUN usermod -l ${JENKINS_USER} ${TOMCAT_USER} && \
+    usermod -d ${JENKINS_HOME} ${JENKINS_USER} && \
+    groupmod -n ${JENKINS_GROUP} ${TOMCAT_GROUP} && \
     echo '${JENKINS_USER}:${JENKINS_PASSWORD}' | chpasswd && \
     mkdir -p ${JENKINS_HOME}/.m2 && \
     wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
@@ -20,14 +28,14 @@ RUN groupadd ${JENKINS_GROUP} && \
     mv /etc/service/tomcat /etc/service/jenkins && \
     chmod -R g+w ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins && \
     mkdir ${TOMCAT_HOME}/.ssh && \
-    chown -R ${JENKINS_USER}:${TOMCAT_GROUP} ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 && \
+    chown -R ${JENKINS_USER}:${JENKINS_GROUP} ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 && \
     chmod 700 ${TOMCAT_HOME}/.ssh && \
-    chown -R ${TOMCAT_USER}:${TOMCAT_GROUP} ${TOMCAT_HOME}/.ssh && \
     ${APTGET_INSTALL} git graphviz && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && \
-    gpasswd -a ${TOMCAT_USER} ${JENKINS_GROUP} && \
     ${APTGET_CLEANUP}
+
+COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groovy
 
 # TODO: add cron job for mvn versions:update-properties
 # TODO: gem install bouncy-castle-java
@@ -39,7 +47,6 @@ COPY config /etc/default/tomcat
 COPY ssh-config /opt/tomcat/.ssh/config
 COPY known_hosts /opt/tomcat/.ssh/known_hosts
 
-VOLUME /home/jenkins
 
 EXPOSE 8080
 
