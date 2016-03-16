@@ -1,0 +1,20 @@
+<VirtualHost *:80>
+        ServerName ${PHABRICATOR_VIRTUAL_HOST}
+
+        ServerAdmin webmaster@${PHABRICATOR_VIRTUAL_HOST}
+        DocumentRoot /opt/phabricator
+
+        ErrorLog ${APACHE_LOG_DIR}/${PHABRICATOR_VIRTUAL_HOST}.error.log
+        CustomLog ${APACHE_LOG_DIR}/${PHABRICATOR_VIRTUAL_HOST}.access.log combined
+
+        RewriteEngine on
+        RewriteRule ^/rsrc/(.*) - [L,QSA]
+        RewriteRule ^/favicon.ico - [L,QSA]
+        RewriteRule ^(.*)$ /index.php?__path__=$1 [B,L,QSA]
+
+        <Directory "/opt/phabricator/webroot">
+                   Require all granted
+        </Directory>
+</VirtualHost>
+
+# vim: syntax=apache ts=4 sw=4 sts=4 sr noet

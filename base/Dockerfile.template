@@ -8,17 +8,19 @@ ENV TERM linux
 @include("addon-toggles")
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
-     process-file.sh data \
+     process-file.sh data check-version \
      /usr/local/bin/
 COPY 20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
      31_create_monit_http_conf.sh 31_create_monit_http_conf.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \
+     00_chown_volumes.sh \
      /etc/my_init.d/
 COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
 COPY display-help.sh /usr/local/bin/help
 COPY my_exec /sbin/my_exec
+COPY versioncheck.daily /etc/cron.daily/versioncheck.daily
 COPY rsnapshot.daily /etc/cron.daily/rsnapshot.daily
 COPY rsnapshot.weekly /etc/cron.weekly/rsnapshot.weekly
 COPY rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
@@ -29,21 +31,12 @@ RUN mkdir -p /etc/my_exec.d && \
     mkdir -p /etc/service/monit/log && \
     mkdir -p /etc/service/cron/log && \
     touch /var/local/docker-installed-packages.txt && \
-    chmod +x /usr/local/bin/dry-wit /usr/local/bin/aptget-install.sh /usr/local/bin/aptget-cleanup.sh && \
-    chmod +x /usr/local/bin/process-file.sh /usr/local/bin/data && \
-    chmod +x /etc/my_init.d/20_create_rsnapshot_conf.sh && \
-    chmod -x /etc/my_init.d/20_create_rsnapshot_conf.inc.sh && \
-    chmod +x /etc/my_init.d/30_create_monit_filesystem_check.sh && \
-    chmod -x /etc/my_init.d/30_create_monit_filesystem_check.inc.sh && \
-    chmod +x /etc/my_init.d/31_create_monit_http_conf.sh && \
-    chmod -x /etc/my_init.d/31_create_monit_http_conf.inc.sh && \
-    chmod +x /etc/my_init.d/32_create_monit_port_check.sh && \
-    chmod -x /etc/my_init.d/32_create_monit_port_check.inc.sh && \
-    chmod +x /usr/local/bin/show && \
+    chmod +x /usr/local/bin/* && \
+    chmod +x /etc/my_init.d/* && \
     chmod +x /sbin/my_exec && \
-    chmod +x /etc/cron.daily/rsnapshot.daily && \
-    chmod +x /etc/cron.weekly/rsnapshot.weekly && \
-    chmod +x /etc/cron.monthly/rsnapshot.monthly
+    chmod +x /etc/cron.daily/* && \
+    chmod +x /etc/cron.weekly/* && \
+    chmod +x /etc/cron.monthly/*
 
 COPY my_exec.cron /etc/my_exec.d/cron
 COPY my_exec.help /etc/my_exec.d/help
@@ -92,11 +85,16 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 # - /LICENSE: rights and restrictions on how to use, inspect, modify and distribute this image.
 # - /Dockerfiles/copyright-preamble.txt: A short summary of the license. It's included, as well
 #   as the README, when displaying the help to the user.
+# - ${DOLLAR}{SERVICE_VERSION}: The service version information.
+# - ${DOLLAR}{SERVICE_USER}: The user under which the service runs.
 
 # Children should provide:
 # - service: to run the process (letting runit handling forking it).
 # - monit.conf: how to monitor the process (or disable monit via declaring ENABLE_MONIT=false).
 # - backup.sh: a custom backup script, if necessary.
+# - check-version.sh-${DOLLAR}{IMAGE}: A script to retrieve the information about the latest version of the service.
+# - ${DOLLAR}{SERVICE_GROUP}: The group of the user under which the service runs. Defaults to ${DOLLAR}{SERVICE_USER}.
+# - ${DOLLAR}{SERVICE_PACKAGE}: The package name, if the service is installed through the package manager.
 #
 # And then add steps in their Dockerfile such as the following:
 # COPY README /README
@@ -105,6 +103,8 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 # RUN chmod +x /etc/service/${IMAGE}/run
 # COPY monit.conf /etc/monit/monitrc.d/${DOLLAR}{IMAGE}.conf
 # COPY backup.sh /usr/local/bin/backup-${DOLLAR}{NAMESPACE}-${DOLLAR}{IMAGE}_${DOLLAR}{TAG}.sh
+# COPY check-version.sh /usr/local/bin/check-version.sh-${DOLLAR}{SERVICE}
+# RUN chmod +x /usr/local/bin/*
 
 # If the process is itself a daemon which cannot be run in foreground,
 # then provide a LSB-like script and call it from within /etc/rc.local:

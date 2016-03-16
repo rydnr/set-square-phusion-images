@@ -1,0 +1,26 @@
+#!/bin/bash
+
+_sleep=3;
+
+if [[ ! -e /var/lib/mysql/.bootstrapped ]]; then
+  /usr/local/bin/bootstrap-db.sh
+  chown -R mysql:mysql /var/lib/mysql /var/lib/mysql/*
+  while [ ! -e /var/lib/mysql/.bootstrapped ]; do
+    echo "Waiting ${_sleep}s for db bootstrap"
+    sleep ${_sleep}
+  done
+fi
+
+_poolSize=$(cat /proc/meminfo | grep MemTotal | awk -v f=${INNODB_POOL_SIZE_FACTOR:-${INNODB_DEFAULT_POOL_SIZE_FACTOR}} '{printf("%s*%s*1024\n", $2, f);}' | bc -l | cut -d'.' -f 1)
+[[ -d /usr/local/etc/mysql ]] && rsync -avz /etc/mysql/conf.d/* /usr/local/etc/mysql && cp /usr/local/etc/mysql/*.cnf /etc/mysql/conf.d/
+[[ "${DISABLE_STRICT_MODE}" == "true" ]] && rm -f /etc/mysql/conf.d/mysqld_strict_mode.cnf
+[[ "${ALTERNATE_BOOLEAN_SYNTAX}" == "true" ]] && rm -f /etc/mysql/conf.d/mysqld_alternate_boolean_syntax.cnf
+
+cat <<EOF > /etc/mysql/conf.d/mysqld_innodb_buffer_pool_size.cnf
+[mysqld]
+innodb_buffer_pool_size=${_poolSize}
+EOF
+
+exec 2>&1
+#exec /usr/bin/mysqld_safe --console --user=mysql  | /opt/logstash/bin/logstash agent -f /etc/logstash/conf.d/mariadb.conf
+exec /usr/bin/mysqld_safe --console --user=mysql

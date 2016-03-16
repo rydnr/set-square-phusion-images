@@ -13,6 +13,10 @@ COPY runme /usr/local/bin/runme
 COPY phabricator-cli /usr/local/bin/phabricator-cli
 COPY upgrade /usr/local/bin/upgrade
 
+ENV VIRTUAL_HOST="${PHABRICATOR_DEFAULT_VIRTUAL_HOST}" \
+    VIRTUAL_PORT=8000 \
+    TIMEZONE="${DEFAULT_TIMEZONE}"
+
 RUN ${APTGET_INSTALL} \
         git libapache2-mod-php5 dpkg-dev \
         php5 php5-mysql php5-gd php5-dev php5-curl php-apc php5-cli php5-json imagemagick && \
@@ -50,6 +54,7 @@ RUN ${APTGET_INSTALL} \
     ln -s runme grants && \
     ln -s runme databases && \
     ln -s runme sql && \
+    ln -s runme sql-post && \
     ln -s runme liquibase && \
     for f in /opt/phabricator/bin/*; do ln -s phabricator-cli $(basename ${f}); done && \
     mkdir -p /usr/local/share/liquibase && \

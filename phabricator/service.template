@@ -1,19 +1,14 @@
 #!/bin/bash
 
-[ -z ${VIRTUAL_HOST} ] && echo "VIRTUAL_HOST environment variable is mandatory" && exit 1
-
-if [ -z ${TIMEZONE} ]; then
-  _timezone="${TIMEZONE}";
-else
-  _timezone="${DEFAULT_TIMEZONE}";
-fi
+[ -z ${VIRTUAL_HOST} ] && "VIRTUAL_HOST environment not defined. Using ${DEFAULT_VIRTUAL_HOST}." && exit 1;
 
 cd /opt/phabricator
 bin/config set mysql.host db
 bin/config set mysql.user ${PHABRICATOR_DB_USER}
 bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
 bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
-sed -i "s/^;date.timezone =$/date.timezone = ${_timezone}/g" /etc/php5/apache2/php.ini
+sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php5/apache2/php.ini
+chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo
 
 echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
 bin/phd restart

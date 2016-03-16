@@ -34,7 +34,7 @@ function defineErrors() {
   export CUT_NOT_INSTALLED="cut is not installed";
   export MOUNT_NOT_INSTALLED="mount not installed";
   export CANNOT_FIND_OUT_THE_DEVICE_FOR_THE_ROOT_FILESYSTEM="Cannot find out the device for the root filesystem";
-  
+
   ERROR_MESSAGES=(\
     INVALID_OPTION \
     CUT_NOT_INSTALLED \
@@ -106,7 +106,7 @@ function retrieve_root_path() {
     exitWithErrorCode CANNOT_FIND_OUT_THE_DEVICE_FOR_THE_ROOT_FILESYSTEM;
   fi
 }
-        
+
 ## Main logic
 ## dry-wit hook
 function main() {

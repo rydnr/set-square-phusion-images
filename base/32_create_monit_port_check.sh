@@ -34,7 +34,7 @@ function defineErrors() {
   export CUT_NOT_INSTALLED="cut is not installed";
   export SED_NOT_INSTALLED="sed is not installed";
   export GREP_NOT_INSTALLED="grep is not installed";
-  
+
   ERROR_MESSAGES=(\
     INVALID_OPTION \
     CUT_NOT_INSTALLED \
@@ -112,21 +112,19 @@ function extract_ports() {
   done
   export RESULT=${_result[@]}
 }
-        
+
 ## Main logic
 ## dry-wit hook
 function main() {
   local _ports;
   echo 'check host localhost with address 0.0.0.0' > ${MONIT_CONF_FILE}
-  for d in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
-    extract_ports "${DOCKERFILES_LOCATION}/${d}";
-    _ports="${RESULT}";
-    for _port in ${_ports}; do
-      logInfo -n "Creating Monit check for ${_port} port (exposed in ${DOCKERFILES_LOCATION}/${d})";
-      cat <<EOF >> ${MONIT_CONF_FILE}
+  extract_ports "${DOCKERFILES_LOCATION}/Dockerfile";
+  _ports="${RESULT}";
+  for _port in ${_ports}; do
+    logInfo -n "Creating Monit check for ${_port} port (exposed in ${DOCKERFILES_LOCATION}/Dockerfile)";
+    cat <<EOF >> ${MONIT_CONF_FILE}
 	if failed port ${_port} with timeout ${PORT_TIMEOUT} then alert
 EOF
-      logInfoResult SUCCESS "done";
-    done
+    logInfoResult SUCCESS "done";
   done
-}  
+}

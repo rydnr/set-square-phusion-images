@@ -8,6 +8,7 @@ $SCRIPT_NAME [-d|--database=vendor]? user
 $SCRIPT_NAME [-d|--database=vendor]? grants
 $SCRIPT_NAME [-d|--database=vendor]? databases
 $SCRIPT_NAME [-d|--database=vendor]? sql [dbName]?
+$SCRIPT_NAME [-d|--database=ventor]? sql-post
 $SCRIPT_NAME [-d|--database=vendor]? liquibase [dbName]
 $SCRIPT_NAME [-h|--help]
 (c) 2016-today Automated Computing Machinery S.L.
@@ -148,7 +149,7 @@ function checkInput() {
   fi
 
   case "${COMMAND}" in
-    "user" | "grants" | "databases")
+    "user" | "grants" | "databases" | "sql-post")
       logDebugResult SUCCESS "done";
       ;;
     "sql")
@@ -187,6 +188,11 @@ function print_grants_bootstrap() {
   for _s in ${PHABRICATOR_DB_SCHEMAS[*]}; do
     echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';";
   done
+}
+
+## Prints the post SQL statements.
+function print_sql_post() {
+  echo "REPAIR TABLE phabricator_search.search_documentfield;";
 }
 
 ## Prints the database names.
@@ -245,6 +251,9 @@ function main() {
         print_database_ddl "${DB_NAME}";
       fi
       ;;
+    "sql-post")
+        print_sql_post;
+        ;;
     "liquibase")
       print_liquibase_changeLog "${DB_NAME}";
       ;;

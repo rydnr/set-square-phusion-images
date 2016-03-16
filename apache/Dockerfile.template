@@ -4,13 +4,22 @@ FROM ${BASE_IMAGE}:${TAG}
 
 @include("addon-toggles")
 
+ENV SERVICE_VERSION="2.4.7" \
+    SERVICE_USER="www-data" \
+    SERVICE_GROUP="www-data" \
+    SERVICE_PACKAGE="apache2"
+
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
+COPY check-version.sh /usr/local/bin/check-version.sh-${IMAGE}
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
-RUN ${APTGET_INSTALL} --update apache2 && \
+RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
     ${APTGET_CLEANUP} && \
-    chmod +x /etc/service/${IMAGE}/run
+    cd /usr/local/bin && \
+    ln -s latest.sh latest-${IMAGE}.sh && \
+    chmod +x /etc/service/${IMAGE}/run && \
+    chmod +x /usr/local/bin/check-version.sh-${IMAGE}
 
 EXPOSE 80
 

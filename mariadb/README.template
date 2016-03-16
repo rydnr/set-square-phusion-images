@@ -9,5 +9,15 @@ Examples:
 - Run a MariaDB instance, to be used outside Docker containers:
 > docker run -d -p [port]:3306 ${NAMESPACE}/${IMAGE}:${TAG}
 
+- Run a MariaDB instance, disabling the "strict mode":
+> docker run -d --name db -e DISABLE_STRICT_MODE=true ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MariaDB instance, using the alternate boolean syntax:
+> docker run -d --name db -e ALTERNATE_BOOLEAN_SYNTAX=true ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MariaDB instance, with a different pool size factor:
+> docker run -d --name db -e INNODB_POOL_SIZE_FACTOR=0.5 ${NAMESPACE}/${IMAGE}:${TAG}
+
 - Run a MariaDB instance with specific configuration:
 > docker run -d --name db -v [my-db-conf]:/etc/mysql/my.cnf ${NAMESPACE}/${IMAGE}:${TAG}
+

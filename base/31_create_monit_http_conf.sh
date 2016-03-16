@@ -36,7 +36,7 @@ function defineErrors() {
   export AWK_NOT_INSTALLED="awk not installed";
   export GREP_NOT_INSTALLED="grep not installed";
   export CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0="Cannot retrieve the /16 subnet for eth0";
-  
+
   ERROR_MESSAGES=(\
     INVALID_OPTION \
     CUT_NOT_INSTALLED \
@@ -109,7 +109,7 @@ function retrieve_eth0_subnet_16() {
     exitWithErrorCode CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0;
   fi
 }
-        
+
 ## Main logic
 ## dry-wit hook
 function main() {
@@ -131,4 +131,4 @@ set httpd port ${MONIT_HTTP_PORT} and
 #       then alert
 EOF
   logInfoResult SUCCESS "done";
-}  
+}
