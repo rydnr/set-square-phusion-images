@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo "### VERSIONCHECK daily ###"
+for s in /usr/local/bin/latest-*.sh; do
+  $s
+done
+echo

@@ -11,7 +11,7 @@ ENV SERVICE_VERSION="2.4.7" \
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
-COPY check-version.sh /usr/local/bin/check-version.sh-${IMAGE}
+COPY check-version /usr/local/bin/check-version.sh-${IMAGE}
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
 RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \

@@ -69,3 +69,4 @@ getboo/rc.local
 ghost/config.js
 graphite/local_settings.py
 observium/setup.sql
+**/LICENSE
