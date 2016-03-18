@@ -8,7 +8,7 @@ ENV TERM linux
 @include("addon-toggles")
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
-     process-file.sh data check-version \
+     process-file.sh data check-version latest.sh latest.inc.sh \
      /usr/local/bin/
 COPY 20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
