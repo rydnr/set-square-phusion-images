@@ -26,9 +26,3 @@ defineEnvVar TTRSS_CHECK_FOR_UPDATES "Check for updates automatically" "true";
 defineEnvVar TTRSS_ENABLE_GZIP_OUTPUT "Selectively gzip output to improve wire performance" false;
 defineEnvVar TTRSS_PLUGINS "Comma-separated list of plugins to load automatically for all users" "auth_internal, note";
 defineEnvVar TTRSS_LOG_DESTINATION "Log destination to use. Possible values: sql (uses internal logging you can read in Preferences -> System), syslog - logs to system log. Setting this to blank uses PHP logging (usually to http server error.log)" "sql";
-defineEnvVar LICENSE_FILE \
-             "The file with the license details" \
-             'LICENSE.gpl3';
-defineEnvVar COPYRIGHT_PREAMBLE_FILE \
-             "The file with the copyright preamble" \
-             'copyright-preamble.default.txt';

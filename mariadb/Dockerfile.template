@@ -4,6 +4,10 @@ FROM ${BASE_IMAGE}:${TAG}
 
 @include("addon-toggles")
 
+ENV SERVICE_PACKAGE="mariadb-server" \
+    SERVICE_USER="mysql" \
+    SERVICE_GROUP="mysql"
+
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
@@ -19,10 +23,14 @@ RUN ${APTGET_INSTALL} --update mariadb-server bc && \
     sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" /etc/mysql/my.cnf && \
     ${APTGET_CLEANUP} && \
     update-rc.d mysql disable && \
-    gpasswd -a mysql crontab && \
+    gpasswd -a ${SERVICE_USER} crontab && \
     rm -f /etc/init.d/mysql && \
     mkdir /var/lib/mysql-sql && \
-    chown -R mysql:mysql /var/lib/mysql /var/lib/mysql-sql && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lib/mysql /var/lib/mysql-sql && \
+    cd /usr/local/bin && \
+    ln -s check-version.sh check-version-${IMAGE}.sh && \
+    ln -s local-ubuntu-version.sh local-version-${IMAGE}.sh && \
+    ln -s remote-ubuntu-version.sh remote-version-${IMAGE}.sh && \
     chmod +x /etc/service/${IMAGE}/run && \
     chmod +x /usr/local/bin/bootstrap-db.sh
 
