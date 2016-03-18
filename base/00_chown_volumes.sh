@@ -115,14 +115,17 @@ function process_volumes() {
   local _dockerfile="${2}";
   local _aux;
   local _single;
-  local _oldIFS="${IFS}";
-  IFS=$'\n';
-  for _aux in $(grep VOLUME "${_dockerfile}" | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
-    IFS="${_oldIFS}";
-    logInfo -n "Changing the ownership of ${v} (declared as volume in ${DOCKERFILES_LOCATION}/${p})";
-    chown_volume "${_user}" "${_group}" "${_aux}";
-    logInfoResult SUCCESS "done";
-  done
+  grep VOLUME "${_dockerfile}" 2>&1 > /dev/null
+  if [ $? -eq 0 ]; then
+    local _oldIFS="${IFS}";
+    IFS=$'\n';
+    for _aux in $(grep VOLUME "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
+      IFS="${_oldIFS}";
+      logInfo -n "Changing the ownership of ${v} (declared as volume in ${DOCKERFILES_LOCATION}/${p})";
+      chown_volume "${_user}" "${_group}" "${_aux}";
+      logInfoResult SUCCESS "done";
+    done
+  fi
 }
 
 ## Main logic
@@ -136,9 +139,9 @@ function main() {
   fi
   local _group="${SERVICE_GROUP}";
   if [ -z ${SERVICE_GROUP} ]; then
-      logWarn "SERVICE_GROUP environment variable not found. Assuming ${_user}.";
+    logWarn "SERVICE_GROUP environment variable not found. Assuming ${_user}.";
   else
-      _group="${_user}";
+    _group="${_user}";
   fi
   for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
     process_volumes "${_user}" "${_group}" "${DOCKERFILES_LOCATION}/${p}";

@@ -8,7 +8,8 @@ ENV TERM linux
 @include("addon-toggles")
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
-     process-file.sh data check-version latest.sh latest.inc.sh \
+     process-file.sh data check-version.sh check-version.inc.sh \
+     local-ubuntu-version.sh remote-ubuntu-version.sh local-git-version.sh remote-git-version.sh \
      /usr/local/bin/
 COPY 20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
@@ -51,9 +52,7 @@ COPY service.monit /etc/service/monit/run
 
 RUN mkdir /Dockerfiles && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    ${APTGET_INSTALL} --update wget mailutils gettext && \
-    ${APTGET_INSTALL} monit && \
-    ${APTGET_INSTALL} rsnapshot && \
+    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
     chmod +x /etc/service/.template/log/run && \
@@ -92,7 +91,7 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 # - service: to run the process (letting runit handling forking it).
 # - monit.conf: how to monitor the process (or disable monit via declaring ENABLE_MONIT=false).
 # - backup.sh: a custom backup script, if necessary.
-# - check-version.sh-${DOLLAR}{IMAGE}: A script to retrieve the information about the latest version of the service.
+# - check-version-${DOLLAR}{IMAGE}: A script to retrieve the information about the latest version of the service.
 # - ${DOLLAR}{SERVICE_GROUP}: The group of the user under which the service runs. Defaults to ${DOLLAR}{SERVICE_USER}.
 # - ${DOLLAR}{SERVICE_PACKAGE}: The package name, if the service is installed through the package manager.
 #

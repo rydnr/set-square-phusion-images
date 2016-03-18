@@ -9,7 +9,7 @@ $SCRIPT_NAME [-h|--help]
 (c) 2015-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
 
-Retrieves the latest version identifier.
+Retrieves the current version of the package.
 
 Common flags:
     * -h | --help: Display this message.
@@ -23,15 +23,11 @@ EOF
 ## dry-wit hook
 function defineErrors() {
   export INVALID_OPTION="Unrecognized option";
-  export SERVICE_VERSION_UNAVAILABLE="The SERVICE_VERSION information is not available";
-  export CHECK_VERSION_SCRIPT_UNAVAILABLE="The check-version.sh script is not available";
-  export EMPTY_RESPONSE_FROM_CHECK_VERSION_SCRIPT="Empty response from check-version.sh script";
+  export CANNOT_RETRIEVE_SERVICE_VERSION="Cannot retrieve the service version, neither via SERVICE_VERSION environment variable nor using dpkg -p ${SERVICE_PACKAGE}";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
-    SERVICE_VERSION_UNAVAILABLE \
-    CHECK_VERSION_SCRIPT_UNAVAILABLE \
-    EMPTY_RESPONSE_FROM_CHECK_VERSION_SCRIPT \
+    CANNOT_RETRIEVE_SERVICE_VERSION \
   );
 
   export ERROR_MESSAGES;
@@ -59,15 +55,6 @@ function checkInput() {
     esac
   done
 
-  if [ -z ${SERVICE_VERSION} ]; then
-    logDebugResult FAILURE "failed";
-    exitWithErrorCode SERVICE_VERSION_UNAVAILABLE;
-  fi
-
-  if [ ! -f "${CHECK_VERSION_SCRIPT}" ]; then
-    logDebugResult FAILURE "failed";
-    exitWithErrorCode CHECK_VERSION_SCRIPT_UNAVAILABLE;
-  fi
   logDebugResult SUCCESS "valid";
 }
 
@@ -93,16 +80,14 @@ function parseInput() {
 ## Main logic
 ## dry-wit hook
 function main() {
-  local _suffix="$(basename $SCRIPT_NAME .sh)";
-  _suffix="${_suffix#latest}";
-  local _latest=$("${CHECK_VERSION_SCRIPT}${_suffix}");
-  if [ -n "${_latest}" ]; then
-    if [ "${_latest}" == "${SERVICE_VERSION}" ]; then
-      echo "up to date";
-    else
-      echo "New version available: ${_latest}";
-    fi
-  else
-    exitWithErrorCode EMPTY_RESPONSE_FROM_CHECK_VERSION_SCRIPT;
+  local _result;
+  if [ -n "${SERVICE_VERSION}" ]; then
+    _result="${SERVICE_VERSION}";
+  elif [ -n "${SERVICE_PACKAGE}" ]; then
+    _result="$(dpkg -p ${SERVICE_PACKAGE} | grep -e '^Version: ' | cut -d' ' -f2)";
   fi
+  if [ -z ${_result} ]; then
+    exitWithErrorCode CANNOT_RETRIEVE_SERVICE_VERSION;
+  fi
+  echo "${_result}";
 }

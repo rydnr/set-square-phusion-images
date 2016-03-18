@@ -1,3 +1,0 @@
-#!/bin/bash
-
-apt-cache madison ${SERVICE_PACKAGE} | tail -n 1 | awk '{print $3;}'

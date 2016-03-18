@@ -1,1 +1,1 @@
-# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME})
+# ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile (generated at ${TIME} by ${BUILDER})

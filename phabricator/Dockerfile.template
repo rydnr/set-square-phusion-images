@@ -7,11 +7,8 @@ FROM ${NAMESPACE}/apache:${TAG}
 RUN mv /etc/service/apache/run /etc/service/apache/run-apache
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/apache/run
-COPY bootstrap /usr/local/bin/bootstrap
-COPY bootstrap.defaults /usr/local/bin/bootstrap.inc.sh
-COPY runme /usr/local/bin/runme
-COPY phabricator-cli /usr/local/bin/phabricator-cli
-COPY upgrade /usr/local/bin/upgrade
+COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade \
+     /usr/local/bin/
 
 ENV VIRTUAL_HOST="${PHABRICATOR_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8000 \
@@ -56,6 +53,10 @@ RUN ${APTGET_INSTALL} \
     ln -s runme sql && \
     ln -s runme sql-post && \
     ln -s runme liquibase && \
+    ln -s check-git-version.sh check-version-libphutil.sh && \
+    ln -s check-git-version.sh check-version-arcanist.sh && \
+    ln -s check-git-version.sh check-version-phabricator.sh && \
+    ln -s check-git-version.sh check-version-libphutil.sh && \
     for f in /opt/phabricator/bin/*; do ln -s phabricator-cli $(basename ${f}); done && \
     mkdir -p /usr/local/share/liquibase && \
     mkdir -p /usr/local/share/sql && \
