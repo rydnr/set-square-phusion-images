@@ -146,17 +146,18 @@ function extract_volumes() {
         fi
     done
     export RESULT=${_result[@]}
-}                
+}
 
 ## Main logic
 ## dry-wit hook
 function main() {
     sed -i -e 's/^backup/#backup/g' ${RSNAPSHOT_CONF}
-    for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
+    for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile' | grep -v 'copyright-preamble.txt'); do
         extract_volumes "${DOCKERFILES_LOCATION}/${p}";
         for v in ${RESULT}; do
             logInfo -n "Annotating ${v} for backup (defined as volume in ${DOCKERFILES_LOCATION}/${p})";
-            echo "backup ${v}/"$'\t'"localhost/" >> ${RSNAPSHOT_CONF};
+            echo "backup_script ssh ${BACKUP_USER}@${IMAGE}${BACKUP_HOST_SUFFIX} \"mkdir -p ~/$(hostname)${v#/backup}\" unused" >> ${RSNAPSHOT_CONF};
+            echo "backup ${v}/"$'\t'"${BACKUP_USER}@${IMAGE}${BACKUP_HOST_SUFFIX}:~/$(hostname)${v#/backup}" >> ${RSNAPSHOT_CONF};
             logInfoResult SUCCESS "done";
         done
     done

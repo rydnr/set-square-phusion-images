@@ -92,7 +92,7 @@ function chown_volume() {
     _single=1; # false, multiple
   fi
   if [ ${_single} -eq 0 ]; then
-    chown -R ${_user}:${_group} "${item}";
+    chown -R ${_user}:${_group} "${_aux}";
   else
     local _oldIFS="${IFS}";
     IFS='"';
@@ -112,16 +112,16 @@ function chown_volume() {
 function process_volumes() {
   local _user="${1}";
   local _group="${2}";
-  local _dockerfile="${2}";
+  local _dockerfile="${3}";
   local _aux;
   local _single;
-  grep VOLUME "${_dockerfile}" 2>&1 > /dev/null
+  grep -e '^\s*VOLUME\s' "${_dockerfile}" > /dev/null 2>&1
   if [ $? -eq 0 ]; then
     local _oldIFS="${IFS}";
     IFS=$'\n';
-    for _aux in $(grep VOLUME "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
+    for _aux in $(grep -e '^\s*VOLUME\s' "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
       IFS="${_oldIFS}";
-      logInfo -n "Changing the ownership of ${v} (declared as volume in ${DOCKERFILES_LOCATION}/${p})";
+      logInfo -n "Changing the ownership of ${_aux} (from ${DOCKERFILES_LOCATION}/${p})";
       chown_volume "${_user}" "${_group}" "${_aux}";
       logInfoResult SUCCESS "done";
     done

@@ -8,11 +8,13 @@ ENV TERM linux
 @include("addon-toggles")
 
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
-     process-file.sh data check-version.sh check-version.inc.sh \
+     process-file.sh data ssh.sh backup.sh backup-default.sh backup-default.inc.sh \
+     check-version.sh check-version.inc.sh \
      local-ubuntu-version.sh remote-ubuntu-version.sh local-git-version.sh remote-git-version.sh \
      /usr/local/bin/
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
+     21_tune_rsync_conf.sh 21_tune_rsync_conf.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
      31_create_monit_http_conf.sh 31_create_monit_http_conf.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \
@@ -31,8 +33,10 @@ RUN mkdir -p /etc/my_exec.d && \
     mkdir -p /etc/service/.template/log && \
     mkdir -p /etc/service/monit/log && \
     mkdir -p /etc/service/cron/log && \
+    mkdir -p /etc/service/sshd/log && \
     touch /var/local/docker-installed-packages.txt && \
     chmod +x /usr/local/bin/* && \
+    chmod -x /usr/local/bin/*.inc.sh && \
     chmod +x /etc/my_init.d/* && \
     chmod -x /etc/my_init.d/*.inc.sh && \
     chmod +x /sbin/my_exec && \
@@ -44,7 +48,6 @@ COPY my_exec.cron /etc/my_exec.d/cron
 COPY my_exec.help /etc/my_exec.d/help
 COPY my_exec.monit /etc/my_exec.d/monit
 COPY my_exec.rsnapshot /etc/my_exec.d/rsnapshot
-COPY my_exec.ssh /etc/my_exec.d/ssh
 COPY my_exec.syslog /etc/my_exec.d/syslog
 
 COPY logger /etc/service/.template/log/run
@@ -52,6 +55,7 @@ COPY service.cron /etc/service/cron/run
 COPY service.monit /etc/service/monit/run
 
 RUN mkdir /Dockerfiles && \
+    /usr/sbin/usermod -d /backup backup && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
@@ -61,10 +65,14 @@ RUN mkdir /Dockerfiles && \
     ln -s -- /usr/local/bin/help /usr/local/bin/-h && \
     ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
     ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile && \
+    ln -s -- /usr/local/bin/backup.sh /usr/local/bin/backup && \
+    ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-public && \
+    ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-private && \
     cp /etc/service/.template/log/run /etc/service/cron/log/run && \
     chmod +x /etc/service/cron/run && \
     cp /etc/service/.template/log/run /etc/service/monit/log/run && \
     chmod +x /etc/service/monit/run && \
+    cp /etc/service/.template/log/run /etc/service/sshd/log/run && \
     sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc && \
     sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
@@ -80,6 +88,8 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 @include("copy-metadata")
 @include("instructions")
 
+# * DOCKERFILES
+#
 # Children must provide:
 # - /README: to describe the image.
 # - /LICENSE: rights and restrictions on how to use, inspect, modify and distribute this image.
@@ -91,7 +101,6 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 # Children should provide:
 # - service: to run the process (letting runit handling forking it).
 # - monit.conf: how to monitor the process (or disable monit via declaring ENABLE_MONIT=false).
-# - backup.sh: a custom backup script, if necessary.
 # - check-version-${DOLLAR}{IMAGE}: A script to retrieve the information about the latest version of the service.
 # - ${DOLLAR}{SERVICE_GROUP}: The group of the user under which the service runs. Defaults to ${DOLLAR}{SERVICE_USER}.
 # - ${DOLLAR}{SERVICE_PACKAGE}: The package name, if the service is installed through the package manager.
@@ -105,7 +114,7 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 # COPY backup.sh /usr/local/bin/backup-${DOLLAR}{NAMESPACE}-${DOLLAR}{IMAGE}_${DOLLAR}{TAG}.sh
 # COPY check-version.sh /usr/local/bin/check-version.sh-${DOLLAR}{SERVICE}
 # RUN chmod +x /usr/local/bin/*
-
+#
 # If the process is itself a daemon which cannot be run in foreground,
 # then provide a LSB-like script and call it from within /etc/rc.local:
 # COPY service /etc/rc.local
@@ -119,3 +128,25 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 # COPY Dockerfile /Dockerfiles/${DOLLAR}{NAMESPACE}-${DOLLAR}{IMAGE}.${DOLLAR}{TAG}
 #
 # And last, adding comments on how to run the image is very helpful.
+#
+# * BACKUPS
+#
+# If ENABLE_RSNAPSHOT is activated at build time, then the resulting image will
+# trigger a built-in rsnapshot-based backup mechanism.
+# Such mechanism analyzes all VOLUMEs in all Dockerfiles (the image's, and its ancestors).
+# For all volumes under /backup folder, rsnapshot will take care of their backup.
+# Additionally, if the Dockerfile stores scripts starting by "backup-"
+# in /usr/local/bin, rsnapshot will invoke them passing the volume folder as argument.
+#
+# Once the cron daemon triggers awakes the rsnapshot process, it will run any backup
+# scrips, and will try to transfer the contents of the backup volumes to a remote
+# server (${IMAGE}${BACKUP_HOST_PREFIX}), using the "backup" user.
+# To authenticate, it will use the very same ssh key generated when building
+# this image.
+#
+# Therefore, the expected way to set a remotely-hosted backup, is:
+# 1) Run this image in a remote host that will store the backups:
+#    > docker run -d --name ${IMAGE}-backup --hostname ${IMAGE}-backup \
+#             (-v [host-path]:[volume])+ \
+#             -p ${BACKUP_HOST_SSH_PORT}:22 ${{NAMESPACE}/backup backup 
+# 2) Launch container(s) normally (as described in their README).

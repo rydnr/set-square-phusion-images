@@ -6,13 +6,15 @@ FROM ${BASE_IMAGE}:${TAG}
 
 ENV SERVICE_PACKAGE="mariadb-server" \
     SERVICE_USER="mysql" \
-    SERVICE_GROUP="mysql"
+    SERVICE_GROUP="mysql" \
+    DOBACKUP="true"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
-ADD conf.d /usr/local/etc/mysql
+COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
+ADD conf.d /etc/mysql/conf.d
 
 #RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
 #RUN add-apt-repository \'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
@@ -32,13 +34,23 @@ RUN ${APTGET_INSTALL} --update mariadb-server bc && \
     ln -s local-ubuntu-version.sh local-version-${IMAGE}.sh && \
     ln -s remote-ubuntu-version.sh remote-version-${IMAGE}.sh && \
     chmod +x /etc/service/${IMAGE}/run && \
-    chmod +x /usr/local/bin/bootstrap-db.sh
+    chmod +x /usr/local/bin/bootstrap-db.sh && \
+    mkdir -p /backup/var/lib && \
+    mv /var/lib/mysql /backup/var/lib && \
+    ln -s /backup/var/lib/mysql /var/lib/ && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.monthly && \
+    ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.daily && \
+    ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.weekly && \
+    ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.monthly
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
 EXPOSE 3306
 
-VOLUME /var/lib/mysql
+VOLUME /backup/var/lib/mysql
 VOLUME /etc/mysql/conf.d
 
 @include("copy-metadata")

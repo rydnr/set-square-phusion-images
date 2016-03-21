@@ -4,6 +4,9 @@ FROM ${BASE_IMAGE}:${TAG}
 
 @include("addon-toggles")
 
+ENV DOBACKUP="true" \
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
+
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf

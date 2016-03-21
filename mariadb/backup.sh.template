@@ -1,0 +1,3 @@
+#!/bin/bash
+
+mysqldump -u root -p ${MARIADB_ROOT_PASSWORD} -A > /backup/dump-$(hostname).sql

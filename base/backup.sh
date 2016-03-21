@@ -147,43 +147,40 @@ function extract_volumes() {
   export RESULT=${_result[@]}
 }
 
-## Checks whether backups are enabled as a whole.
-## <- RESULT: 0 if so, 1 otherwise.
-## Example:
-##   is_backup_enabled -> false
-##   # assuming the environment variable is DOBACKUP
-##   export DOBACKUP=0; is_backup_enabled -> true
-function is_backup_enabled() {
-  local _result;
-  _evalVar "${ENABLE_BACKUP_ENVIRONMENT_VARIABLE}";
-  local _dobackup="${RESULT}";
-  if [ -z ${_dobackup+x} ]; then
-    _result=0;
-  else
-    result=1;
-  fi
-  return ${_result};
-}
-
 ## Main logic
 ## dry-wit hook
 function main() {
-  if is_backup_enabled; then
-    sed -i -e 's/^backup/#backup/g' ${RSNAPSHOT_CONF}
-    for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
-      extract_volumes "${DOCKERFILES_LOCATION}/${p}";
-      for v in ${RESULT}; do
-        logInfo -n "Annotating ${v} for backup (defined as volume in ${DOCKERFILES_LOCATION}/${p})";
-        for f in ${CUSTOM_BACKUP_SCRIPTS_FOLDER}/${CUSTOM_BACKUP_SCRIPT_PREFIX}*; do
-          if [ -x "$f" ]; then
-                 grep -e "^backup"$'\t'"${v}"$'\t'"$(hostname)" ${RSNAPSHOT_CONF} > /dev/null \
-              || echo "backup"$'\t'"${v}"$'\t'"$(hostname)" >> ${RSNAPSHOT_CONF}
-          fi
-        done
-        logInfoResult SUCCESS "done";
-      done
-    done
-  else
-    logInfo "Backup disabled for this image.";
-  fi
+  local _suffix;
+  local _destFolder;
+  for f in ${SQ_CUSTOM_BACKUP_SCRIPTS_FOLDER}/${SQ_CUSTOM_BACKUP_SCRIPTS_PREFIX}*.{hourly,daily,weekly,monthly}; do
+    _basename="$(basename $f)";
+    _suffix="${_basename#*\.}";
+    if [ -d /etc/cron.${_suffix} ]; then
+      ln -s ${f} /etc/cron.${_suffix}/${_basename%\.*};
+      chmod +x ${f};
+    fi
+  done
+  chmod -x /etc/my_init.d/*
+  for s in $(ls /etc/service | grep -v sshd | grep -v syslog ); do
+    rm -rf /etc/service/${s}
+  done
+  logInfoResult SUCCESS "done";
+  logInfo -n "Enabling SSH";
+  rm -f /etc/service/sshd/down
+  chmod +x /etc/service/sshd/run
+  export DISABLE_ALL=true
+  export ENABLE_SSH=true
+  logInfoResult SUCCESS "done";
+  logInfo -n "Configuring SSH key";
+  mkdir /backup/.ssh
+  chmod 700 /backup/.ssh
+  cat /etc/ssh/*.pub >> /backup/.ssh/authorized_keys2
+  chmod 600 /backup/.ssh/authorized_keys2
+  sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config
+  sed -i 's|^#AuthorizedKeysFile\(\s+\).ssh/authorized_keys|AuthorizedKeysFile .ssh/authorized_keys|g' /etc/ssh/sshd_config
+  chown -R backup:backup /backup
+  logInfoResult SUCCESS "done";
+  usermod -s /bin/bash backup
+  /sbin/my_init
 }
+

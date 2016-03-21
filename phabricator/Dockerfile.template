@@ -12,7 +12,8 @@ COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade \
 
 ENV VIRTUAL_HOST="${PHABRICATOR_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8000 \
-    TIMEZONE="${DEFAULT_TIMEZONE}"
+    TIMEZONE="${DEFAULT_TIMEZONE}" \
+    DOBACKUP="true"
 
 RUN ${APTGET_INSTALL} \
         git libapache2-mod-php5 dpkg-dev \
@@ -27,6 +28,9 @@ RUN ${APTGET_INSTALL} \
     git clone https://github.com/phacility/libphutil.git && \
     git clone https://github.com/phacility/arcanist.git && \
     git clone https://github.com/phacility/phabricator.git && \
+    for p in libphputil arcanist phabricator; do \
+      cd /opt/${p} && git checkout stable; \
+    done && \
     a2dissite 000-default.conf && \
     a2enmod rewrite && \
     php5enmod mcrypt && \
@@ -78,14 +82,23 @@ RUN ${APTGET_INSTALL} \
     ${APTGET_CLEANUP} && \
     rm -rf /var/lib/mysql && \
     rm -rf /opt/liquibase* && \
-    rm -rf /opt/php5*
+    rm -rf /opt/php5* && \
+    mkdir -p /backup/var/local && \
+    mv /var/repo /backup/var/repo && \
+    ln -s /backup/var/repo /var/repo && \
+    mv /var/local/phabricator /backup/var/local/phabricator && \
+    ln -s /backup/var/local/phabricator /var/local/phabricator && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.monthly
 
 EXPOSE 8000
 
 VOLUME /usr/local/share/liquibase
 VOLUME /usr/local/share/sql
-VOLUME /var/local/phabricator
-VOLUME /var/repo
+VOLUME /backup/var/local/phabricator
+VOLUME /backup/var/repo
 
 @include("copy-metadata")
 @include("instructions")

@@ -1,6 +1,6 @@
 COPY README /README
 COPY ${LICENSE_FILE} /LICENSE
-COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
+COPY ${COPYRIGHT_PREAMBLE_FILE} /copyright.txt
 COPY Dockerfile /Dockerfiles/Dockerfile
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 

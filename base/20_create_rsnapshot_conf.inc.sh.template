@@ -4,13 +4,7 @@ defineEnvVar DOCKERFILES_LOCATION \
 defineEnvVar RSNAPSHOT_CONF \
              "The rsnapshot configuration file" \
              "/etc/rsnapshot.conf";
-defineEnvVar BACKUP_HOST \
-             "The remote backup host" \
-             "${BACKUP_HOST}";
-defineEnvVar BACKUP_REMOTE_USER \
-             "The remote user for sending backup files remotely" \
-             "${BACKUP_REMOTE_USER}";
-defineEnvVar CUSTOM_BACKUP_SCRIPT_FOLDER \
+defineEnvVar CUSTOM_BACKUP_SCRIPTS_FOLDER \
              "The folder where the backup scripts, if any, are located" \
              "/usr/local/bin";
 defineEnvVar CUSTOM_BACKUP_SCRIPT_PREFIX \
