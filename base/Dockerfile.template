@@ -18,6 +18,7 @@ COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
      31_create_monit_http_conf.sh 31_create_monit_http_conf.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \
+     40_create_ssl_certificate_openssl.sh 40_create_ssl_certificate.inc.sh \
      /etc/my_init.d/
 COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
@@ -39,6 +40,7 @@ RUN mkdir -p /etc/my_exec.d && \
     chmod -x /usr/local/bin/*.inc.sh && \
     chmod +x /etc/my_init.d/* && \
     chmod -x /etc/my_init.d/*.inc.sh && \
+    ln -s /etc/my_init.d/40_create_ssl_certificate.inc.sh /etc/my_init.d/40_create_ssl_certificate_openssl.inc.sh && \
     chmod +x /sbin/my_exec && \
     chmod +x /etc/cron.daily/* && \
     chmod +x /etc/cron.weekly/* && \
@@ -78,6 +80,8 @@ RUN mkdir /Dockerfiles && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
     sed -i 's|^#ssh_args.*|ssh_args\t-i /etc/ssh/ssh_host_dsa_key|g' /etc/rsnapshot.conf && \
     ${APTGET_CLEANUP}
+
+#    /usr/local/bin/create-ssl-certificate-openssl.sh && \
 
 ENTRYPOINT ["/sbin/my_exec"]
 CMD ["/sbin/my_init"]

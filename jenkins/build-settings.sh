@@ -14,15 +14,15 @@ defineEnvVar TOMCAT_HOME \
 defineEnvVar JENKINS_HOME \
              "The home directory of Jenkins" \
              "/var/jenkins_home";
-defineEnvVar TOMCAT_USER \
-             "The Tomcat user" \
-             "tomcat";
-defineEnvVar TOMCAT_GROUP \
-             "The Tomcat group" \
-             "tomcat";
 defineEnvVar JENKINS_GROUP \
              "The Jenkins group" \
              "jenkins";
+defineEnvVar TOMCAT_USER \
+             "The Tomcat user" \
+             '${JENKINS_USER}';
+defineEnvVar TOMCAT_GROUP \
+             "The Tomcat group" \
+             '${JENKINS_GROUP}';
 defineEnvVar JENKINS_MAVEN_FOLDER \
              "The Maven folder" \
              'apache-maven-${JENKINS_MAVEN_VERSION}-bin';
@@ -32,3 +32,4 @@ defineEnvVar JENKINS_MAVEN_FILE \
 defineEnvVar JENKINS_MAVEN_DOWNLOAD_URL \
              "The url to download Maven" \
              'https://www.eu.apache.org/dist/maven/maven-3/${JENKINS_MAVEN_VERSION}/binaries/${JENKINS_MAVEN_FILE}';
+defineEnvVar JENKINS_DEFAULT_VIRTUAL_HOST "The default virtual host for Jenkins" 'jenkins.${DOMAIN}';

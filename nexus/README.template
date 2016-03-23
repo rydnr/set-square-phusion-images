@@ -9,9 +9,9 @@ Examples:
 > docker run -it -p [port]:8081 ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Run Nexus, mounting its persistent data to a host volume
-> docker run -it -p [port]:8081 -v [host-folder]:/${SONATYPE_WORK} ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -it -p [port]:8081 -v [host-folder]:/sonatype_work ${NAMESPACE}/${IMAGE}:${TAG}
 
-- Run Nexus, using a data container to store its persistent data (which declares ${SONATYPE_WORK} as volume}:
+- Run Nexus, using a data container to store its persistent data (which declares /sonatype_work as volume}:
 > docker run -it -p [port]:8081 --volumes-from [data-container] ${NAMESPACE}/${IMAGE}:${TAG}
 
 - To customize how Logstash processes Nexus logs:

@@ -5,23 +5,39 @@ FROM ${NAMESPACE}/java:${TAG}
 @include("addon-toggles")
 
 ENV DOBACKUP="true" \
-    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
+    VIRTUAL_HOST="${NEXUS_DEFAULT_VIRTUAL_HOST}" \
+    VIRTUAL_PORT="8081"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-
+COPY 50_update_nexus_ssl_config.sh 50_update_nexus_ssl_config.inc.sh \
+     /etc/my_init.d/
+     
 RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false nexus && \
     cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
     mkdir /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
     rm -rf /tmp/nexus-${NEXUS_VERSION} /var/tmp/${NEXUS_ARTIFACT} && \
-    chown -R nexus /opt/sonatype
+    mkdir /backup && \
+    mkdir -p /backup/nexus-conf /backup/nexus-blobs && \
+    ln -s /backup/nexus-conf /sonatype-work/etc && \
+    ln -s /backup/nexus-blobs /sonatype-work/blobs && \
+    chown -R nexus /opt/sonatype /sonatype-work && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
+    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.monthly
 
-VOLUME /sonatype-work
+VOLUME /backup/nexus-conf
+VOLUME /backup/nexus-blobs
 
 EXPOSE 8081
+EXPOSE 8082
+EXPOSE ${DOCKER_REGISTRY_PORT}
+EXPOSE 8444
 
 @include("copy-metadata")
 @include("instructions")

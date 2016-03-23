@@ -14,12 +14,12 @@
 JENKINS_USER=jenkins
 LOCKFILE=/var/lock/jenkins
 export PATH=/usr/local/bin:$PATH
-export HOME=/home/jenkins
-export JAVA_HOME=/usr/lib/jvm/java-7-oracle
-export JENKINS_BASEDIR=/home/jenkins
-export TOMCAT_HOME=$JENKINS_BASEDIR/apache-tomcat-6.0.18
+export HOME=/opt/tomcat
+export JAVA_HOME=/usr/lib/jvm/java
+export JENKINS_BASEDIR=/var/jenkins_home
+export TOMCAT_HOME=/opt/tomcat
 export CATALINA_PID=$JENKINS_BASEDIR/jenkins-tomcat.pid
-export CATALINA_OPTS="-DJENKINS_HOME=$JENKINS_BASEDIR/jenkins-home -Xmx512m -Djava.awt.headless=true"
+export CATALINA_OPTS="-DJENKINS_HOME=$JENKINS_BASEDIR -Xmx512m -Djava.awt.headless=true"
 
 [ -f $TOMCAT_HOME/bin/catalina.sh ] || exit 0
 
@@ -30,7 +30,7 @@ case "$1" in
   start)
         # Start daemon.
         echo -n "Starting Tomcat: "
-        su -p -s /bin/sh $JENKINS_USER -c "$TOMCAT_HOME/bin/catalina.sh start"
+        su -p -s /bin/sh ${JENKINS_USER} -c "$TOMCAT_HOME/bin/catalina.sh start"
         RETVAL=$?
         echo
         [ $RETVAL = 0 ] && touch $LOCKFILE

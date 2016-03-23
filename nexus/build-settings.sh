@@ -8,6 +8,5 @@ defineEnvVar NEXUS_ARTIFACT \
 defineEnvVar NEXUS_DOWNLOAD_URL \
              "The url to download Nexus from" \
              'https://download.sonatype.com/nexus/oss/${NEXUS_ARTIFACT}';
-defineEnvVar BACKUP_HOST_SSH_PORT \
-             "The SSH port of the backup host" \
-             "$(grep -e nexus sshports.txt || echo nexus 22 | awk '{print $2;}')";
+defineEnvVar NEXUS_DEFAULT_VIRTUAL_HOST "The default virtual host for Nexus" 'nexus.${DOMAIN}';
+defineEnvVar DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry" "8443";

@@ -14,7 +14,7 @@ COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
 COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
-ADD conf.d /etc/mysql/conf.d
+#ADD conf.d /etc/mysql/conf.d
 
 #RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
 #RUN add-apt-repository \'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
