@@ -22,22 +22,30 @@ EOF
 ## Defines required dependencies
 ## dry-wit hook
 function defineReq() {
-  checkReq keytool KEYTOOL_NOT_AVAILABLE;
+  checkReq java JAVA_NOT_AVAILABLE;
 }
 
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
   export INVALID_OPTION="Unrecognized option";
-  export KEYTOOL_NOT_AVAILABLE="keytool is not installed";
-  export CANNOT_CREATE_SSL_KEY="Cannot create the SSL key pair";
-  export CANNOT_SIGN_SSL_CERTIFICATE="Cannot sign the SSL certificate";
+  export JAVA_NOT_AVAILABLE="java is not installed";
+  export CANNOT_UPDATE_KEYSTOREPATH_IN_JETTY_CONFIG="Cannot update KeyStorePath in Jetty configuration";
+  export CANNOT_UPDATE_TRUSTSTOREPATH_IN_JETTY_CONFIG="Cannot update TrustStorePath in Jetty configuration";
+  export CANNOT_UPDATE_KEYSTOREPASSWORD_IN_JETTY_CONFIG="Cannot update KeyStorePassword in Jetty configuration";
+  export CANNOT_UPDATE_TRUSTSTOREPASSWORD_IN_JETTY_CONFIG="Cannot update TrustStorePassword in Jetty configuration";
+  export CANNOT_UPDATE_KEYMANAGERPASSWORD_IN_JETTY_CONFIG="Cannot update KeyManagerPassword in Jetty configuration";
+  export CANNOT_ENABLE_JETTY_HTTPS="Cannot enable Jetty HTTPS";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
-    KEYTOOL_NOT_AVAILABLE \
-    CANNOT_CREATE_SSL_KEY \
-    CANNOT_SIGN_SSL_CERTIFICATE \
+    JAVA_NOT_AVAILABLE \
+    CANNOT_UPDATE_KEYSTOREPATH_IN_JETTY_CONFIG \
+    CANNOT_UPDATE_TRUSTSTOREPATH_IN_JETTY_CONFIG \
+    CANNOT_UPDATE_KEYSTOREPASSWORD_IN_JETTY_CONFIG \
+    CANNOT_UPDATE_TRUSTSTOREPASSWORD_IN_JETTY_CONFIG \
+    CANNOT_UPDATE_KEYMANAGERPASSWORD_IN_JETTY_CONFIG \
+    CANNOT_ENABLE_JETTY_HTTPS \
   );
 
   export ERROR_MESSAGES;
@@ -102,8 +110,24 @@ function obfuscatePassword() {
 function updateKeyStorePath() {
   local _keyStorePath="${1}";
   local _configFile="${2}";
+
+  logInfo -n "Updating KeyStorePath in ${_configFile}";
   sed -i "s|<Set name=\"KeyStorePath\">.*</Set>|<Set name=\"KeyStorePath\">${_keyStorePath}</Set>|g" "${_configFile}";
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_UPDATE_KEYSTOREPATH_IN_JETTY_CONFIG;
+  fi
+
+  logInfo -n "Updating TrustStorePath in ${_configFile}";
   sed -i "s|<Set name=\"TrustStorePath\">.*</Set>|<Set name=\"TrustStorePath\">${_keyStorePath}</Set>|g" "${_configFile}";
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_UPDATE_TRUSTSTOREPATH_IN_JETTY_CONFIG;
+  fi
 }
 
 ## Updates the keystore password in given Jetty config file.
@@ -112,8 +136,24 @@ function updateKeyStorePath() {
 function updateKeyStorePassword() {
   local _keyStorePassword="${1}";
   local _configFile="${2}";
+
+  logInfo -n "Updating KeyStorePassword in ${_configFile}";
   sed -i "s|<Set name=\"KeyStorePassword\">.*</Set>|<Set name=\"KeyStorePassword\">${_keyStorePassword}</Set>|g" "${_configFile}";
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_UPDATE_KEYSTOREPASSWORD_IN_JETTY_CONFIG;
+  fi
+
+  logInfo -n "Updating TrustStorePassword in ${_configFile}";
   sed -i "s|<Set name=\"TrustStorePassword\">.*</Set>|<Set name=\"TrustStorePassword\">${_keyStorePassword}</Set>|g" "${_configFile}";
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_UPDATE_TRUSTSTOREPASSWORD_IN_JETTY_CONFIG;
+  fi
 }
 
 ## Updates the key password in given Jetty config file.
@@ -122,20 +162,37 @@ function updateKeyStorePassword() {
 function updateKeyPassword() {
   local _keyPassword="${1}";
   local _configFile="${2}";
+
+  logInfo -n "Updating KeyManagerPassword in ${_configFile}";
   sed -i "s|<Set name=\"KeyManagerPassword\">.*</Set>|<Set name=\"KeyManagerPassword\">${_keyPassword}</Set>|g" "${_configFile}";
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_UPDATE_KEYMANAGERPASSWORD_IN_JETTY_CONFIG;
+  fi
 }
 
 function appendHttpsConnectorPort() {
   local _file="${1}";
   local _port="${2}";
 
+  logInfo -n "Updating SSL port ${_port} in ${_file}";
   echo "application-port-ssl=${_port}" >> "${_file}";
+  logInfoResult SUCCESS "done";
 }
 
 function enableJettyHttpsConfig() {
   local _file="${1}";
 
-  sed "s|nexus-args=\(.*\)|nexus-args=\1,\${karaf.base}/etc/jetty-https.xml|g" "${_file}";
+  logInfo -n "Enabling Jetty-https in ${_file}";
+  sed -i "s|nexus-args=\(.*\)|nexus-args=\1,\${karaf.base}/etc/jetty-https.xml|g" "${_file}";
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_ENABLE_JETTY_HTTPS;
+  fi
 }
 
 ## Main logic

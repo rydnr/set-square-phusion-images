@@ -1,0 +1,9 @@
+defineEnvVar PASSWORD_CLASS "The Password class" "org.eclipse.jetty.util.security.Password";
+defineEnvVar PASSWORD_JAR_FILE 'The location of the Jetty jar with the ${PASSWORD_CLASS} class' '/opt/sonatype/nexus/system/org/eclipse/jetty/jetty-util/*/jetty-util-*.jar';
+defineEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" '${SQ_SSL_KEYSTORE_PASSWORD}';
+defineEnvVar SSL_KEY_PASSWORD "The key password" '${SQ_SSL_KEY_PASSWORD}';
+defineEnvVar SSL_KEYSTORE_PATH "The keystore path" '${SQ_SSL_KEY_FOLDER}/${SQ_SSL_KEYSTORE_NAME}.jks';
+defineEnvVar NEXUS_CONFIG_FILE "The Nexus config file" "/opt/sonatype/nexus/etc/org.sonatype.nexus.cfg";
+defineEnvVar NEXUS_PROPERTIES_FILE "The Nexus properties file" "/opt/sonatype/nexus/etc/custom.properties";
+defineEnvVar JETTY_HTTPS_CONFIG_FILE "The Jetty HTTPS configuration file" "/opt/sonatype/nexus/etc/jetty-https.xml";
+defineEnvVar DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry" "${DOCKER_REGISTRY_PORT}";

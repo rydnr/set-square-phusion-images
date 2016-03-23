@@ -15,7 +15,7 @@ RUN chmod +x /etc/service/${IMAGE}/run
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY 50_update_nexus_ssl_config.sh 50_update_nexus_ssl_config.inc.sh \
      /etc/my_init.d/
-     
+
 RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false nexus && \
     cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
@@ -26,6 +26,8 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
     ln -s /backup/nexus-conf /sonatype-work/etc && \
     ln -s /backup/nexus-blobs /sonatype-work/blobs && \
     chown -R nexus /opt/sonatype /sonatype-work && \
+    chmod +x /etc/my_init.d/*.sh && \
+    chmod -x /etc/my_init.d/*.inc.sh && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
