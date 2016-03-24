@@ -34,6 +34,7 @@ function defineErrors() {
   export CANNOT_GENERATE_SSL_KEY="Cannot generate the SSL key pair";
   export CANNOT_GENERATE_SSL_CERTIFICATE="Cannot generate the SSL certificate";
   export CANNOT_SIGN_SSL_CERTIFICATE="Cannot sign the SSL certificate";
+  export CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS="Cannot update the permissions of ${SSL_KEY_FOLDER}";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
@@ -41,6 +42,7 @@ function defineErrors() {
     CANNOT_GENERATE_SSL_KEY \
     CANNOT_GENERATE_SSL_CERTIFICATE \
     CANNOT_SIGN_SSL_CERTIFICATE \
+    CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS \
   );
 
   export ERROR_MESSAGES;
@@ -98,9 +100,9 @@ function generateKeyPair() {
   local _result="${_outputDir}/${SSL_CERTIFICATE_ALIAS}.key";
 
   logInfo -n "Generating a new SSL key pair";
-  openssl genrsa -${SSL_KEY_ENCRYPTION:-aes128} \
-          -passout "pass:${SSL_KEY_PASSWORD}" \
-          -out "${_result}" > /dev/null > 2>&1;
+  openssl genrsa -${SSL_KEY_ENCRYPTION} \
+          -passout pass:"${SSL_KEY_PASSWORD}" \
+          -out "${_result}" > /dev/null 2>&1;
   if [ $? -eq 0 ]; then
     logInfoResult SUCCESS "done";
   else
@@ -133,6 +135,7 @@ function generateCSR() {
     logInfoResult FAILURE "failed";
     exitWithErrorCode CANNOT_GENERATE_SSL_CERTIFICATE;
   fi
+
   export RESULT="${_result}";
 }
 
@@ -164,6 +167,27 @@ function generateCertificate() {
   export RESULT="${_result}";
 }
 
+## Changes the permissions of given folder.
+## -> 1: The folder to update.
+## -> 2: The user.
+## -> 3: The group.
+function updateFolderPermissions() {
+  local _dir="${1}";
+  local _user="${2}";
+  local _group="${3}";
+
+  logInfo -n "Fixing permissions of ${_dir}";
+
+  chown -R ${_user}:${_group} ${_dir};
+
+  if [ $? -eq 0 ]; then
+      logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS;
+  fi
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
@@ -174,5 +198,6 @@ function main() {
   generateCSR "${SSL_KEY_FOLDER}" "${_key}";
   _csr="${RESULT}";
   generateCertificate "${SSL_KEY_FOLDER}" "${_key}" "${_csr}";
-}
 
+  updateFolderPermissions "${SSL_KEY_FOLDER}" "${SERVICE_USER}" "${SERVICE_GROUP}";
+}

@@ -31,14 +31,14 @@ function defineReq() {
 function defineErrors() {
   export INVALID_OPTION="Unrecognized option";
   export KEYTOOL_NOT_AVAILABLE="keytool is not installed";
-  export CANNOT_CREATE_SSL_KEY="Cannot create the SSL key pair";
   export CANNOT_SIGN_SSL_CERTIFICATE="Cannot sign the SSL certificate";
+  export CANNOT_UPDATE_KEYSTORE_FOLDER_PERMISSIONS="Cannot update the permissions of ${SSL_KEYSTORE_FOLDER}";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
     KEYTOOL_NOT_AVAILABLE \
-    CANNOT_CREATE_SSL_KEY \
     CANNOT_SIGN_SSL_CERTIFICATE \
+    CANNOT_UPDATE_KEYSTORE_FOLDER_PERMISSIONS \
   );
 
   export ERROR_MESSAGES;
@@ -88,37 +88,12 @@ function parseInput() {
   done
 }
 
-## Generates a key pair.
-## -> 1: The output folder.
-function generateKeyPair() {
-  local _outputDir="${1}";
-  logInfo -n "Generating new SSL keys and certificates";
-  pushd "${_outputDir}" > /dev/null;
-  keytool -keystore "${SSL_KEYSTORE_NAME}" \
-          -alias "${SSL_CERTIFICATE_ALIAS}" \
-          -genkey \
-          -noprompt \
-          -dname "${SSL_CERTIFICATE_DNAME}" \
-          -keyalg "${SSL_KEY_ALGORITHM}" \
-          -keypass "${SSL_KEY_PASSWORD}" \
-          -storepass "${SSL_STORE_PASSWORD}";
-  if [ $? -eq 0 ]; then
-      export RESULT="${_result}";
-      logInfoResult SUCCESS "done";
-  else
-    export RESULT="";
-    logInfoResult FAILURE "failed";
-    exitWithErrorCode CANNOT_CREATE_SSL_KEY;
-  fi
-  popd > /dev/null;
-}
+## Generates and signs a new certificate.
+function generateAndSignCertificate() {
 
-## Signs the certificate with the default key.
-## -> 1: The output folder.
-function signCertificate() {
-  local _outputDir="${1}";
+  # See https://stackoverflow.com/questions/33827789/self-signed-certificate-dnsname-components-must-begin-with-a-letter
+
   logInfo -n "Signing the SSL certificate";
-  pushd "${_outputDir}" > /dev/null;
   keytool -keystore "${SSL_KEYSTORE_NAME}" \
           -alias "${SSL_CERTIFICATE_ALIAS}" \
           -genkey \
@@ -126,24 +101,48 @@ function signCertificate() {
           -dname "${SSL_CERTIFICATE_DNAME}" \
           -keyalg "${SSL_KEY_ALGORITHM}" \
           -keypass "${SSL_KEY_PASSWORD}" \
-          -storepass "${SSL_STORE_PASSWORD}" \
-          -sigalg "${SSL_SIGN_ALGORITHM}" \
-          -ext "SAN=${SSL_SAN_EXTENSIONS}";
+          -storepass "${SSL_KEYSTORE_PASSWORD}" \
+          -storetype "${SSL_KEYSTORE_TYPE}" \
+          -keysize ${SSL_KEY_LENGTH} \
+          -validity ${SSL_CERTIFICATE_EXPIRATION_DAYS} \
+          -sigalg "${SSL_JAVA_SIGN_ALGORITHM}";
+#          -ext "SAN=${SSL_SAN_EXTENSIONS}";
+
   if [ $? -eq 0 ]; then
-      export RESULT="${_result}";
-      logInfoResult SUCCESS "done";
+    logInfoResult SUCCESS "done";
   else
-    export RESULT="";
     logInfoResult FAILURE "failed";
     exitWithErrorCode CANNOT_SIGN_SSL_CERTIFICATE;
   fi
-  popd > /dev/null;
+
+  export RESULT="${_result}";
+}
+
+## Changes the permissions of given folder.
+## -> 1: The folder to update.
+## -> 2: The user.
+## -> 3: The group.
+function updateFolderPermissions() {
+  local _dir="${1}";
+  local _user="${2}";
+  local _group="${3}";
+
+  logInfo -n "Fixing permissions of ${_dir}";
+
+  chown -R ${_user}:${_group} ${_dir};
+
+  if [ $? -eq 0 ]; then
+      logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_UPDATE_KEYSTORE_FOLDER_PERMISSIONS;
+  fi
+
 }
 
 ## Main logic
 ## dry-wit hook
 function main() {
-  generateKeyPair ${SSL_KEY_FOLDER};
-  signCertificate ${SSL_KEY_FOLDER};
+  generateAndSignCertificate;
+  updateFolderPermissions "${SSL_KEYSTORE_FOLDER}" "${SERVICE_USER}" "${SERVICE_GROUP}";
 }
-

@@ -7,16 +7,19 @@ FROM ${NAMESPACE}/java:${TAG}
 ENV DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
     VIRTUAL_HOST="${NEXUS_DEFAULT_VIRTUAL_HOST}" \
-    VIRTUAL_PORT="8081"
+    VIRTUAL_PORT="8081" \
+    SERVICE_USER="nexus" \
+    SERVICE_GROUP="nexus"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY 50_update_nexus_ssl_config.sh 50_update_nexus_ssl_config.inc.sh \
+     51_copy_nexus_data.sh \
      /etc/my_init.d/
 
-RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false nexus && \
+RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false ${SERVICE_USER} && \
     cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
     mkdir /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
@@ -25,9 +28,12 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
     mkdir -p /backup/nexus-conf /backup/nexus-blobs && \
     ln -s /backup/nexus-conf /sonatype-work/etc && \
     ln -s /backup/nexus-blobs /sonatype-work/blobs && \
-    chown -R nexus /opt/sonatype /sonatype-work && \
+    chown -R ${NEXUS_USER}:${NEXUS_GROUP} /opt/sonatype /sonatype-work && \
     chmod +x /etc/my_init.d/*.sh && \
     chmod -x /etc/my_init.d/*.inc.sh && \
+    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh && \
+    /usr/local/bin/create_ssl_certificate_keytool.sh && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
@@ -36,10 +42,9 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
 VOLUME /backup/nexus-conf
 VOLUME /backup/nexus-blobs
 
-EXPOSE 8081
-EXPOSE 8082
-EXPOSE ${DOCKER_REGISTRY_PORT}
-EXPOSE 8444
+EXPOSE ${NEXUS_HTTP_PORT}
+EXPOSE ${NEXUS_DOCKER_REGISTRY_PORT}
+EXPOSE ${NEXUS_DOCKER_GROUP_PORT}
 
 @include("copy-metadata")
 @include("instructions")

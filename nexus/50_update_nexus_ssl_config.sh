@@ -173,6 +173,9 @@ function updateKeyPassword() {
   fi
 }
 
+## Appends the HTTPS connector port to given file.
+## -> 1: The file to update.
+## -> 2: The HTTPS port.
 function appendHttpsConnectorPort() {
   local _file="${1}";
   local _port="${2}";
@@ -182,6 +185,8 @@ function appendHttpsConnectorPort() {
   logInfoResult SUCCESS "done";
 }
 
+## Enables the Jetty HTTPS configuration.
+## -> 1: The custom.properties file location.
 function enableJettyHttpsConfig() {
   local _file="${1}";
 
@@ -208,7 +213,7 @@ function main() {
   updateKeyStorePath "${SSL_KEYSTORE_PATH}" "${JETTY_HTTPS_CONFIG_FILE}";
   updateKeyStorePassword "${_keyStorePassword}" "${JETTY_HTTPS_CONFIG_FILE}";
   updateKeyPassword "${_keyPassword}" "${JETTY_HTTPS_CONFIG_FILE}";
-  appendHttpsConnectorPort "${NEXUS_CONFIG_FILE}" "${DOCKER_REGISTRY_PORT}";
+  appendHttpsConnectorPort "${NEXUS_CONFIG_FILE}" "${NEXUS_DOCKER_REGISTRY_PORT}";
   enableJettyHttpsConfig "${NEXUS_PROPERTIES_FILE}";
 }
 

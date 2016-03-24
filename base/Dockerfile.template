@@ -11,6 +11,7 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
      process-file.sh data ssh.sh backup.sh backup-default.sh backup-default.inc.sh \
      check-version.sh check-version.inc.sh \
      local-ubuntu-version.sh remote-ubuntu-version.sh local-git-version.sh remote-git-version.sh \
+     create_ssl_certificate_openssl.sh create_ssl_certificate.inc.sh \
      /usr/local/bin/
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
@@ -18,7 +19,6 @@ COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
      31_create_monit_http_conf.sh 31_create_monit_http_conf.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \
-     40_create_ssl_certificate_openssl.sh 40_create_ssl_certificate.inc.sh \
      /etc/my_init.d/
 COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
@@ -79,9 +79,9 @@ RUN mkdir /Dockerfiles && \
     sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
     sed -i 's|^#ssh_args.*|ssh_args\t-i /etc/ssh/ssh_host_dsa_key|g' /etc/rsnapshot.conf && \
+    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh && \
     ${APTGET_CLEANUP}
-
-#    /usr/local/bin/create-ssl-certificate-openssl.sh && \
 
 ENTRYPOINT ["/sbin/my_exec"]
 CMD ["/sbin/my_init"]

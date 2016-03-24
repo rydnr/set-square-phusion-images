@@ -121,7 +121,7 @@ function process_volumes() {
     IFS=$'\n';
     for _aux in $(grep -e '^\s*VOLUME\s' "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
       IFS="${_oldIFS}";
-      logInfo -n "Changing the ownership of ${_aux} (from ${DOCKERFILES_LOCATION}/${p})";
+      logInfo -n "Changing the ownership of ${_aux} to ${_user}/${_group} (from ${DOCKERFILES_LOCATION}/${p})";
       chown_volume "${_user}" "${_group}" "${_aux}";
       logInfoResult SUCCESS "done";
     done

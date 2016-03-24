@@ -70,3 +70,5 @@ ghost/config.js
 graphite/local_settings.py
 observium/setup.sql
 **/LICENSE
+nexus/50_update_nexus_ssl_config.inc.sh
+copyright-preamble.*
