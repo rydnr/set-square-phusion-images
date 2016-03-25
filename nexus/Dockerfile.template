@@ -7,7 +7,7 @@ FROM ${NAMESPACE}/java:${TAG}
 ENV DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
     VIRTUAL_HOST="${NEXUS_DEFAULT_VIRTUAL_HOST}" \
-    VIRTUAL_PORT="8081" \
+    VIRTUAL_PORT="${NEXUS_HTTP_PORT}" \
     SERVICE_USER="nexus" \
     SERVICE_GROUP="nexus"
 
@@ -43,6 +43,7 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
 
 VOLUME /backup/nexus-conf
 VOLUME /backup/nexus-blobs
+VOLUME /backup/nexus-db
 
 EXPOSE ${NEXUS_HTTP_PORT}
 EXPOSE ${NEXUS_DOCKER_REGISTRY_PORT}
