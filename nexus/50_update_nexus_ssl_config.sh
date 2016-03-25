@@ -217,7 +217,6 @@ function appendWorkDir() {
   logInfoResult SUCCESS "done";
 }
 
-LOG_CONFIG
 ## Enables the Jetty HTTPS configuration.
 ## -> 1: The custom.properties file location.
 ## Example:
