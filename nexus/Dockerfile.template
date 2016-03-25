@@ -32,6 +32,8 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
     chmod +x /etc/my_init.d/*.sh && \
     chmod -x /etc/my_init.d/*.inc.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
+    cd /usr/local/bin && \
+    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /usr/local/bin/create_ssl_certificate_keytool.sh && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \

@@ -2,3 +2,4 @@
 mariadb      2222
 postgresql   2223
 phabricator  2224
+nexus        2225

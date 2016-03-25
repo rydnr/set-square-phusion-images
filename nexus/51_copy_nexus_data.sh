@@ -86,4 +86,5 @@ function main() {
   rm -rf /sonatype-work/blobs
   ln -s /backup/nexus-blobs /sonatype-blobs
   /etc/my_init.d/00_chown_volumes.sh
+  chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype /sonatype-work
 }

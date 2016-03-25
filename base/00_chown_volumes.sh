@@ -134,13 +134,11 @@ function main() {
   local _user="${SERVICE_USER}";
   if [ -z ${SERVICE_USER} ]; then
     logInfo "SERVICE_USER environment variable not found. Assuming root.";
-  else
     _user="root";
   fi
   local _group="${SERVICE_GROUP}";
   if [ -z ${SERVICE_GROUP} ]; then
     logInfo "SERVICE_GROUP environment variable not found. Assuming ${_user}.";
-  else
     _group="${_user}";
   fi
   for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do

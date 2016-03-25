@@ -28,8 +28,10 @@ RUN wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | sudo a
     chmod -x /etc/my_init.d/*.inc.sh && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_keytool.inc.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    /usr/local/bin/create_ssl_certificate_openssl.sh && \
+    cd /usr/local/bin && \
+    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh && \
     /usr/local/bin/create_ssl_certificate_keytool.sh && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh && \
     ${APTGET_CLEANUP}
 
 COPY my_exec.logstash /etc/my_exec.d/logstash

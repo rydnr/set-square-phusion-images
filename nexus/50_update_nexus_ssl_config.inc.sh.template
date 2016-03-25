@@ -9,3 +9,7 @@ defineEnvVar JETTY_HTTPS_CONFIG_FILE "The Jetty HTTPS configuration file" "/opt/
 defineEnvVar NEXUS_DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry" "${NEXUS_DOCKER_REGISTRY_PORT}";
 defineEnvVar JETTY_HTTPS_CONFIG_FILE "The Jetty HTTPS configuration file" "/opt/sonatype/nexus/etc/jetty-https.xml";
 defineEnvVar SSL_KEYSTORE_PATH "The keystore path" "${SQ_SSL_KEYSTORE_PATH}";
+defineEnvVar ADDITIONAL_SETTINGS_PATH "The location of the file with additional settings" "/usr/local/bin/create_ssl_certificate.inc.sh";
+defineEnvVar NEXUS_SYSTEM_PROPERTIES_FILE "The system.properties file for Nexus" "/opt/sonatype/nexus/etc/system.properties";
+defineEnvVar NEXUS_LOG_CONFIG_DIR "The folder with logging configuration for Nexus" "/backup/nexus-conf/";
+defineEnvVar NEXUS_WORK_DIR "The folder where Nexus stores runtime data" "/sonatype-work/";

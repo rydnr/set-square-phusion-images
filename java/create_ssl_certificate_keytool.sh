@@ -94,7 +94,7 @@ function generateAndSignCertificate() {
   # See https://stackoverflow.com/questions/33827789/self-signed-certificate-dnsname-components-must-begin-with-a-letter
 
   logInfo -n "Signing the SSL certificate";
-  keytool -keystore "${SSL_KEYSTORE_NAME}" \
+  keytool -keystore "${SSL_KEYSTORE_PATH}" \
           -alias "${SSL_CERTIFICATE_ALIAS}" \
           -genkey \
           -noprompt \

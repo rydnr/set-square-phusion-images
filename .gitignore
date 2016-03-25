@@ -72,3 +72,4 @@ observium/setup.sql
 **/LICENSE
 nexus/50_update_nexus_ssl_config.inc.sh
 copyright-preamble.*
+base/create-ssl-certificate.inc.sh

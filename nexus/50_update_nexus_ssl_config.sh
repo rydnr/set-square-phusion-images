@@ -100,7 +100,7 @@ function parseInput() {
 ## <- RESULT: The obfuscated password.
 function obfuscatePassword() {
   local _pass="${1}";
-  local _result="$(java -cp "${PASSWORD_JAR_FILE}" ${PASSWORD_CLASS} "${_pass}" 2>&1 | grep -e '^OBF:')";
+  local _result="$(java -cp ${PASSWORD_JAR_FILE} ${PASSWORD_CLASS} "${_pass}" 2>&1 | grep -e '^OBF:')";
   export RESULT="${_result}";
 }
 
@@ -159,6 +159,8 @@ function updateKeyStorePassword() {
 ## Updates the key password in given Jetty config file.
 ## -> 1: The keystore password.
 ## -> 2: The Jetty config file.
+## Example:
+##   updateKeyPassword "secret" "/opt/sonatype/nexus/etc/jetty-https.xml"
 function updateKeyPassword() {
   local _keyPassword="${1}";
   local _configFile="${2}";
@@ -176,6 +178,8 @@ function updateKeyPassword() {
 ## Appends the HTTPS connector port to given file.
 ## -> 1: The file to update.
 ## -> 2: The HTTPS port.
+## Example:
+##   appendHttpsConnectorPort "/opt/sonatype/nexus/etc/org.sonatype.nexus.cfg" 8443
 function appendHttpsConnectorPort() {
   local _file="${1}";
   local _port="${2}";
@@ -185,8 +189,39 @@ function appendHttpsConnectorPort() {
   logInfoResult SUCCESS "done";
 }
 
+## Appends the log-config-dir setting to given file.
+## -> 1: The file to update.
+## -> 2: The log folder.
+## Example:
+##   appendLogConfigDir "/opt/sonatype/nexus/etc/system.properties" "/backup/nexus-conf/"
+function appendLogConfigDir() {
+  local _file="${1}";
+  local _dir="${2}";
+
+  logInfo -n "Appending nexus.log-config-dir=${_dir} to ${_file}";
+  echo "nexus.log-config-dir=${_dir}" >> "${_file}";
+  logInfoResult SUCCESS "done";
+}
+
+## Appends the work-dir setting to given file.
+## -> 1: The file to update.
+## -> 2: The work folder.
+## Example:
+##   appendWorkDir "/opt/sonatype/nexus/etc/system.properties" "/sonatype-work"
+function appendWorkDir() {
+  local _file="${1}";
+  local _dir="${2}";
+
+  logInfo -n "Appending nexus.work-dir=${_dir} to ${_file}";
+  echo "nexus.work-dir=${_dir}" >> "${_file}";
+  logInfoResult SUCCESS "done";
+}
+
+LOG_CONFIG
 ## Enables the Jetty HTTPS configuration.
 ## -> 1: The custom.properties file location.
+## Example:
+##   enableJettyHttpsConfig "/opt/sonatype/nexus/etc/jetty-https.xml"
 function enableJettyHttpsConfig() {
   local _file="${1}";
 
@@ -205,7 +240,7 @@ function enableJettyHttpsConfig() {
 function main() {
   local _keyStorePassword;
   local _keyPassword;
-  source /etc/my_init.d/40_create_ssl_certificate.inc.sh
+  [ -e "${ADDITIONAL_SETTINGS_PATH}" ] && source "${ADDITIONAL_SETTINGS_PATH}";
   obfuscatePassword "${SSL_KEYSTORE_PASSWORD}";
   _keyStorePassword="${RESULT}";
   obfuscatePassword "${SSL_KEY_PASSWORD}";
@@ -214,6 +249,8 @@ function main() {
   updateKeyStorePassword "${_keyStorePassword}" "${JETTY_HTTPS_CONFIG_FILE}";
   updateKeyPassword "${_keyPassword}" "${JETTY_HTTPS_CONFIG_FILE}";
   appendHttpsConnectorPort "${NEXUS_CONFIG_FILE}" "${NEXUS_DOCKER_REGISTRY_PORT}";
+  appendLogConfigDir "${NEXUS_SYSTEM_PROPERTIES_FILE}" "${NEXUS_LOG_CONFIG_DIR}";
+  appendWorkDir "${NEXUS_SYSTEM_PROPERTIES_FILE}" "${NEXUS_WORK_DIR}";
   enableJettyHttpsConfig "${NEXUS_PROPERTIES_FILE}";
 }
 
