@@ -4,12 +4,12 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME 
+$SCRIPT_NAME
 $SCRIPT_NAME [-h|--help]
 (c) 2015-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
 
-Copies the contents of a folder to a remote host, using
+Creates symlinks for all cron jobs under /usr/local/bin folder.
 
 Common flags:
     * -h | --help: Display this message.
@@ -23,13 +23,9 @@ EOF
 ## dry-wit hook
 function defineErrors() {
   export INVALID_OPTION="Unrecognized option";
-  export SOURCE_IS_MANDATORY="source is mandatory";
-  export DESTINATION_IS_MANDATORY="destination is mandatory";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
-    SOURCE_IS_MANDATORY \
-    DESTINATION_IS_MANDATORY \
   );
 
   export ERROR_MESSAGES;
@@ -57,16 +53,6 @@ function checkInput() {
     esac
   done
 
-  if [[ -z ${SOURCE} ]]; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode SOURCE_IS_MANDATORY;
-  fi
-
-  if [[ -z ${DESTINATION} ]]; then
-      logDebugResult FAILURE "fail";
-      exitWithErrorCode DESTINATION_IS_MANDATORY;
-  fi
-
   logDebugResult SUCCESS "valid";
 }
 
@@ -89,9 +75,36 @@ function parseInput() {
   done
 }
 
+## Checks whether backups are enabled as a whole.
+## <- RESULT: 0 if so, 1 otherwise.
+## Example:
+##   is_backup_enabled -> false
+##   # assuming the environment variable is DOBACKUP
+##   export DOBACKUP=0; is_backup_enabled -> true
+function is_backup_enabled() {
+  local _result;
+  _evalVar "${ENABLE_BACKUP_ENVIRONMENT_VARIABLE}";
+  local _dobackup="${RESULT}";
+  if [ -z ${_dobackup+x} ]; then
+    _result=0;
+  else
+    result=1;
+  fi
+  return ${_result};
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
-#  ssh -p ${PORT} ${SSH_OPTIONS} ${DESTINATION%:.*} 'mkdir -p ~/$(hostname)';
-  rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}
+  if is_backup_enabled; then
+    for period in hourly daily weekly monthly; do
+      logInfo -n "Enabling ${period} cron jobs";
+      for f in /usr/local/bin/backup*.${period}; do
+        ln -s ${f} /etc/cron.${period}/$(basename $f);
+      done
+      logInfoResult SUCCESS "done";
+    done
+  else
+    logInfo "Backup disabled for this image.";
+  fi
 }
