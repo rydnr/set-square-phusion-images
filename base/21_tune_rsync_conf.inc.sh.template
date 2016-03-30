@@ -1,0 +1,3 @@
+defineEnvVar RSYNC_CONF "The location of the rsync configuration file" "/etc/default/rsync";
+defineEnvVar RSYNC_NICE "The nice level for rsync" "10";
+defineEnvVar RSYNC_IONICE "The I/O nice setting for rsync" "-c3";
