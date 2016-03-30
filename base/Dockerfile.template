@@ -42,7 +42,6 @@ RUN mkdir -p /etc/my_exec.d && \
     chmod +x /etc/my_init.d/* && \
     chmod -x /etc/my_init.d/*.inc.sh && \
     chmod +x /sbin/my_exec && \
-    chmod +x /etc/cron.hourly/* && \
     chmod +x /etc/cron.daily/* && \
     chmod +x /etc/cron.weekly/* && \
     chmod +x /etc/cron.monthly/*
@@ -60,7 +59,6 @@ COPY service.monit /etc/service/monit/run
 RUN mkdir /Dockerfiles && \
     /usr/sbin/usermod -d /backup backup && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
-    cd /usr/local/bin && /usr/local/bin/create_ssl_certificate_openssl.sh && \
     ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
@@ -81,7 +79,6 @@ RUN mkdir /Dockerfiles && \
     sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
     sed -i 's|^#ssh_args.*|ssh_args\t-i /etc/ssh/ssh_host_dsa_key|g' /etc/rsnapshot.conf && \
-    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     ${APTGET_CLEANUP}
 
 ENTRYPOINT ["/sbin/my_exec"]

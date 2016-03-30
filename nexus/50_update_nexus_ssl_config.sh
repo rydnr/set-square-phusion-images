@@ -220,7 +220,7 @@ function appendWorkDir() {
 ## Enables the Jetty HTTPS configuration.
 ## -> 1: The custom.properties file location.
 ## Example:
-##   enableJettyHttpsConfig "/opt/sonatype/nexus/etc/jetty-https.xml"
+##   enableJettyHttpsConfig "/opt/sonatype/nexus/etc/custom.properties"
 function enableJettyHttpsConfig() {
   local _file="${1}";
 
