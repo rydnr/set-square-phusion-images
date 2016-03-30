@@ -1,0 +1,3 @@
+#!/bin/bash
+
+PGPASSWORD="${POSTGRESQL_ROOT_PASSWORD}" pg_dumpall -c -b -c -U ${POSTGRESQL_ROOT_USER} > /backup/${IMAGE}/dump-$(hostname).sql

@@ -9,7 +9,8 @@ ENV DOBACKUP="true" \
     VIRTUAL_HOST="${NEXUS_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT="${NEXUS_HTTP_PORT}" \
     SERVICE_USER="nexus" \
-    SERVICE_GROUP="nexus"
+    SERVICE_GROUP="nexus" \
+    SSL_KEYSTORE_PATH="${SSL_KEYSTORE_FOLDER}/${IMAGE}.${SSL_KEYSTORE_TYPE}"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -28,12 +29,11 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
     mkdir -p /backup/nexus-conf /backup/nexus-blobs && \
     ln -s /backup/nexus-conf /sonatype-work/etc && \
     ln -s /backup/nexus-blobs /sonatype-work/blobs && \
-    chown -R ${NEXUS_USER}:${NEXUS_GROUP} /opt/sonatype /sonatype-work && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype /sonatype-work && \
     chmod +x /etc/my_init.d/*.sh && \
     chmod -x /etc/my_init.d/*.inc.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     cd /usr/local/bin && \
-    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /usr/local/bin/create_ssl_certificate_keytool.sh && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
@@ -45,7 +45,8 @@ VOLUME /backup/nexus-conf
 VOLUME /backup/nexus-blobs
 VOLUME /backup/nexus-db
 
-EXPOSE ${NEXUS_HTTP_PORT}
+EXPOSE ${NEXUS_UI_HTTP_PORT}
+EXPOSE ${NEXUS_UI_HTTPS_PORT}
 EXPOSE ${NEXUS_DOCKER_REGISTRY_PORT}
 EXPOSE ${NEXUS_DOCKER_GROUP_PORT}
 

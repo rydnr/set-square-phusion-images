@@ -93,5 +93,5 @@ function parseInput() {
 ## dry-wit hook
 function main() {
 #  ssh -p ${PORT} ${SSH_OPTIONS} ${DESTINATION%:.*} 'mkdir -p ~/$(hostname)';
-  rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}
+  rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}
 }

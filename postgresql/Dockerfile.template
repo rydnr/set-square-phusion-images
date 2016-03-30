@@ -5,7 +5,9 @@ FROM ${BASE_IMAGE}:${TAG}
 @include("addon-toggles")
 
 ENV DOBACKUP="true" \
-    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
+    SERVICE_USER="postgres" \
+    SERVICE_GROUP="postgres"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -15,6 +17,7 @@ COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
 COPY process-sqls.sh /usr/local/bin/process-sqls.sh
 COPY ${IMAGE}-cron.sh /usr/local/bin/${IMAGE}-cron.sh
 COPY ${IMAGE}-sqls.cron /etc/cron.d/${IMAGE}-sqls
+COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
 
 # From http://docs.docker.com/examples/postgresql_service
 
@@ -25,25 +28,30 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F
     ${APTGET_INSTALL} python-software-properties software-properties-common postgresql-${POSTGRESQL_VERSION} postgresql-client-${POSTGRESQL_VERSION} postgresql-contrib-${POSTGRESQL_VERSION} daemontools && \
     ${APTGET_CLEANUP} && \
     update-rc.d postgresql disable && \
-    gpasswd -a postgres crontab && \
-    gpasswd -a postgres ssl-cert && \
+    gpasswd -a ${SERVICE_USER} crontab && \
+    gpasswd -a ${SERVICE_USER} ssl-cert && \
     rm -f /etc/init.d/postgres && \
     mkdir -p /var/lib/postgresql-sql && \
-    chown -R postgres:postgres /var/lib/postgresql /var/lib/postgresql-sql && \
     chmod +x /etc/service/${IMAGE}/run && \
     chmod +x /usr/local/bin/bootstrap-db.sh && \
     chmod +x /usr/local/bin/process-sqls.sh && \
-    chmod +x /usr/local/bin/${IMAGE}-cron.sh
+    chmod +x /usr/local/bin/${IMAGE}-cron.sh && \
+    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
+    mkdir -p /backup/${IMAGE} && \
+    mv /var/lib/postgresql /backup/${IMAGE}/db && \
+    ln -s /backup/${IMAGE}/db /var/lib/postgresql && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lib/postgresql /var/lib/postgresql-sql
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
-# Expose the PostgreSQL port
 EXPOSE 5432
 
 # Add VOLUMEs to allow backup of config, logs and databases
 # This have to be done in child Dockerfiles, in order to make Dockerfile DB changes persist.
 # See http://stackoverflow.com/questions/27377876/docker-postgres-with-initial-data-is-not-persisted-over-commits
 #VOLUME  ["/etc/postgresql", "/var/log/postgresql", "/var/lib/postgresql"]
+
+VOLUME /backup/postgresql/db
 
 @include("copy-metadata")
 @include("instructions")

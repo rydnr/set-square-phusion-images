@@ -247,7 +247,7 @@ function main() {
   updateKeyStorePath "${SSL_KEYSTORE_PATH}" "${JETTY_HTTPS_CONFIG_FILE}";
   updateKeyStorePassword "${_keyStorePassword}" "${JETTY_HTTPS_CONFIG_FILE}";
   updateKeyPassword "${_keyPassword}" "${JETTY_HTTPS_CONFIG_FILE}";
-  appendHttpsConnectorPort "${NEXUS_CONFIG_FILE}" "${NEXUS_DOCKER_REGISTRY_PORT}";
+  appendHttpsConnectorPort "${NEXUS_CONFIG_FILE}" "${NEXUS_UI_HTTPS_PORT}";
   appendLogConfigDir "${NEXUS_SYSTEM_PROPERTIES_FILE}" "${NEXUS_LOG_CONFIG_DIR}";
   appendWorkDir "${NEXUS_SYSTEM_PROPERTIES_FILE}" "${NEXUS_WORK_DIR}";
   enableJettyHttpsConfig "${NEXUS_PROPERTIES_FILE}";

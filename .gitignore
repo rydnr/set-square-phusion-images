@@ -73,3 +73,11 @@ observium/setup.sql
 nexus/50_update_nexus_ssl_config.inc.sh
 copyright-preamble.*
 base/create-ssl-certificate.inc.sh
+java/41_create_ssl_certificate_keytool.inc.sh
+base/21_tune_rsync_conf.sh
+mariadb/backup.sh
+.templates/instructions
+mariadb/backup.sh
+mariadb/service
+phabricator/bootstrap
+phabricator/service
