@@ -16,7 +16,6 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      21_tune_rsync_conf.sh 21_tune_rsync_conf.inc.sh \
-     23_create_cron_symlinks.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
      31_create_monit_http_conf.sh 31_create_monit_http_conf.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \

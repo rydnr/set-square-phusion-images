@@ -7,7 +7,8 @@ FROM ${BASE_IMAGE}:${TAG}
 ENV SERVICE_PACKAGE="mariadb-server" \
     SERVICE_USER="mysql" \
     SERVICE_GROUP="mysql" \
-    DOBACKUP="true"
+    DOBACKUP="true" \
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -28,16 +29,17 @@ RUN ${APTGET_INSTALL} --update mariadb-server bc && \
     gpasswd -a ${SERVICE_USER} crontab && \
     rm -f /etc/init.d/mysql && \
     mkdir /var/lib/mysql-sql && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lib/mysql /var/lib/mysql-sql && \
     cd /usr/local/bin && \
     ln -s check-version.sh check-version-${IMAGE}.sh && \
     ln -s local-ubuntu-version.sh local-version-${IMAGE}.sh && \
     ln -s remote-ubuntu-version.sh remote-version-${IMAGE}.sh && \
     chmod +x /etc/service/${IMAGE}/run && \
     chmod +x /usr/local/bin/bootstrap-db.sh && \
-    mkdir -p /backup/var/lib && \
-    mv /var/lib/mysql /backup/var/lib && \
-    ln -s /backup/var/lib/mysql /var/lib/ && \
+    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
+    mkdir -p /backup/${IMAGE} && \
+    mv /var/lib/mysql /backup/${IMAGE}/db && \
+    ln -s /backup/${IMAGE}/db /var/lib/mysql && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lib/mysql /var/lib/mysql-sql && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
@@ -50,7 +52,7 @@ COPY setup.sql /usr/local/src/setup.sql.tpl
 
 EXPOSE 3306
 
-VOLUME /backup/var/lib/mysql
+VOLUME /backup/mysql/db
 VOLUME /etc/mysql/conf.d
 
 @include("copy-metadata")

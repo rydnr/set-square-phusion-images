@@ -4,4 +4,3 @@
 
 # Look for new SQL files every minute
 * * * * *     root   /usr/local/bin/postgresql-cron.sh
-
