@@ -45,10 +45,10 @@ VOLUME /backup/nexus-conf
 VOLUME /backup/nexus-blobs
 VOLUME /backup/nexus-db
 
-EXPOSE ${NEXUS_UI_HTTP_PORT}
-EXPOSE ${NEXUS_UI_HTTPS_PORT}
-EXPOSE ${NEXUS_DOCKER_REGISTRY_PORT}
-EXPOSE ${NEXUS_DOCKER_GROUP_PORT}
+EXPOSE ${NEXUS_UI_HTTP_PORT} # Nexus UI - http
+EXPOSE ${NEXUS_UI_HTTPS_PORT} # Nexus UI - https
+EXPOSE ${NEXUS_DOCKER_REGISTRY_PORT} # Docker registry - https
+EXPOSE ${NEXUS_DOCKER_GROUP_PORT} # Docker group - https
 
 @include("copy-metadata")
 @include("instructions")

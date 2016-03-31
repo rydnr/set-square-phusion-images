@@ -10,6 +10,6 @@ defineEnvVar NEXUS_DOWNLOAD_URL \
              'https://download.sonatype.com/nexus/oss/${NEXUS_ARTIFACT}';
 defineEnvVar NEXUS_DEFAULT_VIRTUAL_HOST "The default virtual host for Nexus" 'nexus.${DOMAIN}';
 defineEnvVar NEXUS_UI_HTTP_PORT "The default HTTP por for Nexus" "8081";
-defineEnvVar NEXUS_UI_HTTPS_PORT "The default HTTPS por for Nexus" "8443";
-defineEnvVar NEXUS_DOCKER_GROUP_PORT "The HTTPS port for the Dcoker group (proxy + registry)" "18443";
-defineEnvVar NEXUS_DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry" "18444";
+defineEnvVar NEXUS_UI_HTTPS_PORT "The default HTTPS por for Nexus" "8083";
+defineEnvVar NEXUS_DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry" "18443";
+defineEnvVar NEXUS_DOCKER_GROUP_PORT "The HTTPS port for the Dcoker group (proxy + registry)" "18444";
