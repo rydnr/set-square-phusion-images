@@ -20,39 +20,35 @@ COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
 #RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
 #RUN add-apt-repository \'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
 #RUN apt-get install software-properties-common
-RUN ${APTGET_INSTALL} --update mariadb-server bc && \
+RUN mkdir -p /backup/${IMAGE}-db && \
+    ${APTGET_INSTALL} --update mariadb-server bc && \
     sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf && \
     sed -i -e"s/^log_error/#log_error/" /etc/mysql/my.cnf && \
     sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" /etc/mysql/my.cnf && \
     ${APTGET_CLEANUP} && \
+    mv /var/lib/mysql /backup/${IMAGE}-db && \
+    ln -s /backup/${IMAGE}-db /var/lib/mysql && \
     update-rc.d mysql disable && \
     gpasswd -a ${SERVICE_USER} crontab && \
     rm -f /etc/init.d/mysql && \
-    mkdir /var/lib/mysql-sql && \
-    cd /usr/local/bin && \
-    ln -s check-version.sh check-version-${IMAGE}.sh && \
-    ln -s local-ubuntu-version.sh local-version-${IMAGE}.sh && \
-    ln -s remote-ubuntu-version.sh remote-version-${IMAGE}.sh && \
+    for s in check local-ubuntu remote-ubuntu; do \
+      ln -s /usr/local/bin/${s}-version.sh ${s}-version-${IMAGE}.sh; \
+    done && \
     chmod +x /etc/service/${IMAGE}/run && \
     chmod +x /usr/local/bin/bootstrap-db.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    mkdir -p /backup/${IMAGE} && \
-    mv /var/lib/mysql /backup/${IMAGE}/db && \
-    ln -s /backup/${IMAGE}/db /var/lib/mysql && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lib/mysql /var/lib/mysql-sql && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.monthly && \
-    ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.daily && \
-    ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.weekly && \
-    ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.monthly
+    for p in hourly daily weekly monthly; do \
+      ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.${p}; \
+    done && \
+    for p in daily weekly monthly; do \
+      ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.${p}; \
+    done
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
 EXPOSE 3306
 
-VOLUME /backup/mysql/db
+VOLUME /backup/${IMAGE}-db
 VOLUME /etc/mysql/conf.d
 
 @include("copy-metadata")
