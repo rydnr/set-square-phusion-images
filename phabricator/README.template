@@ -42,6 +42,9 @@ Otherwise you can let Phabricator provide all the DDL in one single step:
 for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
 > docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql [dbName]
 
+- Run Phabricator to print the SQL required to apply all post-statements provided by Phabricator:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql-post
+
 - Run Phabricator to print the Liquibase changeLog file for a given database:
 for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
 > docker run -it ${NAMESPACE}/${IMAGE}:${TAG} liquibase [dbName]

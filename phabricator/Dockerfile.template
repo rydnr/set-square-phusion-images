@@ -19,6 +19,8 @@ RUN ${APTGET_INSTALL} \
         git libapache2-mod-php5 dpkg-dev \
         php5 php5-mysql php5-gd php5-dev php5-curl php-apc php5-cli php5-json imagemagick && \
     ${APTGET_INSTALL} --no-pin mysql-server python-pip openjdk-7-jre-headless && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh && \
+    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     mysql_install_db && \
     service mysql start && \
     mysqladmin -u root password 'secret' && \
