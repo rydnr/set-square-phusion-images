@@ -2,10 +2,11 @@
 
 _sleep=3;
 
-if [[ ! -e /var/lib/mysql/.bootstrapped ]]; then
+_datadir=/backup/${IMAGE}-db
+
+if [[ ! -e ${_datadir}/.bootstrapped ]]; then
   /usr/local/bin/bootstrap-db.sh
-  chown -R mysql:mysql /var/lib/mysql /var/lib/mysql/*
-  while [ ! -e /var/lib/mysql/.bootstrapped ]; do
+  while [ ! -e ${_datadir}/.bootstrapped ]; do
     echo "Waiting ${_sleep}s for db bootstrap"
     sleep ${_sleep}
   done

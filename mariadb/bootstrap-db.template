@@ -1,6 +1,9 @@
 #!/bin/bash
 
 _SLEEP=10;
+
+_datadir=/backup/${IMAGE}-db
+
 # Just in case Monit is configured to restart MariaDB
 service monit stop
 while ps -ef | grep mysql | grep -v grep > /dev/null; do
@@ -12,8 +15,8 @@ done
 _setupFile=/usr/local/src/setup.sql
 sed "s ___LAN___ $(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.%%\n", $1, $2, $3);}') g" ${_setupFile}.tpl > ${_setupFile}
 sed -i "s ___DEBIAN_SYS_MAINT_PASSWORD_HASH___ $(grep password /etc/mysql/debian.cnf  | head -n 1 | cut -d' ' -f 3) g" ${_setupFile}
-mysql_install_db && \
-/usr/bin/mysqld_safe --console --user=mysql &
+mysql_install_db --datadir=${_datadir} && \
+/usr/bin/mysqld_safe --console --user=${SERVICE_USER} --datadir=${_datadir} &
 sleep ${_SLEEP}
 /usr/bin/mysql -u root < ${_setupFile} || \
 /usr/bin/mysql -u root --password="${MARIADB_ROOT_PASSWORD}" < ${_setupFile}
@@ -22,6 +25,8 @@ while ps -ef | grep mysql | grep -v grep > /dev/null; do
   echo "Waiting ${_SLEEP}s for MariaDB to shut down"
   sleep ${_SLEEP}
 done
-chown -R mysql:mysql /var/lib/mysql /var/lib/mysql/*
-touch /var/lib/mysql/.bootstrapped
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${_datadir} && \
+chmod 755 ${_datadir} && \
+touch ${_datadir}/.bootstrapped
+
 service monit start

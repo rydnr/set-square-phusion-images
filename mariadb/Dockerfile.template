@@ -8,7 +8,8 @@ ENV SERVICE_PACKAGE="mariadb-server" \
     SERVICE_USER="mysql" \
     SERVICE_GROUP="mysql" \
     DOBACKUP="true" \
-    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
+    INNODB_POOL_SIZE_FACTOR="0.4"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -24,9 +25,13 @@ RUN mkdir -p /backup/${IMAGE}-db && \
     ${APTGET_INSTALL} --update mariadb-server bc && \
     sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf && \
     sed -i -e"s/^log_error/#log_error/" /etc/mysql/my.cnf && \
+    sed -i -e"s|^datadir.*|datadir = /backup/${IMAGE}-db|" /etc/mysql/my.cnf && \
     sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" /etc/mysql/my.cnf && \
+    sed -i -e"s|# ssl-cert\s*.*|# ssl-cert=/etc/ssl/private/${IMAGE}.crt|" /etc/mysql/my.cnf && \
+    sed -i -e"s|# ssl-key\s*.*|# ssl-key=/etc/ssl/private/${IMAGE}.key|" /etc/mysql/my.cnf && \
     ${APTGET_CLEANUP} && \
-    mv /var/lib/mysql /backup/${IMAGE}-db && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh && \
+    rm -rf /var/lib/mysql && \
     ln -s /backup/${IMAGE}-db /var/lib/mysql && \
     update-rc.d mysql disable && \
     gpasswd -a ${SERVICE_USER} crontab && \
