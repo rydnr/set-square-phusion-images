@@ -12,6 +12,7 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
      check-version.sh check-version.inc.sh \
      local-ubuntu-version.sh remote-ubuntu-version.sh local-git-version.sh remote-git-version.sh \
      create_ssl_certificate_openssl.sh create_ssl_certificate.inc.sh \
+     restart.sh volumes.sh volumes.inc.sh \
      /usr/local/bin/
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
@@ -36,14 +37,8 @@ RUN mkdir -p /etc/my_exec.d && \
     mkdir -p /etc/service/cron/log && \
     mkdir -p /etc/service/sshd/log && \
     touch /var/local/docker-installed-packages.txt && \
-    chmod +x /usr/local/bin/* && \
-    chmod -x /usr/local/bin/*.inc.sh && \
-    chmod +x /etc/my_init.d/* && \
-    chmod -x /etc/my_init.d/*.inc.sh && \
-    chmod +x /sbin/my_exec && \
-    chmod +x /etc/cron.daily/* && \
-    chmod +x /etc/cron.weekly/* && \
-    chmod +x /etc/cron.monthly/*
+    chmod +x /usr/local/bin/*.sh
+    #echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab
 
 COPY my_exec.cron /etc/my_exec.d/cron
 COPY my_exec.help /etc/my_exec.d/help
@@ -58,6 +53,7 @@ COPY service.monit /etc/service/monit/run
 RUN mkdir /Dockerfiles && \
     /usr/sbin/usermod -d /backup backup && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
+    ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes && \
     ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
@@ -78,6 +74,10 @@ RUN mkdir /Dockerfiles && \
     sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
     sed -i 's|^#ssh_args.*|ssh_args\t-i /etc/ssh/ssh_host_dsa_key|g' /etc/rsnapshot.conf && \
+    ln -sf /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly.sh && \
+    ln -sf /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily.sh && \
+    ln -sf /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly.sh && \
+    ln -sf /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.monthly.sh && \
     ${APTGET_CLEANUP}
 
 ENTRYPOINT ["/sbin/my_exec"]
@@ -87,6 +87,7 @@ COPY monit-syslog.conf /etc/monit/conf.d/syslog.conf
 COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")
 
 # * DOCKERFILES
@@ -103,6 +104,7 @@ COPY monit-mail.conf /etc/monit/conf.d/mail.conf
 # - service: to run the process (letting runit handling forking it).
 # - monit.conf: how to monitor the process (or disable monit via declaring ENABLE_MONIT=false).
 # - check-version-${DOLLAR}{IMAGE}: A script to retrieve the information about the latest version of the service.
+# - ${DOLLAR}{SERVICE}: The name of the service (matches a folder under /etc/service/).
 # - ${DOLLAR}{SERVICE_GROUP}: The group of the user under which the service runs. Defaults to ${DOLLAR}{SERVICE_USER}.
 # - ${DOLLAR}{SERVICE_PACKAGE}: The package name, if the service is installed through the package manager.
 #

@@ -25,30 +25,27 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
     mkdir /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
     rm -rf /tmp/nexus-${NEXUS_VERSION} /var/tmp/${NEXUS_ARTIFACT} && \
-    mkdir /backup && \
-    mkdir -p /backup/nexus-conf /backup/nexus-blobs && \
-    ln -s /backup/nexus-conf /sonatype-work/etc && \
-    ln -s /backup/nexus-blobs /sonatype-work/blobs && \
+    mkdir -p /backup/${IMAGE}-conf /backup/${IMAGE}-blobs && \
+    ln -s /backup/${IMAGE}-conf /sonatype-work/etc && \
+    ln -s /backup/${IMAGE}-blobs /sonatype-work/blobs && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype /sonatype-work && \
-    chmod +x /etc/my_init.d/*.sh && \
-    chmod -x /etc/my_init.d/*.inc.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    cd /usr/local/bin && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
-    /usr/local/bin/create_ssl_certificate_keytool.sh && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.monthly
+    /usr/local/bin/create_ssl_certificate_keytool.sh
 
-VOLUME /backup/nexus-conf
-VOLUME /backup/nexus-blobs
-VOLUME /backup/nexus-db
+VOLUME /backup/${IMAGE}-conf
+VOLUME /backup/${IMAGE}-blobs
+VOLUME /backup/${IMAGE}-db
 
-EXPOSE ${NEXUS_UI_HTTP_PORT} # Nexus UI - http
-EXPOSE ${NEXUS_UI_HTTPS_PORT} # Nexus UI - https
-EXPOSE ${NEXUS_DOCKER_REGISTRY_PORT} # Docker registry - https
-EXPOSE ${NEXUS_DOCKER_GROUP_PORT} # Docker group - https
+# Nexus UI - http
+EXPOSE ${NEXUS_UI_HTTP_PORT}
+# Nexus UI - https
+EXPOSE ${NEXUS_UI_HTTPS_PORT}
+# Docker registry - https
+EXPOSE ${NEXUS_DOCKER_REGISTRY_PORT}
+# Docker group - https
+EXPOSE ${NEXUS_DOCKER_GROUP_PORT}
 
 @include("copy-metadata")
 @include("instructions")
+@include("symlinks")

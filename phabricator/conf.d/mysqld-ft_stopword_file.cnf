@@ -1,0 +1,2 @@
+[mysqld]
+ft_stopword_file=/etc/mysql/conf.d/stopwords.txt

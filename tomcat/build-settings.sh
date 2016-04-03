@@ -3,7 +3,7 @@ defineEnvVar TOMCAT_MAJOR_VERSION \
              "8";
 defineEnvVar TOMCAT_VERSION \
              "The version of the Apache Tomcat server" \
-             "8.0.32" \
+             "8.0.33" \
              "curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-8/ | grep folder.gif | tail -n 1 | cut -d '>' -f 3 | cut -d '/' -f 1 | sed 's_^v__g'";
 defineEnvVar APR_VERSION \
              "The version of Apache Portable Runtime" \
@@ -17,12 +17,6 @@ defineEnvVar TOMCAT_FILE \
 defineEnvVar TOMCAT_DOWNLOAD_URL \
              "The url to download Tomcat" \
              'http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/${TOMCAT_FILE}';
-defineEnvVar TOMCAT_USER \
-             "The system user for Tomcat" \
-             "tomcat";
-defineEnvVar TOMCAT_GROUP \
-             "The system group for Tomcat" \
-             "tomcat";
 defineEnvVar TOMCAT_HOME \
              "The home folder for Tomcat user" \
              "/opt/tomcat";

@@ -8,16 +8,16 @@ Examples:
 - Run Phabricator to retrieve the required SQL to bootstrap it.
 
 > rm -f ~/sql/*
-> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap user > ~/sql/user.sql
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} create-db-user > ~/sql/user.sql
 > docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
 > rm -f ~/sql/*
-> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap grants > ~/sql/grants.sql
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} db-grants > ~/sql/grants.sql
 > docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
 
 You can create the databases looping through each of them:
 
 > rm -f ~/sql/*
-> for d in $(docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap databases); do docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap sql ${d} > ~/sql/${d}.sql; done
+> for d in $(docker run -it ${NAMESPACE}/${IMAGE}:${TAG} databases); do docker run -it ${NAMESPACE}/${IMAGE}:${TAG} bootstrap sql ${d} > ~/sql/${d}.sql; done
 docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
 
 Otherwise you can let Phabricator provide all the DDL in one single step:
@@ -27,10 +27,13 @@ Otherwise you can let Phabricator provide all the DDL in one single step:
 > docker run -it --link db:db -v ~/sql:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u ${MARIADB_ADMIN_USER} -p ${MARIADB_ADMIN_PASSWORD}
 
 - Run Phabricator to provide the SQL required to create the database user:
-> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} user
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} create-db-user
+
+- Run Phabricator to provide the SQL required to update the password of the database user:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} change-db-password
 
 - Run Phabricator to provide the SQL required to grant the correct permissions to the database user:
-> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} grants
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} db-grants
 
 - Run Phabricator to provide the names of all Phabricator databases:
 > docker run -it ${NAMESPACE}/${IMAGE}:${TAG} databases
@@ -40,7 +43,7 @@ Otherwise you can let Phabricator provide all the DDL in one single step:
 
 - Run Phabricator to print the SQL required to deploy a single database:
 for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
-> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql [dbName]
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} db-sql [dbName]
 
 - Run Phabricator to print the SQL required to apply all post-statements provided by Phabricator:
 > docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql-post

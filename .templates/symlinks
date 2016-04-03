@@ -1,0 +1,11 @@
+RUN chmod +x /usr/local/bin/* && \
+    chmod -x /usr/local/bin/*.inc.sh && \
+    chmod +x /etc/my_init.d/* && \
+    chmod -x /etc/my_init.d/*.inc.sh && \
+    chmod +x /sbin/my_exec && \
+    chmod +x /etc/cron.daily/* && \
+    chmod +x /etc/cron.weekly/* && \
+    chmod +x /etc/cron.monthly/* && \
+    for p in /usr/local/bin/*.sh; do \
+      if [ "${p%.inc.sh}" == "${p}" ]; then echo ln -sf $p $(basename $p .sh); fi; \
+    done

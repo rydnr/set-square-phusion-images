@@ -1,0 +1,4 @@
+#!/bin/bash
+
+echo "Running mysql_upgrade -u root --password=${MARIADB_ROOT_PASSWORD}"
+mysql_upgrade -u root --password=${MARIADB_ROOT_PASSWORD}

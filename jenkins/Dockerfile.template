@@ -5,8 +5,11 @@ FROM ${NAMESPACE}/tomcat:${TAG}
 @include("addon-toggles")
 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+COPY 50-rsync-jenkins-home.sh /etc/my_init.d/50-rsync-jenkins-home.sh
 
-ENV JENKINS_HOME="/var/jenkins_home" \
+ENV SERVICE_USER="jenkins" \
+    SERVICE_GROUP="jenkins" \
+    JENKINS_HOME="/var/jenkins_home" \
     JENKINS_SLAVE_AGENT_PORT=50000 \
     JENKINS_UC="https://updates.jenkins-ci.org" \
     COPY_REFERENCE_FILE_LOG="$JENKINS_HOME/copy_reference_file.log" \
@@ -14,12 +17,11 @@ ENV JENKINS_HOME="/var/jenkins_home" \
     VIRTUAL_PORT=8080 \
     DOBACKUP="true"
 
-RUN mkdir -p /backup${JENKINS_HOME} && \
-    ln -s /backup${JENKINS_HOME} ${JENKINS_HOME} && \
-    usermod -l ${JENKINS_USER} tomcat && \
-    usermod -d ${JENKINS_HOME} ${JENKINS_USER} && \
-    groupmod -n ${JENKINS_GROUP} tomcat && \
-    echo '${JENKINS_USER}:${JENKINS_PASSWORD}' | chpasswd && \
+RUN mkdir -p ${JENKINS_HOME} && \
+    usermod -l ${SERVICE_USER} ${TOMCAT_USER} && \
+    usermod -d ${JENKINS_HOME} ${SERVICE_USER} && \
+    groupmod -n ${SERVICE_GROUP} ${TOMCAT_GROUP} && \
+    echo "${SERVICE_USER}:${JENKINS_PASSWORD}" | chpasswd && \
     mkdir -p ${JENKINS_HOME}/.m2 /usr/share/jenkins/ref && \
     wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
     mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome && \
@@ -29,10 +31,12 @@ RUN mkdir -p /backup${JENKINS_HOME} && \
     [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml && \
     rm -rf ${TOMCAT_HOME}/webapps/* && \
     mv /etc/service/tomcat /etc/service/jenkins && \
+    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     chmod -R g+w ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins && \
     mkdir ${TOMCAT_HOME}/.ssh && \
-    chown -R ${JENKINS_USER}:${JENKINS_GROUP} ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 && \
     chmod 700 ${TOMCAT_HOME}/.ssh && \
+    chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh && \
     ${APTGET_INSTALL} git graphviz && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && \
@@ -54,10 +58,11 @@ COPY config /etc/default/tomcat
 COPY ssh-config /opt/tomcat/.ssh/config
 COPY known_hosts /opt/tomcat/.ssh/known_hosts
 
-VOLUME /backup/var/jenkins_home
+VOLUME /backup/jenkins-home
 
 EXPOSE 8080
 EXPOSE 50000
 
 @include("copy-metadata")
 @include("instructions")
+@include("symlinks")

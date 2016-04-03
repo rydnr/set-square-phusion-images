@@ -9,8 +9,10 @@ COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/apache/run
 COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade \
      /usr/local/bin/
+ADD conf.d /var/local/conf.d
 
-ENV VIRTUAL_HOST="${PHABRICATOR_DEFAULT_VIRTUAL_HOST}" \
+ENV SERVICE="apache" \
+    VIRTUAL_HOST="${PHABRICATOR_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8000 \
     TIMEZONE="${DEFAULT_TIMEZONE}" \
     DOBACKUP="true"
@@ -52,8 +54,8 @@ RUN ${APTGET_INSTALL} \
     bin/storage upgrade --force && \
     bin/config set storage.local-disk.path /var/local/phabricator && \
     cd /usr/local/bin && \
-    chmod +x bootstrap runme phabricator-cli && \
-    for s in user grants databases sql sql-post liquibase; do \
+    chmod +x bootstrap runme phabricator-cli runme upgrade && \
+    for s in create-db-user change-db-password db-grants databases db-sql sql sql-post liquibase; do \
       ln -s runme ${s}; \
     done && \
     for p in libphputil arcanist phabricator; do \
@@ -85,11 +87,8 @@ RUN ${APTGET_INSTALL} \
     rm -rf /var/lib/mysql && \
     rm -rf /opt/liquibase* && \
     rm -rf /opt/php5* && \
-    mkdir -p /backup/var/local && \
-    mv /var/repo /backup/var/repo && \
-    ln -s /backup/var/repo /var/repo && \
-    mv /var/local/phabricator /backup/var/local/phabricator && \
-    ln -s /backup/var/local/phabricator /var/local/phabricator && \
+    ln -s /backup/${IMAGE}-repo /var/repo && \
+    ln -s /backup/${IMAGE}-local /var/local/phabricator && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
     ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
@@ -99,8 +98,10 @@ EXPOSE 8000
 
 VOLUME /usr/local/share/liquibase
 VOLUME /usr/local/share/sql
-VOLUME /backup/var/local/phabricator
-VOLUME /backup/var/repo
+VOLUME /var/local/mysql/conf.d
+VOLUME /backup/${IMAGE}-local
+VOLUME /backup/${IMAGE}-repo
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

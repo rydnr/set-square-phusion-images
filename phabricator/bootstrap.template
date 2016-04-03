@@ -4,10 +4,12 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME [-d|--database=vendor]? user
-$SCRIPT_NAME [-d|--database=vendor]? grants
+$SCRIPT_NAME [-d|--database=vendor]? create-db-user
+$SCRIPT_NAME [-d|--database=vendor]? change-db-password
+$SCRIPT_NAME [-d|--database=vendor]? db-grants
 $SCRIPT_NAME [-d|--database=vendor]? databases
-$SCRIPT_NAME [-d|--database=vendor]? sql [dbName]?
+$SCRIPT_NAME [-d|--database=vendor]? sql
+$SCRIPT_NAME [-d|--database=vendor]? db-sql [dbName]
 $SCRIPT_NAME [-d|--database=ventor]? sql-post
 $SCRIPT_NAME [-d|--database=vendor]? liquibase [dbName]
 $SCRIPT_NAME [-h|--help]
@@ -93,10 +95,12 @@ function parseInput() {
     shift;
   fi
 
-  if    [[ -z ${DB_NAME} ]] \
-     && [[ "x${COMMAND}" == "xliquibase" ]]; then
-    DB_NAME="${1}";
-    shift;
+  if [[ -z ${DB_NAME} ]]; then
+    if    [[ "x${COMMAND}" == "xliquibase" ]] \
+       || [[ "x${COMMAND}" == "xdb-sql" ]]; then
+      DB_NAME="${1}";
+      shift;
+    fi
   fi
 }
 
@@ -149,7 +153,7 @@ function checkInput() {
   fi
 
   case "${COMMAND}" in
-    "user" | "grants" | "databases" | "sql-post")
+    "create-db-user" | "change-db-password" | "db-grants" | "databases" | "sql-post")
       logDebugResult SUCCESS "done";
       ;;
     "sql")
@@ -179,12 +183,17 @@ function checkInput() {
 }
 
 ## Prints the bootstrap SQL to create the Phabricator database user.
-function print_user_bootstrap() {
-  echo "create user ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';";
+function print_create_db_user_bootstrap() {
+  echo "create user ${PHABRICATOR_DB_USER} identified by '${PHABRICATOR_DB_PASSWORD}';";
+}
+
+## Prints the bootstrap SQL to change the password of the Phabricator database user.
+function print_change_db_password_bootstrap() {
+  echo "update mysql.user set password=PASSWORD('${PHABRICATOR_DB_PASSWORD}') where user='${PHABRICATOR_DB_USER}';";
 }
 
 ## Prints the bootstrap SQL to add the required grants to the Phabricator database user.
-function print_grants_bootstrap() {
+function print_db_grants_bootstrap() {
   for _s in ${PHABRICATOR_DB_SCHEMAS[*]}; do
     echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';";
   done
@@ -235,21 +244,23 @@ function print_liquibase_changeLog() {
 ## dry-wit hook
 function main() {
   case "${COMMAND}" in
-    "user")
-      print_user_bootstrap "${DB_VENDOR}";
+    "create-db-user")
+      print_create_db_user_bootstrap "${DB_VENDOR}";
       ;;
-    "grants")
-      print_grants_bootstrap "${DB_VENDOR}";
+    "change-db-password")
+      print_change_db_password_bootstrap "${DB_VENDOR}";
+      ;;
+    "db-grants")
+      print_db_grants_bootstrap "${DB_VENDOR}";
       ;;
     "databases")
       print_database_names;
       ;;
     "sql")
-      if [[ -z ${DB_NAME} ]]; then
-        print_databases_ddl;
-      else
-        print_database_ddl "${DB_NAME}";
-      fi
+      print_databases_ddl;
+      ;;
+    "db-sql")
+      print_database_ddl "${DB_NAME}";
       ;;
     "sql-post")
         print_sql_post;

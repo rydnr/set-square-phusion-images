@@ -102,7 +102,7 @@ function retrieve_eth0_subnet_16() {
   logInfo -n "Finding out the /16 subnet for eth0";
   _result="$(ip addr show eth0 2> /dev/null | grep 'inet ' | awk '{print $2;}' | cut -d'/' -f 1 | cut -d'.' -f 1-2).0.0/16";
   if [[ -n ${_result} ]]; then
-    logInfoResult SUCCESS "done";
+    logInfoResult SUCCESS "${_result}";
     export RESULT="${_result}";
   else
     logInfoResult FAILED "failed";

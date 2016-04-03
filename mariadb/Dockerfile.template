@@ -16,6 +16,8 @@ COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
 COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
+COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh /usr/local/bin/
+
 #ADD conf.d /etc/mysql/conf.d
 
 #RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
@@ -31,6 +33,8 @@ RUN mkdir -p /backup/${IMAGE}-db && \
     sed -i -e"s|# ssl-key\s*.*|# ssl-key=/etc/ssl/private/${IMAGE}.key|" /etc/mysql/my.cnf && \
     ${APTGET_CLEANUP} && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
+    chmod +x /usr/local/bin/apply-config-changes.sh && \
+    chmod -x /usr/local/bin/apply-config-changes.inc.sh && \
     rm -rf /var/lib/mysql && \
     ln -s /backup/${IMAGE}-db /var/lib/mysql && \
     update-rc.d mysql disable && \
@@ -47,14 +51,17 @@ RUN mkdir -p /backup/${IMAGE}-db && \
     done && \
     for p in daily weekly monthly; do \
       ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.${p}; \
-    done
+    done && \
+    mv /usr/local/bin/restart.sh /usr/local/bin/_restart.sh && \
+    ln -s /usr/local/bin/apply-config-changes.sh /usr/local/bin/restart.sh
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
 EXPOSE 3306
 
 VOLUME /backup/${IMAGE}-db
-VOLUME /etc/mysql/conf.d
+VOLUME /var/local/mysql/conf.d
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")
