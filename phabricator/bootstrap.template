@@ -153,10 +153,10 @@ function checkInput() {
   fi
 
   case "${COMMAND}" in
-    "create-db-user" | "change-db-password" | "db-grants" | "databases" | "sql-post")
+    "create-db-user" | "change-db-password" | "db-grants" | "databases" | "sql-post" | "sql")
       logDebugResult SUCCESS "done";
       ;;
-    "sql")
+    "db-sql")
       if    [[ -n ${DB_NAME} ]] \
          && [[ ! -e "${SQL_DDL_FOLDER}/${DB_NAME}.sql" ]] \
          && [[ ! -e "${SQL_DDL_FOLDER}/phabricator_${DB_NAME}.sql" ]]; then \
@@ -184,18 +184,19 @@ function checkInput() {
 
 ## Prints the bootstrap SQL to create the Phabricator database user.
 function print_create_db_user_bootstrap() {
-  echo "create user ${PHABRICATOR_DB_USER} identified by '${PHABRICATOR_DB_PASSWORD}';";
+  echo "create user ${PHABRICATOR_DB_USER}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
 }
 
 ## Prints the bootstrap SQL to change the password of the Phabricator database user.
 function print_change_db_password_bootstrap() {
   echo "update mysql.user set password=PASSWORD('${PHABRICATOR_DB_PASSWORD}') where user='${PHABRICATOR_DB_USER}';";
+  echo 'flush privileges;';
 }
 
 ## Prints the bootstrap SQL to add the required grants to the Phabricator database user.
 function print_db_grants_bootstrap() {
   for _s in ${PHABRICATOR_DB_SCHEMAS[*]}; do
-    echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME} identified by '${PHABRICATOR_DB_PASSWORD}';";
+    echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
   done
 }
 

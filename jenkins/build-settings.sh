@@ -2,7 +2,7 @@ defineEnvVar JENKINS_MAVEN_VERSION "The Maven version" "3.3.3" "curl -s -k https
 defineEnvVar JENKINS_PASSWORD "The Jenkins password" "secret" "${RANDOM_PASSWORD}";
 defineEnvVar JENKINS_ENCRYPTED_PASSWORD "The Jenkins password, encrypted" "secret" 'mvn --encrypt-password ${JENKINS_PASSWORD} 2> /dev/null';
 defineEnvVar JENKINS_RELEASE_ISSUE_REF "Text referencing a 'Release issue', to be used in commits done by Jenkins while releasing artifacts. ex: 'Ref T10' for Phabricator, 'refs #33' for Trac or Redmine" "";
-defineEnvVar JENKINS_VERSION "The Jenkins version" "1.642.2";
+defineEnvVar JENKINS_VERSION "The Jenkins version" "1.642.4";
 defineEnvVar JENKINS_ARTIFACT "The Jenkins artifact" 'jenkins-war-${JENKINS_VERSION}.war';
 defineEnvVar JENKINS_DOWNLOAD_URL \
              "The url to download Jenkins" \

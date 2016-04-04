@@ -33,8 +33,6 @@ RUN mkdir -p /backup/${IMAGE}-db && \
     sed -i -e"s|# ssl-key\s*.*|# ssl-key=/etc/ssl/private/${IMAGE}.key|" /etc/mysql/my.cnf && \
     ${APTGET_CLEANUP} && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
-    chmod +x /usr/local/bin/apply-config-changes.sh && \
-    chmod -x /usr/local/bin/apply-config-changes.inc.sh && \
     rm -rf /var/lib/mysql && \
     ln -s /backup/${IMAGE}-db /var/lib/mysql && \
     update-rc.d mysql disable && \
