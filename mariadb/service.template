@@ -12,13 +12,8 @@ if [[ ! -e ${_datadir}/.bootstrapped ]]; then
   done
 fi
 
-_setupFile=/usr/local/src/setup.sql
-sed "s ___LAN___ $(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.%%\n", $1, $2, $3);}') g" ${_setupFile}.tpl > ${_setupFile}
-sed -i "s ___DEBIAN_SYS_MAINT_PASSWORD_HASH___ $(grep password /etc/mysql/debian.cnf  | head -n 1 | cut -d' ' -f 3) g" ${_setupFile}
-/usr/bin/mysql -u root < ${_setupFile} || \
-/usr/bin/mysql -u root --password="${MARIADB_ROOT_PASSWORD}" < ${_setupFile}
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${_datadir} && \
 chmod 755 ${_datadir}
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${_datadir}
 
 _poolSize=$(cat /proc/meminfo | grep MemTotal | awk -v f=${INNODB_POOL_SIZE_FACTOR:-${INNODB_DEFAULT_POOL_SIZE_FACTOR}} '{printf("%s*%s*1024\n", $2, f);}' | bc -l | cut -d'.' -f 1)
 [[ -d /usr/local/etc/mysql ]] && rsync -avz /etc/mysql/conf.d/* /usr/local/etc/mysql && cp /usr/local/etc/mysql/*.cnf /etc/mysql/conf.d/
@@ -33,6 +28,10 @@ EOF
 rsync -avz /etc/mysql/conf.d/ /var/local/conf.d/
 rsync -avz /var/local/conf.d/ /etc/mysql/conf.d/
 
+mkdir /var/run/mysql
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/run/mysql
+
 exec 2>&1
 #exec /usr/bin/mysqld_safe --console --user=mysql  | /opt/logstash/bin/logstash agent -f /etc/logstash/conf.d/mariadb.conf
-exec /usr/bin/mysqld_safe --console --user=mysql
+exec /usr/bin/mysqld_safe --console --user=mysql \
+    || mysqladmin -u root --password="${MARIADB_ROOT_PASSWORD}" -h127.0.0.1 --protocol=tcp shutdown

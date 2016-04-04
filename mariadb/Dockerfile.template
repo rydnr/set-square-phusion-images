@@ -16,7 +16,8 @@ COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
 COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
-COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh /usr/local/bin/
+COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh admin.sh \
+     /usr/local/bin/
 
 #ADD conf.d /etc/mysql/conf.d
 

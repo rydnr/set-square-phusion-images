@@ -20,6 +20,7 @@ mysql_install_db --datadir=${_datadir} && \
 sleep ${_SLEEP}
 /usr/bin/mysql -u root < ${_setupFile} || \
 /usr/bin/mysql -u root --password="${MARIADB_ROOT_PASSWORD}" < ${_setupFile}
+mysql_upgrade -u root --password="${MARIADB_ROOT_PASSWORD}"
 mysqladmin -u root --password="${MARIADB_ROOT_PASSWORD}" -h127.0.0.1 --protocol=tcp shutdown
 while ps -ef | grep mysql | grep -v grep > /dev/null; do
   echo "Waiting ${_SLEEP}s for MariaDB to shut down"
