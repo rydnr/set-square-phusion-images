@@ -4,7 +4,7 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME
+$SCRIPT_NAME [source destination]?
 $SCRIPT_NAME [-h|--help]
 (c) 2015-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
@@ -58,8 +58,18 @@ function checkInput() {
   done
 
   if [[ -z ${SOURCE} ]]; then
+    SOURCE="${1}";
+    shift;
+  fi
+
+  if [[ -z ${SOURCE} ]]; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode SOURCE_IS_MANDATORY;
+  fi
+
+  if [[ -z ${DESTINATION} ]]; then
+    DESTINATION="${1}";
+    shift;
   fi
 
   if [[ -z ${DESTINATION} ]]; then
@@ -92,6 +102,10 @@ function parseInput() {
 ## Main logic
 ## dry-wit hook
 function main() {
-#  ssh -p ${PORT} ${SSH_OPTIONS} ${DESTINATION%:.*} 'mkdir -p ~/$(hostname)';
-  rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}
+  if    [[ -z "${DOBACKUP}" ]] \
+     || [[ "${DOBACKUP}" != "true" ]]; then
+    ${BACKUP_FOLDER_SCRIPT} ${RSNAPSHOT_SOURCE_FOLDER} ${RSNAPSSHOT_DESTINATION_FOLDER}
+  else
+    echo "Backup disabled";
+  fi
 }

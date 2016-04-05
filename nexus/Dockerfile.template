@@ -36,6 +36,7 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
 VOLUME /backup/${IMAGE}-conf
 VOLUME /backup/${IMAGE}-blobs
 VOLUME /backup/${IMAGE}-db
+VOLUME /backup/rsnapshot
 
 # Nexus UI - http
 EXPOSE ${NEXUS_UI_HTTP_PORT}

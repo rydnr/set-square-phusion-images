@@ -88,11 +88,7 @@ RUN ${APTGET_INSTALL} \
     rm -rf /opt/liquibase* && \
     rm -rf /opt/php5* && \
     ln -s /backup/${IMAGE}-repo /var/repo && \
-    ln -s /backup/${IMAGE}-local /var/local/phabricator && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.hourly && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.daily && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.weekly && \
-    ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.monthly
+    ln -s /backup/${IMAGE}-local /var/local/phabricator
 
 EXPOSE 8000
 

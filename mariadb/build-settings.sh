@@ -5,6 +5,6 @@ defineEnvVar MARIADB_ADMIN_PRIVILEGES "The default privileges for the admin user
 defineEnvVar INNODB_DEFAULT_POOL_SIZE_FACTOR "The default pool size factor for InnoDB" "0.4";
 overrideEnvVar ENABLE_CRON false;
 overrideEnvVar ENABLE_MONIT true;
-overrideEnvVar ENABLE_RSNAPSHOT true;
+overrideEnvVar ENABLE_RSNAPSHOT false;
 overrideEnvVar ENABLE_SYSLOG true;
 #overrideEnvVar ENABLE_LOGSTASH false;

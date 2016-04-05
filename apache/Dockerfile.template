@@ -6,7 +6,8 @@ FROM ${BASE_IMAGE}:${TAG}
 
 ENV SERVICE_PACKAGE="apache2" \
     SERVICE_USER="www-data" \
-    SERVICE_GROUP="www-data"
+    SERVICE_GROUP="www-data" \
+    DOBACKUP="false"
 
 RUN mkdir -p /etc/service/${IMAGE} /backup/${IMAGE}-www && \
     cp -r /etc/service/.template/* /etc/service/${IMAGE}
