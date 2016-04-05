@@ -9,7 +9,7 @@ COPY 50-rsync-jenkins-home.sh /etc/my_init.d/50-rsync-jenkins-home.sh
 
 ENV SERVICE_USER="jenkins" \
     SERVICE_GROUP="jenkins" \
-    JENKINS_HOME="/var/jenkins_home" \
+    JENKINS_HOME="/backup/jenkins-home" \
     JENKINS_SLAVE_AGENT_PORT=50000 \
     CATALINA_USER="jenkins" \
     CATALINA_GROUP="jenkins" \
@@ -19,25 +19,25 @@ ENV SERVICE_USER="jenkins" \
     VIRTUAL_PORT=8080 \
     DOBACKUP="true"
 
-RUN mkdir -p ${JENKINS_HOME} && \
+RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
     usermod -l ${SERVICE_USER} ${TOMCAT_USER} && \
     usermod -d ${JENKINS_HOME} ${SERVICE_USER} && \
     groupmod -n ${SERVICE_GROUP} ${TOMCAT_GROUP} && \
-    ln -s ${JENKINS_HOME} /home/jenkins && \
+    ln -s /backup/jenkins-home /home/jenkins && \
     echo "${SERVICE_USER}:${JENKINS_PASSWORD}" | chpasswd && \
-    mkdir -p ${JENKINS_HOME}/.m2 /usr/share/jenkins/ref && \
+    mkdir -p /var/jenkins_home/.m2 /usr/share/jenkins/ref && \
     wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
     mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome && \
-    cd ${TOMCAT_HOME} && ln -s ${JENKINS_HOME}/.m2 .m2 && mkdir .jenkins && cd .jenkins && /usr/lib/jvm/java/bin/jar -xvf ${TOMCAT_HOME}/webapps/jenkins.war && \
+    cd ${TOMCAT_HOME} && ln -s /var/jenkins_home/.m2 .m2 && mkdir .jenkins && cd .jenkins && /usr/lib/jvm/java/bin/jar -xvf ${TOMCAT_HOME}/webapps/jenkins.war && \
     sed -i '/<\/tomcat-users>/i \  <role rolename="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
     sed -i '/<\/tomcat-users>/i \  <user username="jenkins-admin" password="${JENKINS_PASSWORD}" roles="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
     [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml && \
     rm -rf ${TOMCAT_HOME}/webapps/* && \
     mv /etc/service/tomcat /etc/service/jenkins && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    chmod -R g+w ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins && \
+    chmod -R g+w /var/jenkins_home ${TOMCAT_HOME}/.jenkins && \
     mkdir ${TOMCAT_HOME}/.ssh && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${JENKINS_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
     chmod 700 ${TOMCAT_HOME}/.ssh && \
     chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh && \
     ${APTGET_INSTALL} git graphviz && \
@@ -56,7 +56,7 @@ COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groov
 # /home/jenkins/identity.key.enc not found
 
 COPY context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
-COPY settings.xml ${JENKINS_HOME}/.m2/settings.xml
+COPY settings.xml /var/jenkins_home/.m2/settings.xml
 COPY config /etc/default/tomcat
 COPY ssh-config /opt/tomcat/.ssh/config
 COPY known_hosts /opt/tomcat/.ssh/known_hosts

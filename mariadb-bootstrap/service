@@ -8,7 +8,7 @@ $SCRIPT_NAME [-v[v]|-q|--quiet|-p=pass|--password=pass|-u=user|--user=user] [sql
 $SCRIPT_NAME [-h|--help]
 (c) 2014-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
- 
+
 Connects to a MariaDB server and processes the SQL files in sql-folder.
 
 Where:
@@ -29,7 +29,7 @@ EOF
 function checkRequirements() {
   checkReq awk AWK_NOT_INSTALLED;
 }
- 
+
 # Error messages
 function defineErrors() {
   export INVALID_OPTION="Unrecognized option";
@@ -80,7 +80,7 @@ function parseInput() {
   if [[ -z ${DB_USER} ]]; then
     DB_USER="${DEFAULT_DB_USER}";
   fi
-  
+
   # Parameters
   if [[ -z ${SQL_FOLDER} ]]; then
     SQL_FOLDER="$1";
@@ -108,18 +108,18 @@ function checkInput() {
          ;;
     esac
   done
- 
+
   if [[ -z ${DB_USER} ]]; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_DB_USER_SPECIFIED;
-  fi 
+  fi
 
   if [[ -z ${SQL_FOLDER} ]]; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_SQL_FOLDER_SPECIFIED;
   else
     logDebugResult SUCCESS "valid";
-  fi 
+  fi
 }
 
 ## Checks whether given SQL file is marked as processed.
@@ -137,7 +137,8 @@ function is_sql_file_marked_as_processed() {
   else
     _rescode=1;
   fi
-  return $?;
+
+  return ${_rescode};
 }
 
 ## Marks given SQL file as processed.

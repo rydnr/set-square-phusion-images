@@ -81,7 +81,7 @@ RUN ${APTGET_INSTALL} \
       /opt/liquibase/liquibase --driver=org.mariadb.jdbc.Driver --username=root --password=secret --url="jdbc:mysql://localhost/${s}?user=root" --changeLogFile=/usr/local/share/liquibase/${s}/changelog.yml generateChangeLog; \
       mysqldump -d -u root -psecret -h localhost --create-options --add-drop-database -B --events --routines --triggers ${s} > /usr/local/share/sql/databases/${s}.sql; \
     done && \
-    mysqldump -u root -psecret -h localhost --create-options --all-databases --add-drop-database -B --events --routines --triggers > /usr/local/share/sql/phabricator.sql && \
+    mysqldump -u root -psecret -h localhost --create-options --add-drop-database --events --routines --triggers --databases $(mysql -u root -psecret --skip-column-names -e "SET SESSION group_concat_max_len=10000; SELECT GROUP_CONCAT(schema_name SEPARATOR ' ') FROM information_schema.schemata WHERE schema_name NOT IN ('mysql','performance_schema','information_schema');") > /usr/local/share/sql/phabricator.sql && \
     service mysql stop && \
     ${APTGET_CLEANUP} && \
     rm -rf /var/lib/mysql && \
