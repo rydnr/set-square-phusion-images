@@ -78,10 +78,10 @@ RUN mkdir /Dockerfiles && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
     sed -i 's|^#ssh_args.*|ssh_args\t-i /etc/ssh/ssh_host_dsa_key|g' /etc/rsnapshot.conf && \
     sed -i 's|^snapshot_root.*|snapshot_root\t/backup/rsnapshot/|g' /etc/rsnapshot.conf && \
-    ln -s /etc/cron.hourly/backup-volumes /usr/local/bin/backup-volumes.sh \
+    ln -s /usr/local/bin/backup-volumes.sh /etc/cron.hourly/backup-volumes && \
     for p in hourly daily weekly monthly; do \
-      ln -s /etc/cron.${p}/backup-rsnapshot /usr/local/bin/backup-rsnapshot.sh; \
-    done
+      ln -s /usr/local/bin/backup-rsnapshot.sh /etc/cron.${p}/backup-rsnapshot; \
+    done && \
     ${APTGET_CLEANUP}
 
 ENTRYPOINT ["/sbin/my_exec"]

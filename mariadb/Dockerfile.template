@@ -45,11 +45,9 @@ RUN mkdir -p /backup/${IMAGE}-db && \
     chmod +x /etc/service/${IMAGE}/run && \
     chmod +x /usr/local/bin/bootstrap-db.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    for p in hourly daily weekly monthly; do \
-      ln -s /usr/local/bin/backup-default.sh /usr/local/bin/backup-rsync.${p}; \
-    done && \
     for p in daily weekly monthly; do \
       ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.${p}; \
+      ln -s /usr/local/bin/backup-${IMAGE}.sh /etc/cron.${p}/backup-mysqldump; \
     done && \
     mv /usr/local/bin/restart.sh /usr/local/bin/_restart.sh && \
     ln -s /usr/local/bin/apply-config-changes.sh /usr/local/bin/restart.sh
