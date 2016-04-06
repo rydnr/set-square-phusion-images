@@ -104,8 +104,8 @@ function parseInput() {
 function main() {
   if    [[ -z "${DOBACKUP}" ]] \
      || [[ "${DOBACKUP}" != "true" ]]; then
-    ${BACKUP_FOLDER_SCRIPT} ${RSNAPSHOT_SOURCE_FOLDER} ${RSNAPSSHOT_DESTINATION_FOLDER}
+    logDebug "Backup disabled";
   else
-    echo "Backup disabled";
+    ${BACKUP_FOLDER_SCRIPT} ${RSNAPSHOT_SOURCE_FOLDER} ${RSNAPSSHOT_DESTINATION_FOLDER}
   fi
 }

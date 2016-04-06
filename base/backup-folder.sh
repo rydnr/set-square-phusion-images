@@ -104,8 +104,8 @@ function parseInput() {
 function main() {
   if    [[ -z "${DOBACKUP}" ]] \
      || [[ "${DOBACKUP}" != "true" ]]; then
-    rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION%/}/
-  else
     logDebug "Backup disabled";
+  else
+    rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION%/}/
   fi
 }

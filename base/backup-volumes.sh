@@ -93,7 +93,7 @@ function process_volumes() {
     IFS=$'\n';
     for _aux in $(grep -e '^\s*VOLUME\s' "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
       IFS="${_oldIFS}";
-      logInfo -n "Backing up ${_aux} to ${IMAGE}-backup";
+      logInfo -n "Backing up ${_aux} to ${SQ_IMAGE}-backup";
       /usr/local/bin/backup-folder.sh "${_aux}" "${_aux}";
       logInfoResult SUCCESS "done";
     done
@@ -105,10 +105,10 @@ function process_volumes() {
 function main() {
   if    [[ -z "${DOBACKUP}" ]] \
      || [[ "${DOBACKUP}" != "true" ]]; then
+    logDebug "Backup disabled";
+  else
     for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
       process_volumes "${_user}" "${_group}" "${DOCKERFILES_LOCATION}/${p}";
     done
-  else
-    logDebug "Backup disabled";
   fi
 }

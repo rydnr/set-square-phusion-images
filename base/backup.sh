@@ -152,14 +152,6 @@ function extract_volumes() {
 function main() {
   local _suffix;
   local _destFolder;
-  for f in ${SQ_CUSTOM_BACKUP_SCRIPTS_FOLDER}/${SQ_CUSTOM_BACKUP_SCRIPTS_PREFIX}*.{hourly,daily,weekly,monthly}; do
-    _basename="$(basename $f)";
-    _suffix="${_basename#*\.}";
-    if [ -d /etc/cron.${_suffix} ]; then
-      ln -s ${f} /etc/cron.${_suffix}/${_basename%\.*};
-      chmod +x ${f};
-    fi
-  done
   chmod -x /etc/my_init.d/*
   for s in $(ls /etc/service | grep -v sshd | grep -v syslog ); do
     rm -rf /etc/service/${s}
@@ -178,9 +170,8 @@ function main() {
   chmod 600 /backup/.ssh/authorized_keys2
   sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config
   sed -i 's|^#AuthorizedKeysFile\(\s+\).ssh/authorized_keys|AuthorizedKeysFile .ssh/authorized_keys|g' /etc/ssh/sshd_config
-  chown -R backup:backup /backup
+  chown -R ${SQ_BACKUP_USER}:backup /backup
   logInfoResult SUCCESS "done";
-  usermod -s /bin/bash backup
+  usermod -s /bin/bash ${SQ_BACKUP_USER}
   /sbin/my_init
 }
-
