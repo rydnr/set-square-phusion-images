@@ -84,12 +84,9 @@ function main() {
   rm -rf /opt/sonatype/nexus/etc /sonatype-work/etc
   ln -s /backup/nexus-conf /opt/sonatype/nexus/etc
   ln -s /backup/nexus-conf /sonatype-work/etc
-  rsync -avz /backup/nexus-blobs/ /sonatype-blobs/
-  rsync -avz /sonatype-work/blobs/ /backup/nexus-blobs/
   rm -rf /sonatype-work/blobs
   ln -s /backup/nexus-blobs /sonatype-blobs
-  rsync -avz /backup/nexus-db/ /sonatype-work/db/
-  rsync -avz /sonatype-work/db/ /backup/nexus-db/
+  ln -s /backup/nexus-blobs /sonatype-work/blobs
   ln -s /backup/nexus-db /sonatype-work/db
   /etc/my_init.d/00_chown_volumes.sh
   chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype /sonatype-work
