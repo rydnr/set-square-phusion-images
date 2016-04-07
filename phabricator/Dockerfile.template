@@ -97,6 +97,7 @@ VOLUME /usr/local/share/sql
 VOLUME /var/local/mysql/conf.d
 VOLUME /backup/${IMAGE}-local
 VOLUME /backup/${IMAGE}-repo
+VOLUME /backup/rsnapshot
 
 @include("copy-metadata")
 @include("symlinks")

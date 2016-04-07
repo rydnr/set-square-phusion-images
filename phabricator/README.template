@@ -54,3 +54,20 @@ for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
 
 - Upgrade a previous Phabricator database:
 > docker run -it --link [db-container]:db ${NAMESPACE}/${IMAGE}:${TAG} upgrade
+
+# Backup
+
+The built-in backup mechanism copies regularly the contents of /backup/phabricator-* and /backup/rsnapshot to a remote server ${IMAGE}{BACKUP_HOST_SUFFIX},
+which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT).
+
+## Preparation
+
+In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Phabricator container as follows:
+
+> docker run -d --name ${IMAGE}-backup -v [host-folder]/${IMAGE}/repo:/backup/${IMAGE}-repo -v [host-folder]/${IMAGE}/local:/backup/${IMAGE}-local -v [host-folder]/${IMAGE}/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+
+## Recovery
+
+The recovery process, once the original Phabricator instance is shutdown, consists of:
+- Copying the contents of [host-folder]/${IMAGE}/repo, [host-folder]/${IMAGE}/local and [host-folder]/${IMAGE}/rsnapshot to the server where Phabricator will run.
+- Launch a new container as defined in this document, binding the volumes of the container to the host folders.

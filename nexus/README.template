@@ -16,3 +16,25 @@ Examples:
 
 - Of course, you can disable Logstash altogether if you so wish:
 > docker run .. -e ENABLE_LOGSTASH=false ..
+
+# Backup
+
+The built-in backup mechanism copies regularly the contents of /backup/nexus-* and /backup/rsnapshot to a remote server ${IMAGE}{BACKUP_HOST_SUFFIX},
+which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT).
+
+## Preparation
+
+In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows:
+
+> docker run -d --name ${IMAGE}-backup -v [host-folder]/nexus/blobs:/backup/nexus-blobs -v [host-folder]/nexus/conf:/backup/nexus-conf -v [host-folder]/nexus/db:/backup/nexus-db -v [host-folder]/nexus/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+
+## Recovery
+
+The recovery process, once the original Nexus instance is shutdown, consists of:
+- Copying the contents of [host-folder]/nexus/blobs, [host-folder]/nexus/conf, [host-folder]/nexus/db, and [host-folder]/nexus/rsnapshot to the server where Nexus will run.
+- Launch a new container as defined in this document, binding the volumes of the container to the host folders.
+
+## Important notice
+
+It's important to notice that this image can be used as Docker registry. So if it's shut down, it obviously cannot serve any Docker images nor layers.
+For that reason, it's recommended to identify potential hosts that would be potentially used for Nexus fail-back hosts, and ensure they have their local copy of ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}. For "latest" tags, that would need a cron job to force they stay current.

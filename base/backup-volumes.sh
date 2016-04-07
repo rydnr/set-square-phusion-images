@@ -76,15 +76,11 @@ function parseInput() {
 }
 
 ## Processes the volumes from a given Dockerfile.
-## -> 1: the user.
-## -> 2: the group.
-## -> 3: the Dockerfile.
+## -> 1: the Dockerfile.
 ## Example:
-##   process_volumes mysql mysql /Dockerfiles/Dockerfile
+##   process_volumes /Dockerfiles/Dockerfile
 function process_volumes() {
-  local _user="${1}";
-  local _group="${2}";
-  local _dockerfile="${3}";
+  local _dockerfile="${1}";
   local _aux;
   local _single;
   grep -e '^\s*VOLUME\s' "${_dockerfile}" > /dev/null 2>&1
@@ -108,7 +104,7 @@ function main() {
     logDebug "Backup disabled";
   else
     for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
-      process_volumes "${_user}" "${_group}" "${DOCKERFILES_LOCATION}/${p}";
+      process_volumes "${DOCKERFILES_LOCATION}/${p}";
     done
   fi
 }

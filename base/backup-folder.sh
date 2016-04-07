@@ -57,7 +57,7 @@ function checkInput() {
     esac
   done
 
-  if [[ -z ${SOURCE} ]]; then
+  if [[ -n "${1}" ]]; then
     SOURCE="${1}";
     shift;
   fi
@@ -67,7 +67,7 @@ function checkInput() {
     exitWithErrorCode SOURCE_IS_MANDATORY;
   fi
 
-  if [[ -z ${DESTINATION} ]]; then
+  if [[ -n "${1}" ]]; then
     DESTINATION="${1}";
     shift;
   fi

@@ -170,7 +170,7 @@ function main() {
   chmod 600 /backup/.ssh/authorized_keys2
   sed -i 's/^#PubkeyAuthentication yes/PubkeyAuthentication yes/g' /etc/ssh/sshd_config
   sed -i 's|^#AuthorizedKeysFile\(\s+\).ssh/authorized_keys|AuthorizedKeysFile .ssh/authorized_keys|g' /etc/ssh/sshd_config
-  chown -R ${SQ_BACKUP_USER}:backup /backup
+  chown -R ${SQ_BACKUP_USER}:${SQ_BACKUP_GROUP} /backup
   logInfoResult SUCCESS "done";
   usermod -s /bin/bash ${SQ_BACKUP_USER}
   /sbin/my_init
