@@ -66,8 +66,15 @@ In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Phabricator contain
 
 > docker run -d --name ${IMAGE}-backup -v [host-folder]/${IMAGE}/repo:/backup/${IMAGE}-repo -v [host-folder]/${IMAGE}/local:/backup/${IMAGE}-local -v [host-folder]/${IMAGE}/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
 
+Additionally, run a backup container for the MariaDB database as well.
+
 ## Recovery
 
-The recovery process, once the original Phabricator instance is shutdown, consists of:
+The recovery process, once the original Phabricator instance (and its associated database) is shutdown, consists of:
+
+- Recovering the database contents. Details are provided by the image itself:
+
+> docker run -it ${NAMESPACE}/mariadb help
+
 - Copying the contents of [host-folder]/${IMAGE}/repo, [host-folder]/${IMAGE}/local and [host-folder]/${IMAGE}/rsnapshot to the server where Phabricator will run.
-- Launch a new container as defined in this document, binding the volumes of the container to the host folders.
+- Launching a new container as defined in this document, binding the volumes of the container to the host folders.

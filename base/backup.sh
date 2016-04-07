@@ -162,6 +162,7 @@ function main() {
   chmod +x /etc/service/sshd/run
   export DISABLE_ALL=true
   export ENABLE_SSH=true
+  export VIRTUAL_HOST="";
   logInfoResult SUCCESS "done";
   logInfo -n "Configuring SSH key";
   mkdir /backup/.ssh

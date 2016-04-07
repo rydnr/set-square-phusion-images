@@ -102,10 +102,14 @@ function parseInput() {
 ## Main logic
 ## dry-wit hook
 function main() {
+  local _hostname="$(hostname)";
   if    [[ -z "${DOBACKUP}" ]] \
      || [[ "${DOBACKUP}" != "true" ]]; then
     logDebug "Backup disabled";
   else
-    rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION%/}/
+    if [ "${_hostname#${SQ_IMAGE}}" == "${_hostname}" ]; then
+      _hostname="${SQ_IMAGE}";
+    fi
+    rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${_hostname}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION%/}/
   fi
 }
