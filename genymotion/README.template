@@ -1,0 +1,5 @@
+This image runs Genymotion emulator.
+
+Examples:
+- Run this image to launch Genymotion emulator:
+> docker run -it -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" -e DISPLAY=:0 ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash

@@ -2,16 +2,16 @@
 FROM ${BASE_IMAGE}:${TAG}
 @include("maintainer")
 
-ENV DISPLAY :0
+@include("addon-toggles")
+
+ENV DOBACKUP="false" \
+    DISPLAY=":0"
 
 @include("addon-toggles")
 
+RUN ${APTGET_INSTALL} x11-apps && \
+    ${APTGET_CLEANUP}
 
-RUN ${APTGET_INSTALL} x11-apps
-
-COPY README /README
-COPY Dockerfile /Dockerfiles/Dockerfile
-COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-
-# For instructions on how to use this image, please run
-# docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

@@ -5,9 +5,10 @@ FROM ${BASE_IMAGE}:${TAG}
 @include("addon-toggles")
 
 # From https://github.com/nodejs/node-v0.x-archive/wiki/Installing-Node.js-via-package-manager#debian-and-ubuntu-based-linux-distributions
-RUN curl --silent --location --location https://deb.nodesource.com/setup_0.12 | bash - && \
-    ${APTGET_INSTALL} nodejs && \
+RUN curl --silent --location ${NODE_DOWNLOAD_URL} | bash - && \
+    ${APTGET_INSTALL} -u nodejs build-essential && \
     ${APTGET_CLEANUP}
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

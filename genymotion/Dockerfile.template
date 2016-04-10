@@ -1,0 +1,27 @@
+@include("preamble")
+FROM ${NAMESPACE}/base-gui:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+COPY my_exec /sbin/my_exec
+
+RUN add-apt-repository ppa:ubuntu-toolchain-r/test && \
+    ${APTGET_INSTALL} --update libharfbuzz-dev libgl1-mesa-glx libxcomposite1 libjpeg8 libxslt1.1 libgstreamer1.0 libgstreamer-plugins-base1.0 libdouble-conversion1 libstdc++6 && \
+    ${APTGET_CLEANUP} && \
+    wget -O /tmp/${GENYMOTION_ARTIFACT} ${GENYMOTION_DOWNLOAD_URL} && \
+    cd /tmp && chmod +x ${GENYMOTION_ARTIFACT} && \
+    yes | ./${GENYMOTION_ARTIFACT} && \
+    rm -f ${GENYMOTION_ARTIFACT} && \
+    useradd -m android -u ${DEVELOPMENT_USER_ID} -s /bin/bash && \
+    mkdir /home/android/.Genymobile && \
+    ln -s /home/android/.Genymobile /root/.Genymobile && \
+    ln -s /opt/genymobile/genymotion/genymotion /usr/local/bin/genymotion && \
+    ln -s /opt/genymobile/genymotion/genymotion-shell /usr/local/bin/genymotion-shell && \
+    ln -s /opt/genymobile/genymotion/gmtool /usr/local/bin/gmtool
+
+VOLUME /home/android
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
