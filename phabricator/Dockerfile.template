@@ -51,6 +51,11 @@ RUN ${APTGET_INSTALL} \
     bin/config set mysql.user root && \
     bin/config set mysql.pass secret && \
     bin/config set pygments.enabled true && \
+    bin/config set metamta.default-address ${PHABRICATOR_FROM_ADDRESS} && \
+    bin/config set metamta.domain ${DOMAIN} && \
+    bin/config set phabricator.timezone ${TIMEZONE} && \
+    bin/config set config.ignore-issues '{ "security.security.alternate-file-domain": true }' && \
+    bin/config set phpmailer.smtp-host ${SMTP_HOST} && \
     bin/storage upgrade --force && \
     bin/config set storage.local-disk.path /var/local/phabricator && \
     cd /usr/local/bin && \
