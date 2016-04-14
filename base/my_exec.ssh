@@ -1,3 +1,6 @@
 #!/bin/bash
 
-chmod +x /etc/my_init.d/00_regen_ssh_host_keys.sh > /dev/null 2>&1
+if    [ "${ENABLE_SSH}" == "false" ] \
+   || [ -n "${DISABLE_ALL}" ]; then
+  rm -rf /etc/service/ssh
+fi

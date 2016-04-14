@@ -13,6 +13,7 @@ rsync -avz /var/local/mysql/conf.d/ /var/local/conf.d/
 rsync -avz /var/local/conf.d/ /var/local/mysql/conf.d/
 
 echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
+chown -R daemon-user /var/tmp/phd
 bin/phd restart
 
 /usr/local/bin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl

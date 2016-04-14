@@ -49,7 +49,7 @@ RUN ${APTGET_INSTALL} \
     sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php5/apache2/php.ini && \
     sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php5/apache2/php.ini && \
     pip install pygments && \
-    /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/false -c "Phabricator daemon user" daemon-user && \
+    /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user && \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git && \
     cd /opt/phabricator && \
     bin/config set phd.user daemon-user && \

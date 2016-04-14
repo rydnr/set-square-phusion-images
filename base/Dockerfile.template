@@ -50,6 +50,7 @@ COPY my_exec.monit /etc/my_exec.d/monit
 COPY my_exec.rsnapshot /etc/my_exec.d/rsnapshot
 COPY my_exec.syslog /etc/my_exec.d/syslog
 COPY my_exec.ssh /etc/my_exec.d/ssh
+COPY my_exec.postfix /etc/my_exec.d/postfix
 
 COPY logger /etc/service/.template/log/run
 COPY service.cron /etc/service/cron/run
@@ -63,7 +64,6 @@ RUN mkdir /Dockerfiles && \
     ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
-    chmod +x /etc/service/.template/log/run && \
     chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show && \
     ln -s -- /usr/local/bin/help /usr/local/bin/-h && \
     ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
@@ -73,9 +73,9 @@ RUN mkdir /Dockerfiles && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-private && \
     ln -s -- /backup/rsnapshot /var/cache/rsnapshot && \
     for s in cron monit ssh postfix; do \
-      cp /etc/service/.template/log/run /etc/service/${s}/log/run && \
-      chmod +x /etc/service/${s}/log/run; \
+      cp /etc/service/.template/log/run /etc/service/${s}/log/run; \
     done && \
+    chmod +x /etc/service/.template/log/run /etc/service/*/log/run /etc/service/*/run && \
     sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc && \
     sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
