@@ -35,7 +35,11 @@ COPY rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
 COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
 
 RUN mkdir -p /etc/my_exec.d && \
-    mkdir -p /etc/service/{.template,monit,cron,sshd,postfix}/log && \
+    mkdir -p /etc/service/.template/log && \
+    mkdir -p /etc/service/monit/log && \
+    mkdir -p /etc/service/cron/log && \
+    mkdir -p /etc/service/sshd/log && \
+    mkdir -p /etc/service/postfix/log && \
     touch /var/local/docker-installed-packages.txt && \
     chmod +x /usr/local/bin/*.sh
     #echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab
@@ -45,6 +49,7 @@ COPY my_exec.help /etc/my_exec.d/help
 COPY my_exec.monit /etc/my_exec.d/monit
 COPY my_exec.rsnapshot /etc/my_exec.d/rsnapshot
 COPY my_exec.syslog /etc/my_exec.d/syslog
+COPY my_exec.ssh /etc/my_exec.d/ssh
 
 COPY logger /etc/service/.template/log/run
 COPY service.cron /etc/service/cron/run
@@ -67,11 +72,10 @@ RUN mkdir /Dockerfiles && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-public && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-private && \
     ln -s -- /backup/rsnapshot /var/cache/rsnapshot && \
-    cp /etc/service/.template/log/run /etc/service/cron/log/run && \
-    chmod +x /etc/service/cron/run && \
-    cp /etc/service/.template/log/run /etc/service/monit/log/run && \
-    chmod +x /etc/service/monit/run && \
-    cp /etc/service/.template/log/run /etc/service/sshd/log/run && \
+    for s in cron monit ssh postfix; do \
+      cp /etc/service/.template/log/run /etc/service/${s}/log/run && \
+      chmod +x /etc/service/${s}/log/run; \
+    done && \
     sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc && \
     sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \
