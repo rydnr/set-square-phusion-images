@@ -4,7 +4,7 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME [-o|--output] output input
+$SCRIPT_NAME -o|--output output input
 $SCRIPT_NAME [-h|--help]
 (c) 2016-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
@@ -88,7 +88,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | --quiet | -u | --user | -p | --password)
+      -h | --help | -v | -vv | -q | --quiet)
          ;;
       -o | --output)
          ;;

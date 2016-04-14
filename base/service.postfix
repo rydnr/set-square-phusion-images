@@ -1,16 +1,18 @@
 #!/bin/sh
 
-if [ -n "${ENABLE_LOCAL_SMTP}" ]; then
+exec 1>&2
 
-  exec 1>&2
- 
-  daemon_directory=/usr/lib/postfix \
-  command_directory=/usr/sbin \
-  config_directory=/etc/postfix \
-  queue_directory=/var/spool/postfix \
-  mail_owner=postfix \
-  setgid_group=postdrop \
-   /etc/postfix/postfix-script check || exit 1
- 
-  exec /usr/lib/postfix/master
-fi
+daemon_directory=/usr/lib/postfix
+command_directory=/usr/sbin
+config_directory=/etc/postfix
+queue_directory=/var/spool/postfix
+mail_owner=postfix
+setgid_group=postdrop
+
+chown -R ${mail_owner}:${setgid_group} ${command_directory}
+chgrp postdrop ${command_directory}/postqueue ${command_directory}/postdrop
+chmod g+s ${command_directory}/postqueue ${command_directory}/postdrop
+
+${command_directory}/postfix check || echo "Postfix checks failed" && exit 1
+
+exec ${daemon_directory}/master 2>&1

@@ -7,6 +7,8 @@ bin/config set mysql.host db
 bin/config set mysql.user ${PHABRICATOR_DB_USER}
 bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
 bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
+bin/config set phpmailer.smtp-host ${SMTP_HOST:-localhost}
+
 sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php5/apache2/php.ini
 chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo
 rsync -avz /var/local/mysql/conf.d/ /var/local/conf.d/
@@ -14,7 +16,7 @@ rsync -avz /var/local/conf.d/ /var/local/mysql/conf.d/
 
 echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
 chown -R daemon-user /var/tmp/phd
-bin/phd restart
+chpst -u daemon-user bin/phd restart
 
 /usr/local/bin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
 

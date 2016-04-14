@@ -86,5 +86,9 @@ function parseInput() {
 ## Main logic
 ## dry-wit hook
 function main() {
-  process-file.sh -o ${MONIT_MAIL_TEMPLATE_FILE} ${MONIT_MAIL_OUTPUT_FILE}
+  if [[ -z "${SMTP_HOST}" ]]; then
+    export SMTP_HOST="localhost";
+  fi
+
+  process-file.sh -o ${MONIT_MAIL_OUTPUT_FILE} ${MONIT_MAIL_TEMPLATE_FILE}
 }

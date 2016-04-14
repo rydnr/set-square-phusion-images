@@ -72,7 +72,7 @@ RUN mkdir /Dockerfiles && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-public && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-private && \
     ln -s -- /backup/rsnapshot /var/cache/rsnapshot && \
-    for s in cron monit ssh postfix; do \
+    for s in cron monit sshd postfix; do \
       cp /etc/service/.template/log/run /etc/service/${s}/log/run; \
     done && \
     chmod +x /etc/service/.template/log/run /etc/service/*/log/run /etc/service/*/run && \

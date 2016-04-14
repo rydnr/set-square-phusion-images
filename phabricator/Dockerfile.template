@@ -43,7 +43,6 @@ RUN ${APTGET_INSTALL} \
     php5enmod mcrypt && \
     apt-get source php5 && \
     cd $(ls -1F | grep '^php5-.*/$')/ext/pcntl && phpize && ./configure && make && make install && \
-    mkdir -p /var/repo /var/local/phabricator && \
     chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} /var/local/phabricator /var/repo && \
     sed -i 's/^Listen 80$/Listen 8000/g' /etc/apache2/ports.conf && \
     sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php5/apache2/php.ini && \
@@ -63,9 +62,10 @@ RUN ${APTGET_INSTALL} \
     bin/config set metamta.domain ${DOMAIN} && \
     bin/config set phabricator.timezone ${DEFAULT_TIMEZONE} && \
     bin/config set config.ignore-issues '{ "security.security.alternate-file-domain": true }' && \
-    bin/config set phpmailer.smtp-host ${SMTP_HOST} && \
+    bin/config set environment.append-paths '["/usr/lib/git-core"]' && \
     bin/storage upgrade --force && \
     bin/config set storage.local-disk.path /var/local/phabricator && \
+    ln -s /usr/lib/git-core/git-http-backend /opt/phabricator/support/bin/git-http-backend && \
     chmod 755 /var/local/phabricator-ssh-hook.sh && \
     mkdir -p /var/tmp/phd/log && \
     chown -R daemon-user /var/tmp/phd && \
