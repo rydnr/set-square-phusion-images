@@ -22,6 +22,7 @@ COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
      31_create_monit_http_conf.sh 31_create_monit_http_conf.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \
+     33_create_monit_mail_conf.sh 33_create_monit_mail_conf.inc.sh \
      /etc/my_init.d/
 COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
@@ -34,10 +35,7 @@ COPY rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
 COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
 
 RUN mkdir -p /etc/my_exec.d && \
-    mkdir -p /etc/service/.template/log && \
-    mkdir -p /etc/service/monit/log && \
-    mkdir -p /etc/service/cron/log && \
-    mkdir -p /etc/service/sshd/log && \
+    mkdir -p /etc/service/{.template,monit,cron,sshd,postfix}/log && \
     touch /var/local/docker-installed-packages.txt && \
     chmod +x /usr/local/bin/*.sh
     #echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab
@@ -51,6 +49,7 @@ COPY my_exec.syslog /etc/my_exec.d/syslog
 COPY logger /etc/service/.template/log/run
 COPY service.cron /etc/service/cron/run
 COPY service.monit /etc/service/monit/run
+COPY service.postfix /etc/service/postfix/run
 
 RUN mkdir /Dockerfiles && \
     /usr/sbin/usermod -d /backup backup && \
@@ -88,7 +87,7 @@ ENTRYPOINT ["/sbin/my_exec"]
 CMD ["/sbin/my_init"]
 
 COPY monit-syslog.conf /etc/monit/conf.d/syslog.conf
-COPY monit-mail.conf /etc/monit/conf.d/mail.conf
+COPY monit-mail.conf.tmpl /var/local/monit-mail.conf.tmpl
 
 @include("copy-metadata")
 @include("symlinks")

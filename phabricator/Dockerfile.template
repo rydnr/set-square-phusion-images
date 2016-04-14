@@ -9,6 +9,9 @@ COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/apache/run
 COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade \
      /usr/local/bin/
+COPY phabricator-ssh-hook.sh sshd_config.phabricator /var/local/
+COPY phabricator-ssh.sudo phabricator-http.sudo /etc/sudoers.d/
+
 ADD conf.d /var/local/conf.d
 
 ENV SERVICE="apache" \
@@ -46,7 +49,12 @@ RUN ${APTGET_INSTALL} \
     sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php5/apache2/php.ini && \
     sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php5/apache2/php.ini && \
     pip install pygments && \
+    /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/false -c "Phabricator daemon user" daemon-user && \
+    /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git && \
     cd /opt/phabricator && \
+    bin/config set phd.user daemon-user && \
+    bin/config set diffusion.ssh-user git && \
+    bin/config set diffusion.allow-http-auth true && \
     bin/config set mysql.host localhost && \
     bin/config set mysql.user root && \
     bin/config set mysql.pass secret && \
@@ -58,6 +66,9 @@ RUN ${APTGET_INSTALL} \
     bin/config set phpmailer.smtp-host ${SMTP_HOST} && \
     bin/storage upgrade --force && \
     bin/config set storage.local-disk.path /var/local/phabricator && \
+    chmod 755 /var/local/phabricator-ssh-hook.sh && \
+    mkdir -p /var/tmp/phd/log && \
+    chown -R daemon-user /var/tmp/phd && \
     cd /usr/local/bin && \
     chmod +x bootstrap runme phabricator-cli runme upgrade && \
     for s in create-db-user change-db-password db-grants databases db-sql sql sql-post liquibase; do \
@@ -93,9 +104,19 @@ RUN ${APTGET_INSTALL} \
     rm -rf /opt/liquibase* && \
     rm -rf /opt/php5* && \
     ln -s /backup/${IMAGE}-repo /var/repo && \
-    ln -s /backup/${IMAGE}-local /var/local/phabricator
+    ln -s /backup/${IMAGE}-local /var/local/phabricator && \
+    for s in /opt/libphutil/bin/*; do \
+      ln -s $s /usr/local/bin/; \
+    done && \
+    for s in /opt/arcanist/bin/*; do \
+      ln -s $s /usr/local/bin/; \
+    done
 
+# Phabricator HTTP UI
 EXPOSE 8000
+
+# Phabricator SSH
+EXPOSE 22
 
 VOLUME /usr/local/share/liquibase
 VOLUME /usr/local/share/sql

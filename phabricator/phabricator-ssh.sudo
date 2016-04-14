@@ -1,0 +1,1 @@
+git ALL=(daemon-user) SETENV: NOPASSWD: /usr/bin/git-upload-pack, /usr/bin/git-receive-pack

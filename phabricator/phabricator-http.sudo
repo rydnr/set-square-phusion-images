@@ -1,0 +1,1 @@
+www-data  ALL=(daemon-user) SETENV: NOPASSWD: /usr/lib/git-core/git-http-backend

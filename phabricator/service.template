@@ -17,6 +17,8 @@ bin/phd restart
 
 /usr/local/bin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
 
+/usr/sbin/sshd -f /var/local/sshd_config.phabricator
+
 a2ensite 001-phabricator.conf && /etc/service/apache/run-apache
 
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet
