@@ -10,7 +10,8 @@ COPY service /etc/service/apache/run
 COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade \
      /usr/local/bin/
 COPY phabricator-ssh-hook.sh sshd_config.phabricator /var/local/
-COPY phabricator-ssh.sudo phabricator-http.sudo /etc/sudoers.d/
+COPY phabricator-ssh.sudo /etc/sudoers.d/phabricator-ssh
+COPY phabricator-http.sudo /etc/sudoers.d/phabricator-http
 
 ADD conf.d /var/local/conf.d
 
@@ -43,6 +44,8 @@ RUN ${APTGET_INSTALL} \
     php5enmod mcrypt && \
     apt-get source php5 && \
     cd $(ls -1F | grep '^php5-.*/$')/ext/pcntl && phpize && ./configure && make && make install && \
+    ln -s /backup/${IMAGE}-repo /var/repo && \
+    ln -s /backup/${IMAGE}-local /var/local/phabricator && \
     chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} /var/local/phabricator /var/repo && \
     sed -i 's/^Listen 80$/Listen 8000/g' /etc/apache2/ports.conf && \
     sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php5/apache2/php.ini && \
@@ -50,6 +53,7 @@ RUN ${APTGET_INSTALL} \
     pip install pygments && \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user && \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git && \
+    sed -i 's/^git:!:\(.*\)/git:*:\1/' /etc/shadow && \
     cd /opt/phabricator && \
     bin/config set phd.user daemon-user && \
     bin/config set diffusion.ssh-user git && \
@@ -65,7 +69,6 @@ RUN ${APTGET_INSTALL} \
     bin/config set environment.append-paths '["/usr/lib/git-core"]' && \
     bin/storage upgrade --force && \
     bin/config set storage.local-disk.path /var/local/phabricator && \
-    ln -s /usr/lib/git-core/git-http-backend /opt/phabricator/support/bin/git-http-backend && \
     chmod 755 /var/local/phabricator-ssh-hook.sh && \
     mkdir -p /var/tmp/phd/log && \
     chown -R daemon-user /var/tmp/phd && \
@@ -103,8 +106,6 @@ RUN ${APTGET_INSTALL} \
     rm -rf /var/lib/mysql && \
     rm -rf /opt/liquibase* && \
     rm -rf /opt/php5* && \
-    ln -s /backup/${IMAGE}-repo /var/repo && \
-    ln -s /backup/${IMAGE}-local /var/local/phabricator && \
     for s in /opt/libphutil/bin/*; do \
       ln -s $s /usr/local/bin/; \
     done && \

@@ -81,3 +81,4 @@ mariadb/backup.sh
 mariadb/service
 phabricator/bootstrap
 phabricator/service
+phabricator/apache-vhost.conf
