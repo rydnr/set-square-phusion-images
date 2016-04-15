@@ -7,7 +7,7 @@ FROM ${NAMESPACE}/apache:${TAG}
 RUN mv /etc/service/apache/run /etc/service/apache/run-apache
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/apache/run
-COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade \
+COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper \
      /usr/local/bin/
 COPY phabricator-ssh-hook.sh sshd_config.phabricator /var/local/
 COPY phabricator-ssh.sudo /etc/sudoers.d/phabricator-ssh
@@ -110,7 +110,7 @@ RUN ${APTGET_INSTALL} \
       ln -s $s /usr/local/bin/; \
     done && \
     for s in /opt/arcanist/bin/*; do \
-      ln -s $s /usr/local/bin/; \
+      ln -s /usr/local/bin/arcanist-wrapper /usr/local/bin/$(basename $s); \
     done
 
 # Phabricator HTTP UI
@@ -122,6 +122,7 @@ EXPOSE 22
 VOLUME /usr/local/share/liquibase
 VOLUME /usr/local/share/sql
 VOLUME /var/local/mysql/conf.d
+VOLUME /arc
 VOLUME /backup/${IMAGE}-local
 VOLUME /backup/${IMAGE}-repo
 VOLUME /backup/rsnapshot
