@@ -1,0 +1,159 @@
+#!/bin/bash
+
+#!/bin/bash dry-wit
+# Copyright 2015-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+
+function usage() {
+cat <<EOF
+$SCRIPT_NAME [-d|--deviceId=[deviceId]] userId groupId
+$SCRIPT_NAME [-h|--help]
+(c) 2016-today ACM-SL
+    Distributed this under the GNU General Public License v3.
+
+Runs Android-Studio under a user matching the specified userId:groupId.
+
+Where:
+  * package: the package(s) to install.
+  * -d | --deviceId: The Android device to test with.
+Common flags:
+    * -h | --help: Display this message.
+    * -v: Increase the verbosity.
+    * -vv: Increase the verbosity further.
+    * -q | --quiet: Be silent.
+EOF
+}
+
+## Defines the errors.
+## dry-wit hook
+function defineErrors() {
+  export INVALID_OPTION="Unrecognized option";
+  export NO_USER_ID_SPECIFIED="No userId specified";
+  export NO_GROUP_ID_SPECIFIED="No groupId specified";
+
+  ERROR_MESSAGES=(\
+    INVALID_OPTION \
+    NO_USER_ID_SPECIFIED \
+    NO_GROUP_ID_SPECIFIED \
+  );
+
+  export ERROR_MESSAGES;
+}
+
+## Validates the input.
+## dry-wit hook
+function checkInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+  logDebug -n "Checking input";
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q | -d | --deviceId)
+         shift;
+         ;;
+      *) logDebugResult FAILURE "failed";
+         exitWithErrorCode INVALID_OPTION;
+         ;;
+    esac
+  done
+
+  if [[ -z ${USER_ID} ]]; then
+    logDebugResult FAILURE "fail";
+    exitWithErrorCode NO_USER_ID_SPECIFIED;
+  else
+    logDebugResult SUCCESS "valid";
+  fi
+
+  if [[ -z ${GROUP_ID} ]]; then
+    logDebugResult FAILURE "fail";
+    exitWithErrorCode NO_GROUP_ID_SPECIFIED;
+  else
+    logDebugResult SUCCESS "valid";
+  fi
+}
+
+## Parses the input.
+## dry-wit hook
+function parseInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q )
+        shift;
+        ;;
+      -d | --deviceId)
+        export DEVICE_ID="${1}";
+        shift;
+        ;;
+    esac
+  done
+
+  if [[ -z ${USER_ID} ]]; then
+    USER_ID="${1}";
+    shift;
+  fi
+
+  if [[ -z ${GROUP_ID} ]]; then
+    GROUP_ID="${1}";
+    shift;
+  fi
+}
+
+## Updates the udev rules for given device.
+## -> 1: The device id.
+## Example:
+##   update_udev_rules 121d
+function update_udev_rules() {
+  local _deviceId="${1}";
+
+  logInfo -n "Adding udev rule for device ${_deviceId}";
+  echo "SUBSYSTEM==\"usb\", ATTR{idVendor}==\"${_deviceId}\", MODE=\"0666\", GROUP=\"plugdev\"" > /etc/udev/rules.d/51-android.rules
+  logInfoResult SUCCESS "done";
+
+  chmod a+r /etc/udev/rules.d/51-android.rules
+}
+
+## Updates the "developer" account.
+## -> 1: The user id.
+## -> 2: The group id.
+## Example:
+##   update_developer_account 1000 1000
+function update_developer_account() {
+  local _userId="${1}";
+  local _groupId="${2}";
+
+  logInfo -n "Fixing /home/developer ownership to ${_userId}:${_groupId}";
+  chown ${_userId}:${_groupId} -R /home/developer
+  logInfoResult SUCCESS "done";
+  logInfo -n "Updating developer account to ${_userId}:${_groupId}";
+  echo "developer:x:${_userId}:${_groupId}:Developer,,,:/home/developer:/bin/bash" >> /etc/passwd
+  logInfoResult SUCCESS "done";
+  logInfo -n "Updating developer group to ${_userId}";
+  logInfoResult SUCCESS "done";
+  echo "developer:x:${_userid}:" >> /etc/group
+  logInfoResult SUCCESS "done";
+}
+
+## Main logic
+## dry-wit hook
+function main() {
+  if [[ -n "${DEVICE_ID}" ]]; then
+    update_udev_rules "${DEVICE_ID}";
+  fi
+
+  update_developer_account "${USER_ID}" "${GROUP_ID}";
+
+  exec 2>&1
+  exec setuser developer /opt/android-studio/bin/studio.sh
+}

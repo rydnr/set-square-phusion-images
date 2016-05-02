@@ -1,7 +1,8 @@
-# Default values, can be overriden with -e ENABLE_[CRON|MONIT|RSNAPSHOT|SSH|SYSLOG|LOGSTASH]=[true|false]
+# Default values, can be overriden with -e ENABLE_[CRON|MONIT|RSNAPSHOT|SSH|SYSLOG|LOGSTASH|LOCAL_SMTP]=[true|false]
 # when launching the container
 ENV ENABLE_CRON true
 ENV ENABLE_MONIT true
 ENV ENABLE_RSNAPSHOT true
 ENV ENABLE_SSH false
 ENV ENABLE_SYSLOG true
+ENV ENABLE_LOCAL_SMTP true

@@ -1,0 +1,8 @@
+Runs Android-Studio within a Docker image.
+
+Examples:
+- Run Android-Studio using a host volume to store project files.
+> docker run -d -v [my-folder]:/data ${NAMESPACE}/${IMAGE}:${TAG} $(id -u) $(id -g)
+
+- Run Android-Studio using a host volume to store project files, testing with an Android device.
+> docker run -d -v [my-folder]:/data ${NAMESPACE}/${IMAGE}:${TAG} -d [deviceId] $(id -u) $(id -g)
