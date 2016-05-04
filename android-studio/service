@@ -122,7 +122,7 @@ function update_udev_rules() {
   chmod a+r /etc/udev/rules.d/51-android.rules
 }
 
-## Updates the "${SQ_SERVICE_USER}" account.
+## Updates the "${SERVICE_USER}" account.
 ## -> 1: The user id.
 ## -> 2: The group id.
 ## Example:
@@ -131,14 +131,14 @@ function update_developer_account() {
   local _userId="${1}";
   local _groupId="${2}";
 
-  logInfo -n "Fixing /home/${SQ_SERVICE_USER} ownership to ${_userId}:${_groupId}";
-  chown ${_userId}:${_groupId} -R /home/${SQ_SERVICE_USER}
+  logInfo -n "Fixing /home/${SERVICE_USER} ownership to ${_userId}:${_groupId}";
+  chown ${_userId}:${_groupId} -R /home/${SERVICE_USER}
   logInfoResult SUCCESS "done";
-  logInfo -n "Updating ${SQ_SERVICE_USER} account to ${_userId}:${_groupId}";
-  sed -i "s|^${SQ_SERVICE_USER}:|${SQ_SERVICE_USER}:x:${_userId}:${_groupId}:${SQ_SERVICE_USER},,,:/home/${SQ_SERVICE_USER}:/bin/bash|g" /etc/passwd
+  logInfo -n "Updating ${SERVICE_USER} account to ${_userId}:${_groupId}";
+  sed -i "s|^${SERVICE_USER}:|${SERVICE_USER}:x:${_userId}:${_groupId}:${SERVICE_USER},,,:/home/${SERVICE_USER}:/bin/bash|g" /etc/passwd
   logInfoResult SUCCESS "done";
-  logInfo -n "Updating ${SQ_SERVICE_GROUP} group to ${_userId}";
-  sed -i "s|^${SQ_SERVICE_GROUP}|${SQ_SERVICE_GROUP}:x:${_userid}:|g" /etc/group
+  logInfo -n "Updating ${SERVICE_GROUP} group to ${_userId}";
+  sed -i "s|^${SERVICE_GROUP}|${SERVICE_GROUP}:x:${_userid}:|g" /etc/group
   logInfoResult SUCCESS "done";
 }
 
@@ -152,5 +152,5 @@ function main() {
   update_developer_account "${USER_ID}" "${GROUP_ID}";
 
   exec 2>&1
-  exec setuser ${SQ_SERVICE_USER} /opt/android-studio/bin/studio.sh
+  exec setuser ${SERVICE_USER} /opt/android-studio/bin/studio.sh
 }
