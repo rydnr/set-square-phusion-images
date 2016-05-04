@@ -17,6 +17,7 @@ ENV SERVICE_USER="jenkins" \
     COPY_REFERENCE_FILE_LOG="$JENKINS_HOME/copy_reference_file.log" \
     VIRTUAL_HOST="${JENKINS_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8080 \
+    PATH="${PATH}:/opt/arcanist/bin" \
     DOBACKUP="true"
 
 RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
@@ -40,9 +41,13 @@ RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
     chmod 700 ${TOMCAT_HOME}/.ssh && \
     chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh && \
-    ${APTGET_INSTALL} git graphviz && \
+    ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && \
+    git clone https://github.com/phacility/libphutil && \
+    git clone https://github.com/phacility/arcanist && \
+    chmod +x /opt/arcanist/bin/arc && \
+    su - jenkins -c '/opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL}' && \
     ${APTGET_CLEANUP}
 
 COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groovy
@@ -52,7 +57,6 @@ COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groov
 # /home/jenkins/identity.key.enc not found
 
 COPY context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
-COPY settings.xml /var/jenkins_home/.m2/settings.xml
 COPY config /etc/default/tomcat
 COPY ssh-config /opt/tomcat/.ssh/config
 COPY known_hosts /opt/tomcat/.ssh/known_hosts
