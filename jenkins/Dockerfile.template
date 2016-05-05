@@ -40,9 +40,12 @@ RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
     chmod 700 ${TOMCAT_HOME}/.ssh && \
     chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh && \
-    ${APTGET_INSTALL} git graphviz && \
+    ${APTGET_INSTALL} git graphviz php5 php5-curl && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && \
+    for p in arcanist libphutil; do
+      cd /opt && git clone https://github.com/phacility/${p}.git && cd ${p} && git checkout stable; \
+    done && \
     ${APTGET_CLEANUP}
 
 COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groovy
