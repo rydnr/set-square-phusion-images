@@ -1,2 +1,2 @@
-set mailserver ${SMTP_HOST}
+set mailserver localhost
 set alert ${MONIT_ALERT_EMAIL}

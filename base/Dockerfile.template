@@ -61,7 +61,7 @@ RUN mkdir /Dockerfiles && \
     /usr/sbin/usermod -d /backup backup && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
     ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes && \
-    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot && \
+    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot postfix sasl2-bin opendkim opendkim-tools && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
     chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show && \

@@ -3,7 +3,7 @@ This image runs Phabricator as a Docker container.
 Examples:
 
 - Run Phabricator accessing a MariaDB/MySQL instance:
-> docker run -p [port]:8000 -p 22:22 --link [db-container]:db -e VIRTUAL_HOST=${PHABRICATOR_VIRTUAL_HOST} --add-host ${SMTP_HOST}:[smtp-host]--volumes-from [data-container]  --link [loghost]:logger ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -p [port]:8000 -p 22:22 --link [db-container]:db -e VIRTUAL_HOST=${PHABRICATOR_VIRTUAL_HOST} --add-host ${SMTP_HOST}:${SMTP_HOST} --volumes-from [data-container]  --link [loghost]:logger ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Run arcanist:
 > docker run --name arc -v ${PWD}:/arc arc

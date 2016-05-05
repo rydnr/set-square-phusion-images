@@ -44,7 +44,7 @@ RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
     ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && \
-    for p in arcanist libphutil; do
+    for p in arcanist libphutil; do \
       cd /opt && git clone https://github.com/phacility/${p}.git && cd ${p} && git checkout stable; \
     done && \
     chmod +x /opt/arcanist/bin/arc && \
