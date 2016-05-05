@@ -1,0 +1,6 @@
+Android SDK image.
+
+Examples:
+
+- Run any of the SDK tools:
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} [tool]

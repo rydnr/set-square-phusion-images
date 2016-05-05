@@ -125,10 +125,38 @@ function delete_caches() {
   fi
 }
 
+## Truncates all log files.
+## Example:
+##   truncate_logs
+function truncate_logs() {
+  logInfo -n "Truncating log files";
+  find /var/log -type f -name '*.log' -exec bash -c 'echo > {}' \;
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+  fi
+}
+
+## Wipes the contents of the /tmp.
+## Example:
+##   wipe_temporary_folder
+function wipe_temporary_folder() {
+  logInfo -n "Wiping /tmp";
+  rm -rf /tmp/*
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+  fi
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
   autoremove_packages;
   clean_system;
   delete_caches;
+  truncate_logs;
+  wipe_temporary_folder;
 }
