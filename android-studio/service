@@ -135,10 +135,10 @@ function update_developer_account() {
   chown ${_userId}:${_groupId} -R /home/${SERVICE_USER}
   logInfoResult SUCCESS "done";
   logInfo -n "Updating ${SERVICE_USER} account to ${_userId}:${_groupId}";
-  sed -i "s|^${SERVICE_USER}:|${SERVICE_USER}:x:${_userId}:${_groupId}:${SERVICE_USER},,,:/home/${SERVICE_USER}:/bin/bash|g" /etc/passwd
+  sed -i "s|^${SERVICE_USER}:.*$|${SERVICE_USER}:x:${_userId}:${_groupId}:${SERVICE_USER},,,:/home/${SERVICE_USER}:/bin/bash|g" /etc/passwd
   logInfoResult SUCCESS "done";
   logInfo -n "Updating ${SERVICE_GROUP} group to ${_userId}";
-  sed -i "s|^${SERVICE_GROUP}|${SERVICE_GROUP}:x:${_userid}:|g" /etc/group
+  sed -i "s|^${SERVICE_GROUP}:.*$|${SERVICE_GROUP}:x:${_userid}:|g" /etc/group
   logInfoResult SUCCESS "done";
 }
 

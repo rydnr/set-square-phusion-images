@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE log4j:configuration [
+
+<!ELEMENT log4j:configuration (renderer*, appender*, plugin*, 
+                               (category|logger)*,root?, categoryFactory?)>
+
+<!ATTLIST log4j:configuration
+  xmlns:log4j              CDATA #FIXED "http://jakarta.apache.org/log4j/" 
+  threshold                (all|debug|info|warn|error|fatal|off|null) "null"
+  debug                    (true|false|null)  "null"
+>
+
+<!ELEMENT renderer EMPTY>
+<!ATTLIST renderer
+  renderedClass  CDATA #REQUIRED
+  renderingClass CDATA #REQUIRED
+>
+
+<!ELEMENT appender (errorHandler?, param*, layout?, filter*, appender-ref*)>
+<!ATTLIST appender
+  name 		ID 	#REQUIRED
+  class 	CDATA	#REQUIRED
+>
+
+<!ELEMENT layout (param*)>
+<!ATTLIST layout
+  class		CDATA	#REQUIRED
+>
+
+<!ELEMENT filter (param*)>
+<!ATTLIST filter
+  class		CDATA	#REQUIRED
+>
+
+<!ELEMENT errorHandler (param*, root-ref?, logger-ref*,  appender-ref?)> 
+<!ATTLIST errorHandler
+   class        CDATA   #REQUIRED 
+>
+
+<!ELEMENT root-ref EMPTY>
+
+<!ELEMENT logger-ref EMPTY>
+<!ATTLIST logger-ref
+  ref IDREF #REQUIRED
+>
+
+<!ELEMENT param EMPTY>
+<!ATTLIST param
+  name		CDATA   #REQUIRED
+  value		CDATA	#REQUIRED
+>
+
+<!ELEMENT priority (param*)>
+<!ATTLIST priority
+  class   CDATA	#IMPLIED
+  value	  CDATA #REQUIRED
+>
+
+<!ELEMENT level (param*)>
+<!ATTLIST level
+  class   CDATA	#IMPLIED
+  value	  CDATA #REQUIRED
+>
+
+<!ELEMENT category (param*,(priority|level)?,appender-ref*)>
+<!ATTLIST category
+  class         CDATA   #IMPLIED
+  name		CDATA	#REQUIRED
+  additivity	(true|false) "true"  
+>
+
+<!ELEMENT logger (level?,appender-ref*)>
+<!ATTLIST logger
+  name		ID	#REQUIRED
+  additivity	(true|false) "true"  
+>
+
+<!ELEMENT categoryFactory (param*)>
+<!ATTLIST categoryFactory 
+   class        CDATA #REQUIRED>
+
+<!ELEMENT appender-ref EMPTY>
+<!ATTLIST appender-ref
+  ref IDREF #REQUIRED
+>
+
+<!ELEMENT plugin (param*)>
+<!ATTLIST plugin
+  name 		ID 	   #REQUIRED
+  class 	CDATA  #REQUIRED
+>
+
+<!ELEMENT root (param*, (priority|level)?, appender-ref*)>
+
+
+<!ELEMENT log4j:eventSet (log4j:event*)>
+<!ATTLIST log4j:eventSet
+  xmlns:log4j             CDATA #FIXED "http://jakarta.apache.org/log4j/" 
+  version                (1.1|1.2) "1.2" 
+  includesLocationInfo   (true|false) "true"
+>
+
+<!ELEMENT log4j:event (log4j:message, log4j:NDC?, log4j:MDC?, 
+                       log4j:throwable?, log4j:locationInfo?, log4j:properties?) >
+
+<!ATTLIST log4j:event
+    logger     CDATA #REQUIRED
+    level      CDATA #REQUIRED
+    thread     CDATA #REQUIRED
+    timestamp  CDATA #REQUIRED
+>
+
+<!ELEMENT log4j:message (#PCDATA)>
+
+<!ELEMENT log4j:NDC (#PCDATA)>
+
+<!ELEMENT log4j:MDC (log4j:data*)>
+
+<!ELEMENT log4j:throwable (#PCDATA)>
+
+<!ELEMENT log4j:locationInfo EMPTY>
+
+<!ATTLIST log4j:locationInfo
+  class  CDATA	#REQUIRED
+  method CDATA	#REQUIRED
+  file   CDATA	#REQUIRED
+  line   CDATA	#REQUIRED
+>
+
+<!ELEMENT log4j:properties (log4j:data*)>
+
+<!ATTLIST log4j:data
+  name 		CDATA  #REQUIRED
+  value 	CDATA  #REQUIRED
+>
+]>
