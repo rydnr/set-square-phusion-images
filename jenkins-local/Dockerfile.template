@@ -1,0 +1,16 @@
+@include("preamble")
+FROM ${NAMESPACE}/jenkins:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV VIRTUAL_HOST="${JENKINS_DEFAULT_VIRTUAL_HOST}" \
+    DOBACKUP="false"
+
+COPY 40_jenkinsfile_to_pipeline_job.sh jenkinsfile_to_pipeline_job.inc.sh /etc/my_init.d/
+
+VOLUME /workspace
+
+@include("copy-metadata")
+@include("instructions")
+@include("symlinks")

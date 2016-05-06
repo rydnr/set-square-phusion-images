@@ -1,0 +1,5 @@
+This image runs Jenkins and automatically generates a job from a Jenkinsfile.
+Examples:
+- Run Jenkins to run the Jenkinsfile for the project.
+> docker run -it -p [port]:8080 -v ${PWD}:/workspace -e VIRTUAL_HOST=${PWD}.${DOMAIN} ${NAMESPACE}/${IMAGE}:${TAG}
+
