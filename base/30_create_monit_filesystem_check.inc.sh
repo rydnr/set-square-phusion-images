@@ -1,9 +1,9 @@
 defineEnvVar MONIT_CONF_FOLDER \
              "Monit's configuration folder" \
-             "/etc/monit/conf.d";
+             "/etc/monit/monitrc.d";
 defineEnvVar MONIT_CONF_FILE \
              "The Monit configuration file to make it check the root filesystem usage" \
-             '${MONIT_CONF_FOLDER}/rootfs.conf';
+             '${MONIT_CONF_FOLDER}/rootfs';
 defineEnvVar DISK_SPACE_THRESHOLD \
              "The threshold used to decide whether to send disk usage alerts" \
              "80%";

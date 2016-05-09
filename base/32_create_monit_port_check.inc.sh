@@ -3,10 +3,10 @@ defineEnvVar DOCKERFILES_LOCATION \
              "/Dockerfiles";
 defineEnvVar MONIT_CONF_FOLDER \
              "Monit's configuration folder" \
-             "/etc/monit/conf.d";
+             "/etc/monit/monitrc.d";
 defineEnvVar MONIT_CONF_FILE \
              "The Monit configuration file to make it check the exposed ports are available" \
-             '${MONIT_CONF_FOLDER}/ports.conf';
+             '${MONIT_CONF_FOLDER}/ports';
 defineEnvVar PORT_TIMEOUT \
              "The timeout until the port is considered unavailable" \
              "10 seconds";
