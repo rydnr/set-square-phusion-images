@@ -30,3 +30,6 @@ defineEnvVar JENKINS_MAVEN_DOWNLOAD_URL \
              'https://www.eu.apache.org/dist/maven/maven-3/${JENKINS_MAVEN_VERSION}/binaries/${JENKINS_MAVEN_FILE}';
 defineEnvVar JENKINS_DEFAULT_VIRTUAL_HOST "The default virtual host for Jenkins" 'jenkins.${DOMAIN}';
 defineEnvVar JENKINS_PHABRICATOR_URL "The Phabricator url should Jenkins uses it" 'http://phabricator.${DOMAIN}';
+defineEnvVar JENKINS_MODULES \
+             "The space-separated list of Jenkins modules to include out-of-the-box" \
+             "gradle grails groovy gitcloudbees-folder branch-api build-pipeline-plugin workflow-multibranch workflow-durable-task-step pipeline-input-step pipeline-stage-step workflow-basic-steps workflow-aggregator workflow-api workflow-basic-steps workflow-cps workflow-cps-global-lib workflow-durable-task-step workflow-job workflow-multibranch workflow-remote-loader workflow-scm-step workflow-step-api workflow-support gradle grails groovy build-pipeline pipeline-utility-steps pipeline-stage-view";

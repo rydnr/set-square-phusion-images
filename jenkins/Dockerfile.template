@@ -41,6 +41,12 @@ RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
     chmod 700 ${TOMCAT_HOME}/.ssh && \
     chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh && \
+    mkdir -p /var/jenkins_home/plugins && \
+    cd /var/jenkins_home/plugins/ && \
+    for m in ${JENKINS_MODULES} $(ls /home/jenkins/plugins/*.jpi | sed 's .jpi$  g'); do \
+      wget -o /dev/null http://mirrors.jenkins-ci.org/plugins/${m}/latest/${m}.hpi; \
+    done && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home && \
     ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && \
