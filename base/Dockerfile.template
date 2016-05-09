@@ -7,6 +7,7 @@ ENV TERM linux
 
 @include("addon-toggles")
 
+# /usr/local/bin
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
      process-file.sh data ssh.sh \
      backup.sh backup-folder.sh backup-folder.inc.sh backup-volumes.sh backup-volumes.inc.sh \
@@ -15,7 +16,10 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
      local-ubuntu-version.sh remote-ubuntu-version.sh local-git-version.sh remote-git-version.sh \
      create_ssl_certificate_openssl.sh create_ssl_certificate.inc.sh \
      restart.sh volumes.sh volumes.inc.sh \
+     show help display-dockerfile.sh \
      /usr/local/bin/
+
+# /etc/my_init.d
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      21_tune_rsync_conf.sh 21_tune_rsync_conf.inc.sh \
@@ -24,15 +28,16 @@ COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \
      33_create_monit_mail_conf.sh 33_create_monit_mail_conf.inc.sh \
      /etc/my_init.d/
-COPY display-dockerfile.sh /usr/local/bin/Dockerfile
-COPY display-file.sh /usr/local/bin/show
-COPY display-help.sh /usr/local/bin/help
+
+# /etc/my_exec.d
+COPY my_exec.d/cron my_exec.d/help my_exec.d/monit my_exec.d/rsnapshot \
+     my_exec.d/syslog my_exec.d/ssh my_exec.d/postfix \
+     /etc/my_exec.d/
+
 COPY my_exec /sbin/my_exec
-COPY versioncheck.daily /etc/cron.daily/versioncheck.daily
-COPY rsnapshot.daily /etc/cron.daily/rsnapshot.daily
+COPY versioncheck.daily rsnapshot.daily /etc/cron.daily/
 COPY rsnapshot.weekly /etc/cron.weekly/rsnapshot.weekly
 COPY rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
-COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
 
 RUN mkdir -p /etc/my_exec.d && \
     mkdir -p /etc/service/.template/log && \
@@ -43,14 +48,6 @@ RUN mkdir -p /etc/my_exec.d && \
     touch /var/local/docker-installed-packages.txt && \
     chmod +x /usr/local/bin/*.sh
     #echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab
-
-COPY my_exec.cron /etc/my_exec.d/cron
-COPY my_exec.help /etc/my_exec.d/help
-COPY my_exec.monit /etc/my_exec.d/monit
-COPY my_exec.rsnapshot /etc/my_exec.d/rsnapshot
-COPY my_exec.syslog /etc/my_exec.d/syslog
-COPY my_exec.ssh /etc/my_exec.d/ssh
-COPY my_exec.postfix /etc/my_exec.d/postfix
 
 COPY logger /etc/service/.template/log/run
 COPY service.cron /etc/service/cron/run
@@ -64,7 +61,8 @@ RUN mkdir /Dockerfiles && \
     ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot postfix sasl2-bin opendkim opendkim-tools && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
-    chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show && \
+    chmod +x -- /usr/local/bin/help /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \
+    ln -s -- /usr/local/bin/display-dockerfile.sh /usr/local/bin/Dockerfile && \
     ln -s -- /usr/local/bin/help /usr/local/bin/-h && \
     ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
     ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile && \
@@ -92,6 +90,7 @@ CMD ["/sbin/my_init"]
 
 COPY monit-syslog.conf /etc/monit/conf.d/syslog.conf
 COPY monit-mail.conf.tmpl /var/local/monit-mail.conf.tmpl
+COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
 
 @include("copy-metadata")
 @include("symlinks")

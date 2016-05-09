@@ -1,4 +1,4 @@
-j#!/bin/bash dry-wit
+#!/bin/bash dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
@@ -23,6 +23,14 @@ EOF
 ## dry-wit hook
 function defineErrors() {
   export INVALID_OPTION="Unrecognized option";
+  export WORKSPACE_FOLDER_IS_NOT_SPECIFIED="Workspace folder is not specified. Define WORKSPACE environment variable";
+  export WORKSPACE_FOLDER_DOES_NOT_EXIST="Workspace folder ${WORKSPACE} does not exist";
+  export WORKSPACE_IS_NOT_A_FOLDER="${WORKSPACE} is not a folder";
+  export CANNOT_READ_WORKSPACE_FOLDER="Cannot read folder ${WORKSPACE}";
+  export CANNOT_ACCESS_WORKSPACE_FOLDER="Cannot access folder ${WORKSPACE}";
+  export JENKINSFILE_IS_NOT_SPECIFIED="Jenkinsfile is not specified. Define JENKINSFILE environment variable";
+  export JENKINSFILE_DOES_NOT_EXIST="${JENKINSFILE} does not exist";
+  export CANNOT_READ_JENKINSFILE="Cannot read ${JENKINSFILE}";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
@@ -79,10 +87,10 @@ function checkInput() {
   if [[ -z "${JENKINSFILE}" ]]; then
     exitWithErrorCode JENKINSFILE_IS_NOT_SPECIFIED;
   fi
-  if [[ -e "${JENKINSFILE}" ]]; then
+  if [[ ! -e "${JENKINSFILE}" ]]; then
     exitWithErrorCode JENKINSFILE_DOES_NOT_EXIST;
   fi
-  if [[ -r "${JENKINSFILE}" ]]; then
+  if [[ ! -r "${JENKINSFILE}" ]]; then
     exitWithErrorCode CANNOT_READ_JENKINSFILE;
   fi
 
@@ -115,7 +123,7 @@ function main() {
   local _config="${_jobHome}/config.xml";
   mkdir -p "${_jobHome}";
 
-  cat <<EOF
+  cat <<EOF > ${_config}
 <?xml version='1.0' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.1">
   <actions/>
@@ -124,16 +132,15 @@ function main() {
   <properties/>
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.2">
     <script>
-EOF > ${_config}
+EOF
   cat ${JENKINSFILE} >> ${_config}
-  cat <<EOF
+  cat <<EOF >> ${_config}
 </script>
     <sandbox>false</sandbox>
   </definition>
   <triggers/>
 </flow-definition>
 EOF
-  EOF > ${_config}
 
-  ln -s ${WORKSPACE_FOLDER} ${_jobHome}/workspace;
+  ln -s ${WORKSPACE} ${_jobHome}/workspace;
 }
