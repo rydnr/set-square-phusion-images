@@ -116,13 +116,42 @@ function parseInput() {
   done
 }
 
+## Retrieves the name of the job.
+## <- RESULT: such name.
+## Example:
+##   retrieve_job_name;
+##   echo "Job name: ${RESULT}";
+function retrieve_job_name() {
+  local _result;
+
+  if [ -e ${WORKSPACE}/.prjname ]; then
+    _result="$(cat ${WORKSPACE}/.prjname)";
+  fi
+
+  if [ -z "${_result}" ]; then
+    _result="${DEFAULT_PROJECT_NAME:-project}";
+  fi
+
+  export RESULT="${_result}";
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
-  local _jobHome="/var/jenkins_home/jobs/project";
+  retrieve_job_name;
+  local _jobName="${RESULT}";
+  local _jobHome="${JOBS_FOLDER}/${_jobName}";
   local _config="${_jobHome}/config.xml";
-  mkdir -p "${_jobHome}";
 
+  logDebug -n "Creating job folder ${_jobHome}";
+  mkdir -p "${_jobHome}";
+  if [ $? -eq 0 ]; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  logInfo -n "Creating job definition file ${_config}";
   cat <<EOF > ${_config}
 <?xml version='1.0' encoding='UTF-8'?>
 <flow-definition plugin="workflow-job@2.1">
@@ -141,6 +170,25 @@ EOF
   <triggers/>
 </flow-definition>
 EOF
+  if [ $? -eq 0 ]; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+  fi
 
+  logDebug -n "Creating symlink ${_jobHome}/workspace -> ${WORKSPACE}";
   ln -s ${WORKSPACE} ${_jobHome}/workspace;
+  if [ $? -eq 0 ]; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  logInfo -n "Fixing permissions of ${_jobHome}";
+  chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${JENKINS_HOME} ${_jobHome};
+  if [ $? -eq 0 ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+  fi
 }
