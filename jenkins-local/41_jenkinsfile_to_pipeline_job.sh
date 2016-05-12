@@ -1,5 +1,5 @@
 #!/bin/bash dry-wit
-# Copyright 2015-today Automated Computing Machinery S.L.
+# Copyright 2016-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
 function usage() {
@@ -167,8 +167,12 @@ EOF
 </script>
     <sandbox>false</sandbox>
   </definition>
-  <triggers/>
-</flow-definition>
+  <triggers>
+    <org.jvnet.hudson.plugins.triggers.startup.HudsonStartupTrigger plugin="startup-trigger-plugin@2.5">
+      <spec></spec>
+      <quietPeriod>0</quietPeriod>
+    </org.jvnet.hudson.plugins.triggers.startup.HudsonStartupTrigger>
+  </triggers></flow-definition>
 EOF
   if [ $? -eq 0 ]; then
     logDebugResult SUCCESS "done";

@@ -1,0 +1,22 @@
+#!/bin/sh
+
+_aux=1
+_sleep=1s;
+_jobName=$(cat /workspace/.prjname);
+_jenkinsCliJar=/opt/tomcat/.jenkins/WEB-INF/jenkins-cli.jar
+
+echo "Waiting until Jenkins becomes ready";
+while [ ${_aux} -ne 0 ]; do
+  sleep ${_sleep};
+  grep 'Jenkins is fully up and running' /opt/tomcat/logs/catalina.$(date '+%Y-%m-%d').log > /dev/null
+  _aux=$?;
+done
+
+#java -jar ${_jenkinsCliJar} -s http://localhost:${VIRTUAL_PORT} wait-node-online ""
+
+echo "Triggering a new build of ${_jobName}";
+curl -s -d '' "http://localhost:${VIRTUAL_PORT}/job/${_jobName}/build?delay=0sec"
+
+while [ 0 -ne 1 ]; do
+  sleep 1000s
+done
