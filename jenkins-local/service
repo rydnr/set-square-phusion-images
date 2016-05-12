@@ -2,7 +2,8 @@
 
 _aux=1
 _sleep=1s;
-_jobName=$(cat /workspace/.prjname);
+_jobName="$(cat /workspace/.prjname)";
+_jobName="${_jobName:-project}";
 _jenkinsCliJar=/opt/tomcat/.jenkins/WEB-INF/jenkins-cli.jar
 
 /usr/local/bin/process-file.sh -o /var/jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl

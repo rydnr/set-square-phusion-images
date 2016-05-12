@@ -78,7 +78,7 @@ COPY hudson.tasks.Mailer.xml \
      hudson.plugins.gradle.Gradle.xml \
      hudson.plugins.groovy.Groovy.xml \
      config.xml \
-     /var/jenkins_home
+     /var/jenkins_home/
 
 VOLUME /backup/jenkins-home
 VOLUME /backup/rsnapshot
