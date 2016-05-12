@@ -5,6 +5,9 @@ _sleep=1s;
 _jobName=$(cat /workspace/.prjname);
 _jenkinsCliJar=/opt/tomcat/.jenkins/WEB-INF/jenkins-cli.jar
 
+/usr/local/bin/process-file.sh -o /var/jenkins_home/jenkins.model.JenkinsLocationConfiguration.xml /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
+/etc/my_init.d/50-rsync-jenkins-home.sh
+
 echo "Waiting until Jenkins becomes ready";
 while [ ${_aux} -ne 0 ]; do
   sleep ${_sleep};

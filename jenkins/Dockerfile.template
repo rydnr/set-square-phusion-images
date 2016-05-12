@@ -48,18 +48,20 @@ RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
       wget -o /dev/null http://mirrors.jenkins-ci.org/plugins/${m}/latest/${m}.hpi; \
     done && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home && \
-    ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli && \
+    ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli unzip && \
     cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     /usr/local/bin/jenkins-update-plugins.sh && \
-    tar xvfz ${JENKINS_MAVEN_FILE} && ln -s ${JENKINS_MAVEN_FOLDER} apache-maven && rm -f ${JENKINS_MAVEN_FILE} && \
     for p in arcanist libphutil; do \
       cd /opt && git clone https://github.com/phacility/${p}.git && cd ${p} && git checkout stable; \
     done && \
     chmod +x /opt/arcanist/bin/arc /usr/local/bin/jenkins-update-plugins.sh && \
     su - ${SERVICE_USER} -c '/opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL}' && \
+    mkdir -p /var/jenkins_home/init.groovy.d && \
+    su - jenkins -c 'curl -s "https://get.sdkman.io" | bash && source "/var/jenkins_home/.sdkman/bin/sdkman-init.sh" && \
+                    for p in groovy gradle maven ant; do yes | sdk i ${p}; done' && \
     ${APTGET_CLEANUP}
 
-COPY init.groovy /usr/share/jenkins/ref/init.groovy.d/tcp-slave-agent-port.groovy
+COPY init.groovy /var/jenkins_home/init.groovy.d/tcp-slave-agent-port.groovy
 
 # TODO: add cron job for mvn versions:update-properties
 # TODO: gem install bouncy-castle-java
@@ -69,6 +71,14 @@ COPY context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
 COPY config /etc/default/tomcat
 COPY ssh-config /opt/tomcat/.ssh/config
 COPY known_hosts /opt/tomcat/.ssh/known_hosts
+COPY jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
+COPY hudson.tasks.Mailer.xml \
+     hudson.tasks.Maven.xml \
+     hudson.tasks.Ant.xml \
+     hudson.plugins.gradle.Gradle.xml \
+     hudson.plugins.groovy.Groovy.xml \
+     config.xml \
+     /var/jenkins_home
 
 VOLUME /backup/jenkins-home
 VOLUME /backup/rsnapshot
