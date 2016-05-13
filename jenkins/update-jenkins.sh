@@ -140,7 +140,7 @@ function update_jenkins() {
   local _rescode=${TRUE};
 
   logDebug -n "Posting update-center.json";
-  #  curl -X POST -H "Accept: application/json" -d @"${_source}" http://localhost:${VIRTUAL_PORT}/updateCenter/byId/default/postBack
+  curl -X POST -H "Accept: application/json" -d @"${_source}" http://localhost:${VIRTUAL_PORT}/updateCenter/byId/default/postBack
   mv "${_source}" /var/jenkins_home/updates/default.json
   if [ $? -eq 0 ]; then
     logDebugResult SUCCESS "done";
@@ -155,5 +155,10 @@ function update_jenkins() {
 ## Main logic
 ## dry-wit hook
 function main() {
-  update_jenkins
+  retrieve_update_center_json;
+  local _jsonFile="${RESULT}";
+
+  process_update_center_json "${_jsonFile}";
+
+  update_jenkins "${_jsonFile}";
 }

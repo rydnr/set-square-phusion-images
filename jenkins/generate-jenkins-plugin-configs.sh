@@ -109,6 +109,16 @@ function parseInput() {
          ;;
     esac
   done
+
+  if [[ -z "${TOOL}" ]]; then
+    export TOOL="${1}";
+    shift;
+  fi
+
+  if [[ -z "${VERSIONS}" ]]; then
+    export VERSIONS="$@";
+    shift;
+  fi
 }
 
 ## PUBLIC
@@ -123,9 +133,10 @@ function generate_gradle_config() {
   local _outputFolder="${1}";
   shift;
   local _versions="$@";
-  local _outputFile="${_outputFolder}/hudson.plugins.gradle.Gradle.xml";
+  local _outputFile="${_outputFolder}/${GRADLE_CONFIG_FILE}";
 
-  if [ ! -w ${_outputFile} ]; then
+  touch "${_outputFile}" > /dev/null
+  if [ $? -ne 0 ]; then
     exitWithErrorCode CANNOT_CREATE_GRADLE_CONFIG_FILE;
   fi
   cat <<EOF > ${_outputFile}
@@ -169,9 +180,10 @@ function generate_groovy_config() {
   local _outputFolder="${1}";
   shift;
   local _versions="$@";
-  local _outputFile="${_outputFolder}/hudson.plugins.groovy.Groovy.xml";
+  local _outputFile="${_outputFolder}/${GROOVY_CONFIG_FILE}";
 
-  if [ ! -w ${_outputFile} ]; then
+  touch "${_outputFile}" > /dev/null
+  if [ $? -ne 0 ]; then
     exitWithErrorCode CANNOT_CREATE_GROOVY_CONFIG_FILE;
   fi
   cat <<EOF > ${_outputFile}
@@ -218,9 +230,10 @@ function generate_grails_config() {
   local _outputFolder="${1}";
   shift;
   local _versions="$@";
-  local _outputFile="${_outputFolder}/hudson.plugins.grails.Grails.xml";
+  local _outputFile="${_outputFolder}/${GRAILS_CONFIG_FILE}";
 
-  if [ ! -w ${_outputFile} ]; then
+  touch "${_outputFile}" > /dev/null
+  if [ $? -ne 0 ]; then
     exitWithErrorCode CANNOT_CREATE_GRAILS_CONFIG_FILE;
   fi
   cat <<EOF > ${_outputFile}
@@ -262,9 +275,10 @@ function generate_maven_config() {
   local _outputFolder="${1}";
   shift;
   local _versions="$@";
-  local _outputFile="${_outputFolder}/hudson.tasks.Maven.xml";
+  local _outputFile="${_outputFolder}/${MAVEN_CONFIG_FILE}";
 
-  if [ ! -w ${_outputFile} ]; then
+  touch "${_outputFile}" > /dev/null
+  if [ $? -ne 0 ]; then
     exitWithErrorCode CANNOT_CREATE_MAVEN_CONFIG_FILE;
   fi
   cat <<EOF > ${_outputFile}
@@ -306,9 +320,10 @@ function generate_ant_config() {
   local _outputFolder="${1}";
   shift;
   local _versions="$@";
-  local _outputFile="${_outputFolder}/hudson.tasks.Ant.xml";
+  local _outputFile="${_outputFolder}/${ANT_CONFIG_FILE}";
 
-  if [ ! -w ${_outputFile} ]; then
+  touch "${_outputFile}" > /dev/null
+  if [ $? -ne 0 ]; then
     exitWithErrorCode CANNOT_CREATE_ANT_CONFIG_FILE;
   fi
   cat <<EOF > ${_outputFile}
@@ -341,6 +356,7 @@ EOF
 ## Main logic
 ## dry-wit hook
 function main() {
+  source ~/.sdkman/bin/sdkman-init.sh;
   for v in ${VERSIONS:- }; do
     yes no | sdk i ${TOOL} ${v}
   done
