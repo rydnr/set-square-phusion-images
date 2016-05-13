@@ -162,7 +162,7 @@ function main() {
   <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.2">
     <script>
 EOF
-  cat ${JENKINSFILE} >> ${_config}
+  cat ${JENKINSFILE} | grep -v 'scm ' >> ${_config}
   cat <<EOF >> ${_config}
 </script>
     <sandbox>false</sandbox>

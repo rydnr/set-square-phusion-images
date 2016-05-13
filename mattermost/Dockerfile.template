@@ -1,0 +1,28 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV SERVICE_USER="www-data" \
+    SERVICE_GROUP="www-data" \
+    VIRTUAL_HOST="${MATTERMOST_DEFAULT_VIRTUAL_HOST}" \
+    VIRTUAL_PORT="${MATTERMOST_HTTP_UI_PORT}" \
+    DOBACKUP="true"
+
+RUN mkdir -p /etc/service/${IMAGE} \
+    cp -r /etc/service/.template/* /etc/service/${IMAGE}
+
+#COPY service /etc/service/${IMAGE}/run
+#COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
+RUN wget -o /tmp/${MATTERMOST_ARTIFACT} ${MATTERMOST_DOWNLOAD_URL} && \
+    chmod +x /etc/service/${IMAGE}/run
+
+EXPOSE ${MATTERMOST_HTTP_UI_PORT}
+
+#VOLUME /backup/${IMAGE}-www
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

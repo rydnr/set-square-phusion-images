@@ -6,7 +6,9 @@ FROM ${NAMESPACE}/tomcat:${TAG}
 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY 50-rsync-jenkins-home.sh /etc/my_init.d/50-rsync-jenkins-home.sh
-COPY jenkins-update-plugins.sh /usr/local/bin/jenkins-update-plugins.sh
+COPY jenkins-update-plugins.sh \
+     generate-jenkins-plugin-configs.sh generate-jenkins-plugin-configs.inc.sh \
+     /usr/local/bin/
 
 ENV SERVICE_USER="jenkins" \
     SERVICE_GROUP="jenkins" \
@@ -19,6 +21,8 @@ ENV SERVICE_USER="jenkins" \
     VIRTUAL_HOST="${JENKINS_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8080 \
     PATH="${PATH}:/opt/arcanist/bin" \
+    JENKINS_MEMORY_MIN="${DEFAULT_JENKINS_MEMORY_MIN}" \
+    JENKINS_MEMORY_MAX="${DEFAULT_JENKINS_MEMORY_MAX}" \
     DOBACKUP="true"
 
 RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
@@ -49,7 +53,6 @@ RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
     done && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home && \
     ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli unzip && \
-    cd /opt && wget --no-check-certificate -O ${JENKINS_MAVEN_FILE} ${JENKINS_MAVEN_DOWNLOAD_URL} && \
     /usr/local/bin/jenkins-update-plugins.sh && \
     for p in arcanist libphutil; do \
       cd /opt && git clone https://github.com/phacility/${p}.git && cd ${p} && git checkout stable; \
@@ -58,10 +61,33 @@ RUN mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
     su - ${SERVICE_USER} -c '/opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL}' && \
     mkdir -p /var/jenkins_home/init.groovy.d && \
     su - jenkins -c 'curl -s "https://get.sdkman.io" | bash && source "/var/jenkins_home/.sdkman/bin/sdkman-init.sh" && \
-                    for p in groovy gradle maven ant; do yes | sdk i ${p}; done' && \
+                    for p in groovy gradle maven ant; do \
+                       yes | sdk i ${p}; yes \
+                    done' && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS} && \
+                    for p in ${GRADLE_VERSIONS}; do \
+                       yes no | sdk i gradle ${p}; \
+                    done && \
+                    /usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} && \
+                    for p in ${GROOVY_VERSIONS}; do \
+                       yes no | sdk i groovy ${p}; \
+                    done && \
+                    /usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS} && \
+                    for p in ${GRAILS_VERSIONS}; do \
+                       yes no | sdk i grails ${p}; \
+                    done && \
+                    /usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} && \
+                    for p in ${MAVEN_VERSIONS}; do \
+                       yes no | sdk i maven ${p}; \
+                    done && \
+                    /usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && \
+                    for p in ${ANT_VERSIONS}; do \
+                       yes no | sdk i ant ${p}; \
+                    done" && \
+    echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> /opt/tomcat/bin/setenv.sh && \
     ${APTGET_CLEANUP}
 
-COPY init.groovy /var/jenkins_home/init.groovy.d/tcp-slave-agent-port.groovy
+ADD init.groovy.d/ /var/jenkins_home/init.groovy.d/
 
 # TODO: add cron job for mvn versions:update-properties
 # TODO: gem install bouncy-castle-java
@@ -73,10 +99,6 @@ COPY ssh-config /opt/tomcat/.ssh/config
 COPY known_hosts /opt/tomcat/.ssh/known_hosts
 COPY jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
 COPY hudson.tasks.Mailer.xml \
-     hudson.tasks.Maven.xml \
-     hudson.tasks.Ant.xml \
-     hudson.plugins.gradle.Gradle.xml \
-     hudson.plugins.groovy.Groovy.xml \
      config.xml \
      /var/jenkins_home/
 

@@ -155,5 +155,5 @@ function update_jenkins() {
 ## Main logic
 ## dry-wit hook
 function main() {
-  
+  update_jenkins
 }

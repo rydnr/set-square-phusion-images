@@ -1,0 +1,14 @@
+Base Apache image.
+
+Use it as a template for your own Apache-based sites or applications, or for the "A" containers
+in LAMP applications.
+
+See ${BASE_IMAGE}:${TAG} [1] for additional options (such as disabling features).
+
+Examples:
+
+- Run a static web site, available in a host folder:
+> docker run -d -p [port]:80 -v [my-folder]:/var/www ${NAMESPACE}/${IMAGE}:${TAG}
+
+[1] docker run -it ${NAMESPACE}/${IMAGE}:${TAG} Dockerfile ${NAMESPACE}-base.${TAG}
+

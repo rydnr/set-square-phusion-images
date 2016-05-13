@@ -4,7 +4,9 @@ FROM ${NAMESPACE}/jenkins:${TAG}
 
 @include("addon-toggles")
 
-ENV DOBACKUP="false"
+ENV DOBACKUP="false" \
+    JENKINS_MEMORY_MIN="${DEFAULT_JENKINS_MEMORY_MIN}" \
+    JENKINS_MEMORY_MAX="${DEFAULT_JENKINS_MEMORY_MAX}"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -14,6 +16,9 @@ COPY 41_jenkinsfile_to_pipeline_job.sh 41_jenkinsfile_to_pipeline_job.inc.sh \
      /etc/my_init.d/
 
 VOLUME /workspace
+VOLUME /var/jenkins_home/.m2
+VOLUME /var/jenkins_home/.gradle
+VOLUME /var/jenkins_home/.grails
 
 @include("copy-metadata")
 @include("instructions")
