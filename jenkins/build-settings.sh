@@ -24,9 +24,17 @@ defineEnvVar JENKINS_DEFAULT_VIRTUAL_HOST "The default virtual host for Jenkins"
 defineEnvVar JENKINS_PHABRICATOR_URL "The Phabricator url should Jenkins uses it" 'http://phabricator.${DOMAIN}';
 defineEnvVar JENKINS_MODULES \
              "The space-separated list of Jenkins modules to include out-of-the-box" \
-             "gradle grails groovy git cloudbees-folder branch-api build-pipeline-plugin workflow-multibranch workflow-durable-task-step pipeline-input-step pipeline-stage-step workflow-basic-steps workflow-aggregator workflow-api workflow-cps workflow-cps-global-lib workflow-job workflow-remote-loader workflow-scm-step workflow-step-api workflow-support build-pipeline pipeline-utility-steps pipeline-stage-view pipeline-build-step jquery parameterized-trigger jquery-detached handlebars pipeline-rest-api scm-api git-server git-client ace-editor durable-task structs momentjs startup-trigger-plugin";
-defineEnvVar GROOVY_VERSIONS "The versions of groovy to include, besides the latest" "2.4.6";
-defineEnvVar GRADLE_VERSIONS "The versions of gradle to include, besides the latest" "2.12";
-defineEnvVar MAVEN_VERSIONS "The versions of maven to include, besides the latest" "3.3.3";
-defineEnvVar GRAILS_VERSIONS "The versions of grails to include, besides the latest" "2.5.4 2.3.9";
-defineEnvVar ANT_VERSIONS "The versions of ant to include, besides the latest" "1.9.7";
+             "gradle grails groovy git cloudbees-folder branch-api build-pipeline-plugin workflow-multibranch workflow-durable-task-step pipeline-input-step pipeline-stage-step workflow-basic-steps workflow-aggregator workflow-api workflow-cps workflow-cps-global-lib workflow-job workflow-remote-loader workflow-scm-step workflow-step-api workflow-support build-pipeline pipeline-utility-steps pipeline-stage-view pipeline-build-step jquery parameterized-trigger jquery-detached handlebars pipeline-rest-api scm-api git-server git-client ace-editor durable-task structs momentjs startup-trigger-plugin slack";
+defineEnvVar GROOVY_DEFAULT_VERSION "The default Groovy version" "2.4.6";
+defineEnvVar GROOVY_VERSIONS "The versions of Groovy to include" '${GROOVY_DEFAULT_VERSION}';
+defineEnvVar GRADLE_DEFAULT_VERSION "The default Gradle version" "2.12";
+defineEnvVar GRADLE_VERSIONS "The versions of Gradle to include" '${GRADLE_DEFAULT_VERSION}';
+defineEnvVar MAVEN_DEFAULT_VERSION "The default Maven version" "3.3.3";
+defineEnvVar MAVEN_VERSIONS "The versions of Maven to include" '${MAVEN_DEFAULT_VERSION}';
+defineEnvVar GRAILS_DEFAULT_VERSION "The Grails default version" "2.5.4";
+defineEnvVar GRAILS_VERSIONS "The versions of Grails to include" '${GRAILS_DEFAULT_VERSION} 2.3.9';
+defineEnvVar ANT_DEFAULT_VERSION "The default Ant version" "1.9.7";
+defineEnvVar ANT_VERSIONS "The versions of Ant" '${ANT_DEFAULT_VERSION}';
+defineEnvVar SLACK_TEAM_DOMAIN "The team domain in Slack" "${DOMAIN}";
+defineEnvVar SLACK_TOKEN "The Slack token" "secret";
+defineEnvVar SLACK_ROOM "The Slack room" "${DOMAIN}";

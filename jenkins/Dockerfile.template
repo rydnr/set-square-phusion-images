@@ -62,11 +62,11 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     mkdir -p /var/jenkins_home/init.groovy.d && \
     chmod +x /usr/local/bin/generate-jenkins-plugin-configs.sh && \
     su - jenkins -c 'curl -s "https://get.sdkman.io" | bash && source "/var/jenkins_home/.sdkman/bin/sdkman-init.sh" && for p in groovy gradle maven ant; do yes | sdk i ${p}; done' && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS} && for p in ${GRADLE_VERSIONS}; do yes no | sdk i gradle \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} && for p in ${GROOVY_VERSIONS}; do yes no | sdk i groovy \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS} && for p in ${GRAILS_VERSIONS}; do yes no | sdk i grails \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} && for p in ${MAVEN_VERSIONS}; do yes no | sdk i maven \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && for p in ${ANT_VERSIONS}; do yes no | sdk i ant \${p}; done" && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS} && yes | sdk i gradle ${GRADLE_DEFAULT_VERSION} && for p in ${GRADLE_VERSIONS}; do yes no | sdk i gradle \${p}; done" && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} && yes | sdk i groovy ${GROOVY_DEFAULT_VERSION} && for p in ${GROOVY_VERSIONS}; do yes no | sdk i groovy \${p}; done" && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS} && yes | sdk i grails ${GRAILS_DEFAULT_VERSION} && for p in ${GRAILS_VERSIONS}; do yes no | sdk i grails \${p}; done" && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} && yes | sdk i maven ${MAVEN_DEFAULT_VERSION} && for p in ${MAVEN_VERSIONS}; do yes no | sdk i maven \${p}; done" && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && yes | sdk i ant ${ANT_DEFAULT_VERSION} && for p in ${ANT_VERSIONS}; do yes no | sdk i ant \${p}; done" && \
     echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> /opt/tomcat/bin/setenv.sh && \
     ${APTGET_CLEANUP}
 

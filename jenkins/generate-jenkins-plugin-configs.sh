@@ -9,10 +9,10 @@ $SCRIPT_NAME [-h|--help]
 (c) 2016-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
 
-Generates the Jenkins configuration file for given tool.
+Generates the Jenkins configuration file for a given tool or plugin.
 
 Where:
-    - tool: either groovy, gradle, grails, maven or ant.
+    - tool: either groovy, gradle, grails, maven, ant, or slack.
     - version: Optional, the version(s) of the tool.
 Common flags:
     * -h | --help: Display this message.
@@ -34,6 +34,7 @@ function defineErrors() {
   export CANNOT_CREATE_GRAILS_CONFIG_FILE="Cannot create Grails configuration file";
   export CANNOT_CREATE_MAVEN_CONFIG_FILE="Cannot create Maven configuration file";
   export CANNOT_CREATE_ANT_CONFIG_FILE="Cannot create Ant configuration file";
+  export CANNOT_CREATE_SLACK_CONFIG_FILE="Cannot create Slack configuration file";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
@@ -45,6 +46,7 @@ function defineErrors() {
     CANNOT_CREATE_GRAILS_CONFIG_FILE \
     CANNOT_CREATE_MAVEN_CONFIG_FILE \
     CANNOT_CREATE_ANT_CONFIG_FILE \
+    CANNOT_CREATE_SLACK_CONFIG_FILE \
   );
 
   export ERROR_MESSAGES;
@@ -77,7 +79,7 @@ function checkInput() {
     exitWithErrorCode TOOL_IS_MANDATORY;
   fi
   case ${TOOL} in
-    gradle | groovy | grails | maven | ant)
+    gradle | groovy | grails | maven | ant | slack)
        ;;
     *) logDebugResult FAILURE "failed";
        exitWithErrorCode UNSUPPORTED_TOOL;
@@ -168,7 +170,7 @@ cat <<EOF >> ${_outputFile}
 EOF
 }
 
-## PUBLIC
+v## PUBLIC
 ## Generates the Jenkins configuration file for Groovy.
 ## -> 1: The Groovy version(s).
 ## -> 2: The output folder.
@@ -353,6 +355,34 @@ cat <<EOF >> ${_outputFile}
 EOF
 }
 
+## PUBLIC
+## Generates the Jenkins configuration file for Slack plugin.
+## -> 1: The output folder.
+## Example:
+##   generate_slack_config /tmp
+##   > ls /tmp | grep slack
+##   jenkins.plugins.slack.SlackNotifier.xml
+function generate_slack_config() {
+  local _outputFolder="${1}";
+  shift;
+  local _versions="$@";
+  local _outputFile="${_outputFolder}/${SLACK_CONFIG_FILE}";
+
+  touch "${_outputFile}" > /dev/null
+  if [ $? -ne 0 ]; then
+    exitWithErrorCode CANNOT_CREATE_SLACK_CONFIG_FILE;
+  fi
+  cat <<EOF > ${_outputFile}
+<?xml version='1.0' encoding='UTF-8'?>
+<jenkins.plugins.slack.SlackNotifier_-DescriptorImpl plugin="slack@2.0.1">
+  <teamDomain>${SLACK_TEAM_DOMAIN:-${SQ_SLACK_TEAM_DOMAIN}}</teamDomain>
+  <token>${SLACK_TOKEN:-${SQ_SLACK_TOKEN}}</token>
+  <room>${SLACK_ROOM:-${SQ_SLACK_ROOM}}</room>
+  <buildServerUrl>http://${VIRTUAL_HOST}</buildServerUrl>
+</jenkins.plugins.slack.SlackNotifier_-DescriptorImpl>
+EOF
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
@@ -376,6 +406,9 @@ function main() {
       ;;
     ant)
       generate_ant_config "${JENKINS_HOME}" ${VERSIONS};
+      ;;
+    slack)
+      generate_slack_config "${JENKINS_HOME}";
       ;;
   esac
 }

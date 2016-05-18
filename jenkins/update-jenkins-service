@@ -11,6 +11,7 @@ while [ ${_aux} -ne 0 ]; do
 done
 
 /usr/local/bin/update-jenkins.sh -v
+/usr/local/bin/generate-jenkins-plugin-configs.sh slack -v
 
 while [ 0 -ne 1 ]; do
   sleep 1000s
