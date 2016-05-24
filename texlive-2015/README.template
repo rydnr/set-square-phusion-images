@@ -1,0 +1,7 @@
+Image for running TexLive 2015.
+
+It's almost a verbatim copy of https://github.com/harshjv/docker-texlive-2015.
+
+# Examples
+- Run pdflatex to process example.tex
+> docker run --rm -it -v $(pwd):/var/texlive -v ~/texmf:/usr/local/texlive/texmf-local ${NAMESPACE}/${IMAGE}:${TAG} pdflatex example.tex

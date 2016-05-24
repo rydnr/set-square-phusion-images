@@ -9,7 +9,7 @@ ENV DOBACKUP="false" \
 
 @include("addon-toggles")
 
-RUN ${APTGET_INSTALL} x11-apps && \
+RUN ${APTGET_INSTALL} -u x11-apps && \
     ${APTGET_CLEANUP}
 
 @include("copy-metadata")

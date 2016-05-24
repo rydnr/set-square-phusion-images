@@ -1,0 +1,24 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="false" \
+    PATH=/opt/texbin:$PATH
+
+ADD https://raw.githubusercontent.com/harshjv/docker-texlive-2015/master/install-tl-ubuntu /var/local/install-tl-ubuntu
+
+RUN ${APTGET_INSTALL} --update -np wget && \
+    chmod +x /var/local/install-tl-ubuntu && \
+    /var/local/install-tl-ubuntu && \
+    ${APTGET_CLEANUP}
+
+VOLUME /var/texlive
+VOLUME /usr/local/texlive/texmf-local
+
+WORKDIR /var/texlive
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
