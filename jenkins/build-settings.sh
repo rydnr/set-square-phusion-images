@@ -22,27 +22,25 @@ defineEnvVar DEFAULT_JENKINS_MEMORY_MIN "The default Xms setting" "-Xms512m";
 defineEnvVar DEFAULT_JENKINS_MEMORY_MAX "The default Xmx setting" "-Xmx1024m";
 defineEnvVar JENKINS_DEFAULT_VIRTUAL_HOST "The default virtual host for Jenkins" 'jenkins.${DOMAIN}';
 defineEnvVar JENKINS_PHABRICATOR_URL "The Phabricator url should Jenkins uses it" 'http://phabricator.${DOMAIN}';
-defineEnvVar JENKINS_MODULES \
-             "The space-separated list of Jenkins modules to include out-of-the-box" \
-             " \
-             ace-editor ansible -async-http-client authentication-tokens \
-             branch-api build-pipeline build-pipeline-plugin \
-             cloudbees-folder \
-             deployment-notification docker-commons dockerhub-notification downstream-buildview durable-task \
-             email-ext emailext-template \
-             fail-the-build-plugin \
-             gcal git git-client git-server gradle grails graphiteIntegrator groovy groovyaxis groovy-events-listener-plugin \
-             handlebars hckrnews html-audio-notifier html5-notifier-plugin \
-             ifttt-build-notifier instant-messaging ircbot \
-             jabber jquery jquery-detached \
-             logstash \
-             parameterized-trigger pipeline-build-step plain-credentials pipeline-input-step pipeline-rest-api pipeline-stage-step pipeline-stage-view pipeline-utility-steps \
-             mail-watcher-plugin maven-deployment-linker momentjs monitoring \
-             notification \
-             rundeck \
-             scm-api sidebar-update-notification slack sms snsnotify sounds speaks ssh-agent startup-trigger-plugin stashNotifier structs \
-             websocket workflow-aggregator workflow-api workflow-basic-steps workflow-cps workflow-cps-global-lib workflow-durable-task-step workflow-job workflow-multibranch workflow-remote-loader workflow-scm-step workflow-step-api workflow-support \
-             ";
+_jm="";
+_jm+="ace-editor ansible async-http-client authentication-tokens ";
+_jm+="branch-api build-pipeline build-pipeline-plugin ";
+_jm+="cloudbees-folder ";
+_jm+="deployment-notification docker-commons dockerhub-notification downstream-buildview durable-task ";
+_jm+="email-ext emailext-template ";
+_jm+="fail-the-build-plugin ";
+_jm+="gcal git git-client git-server gradle grails graphiteIntegrator groovy groovyaxis groovy-events-listener-plugin ";
+_jm+="handlebars hckrnews html-audio-notifier html5-notifier-plugin ";
+_jm+="ifttt-build-notifier instant-messaging ircbot ";
+_jm+="jabber jquery jquery-detached ";
+_jm+="logstash ";
+_jm+="parameterized-trigger pipeline-build-step plain-credentials pipeline-input-step pipeline-rest-api pipeline-stage-step pipeline-stage-view pipeline-utility-steps";
+_jm+="mail-watcher-plugin maven-deployment-linker momentjs monitoring ";
+_jm+="notification ";
+_jm+="rundeck ";
+_jm+="scm-api sidebar-update-notification slack sms snsnotify sounds speaks ssh-agent startup-trigger-plugin stashNotifier structs ";
+_jm+="websocket workflow-aggregator workflow-api workflow-basic-steps workflow-cps workflow-cps-global-lib workflow-durable-task-step workflow-job workflow-multibranch workflow-remote-loader workflow-scm-step workflow-step-api workflow-support ";
+defineEnvVar JENKINS_MODULES "The space-separated list of Jenkins modules to include out-of-the-box" "${_jm}";
 defineEnvVar GROOVY_DEFAULT_VERSION "The default Groovy version" "2.4.6";
 defineEnvVar GROOVY_VERSIONS "The versions of Groovy to include" '${GROOVY_DEFAULT_VERSION}';
 defineEnvVar GRADLE_DEFAULT_VERSION "The default Gradle version" "2.12";
