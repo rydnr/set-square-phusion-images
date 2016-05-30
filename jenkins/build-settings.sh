@@ -24,7 +24,25 @@ defineEnvVar JENKINS_DEFAULT_VIRTUAL_HOST "The default virtual host for Jenkins"
 defineEnvVar JENKINS_PHABRICATOR_URL "The Phabricator url should Jenkins uses it" 'http://phabricator.${DOMAIN}';
 defineEnvVar JENKINS_MODULES \
              "The space-separated list of Jenkins modules to include out-of-the-box" \
-             "gradle grails groovy git cloudbees-folder branch-api build-pipeline-plugin workflow-multibranch workflow-durable-task-step pipeline-input-step pipeline-stage-step workflow-basic-steps workflow-aggregator workflow-api workflow-cps workflow-cps-global-lib workflow-job workflow-remote-loader workflow-scm-step workflow-step-api workflow-support build-pipeline pipeline-utility-steps pipeline-stage-view pipeline-build-step jquery parameterized-trigger jquery-detached handlebars pipeline-rest-api scm-api git-server git-client ace-editor durable-task structs momentjs startup-trigger-plugin slack";
+             " \
+             ace-editor ansible -async-http-client authentication-tokens \
+             branch-api build-pipeline build-pipeline-plugin \
+             cloudbees-folder \
+             deployment-notification docker-commons dockerhub-notification downstream-buildview durable-task \
+             email-ext emailext-template \
+             fail-the-build-plugin \
+             gcal git git-client git-server gradle grails graphiteIntegrator groovy groovyaxis groovy-events-listener-plugin \
+             handlebars hckrnews html-audio-notifier html5-notifier-plugin \
+             ifttt-build-notifier instant-messaging ircbot \
+             jabber jquery jquery-detached \
+             logstash \
+             parameterized-trigger pipeline-build-step plain-credentials pipeline-input-step pipeline-rest-api pipeline-stage-step pipeline-stage-view pipeline-utility-steps \
+             mail-watcher-plugin maven-deployment-linker momentjs monitoring \
+             notification \
+             rundeck \
+             scm-api sidebar-update-notification slack sms snsnotify sounds speaks ssh-agent startup-trigger-plugin stashNotifier structs \
+             websocket workflow-aggregator workflow-api workflow-basic-steps workflow-cps workflow-cps-global-lib workflow-durable-task-step workflow-job workflow-multibranch workflow-remote-loader workflow-scm-step workflow-step-api workflow-support \
+             ";
 defineEnvVar GROOVY_DEFAULT_VERSION "The default Groovy version" "2.4.6";
 defineEnvVar GROOVY_VERSIONS "The versions of Groovy to include" '${GROOVY_DEFAULT_VERSION}';
 defineEnvVar GRADLE_DEFAULT_VERSION "The default Gradle version" "2.12";

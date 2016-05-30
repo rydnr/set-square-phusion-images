@@ -50,7 +50,9 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
     cd /var/jenkins_home/plugins/ && \
     for m in ${JENKINS_MODULES}; do \
-      wget -o /dev/null http://mirrors.jenkins-ci.org/plugins/${m}/latest/${m}.hpi; \
+      for e in hpi jpi; do \
+        wget -o /dev/null http://mirrors.jenkins-ci.org/plugins/${m}/latest/${m}.${e}; \
+      done \
     done && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home && \
     ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli unzip && \

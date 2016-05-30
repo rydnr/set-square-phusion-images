@@ -4,11 +4,16 @@ FROM ${NAMESPACE}/base-gui:${TAG}
 
 @include("addon-toggles")
 
+ENV SERVICE_USER="slack" \
+    SERVICE_GROUP="slack"
+
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 
-RUN cd /tmp && \
-    ${APTGET_INSTALL} -u gconf2 gconf-service libgtk2.0-0 libnotify4 libxtst6 libnss3 python gvfs-bin xdg-utils libxss1 && \
+RUN groupadd ${SERVICE_GROUP} && \
+    /usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Slack user" ${SERVICE_USER} && \
+    cd /tmp && \
+    ${APTGET_INSTALL} -u gconf2 gconf-service libgtk2.0-0 libnotify4 libxtst6 libnss3 python gvfs-bin xdg-utils libxss1 libasound2 libgnome-keyring0 && \
     wget ${SLACK_DOWNLOAD_URL} && \
     dpkg -i ${SLACK_ARTIFACT} && \
     ${APTGET_CLEANUP} && \
