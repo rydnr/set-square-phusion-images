@@ -1,4 +1,4 @@
-defineEnvVar JENKINS_VERSION "The Jenkins version" "1.651.2";
+defineEnvVar JENKINS_VERSION "The Jenkins version" "1.651.3";
 defineEnvVar JENKINS_ARTIFACT "The Jenkins artifact" 'jenkins-war-${JENKINS_VERSION}.war';
 defineEnvVar JENKINS_DOWNLOAD_URL \
              "The url to download Jenkins" \
