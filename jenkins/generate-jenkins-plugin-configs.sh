@@ -12,7 +12,7 @@ $SCRIPT_NAME [-h|--help]
 Generates the Jenkins configuration file for a given tool or plugin.
 
 Where:
-    - tool: either groovy, gradle, grails, maven, ant, or slack.
+    - tool: either groovy, gradle, grails, maven, ant, slack or nodejs.
     - version: Optional, the version(s) of the tool.
 Common flags:
     * -h | --help: Display this message.
@@ -35,6 +35,7 @@ function defineErrors() {
   export CANNOT_CREATE_MAVEN_CONFIG_FILE="Cannot create Maven configuration file";
   export CANNOT_CREATE_ANT_CONFIG_FILE="Cannot create Ant configuration file";
   export CANNOT_CREATE_SLACK_CONFIG_FILE="Cannot create Slack configuration file";
+  export CANNOT_CREATE_NODEJS_CONFIG_FILE="Cannot create NodeJS configuration file";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
@@ -47,6 +48,7 @@ function defineErrors() {
     CANNOT_CREATE_MAVEN_CONFIG_FILE \
     CANNOT_CREATE_ANT_CONFIG_FILE \
     CANNOT_CREATE_SLACK_CONFIG_FILE \
+    CANNOT_CREATE_NODEJS_CONFIG_FILE \
   );
 
   export ERROR_MESSAGES;
@@ -79,7 +81,7 @@ function checkInput() {
     exitWithErrorCode TOOL_IS_MANDATORY;
   fi
   case ${TOOL} in
-    gradle | groovy | grails | maven | ant | slack)
+    gradle | groovy | grails | maven | ant | slack | nodejs )
        ;;
     *) logDebugResult FAILURE "failed";
        exitWithErrorCode UNSUPPORTED_TOOL;
@@ -170,7 +172,7 @@ cat <<EOF >> ${_outputFile}
 EOF
 }
 
-v## PUBLIC
+## PUBLIC
 ## Generates the Jenkins configuration file for Groovy.
 ## -> 1: The Groovy version(s).
 ## -> 2: The output folder.
@@ -383,6 +385,37 @@ function generate_slack_config() {
 EOF
 }
 
+## PUBLIC
+## Generates the Jenkins configuration file for the NodeJS plugin.
+## -> 1: The output folder.
+## Example:
+##   generate_nodejs_config /tmp
+##   > ls /tmp | grep nodejs
+##   nodejs.xml
+function generate_nodejs_config() {
+    local _outputFolder="${1}";
+    shift;
+    local _outputFile="${_outputFolder}/${NODEJS_CONFIG_FILE}";
+
+    touch "${_outputFile}" > /dev/null
+    if [ $? -ne 0 ]; then
+        exitWithErrorCode CANNOT_CREATE_NODEJS_CONFIG_FILE;
+    fi
+    cat <<EOF > ${_outputFile}
+<?xml version='1.0' encoding='UTF-8'?>
+<jenkins.plugins.nodejs.NodeJSPlugin plugin="nodejs@0.2.1">
+  <installations>
+    <jenkins.plugins.nodejs.tools.NodeJSInstallation>
+      <name>nodejs</name>
+      <home></home>
+      <properties/>
+      <nodeJSHome></nodeJSHome>
+    </jenkins.plugins.nodejs.tools.NodeJSInstallation>
+  </installations>
+</jenkins.plugins.nodejs.NodeJSPlugin>
+EOF
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
@@ -409,6 +442,9 @@ function main() {
       ;;
     slack)
       generate_slack_config "${JENKINS_HOME}";
+      ;;
+    nodejs)
+      generate_nodejs_config "${JENKINS_HOME}";
       ;;
   esac
 }

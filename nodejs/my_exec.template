@@ -1,0 +1,20 @@
+#!/bin/bash
+
+_uid=${1}
+if [ -n ${_uid} ]; then
+  shift
+  usermod -u ${_uid} ${SERVICE_USER} > /dev/null 2>&1
+
+  _gid=$1;
+  if [ -n ${_gid} ]; then
+    shift
+    groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
+    usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
+  fi
+fi
+
+# Splitting executable from arguments
+_cmd="${1}";
+shift
+
+su - ${SERVICE_USER} -c "cd /workspace && ${_cmd} $@"

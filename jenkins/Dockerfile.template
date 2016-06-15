@@ -26,50 +26,53 @@ ENV SERVICE_USER="jenkins" \
     DOBACKUP="true"
 
 RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/service/update-jenkins && \
-    mkdir -p ${JENKINS_HOME} /var/jenkins_home & \
-    usermod -l ${SERVICE_USER} ${TOMCAT_USER} && \
-    usermod -d ${JENKINS_HOME} ${SERVICE_USER} && \
-    groupmod -n ${SERVICE_GROUP} ${TOMCAT_GROUP} && \
-    ln -s /backup/jenkins-home /home/jenkins && \
-    echo "${SERVICE_USER}:${JENKINS_PASSWORD}" | chpasswd && \
-    mkdir -p /var/jenkins_home/.m2 /usr/share/jenkins/ref && \
-    wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
-    mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome && \
-    cd ${TOMCAT_HOME} && ln -s /var/jenkins_home/.m2 .m2 && mkdir .jenkins && cd .jenkins && /usr/lib/jvm/java/bin/jar -xvf ${TOMCAT_HOME}/webapps/jenkins.war && \
-    sed -i '/<\/tomcat-users>/i \  <role rolename="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
-    sed -i '/<\/tomcat-users>/i \  <user username="jenkins-admin" password="${JENKINS_PASSWORD}" roles="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
-    [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml && \
-    rm -rf ${TOMCAT_HOME}/webapps/* && \
-    mv /etc/service/tomcat /etc/service/jenkins && \
-    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    chmod -R g+w /var/jenkins_home ${TOMCAT_HOME}/.jenkins && \
-    mkdir ${TOMCAT_HOME}/.ssh && \
-    chmod 700 ${TOMCAT_HOME}/.ssh && \
-    chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh && \
-    mkdir -p /var/jenkins_home/plugins /var/jenkins_home/updates && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
-    cd /var/jenkins_home/plugins/ && \
+    mkdir -p ${JENKINS_HOME} /var/jenkins_home && \
+    usermod -l ${SERVICE_USER} ${TOMCAT_USER}  && \
+    usermod -d ${JENKINS_HOME} ${SERVICE_USER}  && \
+    groupmod -n ${SERVICE_GROUP} ${TOMCAT_GROUP}  && \
+    ln -s /backup/jenkins-home /home/jenkins  && \
+    echo "${SERVICE_USER}:${JENKINS_PASSWORD}" | chpasswd  && \
+    mkdir -p /var/jenkins_home/.m2 /usr/share/jenkins/ref  && \
+    wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL}  && \
+    mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome  && \
+    cd ${TOMCAT_HOME} && ln -s /var/jenkins_home/.m2 .m2 && mkdir .jenkins && cd .jenkins && /usr/lib/jvm/java/bin/jar -xvf ${TOMCAT_HOME}/webapps/jenkins.war  && \
+    sed -i '/<\/tomcat-users>/i \  <role rolename="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml  && \
+    sed -i '/<\/tomcat-users>/i \  <user username="jenkins-admin" password="${JENKINS_PASSWORD}" roles="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml  && \
+    [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml  && \
+    rm -rf ${TOMCAT_HOME}/webapps/*  && \
+    mv /etc/service/tomcat /etc/service/jenkins  && \
+    /etc/my_init.d/00_regen_ssh_host_keys.sh -f  && \
+    chmod -R g+w /var/jenkins_home ${TOMCAT_HOME}/.jenkins  && \
+    mkdir ${TOMCAT_HOME}/.ssh  && \
+    chmod 700 ${TOMCAT_HOME}/.ssh  && \
+    chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh  && \
+    mkdir -p /var/jenkins_home/plugins /var/jenkins_home/updates  && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins
+RUN    cd /var/jenkins_home/plugins/ && \
     for m in ${JENKINS_MODULES}; do \
+      echo "Downloading ${m} plugin"; \
       for e in hpi jpi; do \
-        wget -o /dev/null http://mirrors.jenkins-ci.org/plugins/${m}/latest/${m}.${e}; \
+        wget -o /dev/null http://mirrors.jenkins-ci.org/plugins/${m}/latest/${m}.${e} || echo -n ''; \
       done; \
-    done && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home && \
-    ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli unzip && \
+    done; \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home  && \
+    curl -sL ${NODEJS_ZEROCONF_URL} | sudo -E bash - && \
+    ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli unzip nodejs build-essential && \
     for p in arcanist libphutil; do \
       cd /opt && git clone https://github.com/phacility/${p}.git && cd ${p} && git checkout stable; \
-    done && \
-    chmod +x /opt/arcanist/bin/arc && \
-    su - ${SERVICE_USER} -c '/opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL}' && \
-    mkdir -p /var/jenkins_home/init.groovy.d && \
-    chmod +x /usr/local/bin/generate-jenkins-plugin-configs.sh && \
-    su - jenkins -c 'curl -s "https://get.sdkman.io" | bash && source "/var/jenkins_home/.sdkman/bin/sdkman-init.sh" && for p in groovy gradle maven ant; do yes | sdk i ${p}; done' && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS} && yes | sdk i gradle ${GRADLE_DEFAULT_VERSION} && for p in ${GRADLE_VERSIONS}; do yes no | sdk i gradle \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} && yes | sdk i groovy ${GROOVY_DEFAULT_VERSION} && for p in ${GROOVY_VERSIONS}; do yes no | sdk i groovy \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS} && yes | sdk i grails ${GRAILS_DEFAULT_VERSION} && for p in ${GRAILS_VERSIONS}; do yes no | sdk i grails \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} && yes | sdk i maven ${MAVEN_DEFAULT_VERSION} && for p in ${MAVEN_VERSIONS}; do yes no | sdk i maven \${p}; done" && \
-    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && yes | sdk i ant ${ANT_DEFAULT_VERSION} && for p in ${ANT_VERSIONS}; do yes no | sdk i ant \${p}; done" && \
-    echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> /opt/tomcat/bin/setenv.sh && \
+    done  && \
+    chmod +x /opt/arcanist/bin/arc  && \
+    su - ${SERVICE_USER} -c '/opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL}'  && \
+    mkdir -p /var/jenkins_home/init.groovy.d  && \
+    chmod +x /usr/local/bin/generate-jenkins-plugin-configs.sh  && \
+    su - jenkins -c 'curl -s "https://get.sdkman.io" | bash && source "/var/jenkins_home/.sdkman/bin/sdkman-init.sh" && for p in groovy gradle maven ant; do yes | sdk i ${p}; done'  && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS} && yes | sdk i gradle ${GRADLE_DEFAULT_VERSION} && for p in ${GRADLE_VERSIONS}; do yes no | sdk i gradle \${p}; done"  && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} && yes | sdk i groovy ${GROOVY_DEFAULT_VERSION} && for p in ${GROOVY_VERSIONS}; do yes no | sdk i groovy \${p}; done"  && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS} && yes | sdk i grails ${GRAILS_DEFAULT_VERSION} && for p in ${GRAILS_VERSIONS}; do yes no | sdk i grails \${p}; done"  && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} && yes | sdk i maven ${MAVEN_DEFAULT_VERSION} && for p in ${MAVEN_VERSIONS}; do yes no | sdk i maven \${p}; done"  && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && yes | sdk i ant ${ANT_DEFAULT_VERSION} && for p in ${ANT_VERSIONS}; do yes no | sdk i ant \${p}; done"  && \
+    su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh nodejs" && \
+    echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> /opt/tomcat/bin/setenv.sh  && \
     ${APTGET_CLEANUP}
 
 ADD init.groovy.d/ /var/jenkins_home/init.groovy.d/

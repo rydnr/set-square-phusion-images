@@ -1,5 +1,14 @@
 Base image for NodeJS applications.
 
+Parameters:
+  - userId: Optional. Changes the user id running NodeJS within the container.
+  - groupId: Optional. It changes the group id running NodeJS within the container.
+  - command: The command to run. Typically, npm and its arguments.
+
 Examples:
-- Run this image to review NodeJS installation and settings:
-> docker run -it -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+
+- Run this image to run npm using the very same user id and group id:
+> docker run -it --rm -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" -v ${PWD}:/workspace -v ~/.npmrc:~/.npmrc -v ~/.npm:~/.npm -p 9876:9876 ${NAMESPACE}/${IMAGE}:${TAG} $(id -u) $(id -g) npm ...
+
+- Run this image to run npm:
+> docker run -it --rm -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" -v ${PWD}:/workspace -v ~/.npmrc:~/.npmrc -v ~/.npm:~/.npm -p 9876:9876 ${NAMESPACE}/${IMAGE}:${TAG} npm ...
