@@ -18,5 +18,7 @@ fi
 # Splitting executable from arguments
 _cmd="${1}";
 shift
+_cmd="${_cmd} ${@}";
+echo "Running ${_cmd}";
 
-su - ${SERVICE_USER} -c "cd /workspace && ${_cmd} $@"
+su - ${SERVICE_USER} -c "cd /workspace && ${_cmd}"
