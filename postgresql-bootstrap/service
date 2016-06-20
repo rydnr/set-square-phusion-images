@@ -4,7 +4,7 @@
 
 function usage() {
 cat <<EOF
-docker run -it --link [postgres]:db -v [folder]:/sql [-v[v]|-q|--quiet|-p pass|--password pass|-u user|--user user]
+docker run -it --link [postgres]:db -v [folder]:/sql [-v[v]|-q|--quiet|-p pass|--password pass|-u user|--user user|-s schema|--schema schema]
 $SCRIPT_NAME [-h|--help]
 (c) 2015-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
@@ -12,8 +12,9 @@ $SCRIPT_NAME [-h|--help]
 Connects to a PostgreSQL server and processes the SQL files in a volume.
 
 Where:
-  * -u | --user: the database user. Defaults to "root"
+  * -u | --user: the database user. Defaults to "${DEFAULT_DB_USER}".
   * -p | --password: the database password.
+  * -s | --schema: The database schema. Defaults to "${DEFAULT_DB_SCHEMA}".
 Common flags:
     * -h | --help: Display this message.
     * -v: Increase the verbosity.
@@ -77,11 +78,19 @@ function parseInput() {
          DB_PASSWORD="${1}";
          shift;
          ;;
+      -s | --schema)
+        DB_SCHEMA="${1}";
+        shift;
+        ;;
     esac
   done
 
   if [[ -z ${DB_USER} ]]; then
     DB_USER="${DEFAULT_DB_USER}";
+  fi
+
+  if [[ -z ${DB_SCHEMA} ]]; then
+      DB_USER="${DEFAULT_DB_SCHEMA}";
   fi
 
   # Parameters
@@ -111,11 +120,16 @@ function checkInput() {
          ;;
     esac
   done
- 
+
   if [[ -z ${DB_USER} ]]; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_DB_USER_SPECIFIED;
-  fi 
+  fi
+
+  if [[ -z ${DB_SCHEMA} ]]; then
+      logDebugResult FAILURE "fail";
+      exitWithErrorCode NO_DB_SCHEMA_SPECIFIED;
+  fi
 
   if [[ -z ${SQL_FOLDER} ]]; then
     logDebugResult FAILURE "fail";
@@ -209,9 +223,9 @@ function process_sql_file() {
   createTempFile;
   _logFile="${RESULT}";
   if [[ -z ${DB_PASSWORD} ]]; then
-    /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} -w postgres 2>&1
+    /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} -w ${DB_SCHEMA} 2>&1
   else
-    PGPASSWORD="${DB_PASSWORD}" /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} postgres 2>&1
+    PGPASSWORD="${DB_PASSWORD}" /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} ${DB_SCHEMA} 2>&1
   fi
   if [ $? -eq 0 ]; then
     if ! mark_sql_file_as_processed "$(dirname "${_file}")" "$(basename "${_file}")"; then
