@@ -4,16 +4,23 @@ FROM ${NAMESPACE}/java:${TAG}
 
 @include("addon-toggles")
 
+ENV DOBACKUP="false" \
+    SERVICE_USER="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_GROUP}"
+
 RUN ${APTGET_INSTALL} zip unzip && \
     ${APTGET_CLEANUP} && \
     rm -f /etc/my_init.d/* && \
-    useradd -m -u ${DEVELOPMENT_USER_ID} -c "Development user" -U ${NAMESPACE}
+    (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
+    (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Development user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
+    mkdir -p /home/${SERVICE_USER} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
+    cd /home/${SERVICE_USER} && \
+    wget -q -O- http://get.sdkman.io | su - ${SERVICE_USER} && \
+    chmod +x /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}
 
-USER ${NAMESPACE}
-
-RUN cd /home/${NAMESPACE} && \
-    wget -q -O- http://get.sdkman.io | bash && \
-    chmod +x /home/${NAMESPACE}/.sdkman/bin/sdkman-init.sh
+WORKDIR /workspace
 
 @include("copy-metadata")
 @include("instructions")

@@ -4,20 +4,14 @@ FROM ${NAMESPACE}/sdkman:${TAG}
 
 @include("addon-toggles")
 
-USER ${NAMESPACE}
+COPY my_exec /sbin/my_exec
 
-RUN cd /home/${NAMESPACE} && \
-    source /home/${NAMESPACE}/.sdkman/bin/sdkman-init.sh && \
-    sdk install gradle ${GRADLE_VERSION}
+RUN chmod +x /sbin/my_exec && \
+    cd /home/${SERVICE_USER} && \
+    su - ${SERVICE_USER} -c "source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && sdk install gradle ${GRADLE_VERSION}" && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}
 
-USER root
-
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
-COPY service /etc/service/${IMAGE}/run
-RUN chmod +x /etc/service/${IMAGE}/run
-
-VOLUME /home/${NAMESPACE}/.gradle
-VOLUME /home/${NAMESPACE}/work
+VOLUME [ "/home/${NAMESPACE}/.gradle" "/workspace" ]
 
 EXPOSE 8080
 

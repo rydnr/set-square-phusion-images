@@ -1,1 +1,2 @@
-defineEnvVar DEVELOPMENT_USER_ID "The id of the development user" "1000";
+defineEnvVar SERVICE_USER "The user account" "${NAMESPACE}";
+defineEnvVar SERVICE_GROUP "The group" "users";
