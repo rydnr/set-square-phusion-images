@@ -4,7 +4,7 @@
 
 function usage() {
 cat <<EOF
-docker run -it --link [postgres]:db -v [folder]:/sql [-v[v]|-q|--quiet|-p pass|--password pass|-u user|--user user|-s schema|--schema schema]
+docker run -it --link [postgres]:db -v [folder]:/sql [-v[v]|-q|--quiet] [-u|--user] user [-p|--password] password [[-s|--schema] schema]? [[-f|--file] file]?
 $SCRIPT_NAME [-h|--help]
 (c) 2015-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
@@ -15,6 +15,7 @@ Where:
   * -u | --user: the database user. Defaults to "${DEFAULT_DB_USER}".
   * -p | --password: the database password.
   * -s | --schema: The database schema. Defaults to "${DEFAULT_DB_SCHEMA}".
+  * -f | --file: the input file. Optional. If not specified, all files in the mounted /sql volume will be used as input.
 Common flags:
     * -h | --help: Display this message.
     * -v: Increase the verbosity.
@@ -37,8 +38,12 @@ function defineErrors() {
   export ENVSUBST_NOT_INSTALLED="envsubst is not installed";
   export TR_NOT_INSTALLED="tr is not installed";
   export NO_DB_USER_SPECIFIED="The database user cannot be empty";
+  export NO_DB_SCHEMA_SPECIFIED="The database schema cannot be empty";
   export NO_SQL_FOLDER_SPECIFIED="The SQL folder is mandatory";
   export NO_SQL_FILES_FOUND="No SQL files found in ${SQL_FOLDER}";
+  export SQL_FILE_NOT_FOUND="The specified file does not exist";
+  export SQL_FILE_NOT_READABLE="The specified file is not readable";
+  export SQL_FILE_IS_NOT_A_FILE="The specified file is not a file";
 
   ERROR_MESSAGES=(\
     INVALID_OPTION \
@@ -46,8 +51,12 @@ function defineErrors() {
     ENVSUBST_NOT_INSTALLED \
     TR_NOT_INSTALLED \
     NO_DB_USER_SPECIFIED \
+    NO_DB_SCHEMA_SPECIFIED \
     NO_SQL_FOLDER_SPECIFIED \
     NO_SQL_FILES_FOUND \
+    SQL_FILE_NOT_FOUND \
+    SQL_FILE_NOT_READABLE \
+    SQL_FILE_IS_NOT_A_FILE \
   );
 
   export ERROR_MESSAGES;
@@ -79,9 +88,15 @@ function parseInput() {
          shift;
          ;;
       -s | --schema)
-        DB_SCHEMA="${1}";
-        shift;
-        ;;
+         shift;
+         DB_SCHEMA="${1}";
+         shift;
+         ;;
+      -f | --file)
+         shift;
+         SQL_FILE="${1}";
+         shift;
+         ;;
     esac
   done
 
@@ -90,7 +105,7 @@ function parseInput() {
   fi
 
   if [[ -z ${DB_SCHEMA} ]]; then
-      DB_USER="${DEFAULT_DB_SCHEMA}";
+    DB_SCHEMA="${DEFAULT_DB_SCHEMA}";
   fi
 
   # Parameters
@@ -113,7 +128,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | --quiet | -u | --user | -p | --password)
+      -h | --help | -v | -vv | -q | --quiet | -u | --user | -p | --password | -s | --schema | -f | --file)
          ;;
       *) logDebugResult FAILURE "fail";
          exitWithErrorCode INVALID_OPTION ${_flag};
@@ -132,11 +147,30 @@ function checkInput() {
   fi
 
   if [[ -z ${SQL_FOLDER} ]]; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode NO_SQL_FOLDER_SPECIFIED;
+    if [[ -z ${SQL_FILE} ]]; then
+      logDebugResult FAILURE "fail";
+      exitWithErrorCode NO_SQL_FOLDER_SPECIFIED;
+    else
+      if [[ -e ${SQL_FILE} ]]; then
+        if [[ -r ${SQL_FILE} ]]; then
+          if [[ -f ${SQL_FILE} ]]; then
+            logDebugResult SUCCESS "valid";
+          else
+            logDebugResult FAILURE "fail";
+            exitWithErrorCode SQL_FILE_IS_NOT_A_FILE;
+          fi
+        else
+          logDebugResult FAILURE "fail";
+          exitWithErrorCode SQL_FILE_NOT_READABLE;
+        fi
+      else
+        logDebugResult FAILURE "fail";
+        exitWithErrorCode SQL_FILE_NOT_FOUND;
+      fi
+    fi
   else
     logDebugResult SUCCESS "valid";
-  fi 
+  fi
 }
 
 ## Checks whether given SQL file is marked as processed.
@@ -244,15 +278,21 @@ function process_sql_file() {
 ## dry-wit hook
 function main() {
   local _sqlFiles;
-  local _atLeastOneFile=1;
-  find_sql_files "${SQL_FOLDER}";
-  _sqlFiles="${RESULT}";
-  for _file in ${_sqlFiles}; do
-    _atLeastOneFile=0;
-    process_sql_file "${SQL_FOLDER}/${_file}";
-  done
-  if [ ${_atLeastOneFile} -ne 0 ]; then
-    exitWithErrorCode NO_SQL_FILES_FOUND;
+  local _atLeastOneFile=${FALSE};
+
+  if [[ -n ${SQL_FILE} ]]; then
+    _atLeastOneFile=${TRUE};
+    process_sql_file "${SQL_FOLDER}/${SQL_FILE}";
+  else
+    find_sql_files "${SQL_FOLDER}";
+    _sqlFiles="${RESULT}";
+    for _file in ${_sqlFiles}; do
+      _atLeastOneFile=${TRUE};
+      process_sql_file "${SQL_FOLDER}/${_file}";
+    done
+    if [ ${_atLeastOneFile} -ne ${TRUE} ]; then
+      exitWithErrorCode NO_SQL_FILES_FOUND;
+    fi
   fi
 }
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
