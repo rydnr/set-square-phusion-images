@@ -4,7 +4,7 @@
 
 function usage() {
 cat <<EOF
-docker run -it --link [postgres]:db -v [folder]:/sql [-v[v]|-q|--quiet] [-u|--user] user [-p|--password] password [[-s|--schema] schema]? [[-f|--file] file]?
+docker run -it --link [postgres]:db -v [folder]:/sql [-v[v]|-q|--quiet] [-u|--user] user [-p|--password] password [[-db|--database] database]? [[-f|--file] file]?
 $SCRIPT_NAME [-h|--help]
 (c) 2015-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
@@ -14,7 +14,7 @@ Connects to a PostgreSQL server and processes the SQL files in a volume.
 Where:
   * -u | --user: the database user. Defaults to "${DEFAULT_DB_USER}".
   * -p | --password: the database password.
-  * -s | --schema: The database schema. Defaults to "${DEFAULT_DB_SCHEMA}".
+  * -db | --database: The database name. Defaults to "${DEFAULT_DB_NAME}".
   * -f | --file: the input file. Optional. If not specified, all files in the mounted /sql volume will be used as input.
 Common flags:
     * -h | --help: Display this message.
@@ -30,7 +30,7 @@ function checkRequirements() {
   checkReq envsubst ENVSUBST_NOT_INSTALLED;
   checkReq tr TR_NOT_INSTALLED;
 }
- 
+
 # Error messages
 function defineErrors() {
   export INVALID_OPTION="Unrecognized option";
@@ -38,7 +38,7 @@ function defineErrors() {
   export ENVSUBST_NOT_INSTALLED="envsubst is not installed";
   export TR_NOT_INSTALLED="tr is not installed";
   export NO_DB_USER_SPECIFIED="The database user cannot be empty";
-  export NO_DB_SCHEMA_SPECIFIED="The database schema cannot be empty";
+  export NO_DB_NAME_SPECIFIED="The database name cannot be empty";
   export NO_SQL_FOLDER_SPECIFIED="The SQL folder is mandatory";
   export NO_SQL_FILES_FOUND="No SQL files found in ${SQL_FOLDER}";
   export SQL_FILE_NOT_FOUND="The specified file does not exist";
@@ -51,7 +51,7 @@ function defineErrors() {
     ENVSUBST_NOT_INSTALLED \
     TR_NOT_INSTALLED \
     NO_DB_USER_SPECIFIED \
-    NO_DB_SCHEMA_SPECIFIED \
+    NO_DB_NAME_SPECIFIED \
     NO_SQL_FOLDER_SPECIFIED \
     NO_SQL_FILES_FOUND \
     SQL_FILE_NOT_FOUND \
@@ -87,9 +87,9 @@ function parseInput() {
          DB_PASSWORD="${1}";
          shift;
          ;;
-      -s | --schema)
+      -db | --database)
          shift;
-         DB_SCHEMA="${1}";
+         DB_NAME="${1}";
          shift;
          ;;
       -f | --file)
@@ -104,8 +104,8 @@ function parseInput() {
     DB_USER="${DEFAULT_DB_USER}";
   fi
 
-  if [[ -z ${DB_SCHEMA} ]]; then
-    DB_SCHEMA="${DEFAULT_DB_SCHEMA}";
+  if [[ -z ${DB_NAME} ]]; then
+    DB_NAME="${DEFAULT_DB_NAME}";
   fi
 
   # Parameters
@@ -128,7 +128,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | --quiet | -u | --user | -p | --password | -s | --schema | -f | --file)
+      -h | --help | -v | -vv | -q | --quiet | -u | --user | -p | --password | -db | --database | -f | --file)
          ;;
       *) logDebugResult FAILURE "fail";
          exitWithErrorCode INVALID_OPTION ${_flag};
@@ -141,9 +141,9 @@ function checkInput() {
     exitWithErrorCode NO_DB_USER_SPECIFIED;
   fi
 
-  if [[ -z ${DB_SCHEMA} ]]; then
-      logDebugResult FAILURE "fail";
-      exitWithErrorCode NO_DB_SCHEMA_SPECIFIED;
+  if [[ -z ${DB_NAME} ]]; then
+    logDebugResult FAILURE "fail";
+    exitWithErrorCode NO_DB_NAME_SPECIFIED;
   fi
 
   if [[ -z ${SQL_FOLDER} ]]; then
@@ -257,9 +257,9 @@ function process_sql_file() {
   createTempFile;
   _logFile="${RESULT}";
   if [[ -z ${DB_PASSWORD} ]]; then
-    /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} -w ${DB_SCHEMA} 2>&1
+    /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} -w --dbname=${DB_NAME} 2>&1
   else
-    PGPASSWORD="${DB_PASSWORD}" /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} ${DB_SCHEMA} 2>&1
+    PGPASSWORD="${DB_PASSWORD}" /usr/bin/psql -X -n -h ${DB_HOST} -f ${_file} -o ${_logFile} -U ${DB_USER} --dbname=${DB_NAME} 2>&1
   fi
   if [ $? -eq 0 ]; then
     if ! mark_sql_file_as_processed "$(dirname "${_file}")" "$(basename "${_file}")"; then
