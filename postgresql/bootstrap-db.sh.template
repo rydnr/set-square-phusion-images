@@ -3,9 +3,9 @@
 _sleep=10;
 # Just in case Monit is configured to restart ${IMAGE}
 service monit stop
-while ps -ef | grep postgres | grep -v grep | grep -v runsv | grep -v /etc/service/postgresql/run > /dev/null; do
+while pgrep "postgres" > /dev/null; do
   echo "Waiting ${_sleep}s for ${IMAGE} to shut down"
-  killall postgresql
+  /etc/init.d/postgresql stop
   sleep ${_sleep}
 done
 

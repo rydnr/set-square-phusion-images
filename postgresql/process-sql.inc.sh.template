@@ -1,0 +1,4 @@
+defineEnvVar DB_HOST "The PostgreSQL host" "localhost";
+defineEnvVar SQL_FOLDER "The folder storing the SQL files to run" "/var/lib/postgresql-sql/${POSTGRESQL_ROOT_USER}";
+defineEnvVar DEFAULT_DB_USER "The default database user" "${POSTGRESQL_ROOT_USER}";
+defineEnvVar DEFAULT_DB_NAME "The default database name" "postgres";

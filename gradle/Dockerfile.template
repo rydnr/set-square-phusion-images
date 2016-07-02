@@ -6,10 +6,14 @@ FROM ${NAMESPACE}/sdkman:${TAG}
 
 COPY my_exec /sbin/my_exec
 
-RUN chmod +x /sbin/my_exec && \
-    cd /home/${SERVICE_USER} && \
-    su - ${SERVICE_USER} -c "source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && sdk install gradle ${GRADLE_VERSION}" && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}
+RUN chmod +x /sbin/my_exec
+
+USER ${SERVICE_USER}
+
+RUN cd /home/${SERVICE_USER} && \
+    source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && sdk install gradle ${GRADLE_VERSION}
+
+USER root
 
 VOLUME [ "/home/${NAMESPACE}/.gradle" "/workspace" ]
 

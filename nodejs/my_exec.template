@@ -24,4 +24,5 @@ if [ -n "${PORT}" ]; then
 fi
 echo "Running ${_cmd}";
 
-su - ${SERVICE_USER} -c "cd /workspace && ${_cmd}"
+_exports="$(export)";
+su - ${SERVICE_USER} -c "${_exports} ; cd /workspace ; ${_cmd}";

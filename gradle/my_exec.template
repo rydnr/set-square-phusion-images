@@ -21,5 +21,6 @@ if [ -n "${PORT}" ]; then
   _port="PORT=${PORT} ${_cmd}";
 fi
 echo "Running ${_cmd}";
+_exports="$(export)";
+su - ${SERVICE_USER} -c "${_exports} ; cd /workspace ; source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && ${_cmd}"
 
-su - ${SERVICE_USER} -c "cd /workspace && ${_cmd}"
