@@ -3,7 +3,7 @@ defineEnvVar TOMCAT_MAJOR_VERSION \
              "8";
 defineEnvVar TOMCAT_VERSION \
              "The version of the Apache Tomcat server" \
-             "8.5.2" \
+             "8.5.4" \
              'curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/ | grep folder.gif | tail -n 1 | cut -d ">" -f 3 | cut -d "/" -f 1 | sed "s_^v__g"';
 defineEnvVar APR_VERSION \
              "The version of Apache Portable Runtime" \
