@@ -14,13 +14,15 @@ RUN ${APTGET_INSTALL} zip unzip && \
     (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
     (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Development user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
     mkdir -p /home/${SERVICE_USER} && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
-    cd /home/${SERVICE_USER} && \
-    wget -q -O- http://get.sdkman.io | su - ${SERVICE_USER} && \
-    chmod +x /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}
 
-WORKDIR /workspace
+USER ${SERVICE_USER}
+
+RUN cd /home/${SERVICE_USER} && \
+    wget -q -O- http://get.sdkman.io | bash && \
+    chmod +x /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh
+
+USER root
 
 @include("copy-metadata")
 @include("instructions")
