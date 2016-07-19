@@ -26,4 +26,5 @@ RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
 VOLUME /sql
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

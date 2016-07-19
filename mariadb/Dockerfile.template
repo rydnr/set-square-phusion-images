@@ -55,10 +55,7 @@ COPY setup.sql /usr/local/src/setup.sql.tpl
 
 EXPOSE 3306
 
-VOLUME /backup/${IMAGE}-db
-VOLUME /backup/rsnapshot
-VOLUME /backup/${IMAGE}-dump
-VOLUME /var/local/mysql/conf.d
+VOLUME [ "/backup/${IMAGE}-db", "/backup/rsnapshot", "/backup/${IMAGE}-dump", "/var/local/mysql/conf.d" ]
 
 @include("copy-metadata")
 @include("symlinks")

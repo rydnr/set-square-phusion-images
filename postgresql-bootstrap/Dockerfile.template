@@ -18,4 +18,5 @@ RUN ${APTGET_INSTALL} postgresql-client && \
 VOLUME /sql
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

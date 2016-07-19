@@ -2,25 +2,55 @@
 
 _uid=${1}
 if [ -n ${_uid} ]; then
-  shift
-  usermod -u ${_uid} ${SERVICE_USER} > /dev/null 2>&1
-  chown -R ${SERVICE_USER} /home/${SERVICE_USER} > /dev/null 2>&1
-
-  _gid=$1;
-  if [ -n ${_gid} ]; then
     shift
-    groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
-    usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
-    chgrp -R ${SERVICE_GROUP} /home/${SERVICE_GROUP} > /dev/null 2>&1
-  fi
+    usermod -u ${_uid} ${SERVICE_USER} > /dev/null 2>&1
+    chown -R ${SERVICE_USER} /home/${SERVICE_USER} > /dev/null 2>&1
+
+    _gid=$1;
+    if [ -n ${_gid} ]; then
+        shift
+        groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
+        usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
+        chgrp -R ${SERVICE_GROUP} /home/${SERVICE_GROUP} > /dev/null 2>&1
+    fi
 fi
 
 # Splitting executable from arguments
-_cmd="gradle ${@}";
+_cmd="${1}";
+shift
+_cmd="${_cmd} ${@}";
 if [ -n "${PORT}" ]; then
-  _port="PORT=${PORT} ${_cmd}";
+    _port="PORT=${PORT} ${_cmd}";
 fi
-echo "Running ${_cmd}";
-_exports="$(export)";
-su - ${SERVICE_USER} -c "${_exports} ; cd /workspace ; source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && ${_cmd}"
 
+_exports="$(export)";
+
+touch /var/log/${IMAGE}.log
+chown ${SERVICE_USER} /var/log/${IMAGE}.log
+chown -R ${SERVICE_USER} /home/${SERVICE_USER}/.gradle
+
+_folder="/workspace";
+
+if [ ! -z ${PROJECT_NAME} ]; then
+    _folder="${_folder}/${PROJECT_NAME}"
+fi
+
+mkdir -p "${_folder}";
+chown -R ${SERVICE_USER} ${_folder}
+chmod -R a+w /home/${SERVICE_USER}/.gradle
+ln -s /root/.docker /home/${SERVICE_USER}/.docker
+chown -R ${SERVICE_USER} /usr/local/bin/*
+
+# From https://github.com/docker-library/docker/blob/61353e617f3fe89519de1e00f7de043087839e45/1.12-rc/docker-entrypoint.sh
+# if we have "--link some-docker:docker" and not DOCKER_HOST, let's set DOCKER_HOST automatically
+if [ -z "$DOCKER_HOST" -a "$DOCKER_PORT_2375_TCP" ]; then
+	  export DOCKER_HOST='tcp://docker:2375'
+fi
+
+echo "Running \"gradle ${_env} ${_cmd}\" in ${_folder}, as ${SERVICE_USER}, using GRADLE_USER_HOME=${GRADLE_USER_HOME}"
+su - ${SERVICE_USER} -c "\
+  ${_exports}; \
+  export DOCKER_HOST=\"${DOCKER_HOST}\" && \
+  source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \
+  cd ${_folder} && gradle ${_env} --gradle-user-home=/home/${SERVICE_USER} ${_cmd}"
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

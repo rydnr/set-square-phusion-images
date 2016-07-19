@@ -1,0 +1,6 @@
+This image runs FlywayDB command line to, using the database specified as arguments.
+
+Examples:
+- Run FlywayDB to migrate a PostgreSQL database my_db in host "db", using "root" as username and "secret" as password,
+using the SQL files located in ${PWD}/sql:
+> docker run --rm -it --link db:db -v ${PWD}/sql:/sql ${NAMESPACE}/${IMAGE}:${TAG} migrate "jdbc:postgresql://db:5432/my_db" root secret

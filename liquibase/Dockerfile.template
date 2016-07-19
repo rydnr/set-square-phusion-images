@@ -16,4 +16,5 @@ RUN mkdir /opt/liquibase-${LIQUIBASE_VERSION} && \
     chmod +x /usr/local/bin/liquibase
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

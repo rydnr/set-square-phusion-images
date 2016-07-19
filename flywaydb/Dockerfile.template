@@ -8,21 +8,19 @@ ENV DOBACKUP="false" \
     SERVICE_USER="${SERVICE_USER}" \
     SERVICE_GROUP="${SERVICE_GROUP}"
 
-RUN ${APTGET_INSTALL} zip unzip && \
-    ${APTGET_CLEANUP} && \
+COPY my_exec /sbin/my_exec
+
+RUN chmod +x /sbin/my_exec && \
+    wget ${FLYWAYDB_URL} && \
     rm -f /etc/my_init.d/* && \
     (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
     (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Development user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
     mkdir -p /home/${SERVICE_USER} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}
+    tar xvf ${FLYWAYDB_ARTIFACT} -C /opt/ && \
+    ln -s flyway-${FLYWAYDB_VERSION} flyway
 
-USER ${SERVICE_USER}
-
-RUN cd /home/${SERVICE_USER} && \
-    wget -q -O- http://get.sdkman.io | bash && \
-    chmod +x /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh
-
-USER root
+VOLUME [ "/sql", "/drivers" ]
 
 @include("copy-metadata")
 @include("symlinks")
