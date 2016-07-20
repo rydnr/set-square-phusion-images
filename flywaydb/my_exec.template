@@ -1,0 +1,42 @@
+#!/bin/bash
+
+_uid=${1}
+if [ -n ${_uid} ]; then
+    shift
+    usermod -u ${_uid} ${SERVICE_USER} > /dev/null 2>&1
+    chown -R ${SERVICE_USER} /home/${SERVICE_USER} > /dev/null 2>&1
+
+    _gid=$1;
+    if [ -n ${_gid} ]; then
+        shift
+        groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
+        usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
+        chgrp -R ${SERVICE_GROUP} /home/${SERVICE_GROUP} > /dev/null 2>&1
+    fi
+fi
+
+# Splitting executable from arguments
+_url="${1}";
+_user="${2}";
+_password="${3}";
+shift;
+shift;
+shift;
+
+_cmd="${1}";
+shift
+_cmd="${_cmd} ${@}";
+echo "Running ${_cmd}";
+
+_exports="$(export)";
+
+rsync -avz /drivers/ drivers/
+rsync -avz /sql/ sql/
+
+cat <<EOF >> /opt/flyway/conf/flyway.conf
+flyway.url=${_url}
+flyway.user=${_user}
+flyway.password=${_password}
+EOF
+echo "Running flyway ${_command}"
+su - ${SERVICE_USER} -c "${_exports} ; cd /opt/flyway ; ./flyway ${_cmd}";
