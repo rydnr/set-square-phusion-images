@@ -258,7 +258,7 @@ function main() {
   find_sql_files "${FOLDER}";
   _sqlFiles="${RESULT}";
   for _file in ${_sqlFiles}; do
-    process_sql_file "${FOLDER}" "$(basename ${_file})" "${MARIADB_ADMIN_USER}" "${MARIADB_ADMIN_PASSWORD}";
+    process_sql_file "${FOLDER}" "$(basename ${_file})" "${POSTGRESQL_ROOT_USER}" "${POSTGRESQL_ROOT_PASSWORD}";
   done
 
   # SQL files specific for certain db users.

@@ -11,7 +11,7 @@ if [ -n ${_uid} ]; then
     shift
     groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
     usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
-    chgrp -R ${SERVICE_GROUP} /home/${SERVICE_GROUP} > /dev/null 2>&1
+    chgrp -R ${SERVICE_GROUP} /home/${SERVICE_USER} > /dev/null 2>&1
   fi
 fi
 
@@ -22,7 +22,18 @@ _cmd="${_cmd} ${@}";
 if [ -n "${PORT}" ]; then
   _port="PORT=${PORT} ${_cmd}";
 fi
-echo "Running ${_cmd}";
 
 _exports="$(export)";
-su - ${SERVICE_USER} -c "${_exports} ; cd /workspace ; ${_cmd}";
+
+cat << EOF > /tmp/runme
+#!/bin/bash
+
+${_exports}
+declare -x HOME="/home/${SERVICE_USER}"
+cd /workspace
+${_cmd}
+EOF
+chmod +x /tmp/runme
+
+echo "Running ${_cmd}";
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme

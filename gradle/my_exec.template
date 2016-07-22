@@ -47,10 +47,22 @@ if [ -z "$DOCKER_HOST" -a "$DOCKER_PORT_2375_TCP" ]; then
 	  export DOCKER_HOST='tcp://docker:2375'
 fi
 
-echo "Running \"gradle ${_env} ${_cmd}\" in ${_folder}, as ${SERVICE_USER}, using GRADLE_USER_HOME=${GRADLE_USER_HOME}"
-su - ${SERVICE_USER} -c "\
-  ${_exports}; \
-  export DOCKER_HOST=\"${DOCKER_HOST}\" && \
-  source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \
-  cd ${_folder} && gradle ${_env} --gradle-user-home=/home/${SERVICE_USER} ${_cmd}"
+_exports="$(export)";
+
+cat << EOF > /tmp/runme
+#!/bin/bash
+
+${_exports}
+declare -x HOME="/home/${SERVICE_USER}"
+export DOCKER_HOST=\"${DOCKER_HOST}\"
+source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh
+cd ${_folder}
+gradle --gradle-user-home=/home/${SERVICE_USER} ${_cmd}
+EOF
+chmod +x /tmp/runme
+
+echo "Running \"gradle --gradle-user-home=/home/${SERVICE_USER} ${_cmd}\" in ${_folder}, as ${SERVICE_USER}"
+
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet
+

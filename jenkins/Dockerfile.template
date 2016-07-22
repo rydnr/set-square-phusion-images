@@ -87,12 +87,9 @@ COPY config /etc/default/tomcat
 COPY ssh-config /opt/tomcat/.ssh/config
 COPY known_hosts /opt/tomcat/.ssh/known_hosts
 COPY jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
-COPY hudson.tasks.Mailer.xml \
-     config.xml \
-     /var/jenkins_home/
+COPY hudson.tasks.Mailer.xml config.xml /var/jenkins_home/
 
-VOLUME /backup/jenkins-home
-VOLUME /backup/rsnapshot
+VOLUME [ "/backup/jenkins-home", "/backup/rsnapshot" ]
 
 EXPOSE 8080
 EXPOSE 50000

@@ -16,9 +16,11 @@ RUN chmod +x /sbin/my_exec && \
     (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
     (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Development user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
     mkdir -p /home/${SERVICE_USER} && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
     tar xvf ${FLYWAYDB_ARTIFACT} -C /opt/ && \
-    ln -s flyway-${FLYWAYDB_VERSION} flyway
+    ln -s /opt/flyway-${FLYWAYDB_VERSION} /opt/flyway && \
+    chmod +x /opt/flyway/flyway && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/flyway
 
 VOLUME [ "/sql", "/drivers" ]
 
