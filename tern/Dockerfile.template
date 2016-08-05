@@ -1,0 +1,23 @@
+@include("preamble")
+FROM nodejs:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+COPY my_exec /sbin/my_exec
+
+ENV DOBACKUP="false" \
+    SERVICE_USER="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_GROUP}"
+
+RUN chmod +x /sbin/my_exec && \
+    ${APTGET_INSTALL} -u -np git && \
+    cd /usr/local/src && \
+    git clone https://github.com/ternjs/tern.git && \
+    cd tern && \
+    git checkout ${TERN_TAG} && \
+    ${APTGET_CLEANUP}
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

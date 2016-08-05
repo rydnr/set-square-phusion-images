@@ -11,7 +11,7 @@ if [[ ! -e /var/lib/postgresql/.bootstrapped ]]; then
 fi
 
 exec 2>&1
-exec su - postgres -c "\
+exec su - ${SERVICE_USER} -c "\
      /usr/lib/postgresql/${POSTGRESQL_VERSION}/bin/postgres \
      -D /var/lib/postgresql/${POSTGRESQL_VERSION}/main \
      -c config_file=/etc/postgresql/${POSTGRESQL_VERSION}/main/postgresql.conf 2>&1"

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+#!/bin/bash
+
+_folder="/home/${SERVICE_USER}/workspace";
+
+_uid=$(stat -c '%u' /home/${SERVICE_USER}/workspace)
+_gid=$(stat -c '%g' /home/${SERVICE_USER}/workspace)
+_npmGid=$(stat -c '%g' /home/${SERVICE_USER}/.npm)
+
+usermod -u ${_uid} ${SERVICE_USER} > /dev/null 2>&1
+groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
+usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
+
+for g in ${_gid} ${_npmGid}; do
+  gpasswd -a ${SERVICE_USER} ${g} > /dev/null 2>&1
+done
+
+_exports="$(export)";
+
+cat << EOF > /tmp/runme
+#!/bin/bash
+
+${_exports}
+declare -x HOME="/home/${SERVICE_USER}"
+cd ${_folder}
+/usr/local/src/tern/bin/tern $*
+EOF
+chmod +x /tmp/runme
+
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

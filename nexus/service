@@ -4,24 +4,27 @@ set -a
 NEXUS_HOME=/opt/sonatype/nexus
 SONATYPE_WORK=/sonatype-work
 KARAF_DATA=${SONATYPE_WORK}
-SONATYPE_USER="nexus"
-CONTEXT_PATH=/
-JAVA_HOME="/usr/lib/jvm/java"
-JSSE_HOME="${JAVA_HOME}/jre/"
-MAX_HEAP="768m"
-MIN_HEAP="256m"
-JAVA_OPTS="-server -XX:MaxPermSize=192m -Djava.net.preferIPv4Stack=true -Djava.awt.headless=true -XX:+HeapDumpOnOutOfMemoryError"
-JAVA_PATHS="-Djava.endorsed.dirs=${JSSE_HOME}/lib/endorsed:${JAVA_HOME}/lib/endorsed:${NEXUS_HOME}/lib/endorsed -Djava.ext.dirs=${JSSE_HOME}/lib/ext:${JAVA_HOME}/lib/ext:${NEXUS_HOME}/lib/ext"
-KARAF_OPTS="-Dkaraf.instances=${NEXUS_HOME}/instances -Dkaraf.home=${NEXUS_HOME} -Dkaraf.base=${NEXUS_HOME} -Dkaraf.data=${SONATYPE_WORK} -Dkaraf.etc=${NEXUS_HOME}/etc -Djava.io.tmpdir=${SONATYPE_WORK}/tmp -Dkaraf.startLocalConsole=false -Dkaraf.startRemoteShell=true"
-LOGGING_OPTS="-Djava.util.logging.config.file=${NEXUS_HOME}/etc/java.util.logging.properties"
-CLASSPATH="${NEXUS_HOME}/lib/karaf-jaas-boot.jar:${NEXUS_HOME}/lib/karaf.jar:${NEXUS_HOME}/lib/karaf-nexus-branding.jar:${NEXUS_HOME}/lib/karaf-org.osgi.core.jar"
-LANG="en_US.UTF-8"
+SONATYPE_USER="${SERVICE_USER}"
 
-chown -R ${SONATYPE_USER} ${SONATYPE_WORK}
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SONATYPE_WORK}
 
-cd ${NEXUS_HOME}/bin
+sed -i "s/^-Xms(.*)$/-Xms${NEXUS_MIN_MEMORY:-${SQ_NEXUS_MIN_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
+sed -i "s/^-Xmx(.*)$/-Xms${NEXUS_MAX_MEMORY:-${SQ_NEXUS_MAX_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
+sed -i "s/^#run_as_user=(.*)/run_as_user=${SONATYPE_USER}/g" ${NEXUS_HOME}/bin/nexus.rc
 
-exec 2>&1
-exec setuser ${SONATYPE_USER} ${JAVA_HOME}/bin/java ${JAVA_OPTS} ${JAVA_PATHS} ${KARAF_OPTS} ${LOGGING_OPTS} -classpath ${CLASSPATH} org.apache.karaf.main.Main
+_folder=${NEXUS_HOME}
+_exports="$(export)";
+
+cat << EOF > /tmp/runme
+#!/bin/bash
+
+${_exports}
+declare -x HOME="/home/${SERVICE_USER}"
+cd ${_folder}
+bin/nexus run
+EOF
+chmod +x /tmp/runme
+
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
 
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet

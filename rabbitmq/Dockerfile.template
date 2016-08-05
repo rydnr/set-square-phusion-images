@@ -4,7 +4,16 @@ FROM ${BASE_IMAGE}:${TAG}
 
 @include("addon-toggles")
 
-COPY rc.local /etc/rc.local
+ENV DOBACKUP="true" \
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
+    SERVICE_USER="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_USER}" \
+    RABBITMQ_LOG_BASE=/data/log \
+    RABBITMQ_MNESIA_BASE=/data/mnesia
+
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+COPY service /etc/service/${IMAGE}/run
+#COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
 # From official RabbitMQ Dockerfile: https://github.com/dockerfile/rabbitmq/blob/master/Dockerfile
 
@@ -12,22 +21,25 @@ COPY rc.local /etc/rc.local
 RUN wget -O /usr/local/bin/rabbitmq-start https://github.com/dockerfile/rabbitmq/raw/master/bin/rabbitmq-start && \
     wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
     echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
-    ${APTGET_INSTALL} --update rabbitmq-server && \
+    ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
+    mv /var/lib/rabbitmq /data && \
+    ln -s /data /var/lib/rabbitmq && \
+    mv /var/log/rabbitmq /data/log && \
+    ln -s /data/log /var/log/rabbitmq && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data && \
     echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config && \
-    chmod +x /usr/local/bin/rabbitmq-start /etc/rc.local && \
+    chmod +x /usr/local/bin/rabbitmq-start && \
+    mkdir -p /backup/${IMAGE}/data/mnesia && \
     ${APTGET_CLEANUP}
-
-# Define environment variables.
-ENV RABBITMQ_LOG_BASE /data/log
-ENV RABBITMQ_MNESIA_BASE /data/mnesia
 
 # Expose ports.
 EXPOSE 5672
 EXPOSE 15672
 
 # Define mount points.
-# VOLUME ["/data/mnesia"]
+VOLUME ["/backup/${IMAGE}/data/mnesia"]
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

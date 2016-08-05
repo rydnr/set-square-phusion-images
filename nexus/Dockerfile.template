@@ -8,19 +8,19 @@ ENV DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
     VIRTUAL_HOST="${NEXUS_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT="${NEXUS_UI_HTTP_PORT}" \
-    SERVICE_USER="nexus" \
-    SERVICE_GROUP="nexus" \
+    SERVICE_USER="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_GROUP}" \
     SSL_KEYSTORE_PATH="${SSL_KEYSTORE_FOLDER}/${IMAGE}.${SSL_KEYSTORE_TYPE}"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
-RUN chmod +x /etc/service/${IMAGE}/run
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY 50_update_nexus_ssl_config.sh 50_update_nexus_ssl_config.inc.sh \
      51_copy_nexus_data.sh \
      /etc/my_init.d/
 
-RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false ${SERVICE_USER} && \
+RUN chmod +x /etc/service/${IMAGE}/run && \
+    useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false ${SERVICE_USER} && \
     cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
     mkdir /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
@@ -29,9 +29,13 @@ RUN useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false
     ln -s /backup/${IMAGE}-conf /sonatype-work/etc && \
     ln -s /backup/${IMAGE}-blobs /sonatype-work/blobs && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype /sonatype-work && \
+    sed -i "s/^-Xms.*/-Xms${NEXUS_MIN_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions && \
+    sed -i "s/^-Xmx.*/-Xmx${NEXUS_MAX_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
-    /usr/local/bin/create_ssl_certificate_keytool.sh
+    /usr/local/bin/create_ssl_certificate_keytool.sh && \
+    mkdir -p /opt/sonatype/nexus/etc/ssl && \
+    ln -s /etc/ssl/private/nexus.jks /opt/sonatype/nexus/etc/ssl/keystore.jks
 
 VOLUME /backup/${IMAGE}-conf
 VOLUME /backup/${IMAGE}-blobs

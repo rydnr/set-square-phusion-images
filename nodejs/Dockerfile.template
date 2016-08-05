@@ -12,8 +12,10 @@ ENV DOBACKUP="false" \
 
 # From https://github.com/nodejs/node-v0.x-archive/wiki/Installing-Node.js-via-package-manager#debian-and-ubuntu-based-linux-distributions
 RUN chmod +x /sbin/my_exec && \
-    /usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists" && \
-    /usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "uncommitted-pipeline user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists" && \
+    (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
+    (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "NodeJS user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
+    mkdir -p /home/${SERVICE_USER} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
     curl --silent --location ${NODEJS_DOWNLOAD_URL} | bash - && \
     ${APTGET_INSTALL} -u nodejs build-essential libfontconfig && \
     AUX="${NODEJS_MODULES}" && if [ -n "${AUX}" ]; then \
@@ -23,8 +25,8 @@ RUN chmod +x /sbin/my_exec && \
     fi && \
     ${APTGET_CLEANUP}
 
-VOLUME [ "/workspace" "/home/${SERVICE_USER}/.npm" ]
-WORKDIR /workspace
+VOLUME [ "/home/${SERVICE_USER}/workspace" "/home/${SERVICE_USER}/.npm" ]
+WORKDIR /home/${SERVICE_USER}/workspace
 
 @include("copy-metadata")
 @include("symlinks")

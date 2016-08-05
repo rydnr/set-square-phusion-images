@@ -6,8 +6,8 @@ FROM ${BASE_IMAGE}:${TAG}
 
 ENV DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
-    SERVICE_USER="postgres" \
-    SERVICE_GROUP="postgres"
+    SERVICE_USER="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_GROUP}"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run

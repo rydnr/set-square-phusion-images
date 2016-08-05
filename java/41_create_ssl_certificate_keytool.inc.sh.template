@@ -1,0 +1,12 @@
+defineEnvVar SSL_CERTIFICATE_ALIAS "The alias of the SSL certificate" "${SSL_CERTIFICATE_ALIAS}";
+defineEnvVar SSL_KEY_ALGORITHM "The algorithm of the SSL key pairs" "${SSL_KEY_ALGORITHM}";
+defineEnvVar SSL_KEY_FOLDER "The folder storing the SSL key pairs" "${SSL_KEY_FOLDER}";
+defineEnvVar SSL_KEYSTORE_NAME "The keystore name" "${SSL_KEYSTORE_NAME}";
+defineEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" "${SSL_KEYSTORE_PASSWORD}";
+defineEnvVar SSL_KEYSTORE_FOLDER "The folder storing the SSL keystore" "${SSL_KEYSTORE_FOLDER}";
+defineEnvVar SSL_KEYSTORE_PATH "The path of the keystore" '${SSL_KEY_FOLDER}/${SSL_KEYSTORE_NAME}.${SSL_KEYSTORE_TYPE}';
+defineEnvVar SSL_KEY_PASSWORD "The key password" "${SSL_KEY_PASSWORD}";
+defineEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" "${SSL_CERTIFICATE_DNAME}";
+defineEnvVar SSL_SIGN_ALGORITHM "The algorithm used to sign the SSL certificate" "${SSL_SIGN_ALGORITHM}";
+defineEnvVar SSL_SAN_EXTENSIONS "The SAN extensions for the SSL certificate" "${SSL_SAN_EXTENSIONS}";
+";

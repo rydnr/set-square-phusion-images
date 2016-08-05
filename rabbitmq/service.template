@@ -1,0 +1,8 @@
+#!/bin/bash
+
+rsync -az /backup/${IMAGE}/data/ /data/ > /dev/null
+
+exec 2>&1
+exec su - ${SERVICE_USER} -c "/usr/local/bin/rabbitmq-start"
+
+exit 0

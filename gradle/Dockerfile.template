@@ -7,24 +7,19 @@ FROM ${NAMESPACE}/sdkman:${TAG}
 COPY my_exec /sbin/my_exec
 
 RUN chmod +x /sbin/my_exec && \
-    set -x && \
-    curl -fSL "${DOCKER_URL}" -o docker.tgz && \
-	  echo "${DOCKER_SHA256} *docker.tgz" | sha256sum -c - && \
-    tar -xzvf docker.tgz && \
-    mv docker/* /usr/local/bin/ && \
-    rmdir docker && \
-    rm docker.tgz
-
-ENV GRADLE_USER_HOME "/home/${SERVICE_USER}/.gradle"
+    gpasswd -a ${SERVICE_USER} root
 
 USER ${SERVICE_USER}
+
+ENV GRADLE_USER_HOME "/home/${SERVICE_USER}/.gradle"
 
 RUN cd /home/${SERVICE_USER} && \
     source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && sdk install gradle ${GRADLE_VERSION}
 
 USER root
 
-VOLUME [ "/home/${NAMESPACE}/.gradle" "/workspace" ]
+VOLUME [ "/home/${SERVICE_USER}/.gradle" "/home/${SERVICE_USER}/workspace" ]
+WORKDIR /home/${SERVICE_USER}/workspace
 
 EXPOSE 8080
 

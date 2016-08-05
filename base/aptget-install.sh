@@ -68,13 +68,13 @@ function checkInput() {
 
   # Flags
   for _flag in ${_flags}; do
+    logTrace -n "Checking ${_flag}";
     _flagCount=$((_flagCount+1));
     case ${_flag} in
       -h | --help | -v | -vv | -q | -u | --update | -np | --no-pin)
          shift;
          ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
+      *) logTraceResult FAILURE "${_flag}";
          ;;
     esac
   done
@@ -110,6 +110,9 @@ function parseInput() {
           export NO_PIN=TRUE;
           shift
           ;;
+      *)
+          export EXTRA_ARGS="${EXTRA_ARGS} ${_flag}";
+          shift
     esac
   done
 
@@ -168,7 +171,7 @@ function install_package() {
   if [ $? -eq 0 ]; then
     logInfoResult SUCCESS "skipped";
   else
-    runCommandLongOutput "apt-get install -y --no-install-recommends ${_package}"
+    runCommandLongOutput "apt-get install -y ${EXTRA_ARGS} --no-install-recommends ${_package}"
     if [ $? -eq 0 ]; then
       echo "${_package}" >> ${INSTALLED_PACKAGES_FILE}
       logInfoResult SUCCESS "done";
