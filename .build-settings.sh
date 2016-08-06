@@ -1,0 +1,2 @@
+overrideEnvVar PHABRICATOR_DEFAULT_VIRTUAL_HOST "phabricator.osoco.es";
+overrideEnvVar PHABRICATOR_DB_PASSWORD 'abU0EXfi0QXtfL10TrlhhX0zMX7xpdadWkKM50ayTEkQYtAzhK';

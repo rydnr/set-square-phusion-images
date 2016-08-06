@@ -3,4 +3,4 @@ Base image for the tern server for code analysis of Javascript code.
 Examples:
 
 - Run this image to run tern:
-> docker run -it --rm -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" -v ${PWD}:/home/${SERVICE_USER}/workspace -v ~/.npmrc:~/.npmrc -v ~/.npm:~/.npm ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -it --rm -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" -v ${PWD}:/home/${SERVICE_USER}/workspace -v ~/.npmrc:~/.npmrc -v ~/.npm:~/.npm -p 36515:36515 ${NAMESPACE}/${IMAGE}:${TAG}

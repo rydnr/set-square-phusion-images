@@ -12,7 +12,6 @@ $SCRIPT_NAME [-h|--help]
 Runs Android-Studio under a user matching the specified userId:groupId.
 
 Where:
-  * package: the package(s) to install.
   * -d | --deviceId: The Android device to test with.
 Common flags:
     * -h | --help: Display this message.
@@ -131,9 +130,14 @@ function update_developer_account() {
   local _userId="${1}";
   local _groupId="${2}";
 
-  logInfo -n "Fixing /home/${SERVICE_USER} ownership to ${_userId}:${_groupId}";
-  chown ${_userId}:${_groupId} -R /home/${SERVICE_USER}
-  logInfoResult SUCCESS "done";
+  logInfo -n "Changing ${SERVICE_USER}'s uid to ${_userId}";
+  usermod -u ${_userId} ${SERVICE_USER};
+  if [ $? ]; then
+      logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_CHANGE_SERVICE_USER_UID "${_uid}";
+  fi
   logInfo -n "Updating ${SERVICE_USER} account to ${_userId}:${_groupId}";
   sed -i "s|^${SERVICE_USER}:.*$|${SERVICE_USER}:x:${_userId}:${_groupId}:${SERVICE_USER},,,:/home/${SERVICE_USER}:/bin/bash|g" /etc/passwd
   logInfoResult SUCCESS "done";
@@ -151,6 +155,21 @@ function main() {
 
   update_developer_account "${USER_ID}" "${GROUP_ID}";
 
+  _exports="$(export)";
+
+  cat << EOF > /tmp/runme
+#!/bin/bash
+
+${_exports}
+declare -x HOME="/home/${SERVICE_USER}"
+cd /data
+exec setuser ${SERVICE_USER} /opt/android-studio/bin/studio.sh
+EOF
+  chmod +x /tmp/runme
+
+
   exec 2>&1
+  chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
+
   exec setuser ${SERVICE_USER} /opt/android-studio/bin/studio.sh
 }

@@ -24,7 +24,7 @@ cat << EOF > /tmp/runme
 ${_exports}
 declare -x HOME="/home/${SERVICE_USER}"
 cd ${_folder}
-/usr/local/src/tern/bin/tern $*
+tern $*
 EOF
 chmod +x /tmp/runme
 
