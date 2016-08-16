@@ -1,0 +1,25 @@
+This image runs Calibre2Opds ${NEXUS_VERSION}
+
+Examples:
+- Default invocation:
+> docker run -p [host-port]:80 -v [calibre-library]:/backup/${IMAGE}/library --name ${IMAGE} ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Running behind nginx-proxy:
+> docker run -e VIRTUAL_HOST="${DEFAULT_VIRTUAL_HOST}  -v [calibre-library]:/backup/${IMAGE}/library --name ${IMAGE} ${NAMESPACE}/${IMAGE}:${TAG}
+
+# Backup
+
+The built-in backup mechanism copies regularly the contents of /backup/nexus-* and /backup/rsnapshot to a remote server ${IMAGE}{BACKUP_HOST_SUFFIX},
+which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT).
+
+## Preparation
+
+In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows:
+
+> docker run -d --name ${IMAGE}-backup -v [host-folder]/library:/backup/${IMAGE}/library -v [host-folder]/nexus/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+
+## Recovery
+
+The recovery process, once the original Calibre2Opds instance is shutdown, consists of:
+- Copying the contents of [host-folder]/library and [host-folder]/nexus/rsnapshot to the server where Calibre2Opds will run.
+- Launch a new container as defined in this document, binding the volumes of the container to the host folders.

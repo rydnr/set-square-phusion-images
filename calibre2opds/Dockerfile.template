@@ -1,0 +1,39 @@
+@include("preamble")
+FROM ${NAMESPACE}/apache:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="true" \
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
+    VIRTUAL_HOST="${CALIBRE2OPDS_DEFAULT_VIRTUAL_HOST}" \
+    VIRTUAL_PORT="${CALIBRE2OPDS_HTTP_PORT}" \
+    SERVICE_USER="${CALIBRE2OPDS_SERVICE_USER}" \
+    SERVICE_GROUP="${CALIBRE2OPDS_SERVICE_GROUP}"
+
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+COPY service /etc/service/${IMAGE}/run
+#COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
+RUN chmod +x /etc/service/${IMAGE}/run && \
+    useradd -r -u 200 -m -c "${IMAGE} role account" -d /home/${CALIBRE2OPDS_SERVICE_USER} -s /bin/false ${CALIBRE2OPDS_SERVICE_USER} && \
+    ${APTGET_INSTALL} --update openjdk && \
+    mkdir /home/${CALIBRE2OPDS_SERVICE_USER}/$(basename ${CALIBRE2OPDS_ARTIFACT}) && \
+    ln -s /home/${CALIBRE2OPDS_SERVICE_USER}/$(basename ${CALIBRE2OPDS_ARTIFACT}) /home/${CALIBRE2OPDS_SERVICE_USER}/calibre2opds && \
+    cd /home/${CALIBRE2OPDS_SERVICE_USER}/calibre2opds && \
+    wget -O ${CALIBRE2OPDS_ARTIFACT} ${CALIBRE2OPDS_DOWNLOAD_URL} && \
+    mkdir /home/${CALIBRE2OPDS_SERVICE_USER}/.calibre2opds && \
+    chown -R ${CALIBRE2OPDS_SERVICE_USER}:${CALIBRE2OPDS_SERVICE_GROUP} /home/${CALIBRE2OPDS_SERVICE_USER} && \
+    ${APTGET_CLEANUP}
+
+COPY default.profile.xml /home/${CALIBRE2OPDS_SERVICE_USER}/.calibre2opds/default.profile.xml
+
+VOLUME /backup/${IMAGE}-library
+VOLUME /backup/rsnapshot
+
+# Calibre http port
+EXPOSE ${CALIBRE_HTTP_PORT}
+
+@include("copy-metadata")
+@include("instructions")
+@include("symlinks")

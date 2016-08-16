@@ -1,0 +1,27 @@
+#!/bin/bash
+
+set -a
+
+_uid=$(stat -c '%u' /backup/${IMAGE}-library)
+_gid=$(stat -c '%g' /backup/${IMAGE}-library)
+
+usermod -u ${_uid} ${CALIBRE2OPDS_SERVICE_USER} > /dev/null 2>&1
+groupmod -g ${_gid} ${CALIBRE2OPDS_SERVICE_GROUP} > /dev/null 2>&1
+usermod -g ${_gid} ${CALIBRE2OPDS_SERVICE_USER} > /dev/null 2>&1
+
+_folder=/home/${CALIBRE2OPDS_SERVICE_USER}/calibre2opds
+_exports="$(export)";
+
+cat << EOF > /tmp/runme
+#!/bin/bash
+
+${_exports}
+declare -x HOME="/home/${CALIBRE2OPDS_SERVICE_USER}"
+cd ${_folder}
+java -jar ${CALIBRE2OPDS_JAR_FILE}
+EOF
+chmod +x /tmp/runme
+
+chpst -u ${CALIBRE2OPDS_SERVICE_USER}:${CALIBRE2OPDS_SERVICE_GROUP} -U ${CALIBRE2OPDS_SERVICE_USER}:${CALIBRE2OPDS_SERVICE_GROUP} /tmp/runme
+
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

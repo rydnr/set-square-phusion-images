@@ -4,3 +4,4 @@ postgresql   2223
 phabricator  2224
 nexus        2225
 rabbitmq     2226
+calibre2opds 2227
