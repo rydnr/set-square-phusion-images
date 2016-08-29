@@ -92,11 +92,11 @@ function chown_volume() {
     _single=1; # false, multiple
   fi
   if [ ${_single} -eq 0 ]; then
-    chown -R ${_user}:${_group} "${_aux}";
+    chown -R ${_user}:${_group} "${_volume}";
   else
     local _oldIFS="${IFS}";
     IFS='"';
-    for item in $(echo ${_aux} | tr -d '[],'); do
+    for item in $(echo ${_volume} | tr -d '[],'); do
       IFS="${_oldIFS}";
       chown -R ${_user}:${_group} "${item}";
     done

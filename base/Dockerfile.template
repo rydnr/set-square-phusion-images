@@ -10,7 +10,7 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 
 # /usr/local/bin
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
-     process-file.sh data ssh.sh \
+     process-file.sh data copy.sh ssh.sh \
      backup.sh backup-folder.sh backup-folder.inc.sh backup-volumes.sh backup-volumes.inc.sh \
      backup-rsnapshot.sh backup-rsnapshot.inc.sh \
      check-version.sh check-version.inc.sh run-as.sh \
