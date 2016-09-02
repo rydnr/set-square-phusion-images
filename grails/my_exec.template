@@ -4,33 +4,21 @@ _folder="/home/${SERVICE_USER}/workspace";
 
 _uid=$(stat -c '%u' /home/${SERVICE_USER}/workspace)
 _gid=$(stat -c '%g' /home/${SERVICE_USER}/workspace)
-_dockerGid=$(stat -c '%g' /run/docker.sock 2> /dev/null)
-if [ -n "${_dockerGid}" ]; then
-  _dockerGid=${_gid}
-fi
-_gradleGid=$(stat -c '%g' /home/${SERVICE_USER}/.gradle)
+_grailsGid=$(stat -c '%g' /home/${SERVICE_USER}/.grails)
 
 usermod -u ${_uid} ${SERVICE_USER} > /dev/null 2>&1
 groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
 usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
-
-for g in ${_gid} ${_dockerGid} ${_gradleGid}; do
-  gpasswd -a ${SERVICE_USER} ${g} > /dev/null 2>&1
-done
 
 # Splitting executable from arguments
 _cmd="${1}";
 shift
 _cmd="${_cmd} ${@}";
 
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}/.gradle &
-
-_exports="$(export)";
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}/.grails &
 
 touch /var/log/${IMAGE}.log
 chown ${SERVICE_USER}:${SERVICE_GROUP} /var/log/${IMAGE}.log
-
-_dockerHost="${DOCKER_HOST:-unix:///run/docker.sock}"
 
 _projectFolder="${_folder}"
 
@@ -38,12 +26,13 @@ if [ -n ${PROJECT_NAME} ]; then
   _projectFolder="${_folder}/${PROJECT_NAME}"
 fi
 
-mkdir -p "${_projectFolder}";
-
-_dockerApiVersion="${DOCKER_API_VERSION}"
-if [ -n "${_dockerApiVersion}" ]; then
-  _dockerApiVersion="-DAPI_VERSION=${_dockerApiVersion} -Dapi.version=${_dockerApiVersion}"
+if [ -n "${GRAILS_ENV}" ]; then
+  _grailsEnv="-Dgrails.env=${GRAILS_ENV}";
+else
+  _grailsEnv="";
 fi
+
+mkdir -p "${_projectFolder}";
 
 _exports="$(export)";
 
@@ -54,7 +43,7 @@ ${_exports}
 declare -x HOME="/home/${SERVICE_USER}"
 source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh
 cd ${_projectFolder}
-gradle -DDOCKER_HOST=${DOCKER_HOST} -DHOST_PROJECTDIR=${HOST_PROJECTDIR:-${_folder}} -DHOST_USERHOME=${HOST_USERHOME:-${HOME}} ${_dockerApiVersion} --gradle-user-home=/home/${SERVICE_USER}/.gradle ${_cmd}
+grails ${_grailsEnv} ${_cmd}
 EOF
 chmod +x /tmp/runme
 

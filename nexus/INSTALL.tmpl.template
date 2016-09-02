@@ -1,0 +1,38 @@
+# INSTALL
+
+This is a minimal guide to configure Nexus as private Docker repository.
+
+In the web interface, you'll need to create three groups: a proxy for Docker hub, a hosted group for in-house images, and a group containing them.
+
+To do so, assuming you have an nginx-proxy upfront (or the ${NEXUS_UI_HTTP_PORT} port is mapped to 80), first visit http://${VIRTUAL_HOST}. Then, login as admin/admin123.
+
+## Docker Hub
+
+- Go to Components (http://${VIRTUAL_HOST}/#admin/repository), select Repositories (http://${VIRTUAL_HOST}/#admin/repository/repositories), and click on "Create repository" button.
+- Create a new 'docker (proxy)'.
+- Use 'Docker-Hub.proxy' as name.
+- Specify https://registry-1.docker.io for the Remote storage URL.
+- Enable Docker V1 API support, if required by the remote repository.
+- Select "Use Docker Hub", or enter https://index.docker.io/ as the url of the Docker index if you choose "Custom index".
+- Select the default Blob store.
+- Click on "Create repository".
+
+### In-house images
+
+- Go to Components (http://${VIRTUAL_HOST}/#admin/repository), select Repositories (http://${VIRTUAL_HOST}/#admin/repository/repositories), and click on "Create repository" button.
+- Create a new 'docker (hosted)'.
+- Name it as '${NAMESPACE}.images'.
+- Enable the HTTPS connector.
+- Use ${NEXUS_DOCKER_REGISTRY_PORT} for the HTTPS connector.
+- Choose the default Blob store.
+- Click on "Create repository".
+
+### Repository Group
+
+- Create a new 'docker (group)',
+- Name it as 'Docker'.
+- Enable the HTTP connector.
+- Use ${NEXUS_DOCKER_GROUP_PORT} for the HTTP connector.
+- Choose the default Blob store.
+- Add '${NAMESPACE}.images' to the group.
+- Add 'Docker Hub proxy' to the group.

@@ -4,7 +4,12 @@ FROM ${NAMESPACE}/sdkman:${TAG}
 
 @include("addon-toggles")
 
-USER ${NAMESPACE}
+COPY my_exec /sbin/my_exec
+
+RUN chmod +x /sbin/my_exec && \
+    gpasswd -a ${SERVICE_USER} root
+
+USER ${SERVICE_USER}
 
 RUN cd /home/${NAMESPACE} && \
     source /home/${NAMESPACE}/.sdkman/bin/sdkman-init.sh && \
@@ -12,14 +17,11 @@ RUN cd /home/${NAMESPACE} && \
 
 USER root
 
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
-COPY service /etc/service/${IMAGE}/run
-RUN chmod +x /etc/service/${IMAGE}/run
-
-VOLUME /home/${NAMESPACE}/.grails
-VOLUME /home/${NAMESPACE}/work
+VOLUME [ "/home/${SERVICE_USER}/.grails" "/home/${SERVICE_USER}/workspace" ]
+WORKDIR /home/${SERVICE_USER}/workspace
 
 EXPOSE 8080
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

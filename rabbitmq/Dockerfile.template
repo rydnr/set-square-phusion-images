@@ -18,7 +18,11 @@ COPY service /etc/service/${IMAGE}/run
 # From official RabbitMQ Dockerfile: https://github.com/dockerfile/rabbitmq/blob/master/Dockerfile
 
 # Install RabbitMQ.
-RUN wget -O /usr/local/bin/rabbitmq-start https://github.com/dockerfile/rabbitmq/raw/master/bin/rabbitmq-start && \
+RUN (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
+    (/usr/sbin/groupadd docker 2> /dev/null || echo "Group docker already exists") && \
+    (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP},docker -s /bin/bash -c "Development user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
+    mkdir -p /home/${SERVICE_USER} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
     wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
     echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
     ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
@@ -29,7 +33,6 @@ RUN wget -O /usr/local/bin/rabbitmq-start https://github.com/dockerfile/rabbitmq
     ln -s /data/log /var/log/rabbitmq && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data && \
     echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config && \
-    chmod +x /usr/local/bin/rabbitmq-start && \
     mkdir -p /backup/${IMAGE}/data/mnesia && \
     ${APTGET_CLEANUP}
 

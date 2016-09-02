@@ -23,6 +23,7 @@ RUN groupadd ${SERVICE_GROUP} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lock/tomcat /var/run/tomcat /var/log/tomcat ${TOMCAT_HOME} /opt/${TOMCAT_FOLDER} && \
     rm -f /opt/${TOMCAT_FILE} && \
     chmod +x /etc/service/${IMAGE}/run && \
+    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' /opt/tomcat/conf/context.xml && \
     ${APTGET_INSTALL} -np make gcc openssl libssl-dev && \
     cd /usr/local/src && wget -O ${APR_FILE} ${APR_DOWNLOAD_URL} && \
     tar xvfz ${APR_FILE} && cd ${APR_FOLDER} && \

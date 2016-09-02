@@ -21,6 +21,7 @@ chmod 0755 /var/local
 chmod 775 /backup/phabricator-local/
 
 /usr/local/bin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
+sed -i "s/^Listen 80$/Listen ${VIRTUAL_PORT}/g" /etc/apache2/ports.conf
 
 /usr/sbin/sshd -f /var/local/sshd_config.phabricator
 

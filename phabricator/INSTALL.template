@@ -1,0 +1,41 @@
+# Installation
+
+Phabricator is composed of two containers: a MariaDB/MySQL instance, and the Phabricator application itself.
+Once the database contains the Phabricator schema and objects, running Phabricator means just starting both containers.
+
+The steps to install the Phabricator database into the MariaDB instance are described below.
+
+## Retrieve the required DDL scripts
+
+From now on, we assume ${sqlFolder} is the folder we'll use to store and manage the DDL files required by Phabricator.
+
+> mkdir -p ${sqlFolder}
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} create-db-user > ${sqlFolder}/1-user.sql
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} change-db-password > ${sqlFolder}/2-password.sql
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} db-grants > ${sqlFolder}/3-grants.sql
+> docker run -it ${NAMESPACE}/${IMAGE}:${TAG} sql > ${sqlFolder}/4-phabricator.sql
+
+## Tuning MySQL/MariaDB
+
+Phabricator suggests some tuning at the database level. Here, we'll use ${confFolder} to store the
+configuration files provided by Phabricator.
+
+> mkdir -p ${confFolder}
+> docker run -it -v ${confFolder}:/tmp/conf ${NAMESPACE}/${IMAGE}:${TAG} copy /var/local/conf.d /tmp/conf
+
+## Setting up the MariaDB/MySQL database
+
+> docker run -d --name phabricatordb -v ${confFolder}:/var/local/conf.d ${NAMESPACE}/mariadb:${TAG}
+> docker run -it --link phabricatordb:db -v ${sqlFolder}:/sql ${NAMESPACE}/mariadb-bootstrap:${TAG} -u $(docker exec -it phabricatordb bash -c 'echo ${MARIADB_ADMIN_USER}') -p $(docker exec -it phabricatordb bash -c '${MARIADB_ADMIN_PASSWORD})
+
+## Launching Phabricator application
+
+At this point, launch Phabricator to check it works fine with no database warnings.
+
+> docker run -d --name phabricatordb --link phabricatordb:db -p 8000:8000 ${NAMESPACE}/${IMAGE}:${TAG}
+
+Since Phabricator needs to be serving a valid host name, we'll need to temporarily add an entry to our /etc/hosts:
+
+  127.0.0.1 ${PHABRICATOR_VIRTUAL_HOST}
+
+We can now visit http://localhost:8000 and register the administrator account.

@@ -11,10 +11,12 @@ RUN chmod +x /sbin/my_exec && \
 
 USER ${SERVICE_USER}
 
-ENV GRADLE_USER_HOME "/home/${SERVICE_USER}/.gradle"
+ENV GRADLE_USER_HOME="/home/${SERVICE_USER}/.gradle" \
+    DOCKER_API_VERSION="${DOCKER_API_VERSION}"
 
 RUN cd /home/${SERVICE_USER} && \
-    source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && sdk install gradle ${GRADLE_VERSION}
+    source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \
+    sdk install gradle ${GRADLE_VERSION}
 
 USER root
 

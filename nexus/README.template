@@ -28,6 +28,37 @@ In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as 
 
 > docker run -d --name ${IMAGE}-backup -v [host-folder]/nexus/blobs:/backup/nexus-blobs -v [host-folder]/nexus/conf:/backup/nexus-conf -v [host-folder]/nexus/db:/backup/nexus-db -v [host-folder]/nexus/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
 
+## Configuration
+
+In the web interface, you'll need to create three groups: a proxy for Docker hub, a hosted group for in-house images, and a group containing them.
+
+To do so, assuming you have an nginx-proxy upfront (or the ${NEXUS_UI_HTTP_PORT} port is mapped to 80), first visit http://${VIRTUAL_HOST}. Then, login as admin/admin123.
+
+Go to Components.
+
+### Docker Hub
+
+- Create a new 'docker (proxy)'.
+- Use 'Docker Hub proxy' as name.
+- Specify https://registry-1.docker.io for the Remote storage URL.
+- Enable Docker V1 API support, if required by the remote repository.
+- Enter https://index.docker.io/ as the url of the Docker index.
+- Select Blob store for Storage
+
+### In-house images
+
+- Create a new 'docker (hosted)'.
+- Name it as '${NAMESPACE} images'.
+- Choose the Blob store.
+
+### Repository Group
+
+- Create a new 'docker (group)',
+- Name it as 'Docker'.
+- Choose the Blob store to use.
+- Add '${Namespace} images' to the group.
+- Add 'Docker Hub proxy' to the group.
+
 ## Recovery
 
 The recovery process, once the original Nexus instance is shutdown, consists of:

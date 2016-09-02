@@ -73,7 +73,10 @@ RUN    cd /var/jenkins_home/plugins/ && \
     su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && yes | sdk i ant ${ANT_DEFAULT_VERSION} && for p in ${ANT_VERSIONS}; do yes no | sdk i ant \${p}; done"  && \
     su - jenkins -c "/usr/local/bin/generate-jenkins-plugin-configs.sh nodejs" && \
     echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> /opt/tomcat/bin/setenv.sh  && \
-    ${APTGET_CLEANUP}
+    ${APTGET_CLEANUP} && \
+    mkdir -p /backup/rsnapshot && \
+    cd /var/jenkins_home/plugins && \
+    wget -o /dev/null ${SWARM_CLIENT_DOWNLOAD_URL}
 
 ADD init.groovy.d/ /var/jenkins_home/init.groovy.d/
 

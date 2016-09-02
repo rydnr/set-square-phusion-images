@@ -5,6 +5,9 @@ defineEnvVar TOMCAT_VERSION \
              "The version of the Apache Tomcat server" \
              "8.5.4" \
              'curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/ | grep folder.gif | tail -n 1 | cut -d ">" -f 3 | cut -d "/" -f 1 | sed "s_^v__g"';
+defineEnvVar TOMCAT_CACHE_MAX_SIZE \
+             "The maximum size of the static resource cache in kilobytes" \
+             "10000";
 defineEnvVar APR_VERSION \
              "The version of Apache Portable Runtime" \
              "1.5.2";

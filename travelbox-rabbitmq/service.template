@@ -1,18 +1,15 @@
 #!/bin/bash
 
-rsync -az /backup/${IMAGE}/data/ /data/ > /dev/null
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data
-
 _exports="$(export)";
 
 cat << EOF > /tmp/runme
 #!/bin/bash
 
 ${_exports}
-declare -x HOME="/home/${SERVICE_USER}"
 export PATH=/usr/sbin:${PATH}
-ulimit -n 1024
-rabbitmq-server $@
+/usr/local/bin/rabbitmq-start &
+/usr/local/bin/bootstrap.sh
+fg %1
 EOF
 chmod +x /tmp/runme
 

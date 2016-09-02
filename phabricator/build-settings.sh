@@ -1,4 +1,5 @@
 defineEnvVar PHABRICATOR_VIRTUAL_HOST "The virtual host of the Phabricator installation" "phabricator.${DOMAIN}";
+defineEnvVar PHABRICATOR_PORT "The port used by Phabricator" "8000";
 defineEnvVar PHABRICATOR_DB_NAME "The database name" "phabricator";
 defineEnvVar PHABRICATOR_DB_USER "The database user" "phabricator";
 defineEnvVar PHABRICATOR_DB_PASSWORD "The database password" '${RANDOM_PASSWORD}';

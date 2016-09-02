@@ -121,10 +121,12 @@ function parseInput() {
 
   if [ -z "${ORIGIN}" ]; then
     ORIGIN="${1}";
+    shift;
   fi
 
   if [ -z "${DESTINATION}" ]; then
     DESTINATION="${1}";
+    shift;
   fi
 
   logDebugResult SUCCESS "valid";
@@ -154,30 +156,59 @@ function retrieve_group_id() {
   export RESULT="${_result}";
 }
 
-## Copies a folder.
-## -> 1: The user.
-## -> 2: The group.
-## -> 3: The origin folder.
-## -> 4: The destination folder.
+## Copies the contents of a folder into another.
+## -> 1: The origin folder.
+## -> 2: The destination folder.
 ## Example:
 ##   copy_folder mysql mysql /var/local/mysql/conf.d /tmp/conf.d
 function copy_folder() {
-  local _user="${1}";
-  local _group="${2}";
-  local _origin="${3}";
-  local _destination="${4}";
-  local _single=0;
-  rsync -az "${_origin}"/ "${_destination}"/ > /dev/null
-  chown -R ${_user}:${_group} "${_destination}"/* > /dev/null;
+  local _origin="${1}";
+  local _destination="${2}";
+  local _rescode;
+
+  logInfo -n "Copying the contents of ${_origin} into ${_destination}";
+  rsync -az "${_origin}"/ "${_destination}"/ > /dev/null;
+  _rescode=$?;
+  if [ ${_rescode} -eq ${TRUE} ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+  fi
+
+  return ${_rescode};
+}
+
+## Preserves the permissions of given folder.
+## -> 1: The folder.
+## <- 0: if the permissions were restored successfully; 1 otherwise.
+## Example:
+##   if preserve_pemissions "/tmp"; then
+##     ...
+##   fi
+function preserve_permissions() {
+  local _folder="${1}";
+  local _rescode;
+
+  retrieve_user_id "${_folder}";
+  local _userId="${RESULT}";
+  retrieve_group_id "${_folder}";
+  local _groupId="${RESULT}";
+
+  logInfo -n "Restoring permissions of ${_folder}/* to ${_userId}:${_groupId}";
+  chown -R ${_userId}:${_groupId} "${_folder}"/* > /dev/null;
+  _rescode=$?;
+  if [ ${_rescode} -eq ${TRUE} ]; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+  fi
+
+  return ${_rescode};
 }
 
 ## Main logic
 ## dry-wit hook
 function main() {
-  retrieve_user_id "${DESTINATION}";
-  local _userId="${RESULT}";
-  retrieve_group_id "${DESTINATION}";
-  local _groupId="${RESULT}";
-
-  copy_folder "${_userId}" "${_groupId}" "${ORIGIN}" "${DESTINATION}";
+  copy_folder "${ORIGIN}" "${DESTINATION}";
+  preserve_permissions "${DESTINATION}";
 }

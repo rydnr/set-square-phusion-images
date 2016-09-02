@@ -239,7 +239,7 @@ function find_sql_files() {
   local _result=();
 
   for _aux in $(ls -a "${_folder}" | grep -v '^\..*$'); do
-    if is_sql_file_marked_as_processed "${_folder}" "${_aux}"; then
+    if ! is_sql_file_marked_as_processed "${_folder}" "${_aux}"; then
       _result[${#_result[@]}]="${_aux}";
     fi
   done

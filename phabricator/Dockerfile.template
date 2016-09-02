@@ -7,11 +7,12 @@ FROM ${NAMESPACE}/apache:${TAG}
 RUN mv /etc/service/apache/run /etc/service/apache/run-apache
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/apache/run
-COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper \
+COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper help.sh \
      /usr/local/bin/
 COPY phabricator-ssh-hook.sh sshd_config.phabricator /var/local/
 COPY phabricator-ssh.sudo /etc/sudoers.d/phabricator-ssh
 COPY phabricator-http.sudo /etc/sudoers.d/phabricator-http
+COPY INSTALL /
 
 ADD conf.d /var/local/conf.d
 
@@ -47,7 +48,6 @@ RUN ${APTGET_INSTALL} \
     ln -s /backup/${IMAGE}-repo /var/repo && \
     ln -s /backup/${IMAGE}-local /var/local/phabricator && \
     chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} /var/local/phabricator /var/repo && \
-    sed -i 's/^Listen 80$/Listen 8000/g' /etc/apache2/ports.conf && \
     sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php5/apache2/php.ini && \
     sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php5/apache2/php.ini && \
     pip install pygments && \
@@ -111,7 +111,9 @@ RUN ${APTGET_INSTALL} \
     done && \
     for s in /opt/arcanist/bin/*; do \
       ln -s /usr/local/bin/arcanist-wrapper /usr/local/bin/$(basename $s); \
-    done
+    done && \
+    rm -f /usr/local/bin/help.sh && \
+    ln -s /usr/local/bin/help.phabricator.sh /usr/local/bin/help.sh
 
 # Phabricator HTTP UI
 EXPOSE 8000

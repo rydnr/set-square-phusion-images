@@ -6,7 +6,7 @@ Examples:
 > docker run -p [port]:8000 -p 22:22 --link [db-container]:db -e VIRTUAL_HOST=${PHABRICATOR_VIRTUAL_HOST} --add-host ${SMTP_HOST}:${SMTP_HOST} --volumes-from [data-container]  --link [loghost]:logger ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Run arcanist:
-> docker run --name arc -v ${PWD}:/arc arc
+> docker run --name arc -v ${PWD}:/arc ${NAMESPACE}/${IMAGE}:${TAG} arc
 
 - Run Phabricator to retrieve the required SQL to bootstrap it.
 
