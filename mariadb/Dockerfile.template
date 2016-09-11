@@ -24,7 +24,8 @@ COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh 
 #RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
 #RUN add-apt-repository \'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
 #RUN apt-get install software-properties-common
-RUN mkdir -p /backup/${IMAGE}-db && \
+RUN ([ ! -d /backup ] && rm -f /backup) && \
+    mkdir -p /backup/${IMAGE}-db && \
     ${APTGET_INSTALL} --update mariadb-server bc && \
     sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/my.cnf && \
     sed -i -e"s/^log_error/#log_error/" /etc/mysql/my.cnf && \

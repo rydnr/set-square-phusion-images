@@ -1,7 +1,6 @@
 #!/bin/bash
 
-rsync -az /backup/${IMAGE}/data/ /data/ > /dev/null
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data /backup
 
 _exports="$(export)";
 
@@ -11,8 +10,8 @@ cat << EOF > /tmp/runme
 ${_exports}
 declare -x HOME="/home/${SERVICE_USER}"
 export PATH=/usr/sbin:${PATH}
-ulimit -n 1024
-rabbitmq-server $@
+ulimit -n ${RABBITMQ_ULIMIT_N}
+rabbitmq-server \$@
 EOF
 chmod +x /tmp/runme
 

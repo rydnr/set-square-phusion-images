@@ -12,6 +12,6 @@ RUN chmod +x /usr/local/bin/* && \
       fi; \
     done; \
     for p in /usr/local/bin/*.sh; do \
-      if [ "${p%.inc.sh}" == "${p}" ]; then ln -sf $p $(basename $p .sh); fi; \
+      if [ "${p%.inc.sh}" == "${p}" ]; then ln -sf $p $(dirname $p)/$(basename $p .sh); fi; \
     done && \
     ln -sf /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG} /Dockerfiles/Dockerfile

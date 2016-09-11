@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/apache:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/apache:${TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -7,12 +7,12 @@ FROM ${NAMESPACE}/apache:${TAG}
 RUN mv /etc/service/apache/run /etc/service/apache/run-apache
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/apache/run
-COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper help.sh \
+COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper help.phabricator.sh \
      /usr/local/bin/
 COPY phabricator-ssh-hook.sh sshd_config.phabricator /var/local/
 COPY phabricator-ssh.sudo /etc/sudoers.d/phabricator-ssh
 COPY phabricator-http.sudo /etc/sudoers.d/phabricator-http
-COPY INSTALL /
+COPY INSTALL /INSTALL
 
 ADD conf.d /var/local/conf.d
 
@@ -29,8 +29,6 @@ RUN ${APTGET_INSTALL} \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     mysql_install_db && \
-    service mysql start && \
-    mysqladmin -u root password 'secret' && \
     chmod +x /etc/service/apache/run && \
     mkdir /usr/local/share/liquibase && \
     cd /opt && \
@@ -54,19 +52,22 @@ RUN ${APTGET_INSTALL} \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user && \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git && \
     sed -i 's/^git:!:\(.*\)/git:*:\1/' /etc/shadow && \
+    service mysql start && \
+    sleep 5 && \
     cd /opt/phabricator && \
-    bin/config set phd.user daemon-user && \
-    bin/config set diffusion.ssh-user git && \
-    bin/config set diffusion.allow-http-auth true && \
-    bin/config set mysql.host localhost && \
-    bin/config set mysql.user root && \
-    bin/config set mysql.pass secret && \
     bin/config set pygments.enabled true && \
     bin/config set metamta.default-address ${PHABRICATOR_FROM_ADDRESS} && \
     bin/config set metamta.domain ${DOMAIN} && \
     bin/config set phabricator.timezone ${DEFAULT_TIMEZONE} && \
     bin/config set config.ignore-issues '{ "security.security.alternate-file-domain": true }' && \
     bin/config set environment.append-paths '["/usr/lib/git-core"]' && \
+    bin/config set phd.user daemon-user && \
+    bin/config set diffusion.ssh-user git && \
+    bin/config set diffusion.allow-http-auth true && \
+    bin/config set mysql.host localhost && \
+    bin/config set mysql.user root && \
+    bin/config set mysql.pass secret && \
+    mysqladmin -u root password 'secret' && \
     bin/storage upgrade --force && \
     bin/config set storage.local-disk.path /var/local/phabricator && \
     chmod 755 /var/local/phabricator-ssh-hook.sh && \
@@ -85,6 +86,7 @@ RUN ${APTGET_INSTALL} \
     for f in /opt/phabricator/bin/*; do ln -s phabricator-cli $(basename ${f}); done && \
     mkdir -p /usr/local/share/liquibase && \
     mkdir -p /usr/local/share/sql && \
+    echo "before sql" && \
     echo "select schema_name from information_schema.schemata where schema_name like 'phabricator_%'" | mysql -N -u root --password=secret >> /usr/local/share/liquibase/phabricator-schemas.txt && \
     mkdir /opt/liquibase-${LIQUIBASE_VERSION} && \
     cd /opt && \

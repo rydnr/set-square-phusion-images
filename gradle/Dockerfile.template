@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/sdkman:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/sdkman:${TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -12,7 +12,7 @@ RUN chmod +x /sbin/my_exec && \
 USER ${SERVICE_USER}
 
 ENV GRADLE_USER_HOME="/home/${SERVICE_USER}/.gradle" \
-    DOCKER_API_VERSION="${DOCKER_API_VERSION}"
+    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
 
 RUN cd /home/${SERVICE_USER} && \
     source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \

@@ -1,0 +1,5 @@
+This image runs PHPPGADMIN.
+It expects the database to be accessible through a container.
+
+Examples:
+> docker run -it -p [port]:80 --link [db-container]:db ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

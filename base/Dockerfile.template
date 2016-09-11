@@ -47,8 +47,9 @@ RUN mkdir -p /etc/my_exec.d && \
     mkdir -p /etc/service/sshd/log && \
     mkdir -p /etc/service/postfix/log && \
     touch /var/local/docker-installed-packages.txt && \
-    chmod +x /usr/local/bin/*.sh
-    #echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab
+    chmod +x /usr/local/bin/*.sh && \
+    mkdir /etc/cron.now && \
+    echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab
 
 COPY logger /etc/service/.template/log/run
 COPY service.cron /etc/service/cron/run
@@ -62,10 +63,10 @@ RUN mkdir /Dockerfiles && \
     ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot postfix sasl2-bin opendkim opendkim-tools && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
-    chmod +x -- /usr/local/bin/help /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \
+    chmod +x -- /usr/local/bin/help.base.sh /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \
     ln -s -- /usr/local/bin/display-dockerfile.sh /usr/local/bin/Dockerfile && \
-    ln -s -- /usr/local/bin/help /usr/local/bin/-h && \
-    ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
+    ln -s -- /usr/local/bin/help.base.sh /usr/local/bin/-h && \
+    ln -s -- /usr/local/bin/help.base.sh /usr/local/bin/--help && \
     ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile && \
     ln -s -- /usr/local/bin/backup.sh /usr/local/bin/backup && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-public && \

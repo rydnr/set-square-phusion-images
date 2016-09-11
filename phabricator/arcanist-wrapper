@@ -1,35 +1,8 @@
 #!/bin/bash
 
-_folder="/arc";
-
-_USER="git";
-_GROUP="www-data";
-
-_uid=$(stat -c '%u' ${_folder})
-_gid=$(stat -c '%g' ${_folder})
-
-usermod -u ${_uid} ${_USER} > /dev/null 2>&1
-groupmod -g ${_gid} ${_GROUP} > /dev/null 2>&1
-usermod -g ${_gid} ${_USER} > /dev/null 2>&1
-
 # executable
 _exec="$(basename $0)";
 _args="${@}";
 
-_exports="$(export)";
-
-touch /var/log/${IMAGE}.log
-chown ${SERVICE_USER}:${SERVICE_GROUP} /var/log/${IMAGE}.log
-
-cat << EOF > /tmp/runme
-#!/bin/bash
-
-${_exports}
-declare -x HOME="/opt/phabricator"
-cd ${_folder}
-/opt/arcanist/bin/${_exec} ${_args}
-EOF
-chmod +x /tmp/runme
-
-chpst -u ${_uid}:${_gid} -U ${_uid}:${_gid} /tmp/runme
+/usr/local/bin/run-as.sh /arc /opt/arcanist/bin/${_exec} ${_args}
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet

@@ -83,3 +83,5 @@ phabricator/bootstrap
 phabricator/service
 phabricator/apache-vhost.conf
 .templates/addon-toggles
+*
+*/*

@@ -40,9 +40,9 @@ fi
 
 mkdir -p "${_projectFolder}";
 
-_dockerApiVersion="${DOCKER_API_VERSION}"
+_dockerApiVersion="${DOCKER_API_VERSION:-${DEFAULT_DOCKER_API_VERSION}}"
 if [ -n "${_dockerApiVersion}" ]; then
-  _dockerApiVersion="-DAPI_VERSION=${_dockerApiVersion} -Dapi.version=${_dockerApiVersion}"
+  _dockerApiVersion="-DAPI_VERSION=${_dockerApiVersion} -Dapi.version=${_dockerApiVersion} -DDOCKER_API_VERSION=${_dockerApiVersion}"
 fi
 
 _exports="$(export)";

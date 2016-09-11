@@ -1,0 +1,25 @@
+@include("preamble")
+FROM ${NAMESPACE}/apache:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+COPY apache-vhost.conf /etc/apache2/sites-available/phppgadmin.conf
+
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    ${APTGET_INSTALL} postgresql-client-${POSTGRESQL_VERSION} phppgadmin && \
+    ${APTGET_CLEANUP} && \
+    rm -rf /etc/apache2/conf.d && \
+    a2ensite phppgadmin && \
+    a2dissite 000-default && \
+    sed -i "s|\$conf\['extra_login_security'\] = true|\$conf['extra_login_security'] = false|g" /usr/share/phppgadmin/conf/config.inc.php && \
+    sed -i "s|\$conf\['servers'\]\[0\]\['desc'\] = 'PostgreSQL'|\$conf['servers'][0]['desc'] = 'PostgreSQL@db'|g" /usr/share/phppgadmin/conf/config.inc.php && \
+    sed -i "s|\$conf\['servers'\]\[0\]\['host'\] = 'localhost'|\$conf['servers'][0]['host'] = 'db'|g" /usr/share/phppgadmin/conf/config.inc.php && \
+    ${APTGET_CLEANUP}
+
+EXPOSE 80
+
+@include("copy-metadata")
+@include("instructions")
+@include("symlinks")

@@ -74,7 +74,6 @@ function parseInput() {
     esac
   done
 }
-
 ## Changes the ownership of a Docker volume.
 ## -> 1: The user.
 ## -> 2: The group.
@@ -86,20 +85,25 @@ function chown_volume() {
   local _group="${2}";
   local _volume="${3}";
   local _single=0;
+  local _item;
+
   if [ "${_volume#[}" == "${_volume}" ]; then
-    _single=0; # true, single
+      _single=0; # true, single
   else
     _single=1; # false, multiple
   fi
+
   if [ ${_single} -eq 0 ]; then
-    chown -R ${_user}:${_group} "${_volume}";
+      _volume="$(echo ${_volume} | sed 's ^"  g' | sed 's "$  g')";
+      chown -R ${_user}:${_group} "${_volume}";
   else
     local _oldIFS="${IFS}";
     IFS='"';
-    for item in $(echo ${_volume} | tr -d '[],'); do
-      IFS="${_oldIFS}";
-      chown -R ${_user}:${_group} "${item}";
+    for _item in $(echo ${_volume} | tr -d '[],'); do
+      _item="$(echo ${_item} | sed 's ^"  g' | sed 's "$  g')";
+      chown -R ${_user}:${_group} "${_item}";
     done
+    IFS="${_oldIFS}";
   fi
 }
 
@@ -114,17 +118,24 @@ function process_volumes() {
   local _group="${2}";
   local _dockerfile="${3}";
   local _aux;
-  local _single;
+  local _item;
+  local _volumes;
+
   grep -e '^\s*VOLUME\s' "${_dockerfile}" > /dev/null 2>&1
   if [ $? -eq 0 ]; then
-    local _oldIFS="${IFS}";
-    IFS=$'\n';
-    for _aux in $(grep -e '^\s*VOLUME\s' "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
+      local _oldIFS="${IFS}";
+      IFS=$'\n';
+      _volumes="$(grep -e '^\s*VOLUME\s' "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g')";
+      _volumes="$(echo ${_volumes} | tr -d '[' | tr -d ']')";
+      for _aux in ${_volumes}; do
+        IFS=$' ';
+        for _entry in ${_aux}; do
+          logInfo -n "Changing the ownership of ${_entry} to ${_user}/${_group} (from ${DOCKERFILES_LOCATION}/${p})";
+          chown_volume "${_user}" "${_group}" "${_entry}";
+          logInfoResult SUCCESS "done";
+        done
+      done
       IFS="${_oldIFS}";
-      logInfo -n "Changing the ownership of ${_aux} to ${_user}/${_group} (from ${DOCKERFILES_LOCATION}/${p})";
-      chown_volume "${_user}" "${_group}" "${_aux}";
-      logInfoResult SUCCESS "done";
-    done
   fi
 }
 

@@ -7,9 +7,11 @@ FROM ${BASE_IMAGE}:${TAG}
 ENV DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
     SERVICE_USER="${SERVICE_USER}" \
-    SERVICE_GROUP="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_GROUP}" \
     RABBITMQ_LOG_BASE=/data/log \
-    RABBITMQ_MNESIA_BASE=/data/mnesia
+    LOG_BASE=/data/log \
+    RABBITMQ_MNESIA_BASE=/backup/${IMAGE}/data/mnesia \
+    MNESIA_BASE=/backup/${IMAGE}/data/mnesia
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -22,23 +24,23 @@ RUN (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_G
     (/usr/sbin/groupadd docker 2> /dev/null || echo "Group docker already exists") && \
     (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP},docker -s /bin/bash -c "Development user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
     mkdir -p /home/${SERVICE_USER} && \
+    mkdir -p /backup/${IMAGE}/data /data && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
     wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
     echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
     ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
     rabbitmq-plugins enable rabbitmq_management && \
-    mv /var/lib/rabbitmq /data && \
-    ln -s /data /var/lib/rabbitmq && \
+    mv /var/lib/rabbitmq/mnesia /backup/${IMAGE}/data && \
+    ln -s /backup/${IMAGE}/data/mnesia /var/lib/rabbitmq/mnesia && \
+    ln -s /backup/${IMAGE}/data/mnesia /data/mnesia && \
     mv /var/log/rabbitmq /data/log && \
     ln -s /data/log /var/log/rabbitmq && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data && \
     echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config && \
-    mkdir -p /backup/${IMAGE}/data/mnesia && \
     ${APTGET_CLEANUP}
 
 # Expose ports.
-EXPOSE 5672
-EXPOSE 15672
+EXPOSE 5672 15672 5671 5672 5671 4369 25672 1883 8883 61613 61614
 
 # Define mount points.
 VOLUME ["/backup/${IMAGE}/data/mnesia"]

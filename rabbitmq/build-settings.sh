@@ -4,5 +4,6 @@ defineEnvVar RABBITMQ_EXCHANGE "The RabbitMQ exchange" '${NAMESPACE}';
 defineEnvVar RABBITMQ_VIRTUALHOST "The RabbitMQ virtual host" '${NAMESPACE}';
 defineEnvVar RABBITMQ_QUEUE "The queue in RabbitMQ" "exchange@queue";
 defineEnvVar RABBITMQ_ROUTING_KEY "The RabbitMQ routing queue" "#";
+defineEnvVar RABBITMQ_ULIMIT_N "The ulimit -n value to use when launching RabbitMQ" "1024";
 defineEnvVar SERVICE_USER "The service user" '${RABBITMQ_USER}';
 defineEnvVar SERVICE_GROUP "The service group" '${SERVICE_USER}';

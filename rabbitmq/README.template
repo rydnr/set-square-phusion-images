@@ -4,5 +4,8 @@ Examples:
 - Run RabbitMQ with default settings:
 > docker run -d -p [port]:5672 -p [port]:15672 --name mq ${NAMESPACE}/${IMAGE}:${TAG}
 
+- Run RabbitMQ defining an explicit nodename:
+> docker run -d -p [port]:5672 -p [port]:15672 --name mq -e NODENAME="rabbit@cluster1" ${NAMESPACE}/${IMAGE}:${TAG}
+
 - Run RabbitMQ redirecting logs to an external service:
 > docker run -d -p [port]:5672 -p [port]:15672 --name mq --link [loghost]:loghost ${NAMESPACE}/${IMAGE}:${TAG}

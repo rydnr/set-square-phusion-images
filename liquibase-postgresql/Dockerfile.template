@@ -12,3 +12,4 @@ RUN cd /opt/liquibase/lib && \
 
 @include("copy-metadata")
 @include("instructions")
+@include("symlinks")
