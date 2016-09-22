@@ -8,4 +8,5 @@ defineEnvVar BOUNCY_CASTLE_ARTIFACT \
 defineEnvVar BOUNCY_CASTLE_DOWNLOAD_URL \
              "The Bouncy Castle download URL" \
              'http://www.bouncycastle.org/download/${BOUNCY_CASTLE_ARTIFACT}';
+defineEnvVar LOGSTASH_VERSION "The Logstash version" "2.2";
 overrideEnvVar ENABLE_LOGSTASH true;

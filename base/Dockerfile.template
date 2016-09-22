@@ -28,11 +28,12 @@ COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
      31_create_monit_http_conf.sh 31_create_monit_http_conf.inc.sh \
      32_create_monit_port_check.sh 32_create_monit_port_check.inc.sh \
      33_create_monit_mail_conf.sh 33_create_monit_mail_conf.inc.sh \
+     34_change_dockersock_permissions.sh 34_change_dockersock_permissions.inc.sh \
      /etc/my_init.d/
 
 # /etc/my_exec.d
 COPY my_exec.d/cron my_exec.d/help my_exec.d/monit my_exec.d/rsnapshot \
-     my_exec.d/syslog my_exec.d/ssh my_exec.d/postfix \
+     my_exec.d/syslog my_exec.d/ssh my_exec.d/postfix my_exec.d/ntp \
      /etc/my_exec.d/
 
 COPY my_exec /sbin/my_exec
@@ -41,11 +42,9 @@ COPY rsnapshot.weekly /etc/cron.weekly/rsnapshot.weekly
 COPY rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
 
 RUN mkdir -p /etc/my_exec.d && \
-    mkdir -p /etc/service/.template/log && \
-    mkdir -p /etc/service/monit/log && \
-    mkdir -p /etc/service/cron/log && \
-    mkdir -p /etc/service/sshd/log && \
-    mkdir -p /etc/service/postfix/log && \
+    for s in .template monit cron sshd postfix ntpd; do \
+      mkdir -p /etc/service/${s}/log; \
+    done && \
     touch /var/local/docker-installed-packages.txt && \
     chmod +x /usr/local/bin/*.sh && \
     mkdir /etc/cron.now && \
@@ -55,12 +54,25 @@ COPY logger /etc/service/.template/log/run
 COPY service.cron /etc/service/cron/run
 COPY service.monit /etc/service/monit/run
 COPY service.postfix /etc/service/postfix/run
+COPY service.ntpd /etc/service/ntpd/run
 
 RUN mkdir /Dockerfiles && \
     /usr/sbin/usermod -d /backup backup && \
+    /usr/sbin/groupadd ${DOCKER_GROUP} && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
     ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes && \
-    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot postfix sasl2-bin opendkim opendkim-tools && \
+    echo "${ISO639_1_LANGUAGE_CODE}_${ISO3166_COUNTRY_CODE}.${ENCODING} ${ENCODING}" > /etc/locale.gen && \
+    rm -f /var/lib/locales/supported.d/* && \
+    echo "${ISO639_1_LANGUAGE_CODE}_${ISO3166_COUNTRY_CODE}.${ENCODING} ${ENCODING}" > /var/lib/locales/supported.d/${ISO639_1_LANGUAGE_CODE} && \
+    echo 'LANG="${ISO639_1_LANGUAGE_CODE}_${ISO3166_COUNTRY_CODE}"' > /etc/default/locale && \
+    echo 'LANGUAGE="${ISO639_1_LANGUAGE_CODE}_${ISO3166_COUNTRY_CODE}:${ISO639_1_LANGUAGE_CODE}"' > /etc/default/locale && \
+    rm -rf /usr/lib/locale/* && \
+    echo 'export LC_ALL="${ISO639_1_LANGUAGE_CODE}_${ISO3166_COUNTRY_CODE}.${ENCODING}"' >> /etc/bash.bashrc && \
+    echo 'export LC_CTYPE="${ISO639_1_LANGUAGE_CODE}_${ISO3166_COUNTRY_CODE}.${ENCODING}"' >> /etc/bash.bashrc && \
+    locale-gen && \
+    rm -f /etc/localtime && \
+    ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
+    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot postfix sasl2-bin opendkim opendkim-tools language-pack-${ISO639_1_LANGUAGE_CODE}-base localepurge ntp && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
     chmod +x -- /usr/local/bin/help.base.sh /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \
@@ -72,7 +84,7 @@ RUN mkdir /Dockerfiles && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-public && \
     ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-private && \
     ln -s -- /backup/rsnapshot /var/cache/rsnapshot && \
-    for s in cron monit sshd postfix; do \
+    for s in cron monit sshd postfix ntpd; do \
       cp /etc/service/.template/log/run /etc/service/${s}/log/run; \
     done && \
     chmod +x /etc/service/.template/log/run /etc/service/*/log/run /etc/service/*/run && \
@@ -159,5 +171,5 @@ COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
 # 1) Run this image in a remote host that will store the backups:
 #    > docker run -d --name ${IMAGE}-backup --hostname ${IMAGE}-backup \
 #             (-v [host-path]:[volume])+ \
-#             -p ${BACKUP_HOST_SSH_PORT}:22 ${{NAMESPACE}/backup backup 
+#             -p ${BACKUP_HOST_SSH_PORT}:22 ${{NAMESPACE}/backup backup
 # 2) Launch container(s) normally (as described in their README).
