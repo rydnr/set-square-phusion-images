@@ -4,7 +4,8 @@ FROM ${ROOT_IMAGE}
 
 ENV DEBIAN_FRONTEND="noninteractive" \
     TERM="linux" \
-    PATH="${PATH}:/usr/local/bin"
+    PATH="${PATH}:/usr/local/bin" \
+    DW_TERM_WIDTH="${DW_TERM_WIDTH}"
 
 @include("addon-toggles")
 
