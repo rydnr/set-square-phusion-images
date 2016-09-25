@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Starting ntpd"
+exec 2>&1
+exec ntpd -n

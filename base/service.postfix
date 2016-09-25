@@ -9,8 +9,8 @@ queue_directory=/var/spool/postfix
 mail_owner=postfix
 setgid_group=postdrop
 
-chown -R ${mail_owner}:${setgid_group} ${command_directory}
-chgrp postdrop ${command_directory}/postqueue ${command_directory}/postdrop
+chown -R ${mail_owner}:${setgid_group} ${command_directory}/post*
+chgrp ${setgid_group} ${command_directory}/postqueue ${command_directory}/postdrop
 chmod g+s ${command_directory}/postqueue ${command_directory}/postdrop
 
 cd ${command_directory}
@@ -113,4 +113,4 @@ EOF
 chown opendkim:opendkim $(find /etc/opendkim/domainkeys -iname *.private)
 chmod 400 $(find /etc/opendkim/domainkeys -iname *.private)
 
-exec ${daemon_directory}/master 2>&1
+exec ${daemon_directory}/sbin/master 2>&1

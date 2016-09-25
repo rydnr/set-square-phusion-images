@@ -33,7 +33,7 @@ COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
 
 # /etc/my_exec.d
 COPY my_exec.d/cron my_exec.d/help my_exec.d/monit my_exec.d/rsnapshot \
-     my_exec.d/syslog my_exec.d/ssh my_exec.d/postfix my_exec.d/ntp \
+     my_exec.d/syslog my_exec.d/ssh my_exec.d/postfix my_exec.d/ntpd \
      /etc/my_exec.d/
 
 COPY my_exec /sbin/my_exec
