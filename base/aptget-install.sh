@@ -60,6 +60,7 @@ function checkInput() {
     _flagCount=$((_flagCount+1));
     case ${_flag} in
       -h | --help | -v | -vv | -q | -u | --update | -np | --no-pin)
+         logTraceResult SUCCESS "${_flag}";
          shift;
          ;;
       *) logTraceResult FAILURE "${_flag}";
@@ -67,7 +68,7 @@ function checkInput() {
     esac
   done
 
-  if [[ -z ${PACKAGES} ]]; then
+  if [[ -z "${PACKAGES}" ]]; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_PACKAGES_SPECIFIED;
   else

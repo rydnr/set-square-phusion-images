@@ -17,7 +17,7 @@ RUN chmod +x /sbin/my_exec && \
     mkdir -p /home/${SERVICE_USER} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
     curl --silent --location ${NODEJS_DOWNLOAD_URL} | bash - && \
-    ${APTGET_INSTALL} nodejs build-essential libfontconfig && \
+    ${APTGET_INSTALL} nodejs build-essential libfontconfig1 && \
     AUX="${NODEJS_MODULES}" && if [ -n "${AUX}" ]; then \
       for p in ${NODEJS_MODULES}; do \
         npm install -g ${p}; \
