@@ -29,32 +29,20 @@ EOF
 ## Declares the requirements.
 ## dry-wit hook
 function checkRequirements() {
-  checkReq apt-get APTGET_NOT_AVAILABLE;
-  checkReq apt-mark APTMARK_NOT_AVAILABLE;
+  checkReq apt-get;
+  checkReq apt-mark;
 }
 
 ## Defines the errors.
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export APTGET_NOT_AVAILABLE="apt-get not found";
-  export APTMARK_NOT_AVAILABLE="apt-mark not found";
-  export NO_PACKAGES_SPECIFIED="No packages specified";
-  export CANNOT_WRITE_TO_INSTALLED_PACKAGES_FILE='Cannot write to ';
-  export ERROR_INSTALLING_PACKAGE="Error installing ";
-  export ERROR_PINNING_PACKAGE='Error pinning ';
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    APTGET_NOT_AVAILABLE \
-    APTMARK_NOT_AVAILABLE \
-    NO_PACKAGES_SPECIFIED \
-    CANNOT_WRITE_TO_INSTALLED_PACKAGES_FILE \
-    ERROR_INSTALLING_PACKAGE \
-    ERROR_PINNING_PACKAGE \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "APTGET_NOT_INSTALLED" "apt-get not found";
+  addError "APTMARK_NOT_INSTALLED" "apt-mark not found";
+  addError "NO_PACKAGES_SPECIFIED" "No packages specified";
+  addError "CANNOT_WRITE_TO_INSTALLED_PACKAGES_FILE" 'Cannot write to ';
+  addError "ERROR_INSTALLING_PACKAGE" "Error installing ";
+  addError "ERROR_PINNING_PACKAGE" 'Error pinning ';
 }
 
 ## Validates the input.
@@ -132,7 +120,7 @@ function update_system() {
   logInfo -n "Updating system (this can take some time)";
   ${APTGET_UPDATE} > /dev/null 2>&1
   _rescode=$?;
-  if [ ${_rescode} -eq 0 ]; then
+  if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
@@ -166,13 +154,17 @@ function no_pin_enabled() {
 ##   install_package wget
 function install_package() {
   local _package="${1}";
-  logInfo -n "Installing ${_package}";
+  local -i _aux;
+
+  logInfo "Installing ${_package}";
   grep -e "^${_package}$" ${INSTALLED_PACKAGES_FILE} > /dev/null
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
     logInfoResult SUCCESS "skipped";
   else
     runCommandLongOutput "apt-get install -y ${EXTRA_ARGS} --no-install-recommends ${_package}"
-    if [ $? -eq 0 ]; then
+    _aux=$?;
+    logInfo -n "Installing ${_package}";
+    if isTrue ${_aux}; then
       echo "${_package}" >> ${INSTALLED_PACKAGES_FILE}
       logInfoResult SUCCESS "done";
     else
@@ -191,11 +183,11 @@ function pin_package() {
   local _package="${1}";
   logInfo -n "Pinning ${_package}";
   ${HOLD_PACKAGE} ${_package} > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
-    exitWithErrorCode ERROR_PINNING_PACKAGE "${_package}";
+    exitWithErrorCode ERROR_PINNING_PACKAGE "${_package} ($(${HOLD_PACKAGE} ${_package}))";
   fi
 }
 

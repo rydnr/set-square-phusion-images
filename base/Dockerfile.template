@@ -73,7 +73,7 @@ RUN mkdir /Dockerfiles && \
     locale-gen && \
     rm -f /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
-    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot postfix sasl2-bin opendkim opendkim-tools language-pack-${ISO639_1_LANGUAGE_CODE}-base localepurge ntp && \
+    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot postfix sasl2-bin opendkim opendkim-tools language-pack-${ISO639_1_LANGUAGE_CODE}-base localepurge ntp apt-utils && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     mkfifo /var/spool/postfix/public/pickup && \
     chmod +x -- /usr/local/bin/help.base.sh /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \

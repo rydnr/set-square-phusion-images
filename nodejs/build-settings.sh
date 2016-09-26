@@ -3,3 +3,5 @@ defineEnvVar NODEJS_DOWNLOAD_URL "The url to download NodeJS artifact" 'https://
 defineEnvVar NODEJS_MODULES "The NodeJS modules to install" "inherits uncss json5 eslint gh-pages mountebank";
 defineEnvVar SERVICE_USER "The name of the user" '${NAMESPACE}';
 defineEnvVar SERVICE_GROUP "The name of the group" "users";
+overrideEnvVar ENABLE_RSNAPSHOT "false";
+overrideEnvVar ENABLE_LOGSTASH "false";
