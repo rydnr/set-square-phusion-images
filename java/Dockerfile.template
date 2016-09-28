@@ -22,8 +22,9 @@ RUN wget -qO - https://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-ke
     ${APTGET_INSTALL} --update logstash python-software-properties && \
    (${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer oracle-java8-set-default || \
     ${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer oracle-java8-set-default ) && \
-    wget -nv --no-check-certificate --no-cookies --header "Cookie: ${JCE_POLICY_EULA_COOKIE}" ${JCE_POLICY_DOWNLOAD_URL} -O /opt/${JCE_ARTIFACT} && \
-    cd /opt && jar xvf ${JCE_POLICY_ARTIFACT} && cp UnlimitedJCEPolicy/*.jar /usr/lib/jvm/java-${JAVA_VERSION}-oracle/jre/lib/security/ && rm -rf UnlimitedJCEPolicy* && \
+    wget -nv --no-check-certificate --no-cookies --header "Cookie: ${JCE_POLICY_EULA_COOKIE}" ${JCE_POLICY_DOWNLOAD_URL} -O /opt/${JCE_POLICY_ARTIFACT} && \
+    cd /opt && jar xvf ${JCE_POLICY_ARTIFACT} && cp ${JCE_POLICY_FOLDER}/*.jar /usr/lib/jvm/java-${JAVA_VERSION}-oracle/jre/lib/security/ && \
+    rm -rf /opt/${JCE_POLICY_FOLDER} /opt/${JCE_ARTIFACT} && \
     cd /usr/lib/jvm && ln -s java-${JAVA_VERSION}-oracle java && \
     wget -O /usr/lib/jvm/java/jre/lib/ext/${BOUNCY_CASTLE_ARTIFACT} ${BOUNCY_CASTLE_DOWNLOAD_URL} && \
     sed -i -e "/^security.provider.9.\.*/asecurity.provider.10=org.bouncycastle.jce.provider.BouncyCastleProvider" /usr/lib/jvm/java/jre/lib/security/java.security && \
@@ -40,4 +41,3 @@ COPY logstash-default.conf /etc/logstash/conf.d/default.conf
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-

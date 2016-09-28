@@ -1,4 +1,4 @@
-defineEnvVar JENKINS_VERSION "The Jenkins version" "2.19";
+defineEnvVar JENKINS_VERSION "The Jenkins version" "2.23";
 defineEnvVar JENKINS_ARTIFACT "The Jenkins artifact" 'jenkins-war-${JENKINS_VERSION}.war';
 defineEnvVar JENKINS_DOWNLOAD_URL \
              "The url to download Jenkins" \
@@ -47,7 +47,7 @@ defineEnvVar GRADLE_DEFAULT_VERSION "The default Gradle version" "3";
 defineEnvVar GRADLE_VERSIONS "The versions of Gradle to include" '${GRADLE_DEFAULT_VERSION}';
 defineEnvVar MAVEN_DEFAULT_VERSION "The default Maven version" "3.3.9";
 defineEnvVar MAVEN_VERSIONS "The versions of Maven to include" '${MAVEN_DEFAULT_VERSION}';
-defineEnvVar GRAILS_DEFAULT_VERSION "The Grails default version" "3.1.10";
+defineEnvVar GRAILS_DEFAULT_VERSION "The Grails default version" "3.1.12";
 defineEnvVar GRAILS_VERSIONS "The versions of Grails to include" '${GRAILS_DEFAULT_VERSION} 2.5.5';
 defineEnvVar ANT_DEFAULT_VERSION "The default Ant version" "1.9.7";
 defineEnvVar ANT_VERSIONS "The versions of Ant" '${ANT_DEFAULT_VERSION}';

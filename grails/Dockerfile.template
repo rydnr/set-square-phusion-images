@@ -13,7 +13,9 @@ USER ${SERVICE_USER}
 
 RUN cd /home/${NAMESPACE} && \
     source /home/${NAMESPACE}/.sdkman/bin/sdkman-init.sh && \
-    sdk install grails ${GRAILS_VERSION}
+    sdk install grails ${GRAILS_VERSION} && \
+    ${APTGET_INSTALL} -u wkhtmlpdf && \
+    ${APTGET_CLEANUP}
 
 USER root
 
