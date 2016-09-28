@@ -105,7 +105,7 @@ function parseInput() {
     esac
   done
 
-  if [[ -z ${PACKAGES} ]]; then
+  if isEmpty "${PACKAGES}"; then
     PACKAGES="$@";
   fi
 }
@@ -137,7 +137,7 @@ function check_packages_file_writeable() {
   if fileIsWriteable "${INSTALLED_PACKAGES_FILE}"; then
     logDebugResult SUCCESS "true";
   else
-    logDebugResult SUCCESS "false";
+    logDebugResult FAILURE "false";
     exitWithErrorCode CANNOT_WRITE_TO_INSTALLED_PACKAGES_FILE ${INSTALLED_PACKAGES_FILE};
   fi
 }
@@ -157,11 +157,13 @@ function install_package() {
   local _package="${1}";
   local -i _aux;
 
-  logInfo "Installing ${_package}";
+  logInfo -n "Checking if ${_package} is already installed";
   grep -e "^${_package}$" ${INSTALLED_PACKAGES_FILE} > /dev/null
   if isTrue $?; then
-    logInfoResult SUCCESS "skipped";
+    logInfoResult SUCCESS "true";
   else
+    logInfoResult SUCCESS "false";
+    logInfo "Installing ${_package}";
     runCommandLongOutput "apt-get install -y ${EXTRA_ARGS} --no-install-recommends ${_package}"
     _aux=$?;
     logInfo -n "Installing ${_package}";

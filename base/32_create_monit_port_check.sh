@@ -22,27 +22,18 @@ EOF
 ## Defines the requirements
 ## dry-wit hook
 function defineReq() {
-  checkReq cut CUT_NOT_INSTALLED;
-  checkReq sed SED_NOT_INSTALLED;
-  checkReq grep GREP_NOT_INSTALLED;
+  checkReq cut;
+  checkReq sed;
+  checkReq grep;
 }
 
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export CUT_NOT_INSTALLED="cut is not installed";
-  export SED_NOT_INSTALLED="sed is not installed";
-  export GREP_NOT_INSTALLED="grep is not installed";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    CUT_NOT_INSTALLED \
-    SED_NOT_INSTALLED \
-    GREP_NOT_INSTALLED \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "CUT_NOT_INSTALLED" "cut is not installed";
+  addError "SED_NOT_INSTALLED" "sed is not installed";
+  addError "GREP_NOT_INSTALLED" "grep is not installed";
 }
 
 ## Validates the input.

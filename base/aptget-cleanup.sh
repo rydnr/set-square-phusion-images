@@ -23,23 +23,15 @@ EOF
 ## Declares the requirements.
 ## dry-wit hook
 function checkRequirements() {
-  checkReq apt-get APTGET_NOT_AVAILABLE;
+  checkReq "apt-get" "APTGET_NOT_INSTALLED";
 }
 
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export APTGET_NOT_AVAILABLE="apt-get not found";
-  export ERROR_REMOVING_UNUSED_PACKAGES="Error removing unused packages";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    APTGET_NOT_AVAILABLE \
-    ERROR_REMOVING_UNUSED_PACKAGES \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "APTGET_NOT_INSTALLED" "apt-get not found";
+  addError "ERROR_REMOVING_UNUSED_PACKAGES" "Error removing unused packages";
 }
 
 ## Validates the input.
@@ -103,13 +95,27 @@ function autoremove_packages() {
 ## Example:
 ##   clean_system
 function clean_system() {
+  local -i _rescode;
   logInfo -n "Cleaning up the system";
   ${APTGET_CLEAN} > /dev/null
-  if [ $? -eq 0 ]; then
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
+
+    logInfo -n "Autoremoving unused packages";
+    ${APTGET_AUTOREMOVE} > /dev/null;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "done";
+    else
+      logInfoResult FAILURE "failed";
+    fi
   else
     logInfoResult FAILURE "failed";
   fi
+
+  return ${_rescode};
 }
 
 ## Deletes all caches.
@@ -144,11 +150,12 @@ function truncate_logs() {
 function wipe_temporary_folder() {
   logInfo -n "Wiping /tmp";
   rm -rf /tmp/*
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
   fi
+  rm -f /tmp/.apt* > /dev/null 2>&1
 }
 
 ## Main logic

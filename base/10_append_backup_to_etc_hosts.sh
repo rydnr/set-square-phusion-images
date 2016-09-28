@@ -23,13 +23,7 @@ EOF
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
 }
 
 ## Validates the input.

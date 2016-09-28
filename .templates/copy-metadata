@@ -1,0 +1,3 @@
+COPY README LICENSE /
+COPY Dockerfile /Dockerfiles/acmsl-getboo.201609
+COPY copyright-preamble.txt /Dockerfiles/copyright-preamble.txt

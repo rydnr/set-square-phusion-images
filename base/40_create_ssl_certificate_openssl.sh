@@ -23,29 +23,18 @@ EOF
 ## Defines required dependencies
 ## dry-wit hook
 function defineReq() {
-  checkReq openssl OPENSSL_NOT_AVAILABLE;
+  checkReq openssl;
 }
 
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export OPENSSL_NOT_AVAILABLE="openssl is not installed";
-  export CANNOT_GENERATE_SSL_KEY="Cannot generate the SSL key pair";
-  export CANNOT_GENERATE_SSL_CERTIFICATE="Cannot generate the SSL certificate";
-  export CANNOT_SIGN_SSL_CERTIFICATE="Cannot sign the SSL certificate";
-  export CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS="Cannot update the permissions of ${SSL_KEY_FOLDER}";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    OPENSSL_NOT_AVAILABLE \
-    CANNOT_GENERATE_SSL_KEY \
-    CANNOT_GENERATE_SSL_CERTIFICATE \
-    CANNOT_SIGN_SSL_CERTIFICATE \
-    CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "OPENSSL_NOT_AVAILABLE" "openssl is not installed";
+  addError "CANNOT_GENERATE_SSL_KEY" "Cannot generate the SSL key pair";
+  addError "CANNOT_GENERATE_SSL_CERTIFICATE" "Cannot generate the SSL certificate";
+  addError "CANNOT_SIGN_SSL_CERTIFICATE" "Cannot sign the SSL certificate";
+  addError "CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS" "Cannot update the permissions of ${SSL_KEY_FOLDER}";
 }
 
 ## Validates the input.

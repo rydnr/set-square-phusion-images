@@ -22,19 +22,14 @@ EOF
 ## Defines the requirements
 ## dry-wit hook
 function defineReq() {
-  checkReq process-file.sh PROCESS_FILE_NOT_INSTALLED;
+  checkReq "process-file.sh" PROCESSFILE_NOT_INSTALLED;
 }
 
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export PROCESSFILE_NOT_INSTALLED="process-file.sh is not installed";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    PROCESSFILE_NOT_INSTALLED \
-  );
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "PROCESSFILE_NOT_INSTALLED" "process-file.sh is not installed";
 
   export ERROR_MESSAGES;
 }

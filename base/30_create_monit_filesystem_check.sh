@@ -23,26 +23,17 @@ EOF
 ## Defines the requirements
 ## dry-wit hook
 function defineReq() {
-  checkReq cut CUT_NOT_INSTALLED;
-  checkReq mount MOUNT_NOT_INSTALLED;
+  checkReq cut;
+  checkReq mount;
 }
 
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export CUT_NOT_INSTALLED="cut is not installed";
-  export MOUNT_NOT_INSTALLED="mount not installed";
-  export CANNOT_FIND_OUT_THE_DEVICE_FOR_THE_ROOT_FILESYSTEM="Cannot find out the device for the root filesystem";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    CUT_NOT_INSTALLED \
-    MOUNT_NOT_INSTALLED \
-    CANNOT_FIND_OUT_THE_DEVICE_FOR_THE_ROOT_FILESYSTEM \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "CUT_NOT_INSTALLED" "cut is not installed";
+  addError "MOUNT_NOT_INSTALLED" "mount not installed";
+  addError "CANNOT_FIND_OUT_THE_DEVICE_FOR_THE_ROOT_FILESYSTEM" "Cannot find out the device for the root filesystem";
 }
 
 ## Validates the input.

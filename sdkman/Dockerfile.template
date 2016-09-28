@@ -1,5 +1,7 @@
 @include("preamble")
 FROM ${REGISTRY}/${NAMESPACE}/java:${TAG}
+MAINTAINER ${MAINTAINER}
+
 @include("maintainer")
 
 @include("addon-toggles")

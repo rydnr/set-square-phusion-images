@@ -11,7 +11,7 @@ COPY service.inc.sh /usr/local/bin/${IMAGE}.inc.sh
 
 ENV SERVICE_PACKAGE="mariadb-client" \
     SERVICE_USER="mysql" \
-    SERVICE_GROUP="mysql"
+    SERVICE_GROUP="mysql";
 
 RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
     ${APTGET_CLEANUP} && \

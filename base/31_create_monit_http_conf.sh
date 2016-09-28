@@ -23,29 +23,21 @@ EOF
 ## Defines the requirements
 ## dry-wit hook
 function defineReq() {
-  checkReq cut CUT_NOT_INSTALLED;
-  checkReq grep GREP_NOT_INSTALLED;
-  checkReq AWK AWK_NOT_INSTALLED;
+  checkReq cut;
+  checkReq grep;
+  checkReq awk;
+  checkReq ifconfig;
 }
 
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export CUT_NOT_INSTALLED="cut is not installed";
-  export AWK_NOT_INSTALLED="awk not installed";
-  export GREP_NOT_INSTALLED="grep not installed";
-  export CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0="Cannot retrieve the /16 subnet for eth0";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    CUT_NOT_INSTALLED \
-    AWK_NOT_INSTALLED \
-    GREP_NOT_INSTALLED \
-    CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0 \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "CUT_NOT_INSTALLED" "cut is not installed";
+  addError "GREP_NOT_INSTALLED" "grep not installed";
+  addError "AWK_NOT_INSTALLED" "awk not installed";
+  addError "IFCONFIG_NOT_INSTALLED" "ifconfig not installed";
+  addError "CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0" "Cannot retrieve the /16 subnet for eth0";
 }
 
 ## Validates the input.
@@ -100,7 +92,7 @@ function parseInput() {
 function retrieve_eth0_subnet_16() {
   local _result;
   logInfo -n "Finding out the /16 subnet for eth0";
-  _result="$(ip addr show eth0 2> /dev/null | grep 'inet ' | awk '{print $2;}' | cut -d'/' -f 1 | cut -d'.' -f 1-2).0.0/16";
+  _result="$(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.0/24\n", $1, $2, $3);}')";
   if [[ -n ${_result} ]]; then
     logInfoResult SUCCESS "${_result}";
     export RESULT="${_result}";

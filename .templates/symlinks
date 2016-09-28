@@ -1,16 +1,16 @@
-RUN chmod +x /usr/local/bin/* && \
-    chmod -x /usr/local/bin/*.inc.sh && \
-    chmod +x /etc/my_init.d/* && \
-    chmod -x /etc/my_init.d/*.inc.sh && \
-    chmod +x /sbin/my_exec && \
-    chmod +x /etc/cron.daily/* && \
-    chmod +x /etc/cron.weekly/* && \
-    chmod +x /etc/cron.monthly/* && \
+RUN (chmod +x /usr/local/bin/* > /dev/null 2>&1 || true) && \
+    (chmod -x /usr/local/bin/*.inc.sh > /dev/null 2>&1 || true) && \
+    (chmod +x /etc/my_init.d/* > /dev/null 2>&1 || true) && \
+    (chmod -x /etc/my_init.d/*.inc.sh > /dev/null 2>&1 || true) && \
+    (chmod +x /sbin/my_exec > /dev/null 2>&1 || true) && \
+    (chmod +x /etc/cron.daily/* > /dev/null 2>&1 || true) && \
+    (chmod +x /etc/cron.weekly/* > /dev/null 2>&1 || true) && \
+    (chmod +x /etc/cron.monthly/* > /dev/null 2>&1 || true) && \
     for s in /etc/service/*; do \
       if [ ! -e "${s}/.disabled" ]; then \
-        chmod +x "${s}/run" 2> /dev/null; \
+        chmod +x "${s}/run" > /dev/null 2>&1; \
       fi; \
-    done; \
+    done && \
     for p in /usr/local/bin/*.sh; do \
       if [ "${p%.inc.sh}" == "${p}" ]; then ln -sf $p $(dirname $p)/$(basename $p .sh); fi; \
     done && \

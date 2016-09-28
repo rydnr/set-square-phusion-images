@@ -22,13 +22,7 @@ EOF
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
 }
 
 ## Validates the input.
@@ -94,8 +88,8 @@ function chown_volume() {
   fi
 
   if [ ${_single} -eq 0 ]; then
-      _volume="$(echo ${_volume} | sed 's ^"  g' | sed 's "$  g')";
-      chown -R ${_user}:${_group} "${_volume}";
+    _volume="$(echo ${_volume} | sed 's ^"  g' | sed 's "$  g')";
+    chown -R ${_user}:${_group} "${_volume}";
   else
     local _oldIFS="${IFS}";
     IFS='"';
