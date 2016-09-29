@@ -30,8 +30,10 @@ RUN ${APTGET_INSTALL} -u build-essential python-dev python-virtualenv libssl-dev
     wget -O /opt/${PLONE3_FILE} ${PLONE3_DOWNLOAD_URL} && \
     tar xvfz /opt/${PLONE3_FILE} -C /opt && \
     cd /opt/${PLONE3_ARTIFACT} && \
-    chmod +x install.sh && \
-    ./install.sh standalone --target=${PLONE3_HOME} && \
+    ./install.sh standalone --target=${PLONE3_HOME} > ${PLONE3_HOME}/install.log && \
+    cd && \
+    grep 'Username: ' ${PLONE3_HOME}/install.log > /username && \
+    grep 'Password: ' ${PLONE3_HOME}/install.log > /password && \
     rm -rf /opt/${PLONE3_FILE} /opt/${PLONE3_ARTIFACT} && \
     ${APTGET_CLEANUP} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${PLONE3_HOME}
