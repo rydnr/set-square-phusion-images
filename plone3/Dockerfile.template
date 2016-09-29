@@ -25,7 +25,9 @@ COPY plonebackup zeopack /etc/cron.d/
 #      pip install ${i}; \
 #    done && \
 
-RUN ${APTGET_INSTALL} -u build-essential python-dev python-virtualenv libssl-dev libxml2-dev libxslt1-dev libbz2-dev python-tk python-gdbm libxslt1-dev && \
+RUN ${APTGET_INSTALL} -u build-essential python-dev python-virtualenv libssl-dev libxml2-dev libxslt1-dev libbz2-dev python-tk python-gdbm libxslt1-dev \
+      python-setuptools libjpeg62-dev \
+      libreadline-dev wv poppler-utils && \
     mkdir -p /opt && \
     wget -O /opt/${PLONE3_FILE} ${PLONE3_DOWNLOAD_URL} && \
     tar xvfz /opt/${PLONE3_FILE} -C /opt && \

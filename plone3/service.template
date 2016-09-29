@@ -6,4 +6,4 @@ chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${PLONE3_HOME}
 cd ${PLONE3_HOME}/zinstance
 
 exec 2>&1
-exec setuser ${SERVICE_USER} bin/instance fg
+exec setuser ${SERVICE_USER} bin/plonectl fg

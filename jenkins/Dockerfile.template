@@ -77,7 +77,8 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     ${APTGET_CLEANUP} && \
     mkdir -p /backup/rsnapshot && \
     cd /var/jenkins_home/plugins && \
-    wget -o /dev/null ${SWARM_CLIENT_DOWNLOAD_URL}
+    wget -o /dev/null ${SWARM_CLIENT_DOWNLOAD_URL} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/jenkins
 
 ADD init.groovy.d/ /var/jenkins_home/init.groovy.d/
 
