@@ -22,15 +22,8 @@ EOF
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export CANNOT_RETRIEVE_SERVICE_VERSION="Cannot retrieve the service version, neither via SERVICE_VERSION environment variable nor using dpkg -p ${SERVICE_PACKAGE}";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    CANNOT_RETRIEVE_SERVICE_VERSION \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "CANNOT_RETRIEVE_SERVICE_VERSION" "Cannot retrieve the service version, neither via SERVICE_VERSION environment variable nor using dpkg -p ${SERVICE_PACKAGE}";
 }
 
 ## Validates the input.
@@ -76,7 +69,7 @@ function parseInput() {
     esac
   done
 
-  if [ -n "${PACKAGE}" ]; then
+  if isEmpty "${PACKAGE}"; then
     PACKAGE="${1}";
     shift;
   fi
@@ -89,25 +82,25 @@ function main() {
   local _package;
   local _rescode=-1;
 
-  if [ -n "${PACKAGE}" ]; then
+  if ! isEmpty "${PACKAGE}"; then
     _package="${PACKAGE}";
-  elif [ -n "${SERVICE_PACKAGE}" ]; then
+  elif ! isEmpty "${SERVICE_PACKAGE}"; then
     _package="${SERVICE_PACKAGE}";
   fi
 
   logDebug -n "Checking ${PACKAGE} local version";
   _result="$(apt-cache madison ${_package}} | grep 'trusty' | grep 'Packages' | head -n 1 | awk '{print $3;}')";
   _rescode=$?;
-  if [ ${_rescode} -ne 0 ]; then
-  else
-    logDebugResult FAILURE "${_result}}";
+  if ! isTrue ${_rescode}; then
+    logDebugResult FAILURE "${_result}";
     exitWithErrorCode CANNOT_RETRIEVE_SERVICE_VERSION;
   fi
-  if [ -n ${_result} ]; then
+
+  if isEmpty ${_result}; then
+    logDebugResult FAILURE "${_result}";
+    exitWithErrorCode CANNOT_RETRIEVE_SERVICE_VERSION;
+  else
     logDebugResult SUCCESS "${_result}";
     echo "${_result}";
-  else
-    logDebugResult FAILURE "${_result}}";
-    exitWithErrorCode CANNOT_RETRIEVE_SERVICE_VERSION;
   fi
 }

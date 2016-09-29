@@ -3,7 +3,7 @@ defineEnvVar TOMCAT_MAJOR_VERSION \
              "8";
 defineEnvVar TOMCAT_VERSION \
              "The version of the Apache Tomcat server" \
-             "8.5.4" \
+             "8.5.5" \
              'curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/ | grep folder.gif | tail -n 1 | cut -d ">" -f 3 | cut -d "/" -f 1 | sed "s_^v__g"';
 defineEnvVar TOMCAT_CACHE_MAX_SIZE \
              "The maximum size of the static resource cache in kilobytes" \
@@ -34,7 +34,7 @@ defineEnvVar APR_DOWNLOAD_URL \
              'http://www.us.apache.org/dist//apr/${APR_FILE}';
 defineEnvVar TOMCAT_NATIVE_VERSION \
              "The version of Tomcat Native" \
-             "1.1.34";
+             "1.2.8";
 defineEnvVar TOMCAT_NATIVE_FOLDER \
              "The Tomcat Native folder" \
              'tomcat-native-${TOMCAT_NATIVE_VERSION}-src';
@@ -44,3 +44,5 @@ defineEnvVar TOMCAT_NATIVE_FILE \
 defineEnvVar TOMCAT_NATIVE_DOWNLOAD_URL \
              "The url to download Tomcat Native" \
              'http://www.us.apache.org/dist/tomcat/tomcat-connectors/native/${TOMCAT_NATIVE_VERSION}/source/${TOMCAT_NATIVE_FILE}';
+defineEnvVar SERVICE_USER "The user to run Tomcat" "tomcat";
+defineEnvVar SERVICE_GROUP 'The main group of ${SERVICE_USER}' "tomcat";

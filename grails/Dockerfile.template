@@ -7,15 +7,15 @@ FROM ${REGISTRY}/${NAMESPACE}/sdkman:${TAG}
 COPY my_exec /sbin/my_exec
 
 RUN chmod +x /sbin/my_exec && \
-    gpasswd -a ${SERVICE_USER} root
+    gpasswd -a ${SERVICE_USER} root && \
+    ${APTGET_INSTALL} -u wkhtmltopdf && \
+    ${APTGET_CLEANUP}
 
 USER ${SERVICE_USER}
 
 RUN cd /home/${NAMESPACE} && \
     source /home/${NAMESPACE}/.sdkman/bin/sdkman-init.sh && \
-    sdk install grails ${GRAILS_VERSION} && \
-    ${APTGET_INSTALL} -u wkhtmlpdf && \
-    ${APTGET_CLEANUP}
+    sdk install grails ${GRAILS_VERSION}
 
 USER root
 

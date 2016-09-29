@@ -6,9 +6,9 @@ You can provide yours when launching the image, by volume-mounting
 
 Examples:
 - Default invocation:
-> docker run -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/conf:/backup/nexus-conf -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/blobs:/backup/nexus-blobs -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/db:/backup/nexus-db --name ${IMAGE} ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/conf:/backup/nexus-conf -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/blobs:/backup/nexus-blobs -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/db:/backup/nexus-db --name ${IMAGE} ${NAMESPACE}/${IMAGE}:${TAG}
 
-- Run Nexus, using a data container to store its persistent data (which declares /sonatype_work as volume}:
+- Run Nexus, using a data container to store its persistent data (which declares /backup/nexus-* as volumes):
 > docker run -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT}  --volumes-from [data-container] ${NAMESPACE}/${IMAGE}:${TAG}
 
 - To customize how Logstash processes Nexus logs:
@@ -27,6 +27,10 @@ which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH
 In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows:
 
 > docker run -d --name ${IMAGE}-backup -v [host-folder]/nexus/blobs:/backup/nexus-blobs -v [host-folder]/nexus/conf:/backup/nexus-conf -v [host-folder]/nexus/db:/backup/nexus-db -v [host-folder]/nexus/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+
+## Launching Nexus
+
+> docker run -d -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT}  --volumes-from nexus-backup ${NAMESPACE}/${IMAGE}:${TAG}
 
 ## Configuration
 

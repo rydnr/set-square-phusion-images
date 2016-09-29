@@ -23,7 +23,8 @@ ENV SERVICE_USER="jenkins" \
     PATH="${PATH}:/opt/arcanist/bin" \
     JENKINS_MEMORY_MIN="${DEFAULT_JENKINS_MEMORY_MIN}" \
     JENKINS_MEMORY_MAX="${DEFAULT_JENKINS_MEMORY_MAX}" \
-    DOBACKUP="true"
+    DOBACKUP="true" \
+    DEFAULT_LOCALE="en_US.UTF-8"
 
 RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/service/update-jenkins && \
     mkdir -p ${JENKINS_HOME} /var/jenkins_home && \
@@ -47,8 +48,8 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     chmod 700 ${TOMCAT_HOME}/.ssh  && \
     chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh  && \
     mkdir -p /var/jenkins_home/plugins /var/jenkins_home/updates  && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins
-RUN    cd /var/jenkins_home/plugins/ && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
+    cd /var/jenkins_home/plugins/ && \
     for m in ${JENKINS_MODULES}; do \
       echo "Downloading ${m} plugin"; \
       for e in hpi jpi; do \
@@ -56,8 +57,8 @@ RUN    cd /var/jenkins_home/plugins/ && \
       done; \
     done; \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home  && \
-    curl -sL ${NODEJS_ZEROCONF_URL} | sudo -E bash - && \
-    ${APTGET_INSTALL} git graphviz php5 php5-curl php5-cli unzip nodejs build-essential && \
+    curl -sL ${NODEJS_ZEROCONF_URL} | bash - && \
+    ${APTGET_INSTALL} git graphviz php php-curl php-cli unzip nodejs build-essential && \
     for p in arcanist libphutil; do \
       cd /opt && git clone https://github.com/phacility/${p}.git && cd ${p} && git checkout stable; \
     done  && \

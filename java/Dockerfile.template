@@ -9,9 +9,9 @@ COPY logstash-cron.sh /etc/service/cron/log/run
 COPY logstash-cron.sh /etc/service/cron/log/
 COPY create_ssl_certificate_keytool.sh /usr/local/bin/create_ssl_certificate_keytool.sh
 
-ENV JAVA_HEAP_MIN=${JAVA_HEAP_MIN} \
-    JAVA_HEAP_MAX=${JAVA_HEAP_MAX} \
-    JAVA_OPTS=${JAVA_OPTS}
+ENV JAVA_HEAP_MIN="${JAVA_HEAP_MIN}" \
+    JAVA_HEAP_MAX="${JAVA_HEAP_MAX}" \
+    JAVA_OPTS="${JAVA_OPTS}"
 
 # From http://www.webupd8.org/2012/09/install-oracle-java-8-in-ubuntu-via-ppa.html
 # From https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get
@@ -41,3 +41,4 @@ COPY logstash-default.conf /etc/logstash/conf.d/default.conf
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+
