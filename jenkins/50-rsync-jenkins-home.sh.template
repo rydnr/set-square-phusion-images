@@ -2,3 +2,4 @@
 
 rsync -az --exclude '.sdkman/*' /backup/jenkins-home/ /var/jenkins_home/
 rsync -az --exclude '.sdkman/*' /var/jenkins_home/ /backup/jenkins-home/
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home/ /backup/jenkins-home/

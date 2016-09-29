@@ -29,23 +29,19 @@ function defineReq() {
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export OPENSSL_NOT_AVAILABLE="openssl is not installed";
-  export CANNOT_GENERATE_SSL_KEY="Cannot generate the SSL key pair";
-  export CANNOT_GENERATE_SSL_CERTIFICATE="Cannot generate the SSL certificate";
-  export CANNOT_SIGN_SSL_CERTIFICATE="Cannot sign the SSL certificate";
-  export CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS="Cannot update the permissions of ${SSL_KEY_FOLDER}";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    OPENSSL_NOT_AVAILABLE \
-    CANNOT_GENERATE_SSL_KEY \
-    CANNOT_GENERATE_SSL_CERTIFICATE \
-    CANNOT_SIGN_SSL_CERTIFICATE \
-    CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS \
-  );
-
-  export ERROR_MESSAGES;
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "OPENSSL_NOT_AVAILABLE" "openssl is not installed";
+  addError "CANNOT_GENERATE_SSL_KEY" "Cannot generate the SSL key pair";
+  addError "CANNOT_GENERATE_SSL_CERTIFICATE" "Cannot generate the SSL certificate";
+  addError "CANNOT_SIGN_SSL_CERTIFICATE" "Cannot sign the SSL certificate";
+  addError "CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS" "Cannot update the permissions of ${SSL_KEY_FOLDER}";
+  addError "SSL_CERTIFICATE_ALIAS_IS_MANDATORY" "SSL_CERTIFICATE_ALIAS environment variable is mandatory";
+  addError "SSL_KEY_ENCRYPTION_IS_MANDATORY" "SSL_KEY_ENCRYPTION environment variable is mandatory";
+  addError "SSL_KEY_PASSWORD_IS_MANDATORY" "SSL_KEY_PASSWORD environment variable is mandatory";
+  addError "SSL_CERTIFICATE_SUBJECT_IS_MANDATORY" "SSL_CERTIFICATE_SUBJECT environment variable is mandatory";
+  addError "SSL_KEY_FOLDER_IS_MANDATORY" "SSL_KEY_FOLDER environment variable is mandatory";
+  addError "SERVICE_USER_IS_MANDATORY" "SERVICE_USER environment variable is mandatory";
+  addError "SERVICE_GROUP_IS_MANDATORY" "SERVICE_GROUP environment variable is mandatory";
 }
 
 ## Validates the input.
@@ -69,6 +65,41 @@ function checkInput() {
          ;;
     esac
   done
+
+  if isEmpty "${SSL_CERTIFICATE_ALIAS}"; then
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode SSL_CERTIFICATE_ALIAS_IS_MANDATORY;
+  fi
+
+  if isEmpty "${SSL_KEY_ENCRYPTION}"; then
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode SSL_KEY_ENCRYPTION_IS_MANDATORY;
+  fi
+
+  if isEmpty "${SSL_KEY_PASSWORD}"; then
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode SSL_KEY_PASSWORD_IS_MANDATORY;
+  fi
+
+  if isEmpty "${SSL_CERTIFICATE_SUBJECT}"; then
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode SSL_CERTIFICATE_SUBJECT_IS_MANDATORY;
+  fi
+
+  if isEmpty "${SSL_KEY_FOLDER}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode SSL_KEY_FOLDER_IS_MANDATORY;
+  fi
+
+  if isEmpty "${SERVICE_USER}"; then
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode SERVICE_USER_IS_MANDATORY;
+  fi
+
+  if isEmpty "${SERVICE_GROUP}"; then
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode SERVICE_GROUP_IS_MANDATORY;
+  fi
 
   logDebugResult SUCCESS "valid";
 }
@@ -98,20 +129,19 @@ function parseInput() {
 function generateKeyPair() {
   local _outputDir="${1}";
   local _result="${_outputDir}/${SSL_CERTIFICATE_ALIAS}.key";
+  local _output;
 
   logInfo -n "Generating a new SSL key pair";
-  openssl genrsa -${SSL_KEY_ENCRYPTION} \
-          -passout pass:"${SSL_KEY_PASSWORD}" \
-          -out "${_result}" > /dev/null 2>&1;
-  if [ $? -eq 0 ]; then
+  _output="$(openssl genrsa -${SSL_KEY_ENCRYPTION} -passout pass:"${SSL_KEY_PASSWORD}" -out "${_result}" 2>&1)";
+  if isTrue $?; then
     logInfoResult SUCCESS "done";
+    export RESULT="${_result}";
   else
-    _result="";
     logInfoResult FAILURE "failed";
+    logInfo "openssl genrsa -${SSL_KEY_ENCRYPTION} -passout pass:\"${SSL_KEY_PASSWORD}\" -out \"${_result}\"";
+    logInfo "${_output}";
     exitWithErrorCode CANNOT_GENERATE_SSL_KEY;
   fi
-
-  export RESULT="${_result}";
 }
 
 ## Generates a certificate signing request.
@@ -119,24 +149,27 @@ function generateKeyPair() {
 function generateCSR() {
   local _outputDir="${1}";
   local _result="${_outputDir}/${SSL_CERTIFICATE_ALIAS}.csr";
+  local _output;
 
   logInfo -n "Generating a new SSL certificate signing request";
 
-  openssl req \
+  _output="$(openssl req \
           -new \
           -passin pass:"${SSL_KEY_PASSWORD}" \
           -passout pass:"${SSL_KEY_PASSWORD}" \
           -key "${_key}" -out "${_result}" \
-          -subj "${SSL_CERTIFICATE_SUBJECT}" > /dev/null 2>&1;
-  if [ $? -eq 0 ]; then
+          -subj "${SSL_CERTIFICATE_SUBJECT}" 2>&1)";
+
+  if isTrue $?; then
     logInfoResult SUCCESS "done";
+    export RESULT="${_result}";
   else
-    _result="";
     logInfoResult FAILURE "failed";
+    logInfo "openssl req -new -passin pass:\"${SSL_KEY_PASSWORD}\" -passout pass:\"${SSL_KEY_PASSWORD}\" -key \"${_key}\" -out \"${_result}\" -subj \"${SSL_CERTIFICATE_SUBJECT}\"";
+    logInfo "${_output}";
     exitWithErrorCode CANNOT_GENERATE_SSL_CERTIFICATE;
   fi
 
-  export RESULT="${_result}";
 }
 
 ## Generates a certificate for a given key.
@@ -146,25 +179,33 @@ function generateCertificate() {
   local _outputDir="${1}";
   local _key="${2}";
   local _result="${_outputDir}/${SSL_CERTIFICATE_ALIAS}.crt";
+  local _output;
 
   logInfo -n "Generating a new SSL certificate";
 
-  openssl x509 \
+  _output="$(openssl x509 \
           -in "${_csr}" \
           -out "${_result}" \
           -req \
           -signkey "${_key}" \
           -days ${SSL_CERTIFICATE_EXPIRATION_DAYS} \
-          -passin pass:"${SSL_KEY_PASSWORD}" > /dev/null 2>&1;
-  if [ $? -eq 0 ]; then
+          -passin pass:"${SSL_KEY_PASSWORD}" 2>&1)";
+  if isTrue $?; then
+    export RESULT="${_result}";
     logInfoResult SUCCESS "done";
   else
-    _result="";
     logInfoResult FAILURE "failed";
+    logInfo "openssl x509 \
+          -in \"${_csr}\" \
+          -out \"${_result}\" \
+          -req \
+          -signkey \"${_key}\" \
+          -days ${SSL_CERTIFICATE_EXPIRATION_DAYS} \
+          -passin pass:\"${SSL_KEY_PASSWORD}\"";
+    logInfo "${_output}";
     exitWithErrorCode CANNOT_GENERATE_SSL_CERTIFICATE;
   fi
 
-  export RESULT="${_result}";
 }
 
 ## Changes the permissions of given folder.
@@ -175,15 +216,18 @@ function updateFolderPermissions() {
   local _dir="${1}";
   local _user="${2}";
   local _group="${3}";
+  local _output;
 
   logInfo -n "Fixing permissions of ${_dir}";
 
-  chown -R ${_user}:${_group} ${_dir};
+  _output="$(chown -R ${_user}:${_group} ${_dir})";
 
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
       logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
+    logInfo "chown -R ${_user}:${_group} ${_dir}";
+    logInfo "${_output}";
     exitWithErrorCode CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS;
   fi
 }

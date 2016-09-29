@@ -63,16 +63,14 @@ RUN mkdir /Dockerfiles && \
     /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER} && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
     ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes && \
-    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools language-pack-en-base language-pack-${EXTRA_ISO639_1_LANGUAGE_CODE}-base localepurge apt-utils net-tools && \
+    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools localepurge apt-utils net-tools && \
+    SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
+    echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
     if [ -n "${LOCALES}" ]; then \
-      rm -rf /usr/lib/locale/* && \
-      rm -f /var/lib/locales/supported.d/* && \
-      echo > /etc/locale.gen && \
       for _locale in ${LOCALES}; do \
         ${APTGET_INSTALL} language-pack-${_locale%_*}-base && \
-        echo > /var/lib/locales/supported.d/${_locale%_*} && \
         echo "${_locale}" >> /etc/locale.gen; \
-        echo "${_locale} ${_locale#* }" >> /var/lib/locales/supported.d/${_locale%_*}; \
+        echo "${_locale} ${_locale#* }" > /var/lib/locales/supported.d/${_locale%_*}; \
       done; \
     fi && \
     /etc/my_init.d/01_change_default_locale.sh && \
@@ -109,6 +107,7 @@ CMD ["/sbin/my_init"]
 COPY monit-syslog.conf /etc/monit/monitrc.d/syslog
 COPY monit-mail.conf.tmpl /var/local/monit-mail.conf.tmpl
 COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
+COPY exim.00_local_macros /etc/exim4/conf.d/00_local_macros
 
 @include("copy-metadata")
 @include("symlinks")
