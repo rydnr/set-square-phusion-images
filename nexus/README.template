@@ -19,18 +19,22 @@ Examples:
 
 # Backup
 
-The built-in backup mechanism copies regularly the contents of /backup/nexus-* and /backup/rsnapshot to a remote server ${IMAGE}{BACKUP_HOST_SUFFIX},
+The built-in backup mechanism copies regularly the contents of /backup/nexus-* and /backup/rsnapshot to a remote server ${IMAGE}${BACKUP_HOST_SUFFIX},
 which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT).
 
 ## Preparation
 
-In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows:
+In the host where Nexus will be running, create a folder to store all persistent information:
 
-> docker run -d --name ${IMAGE}-backup -v [host-folder]/nexus/blobs:/backup/nexus-blobs -v [host-folder]/nexus/conf:/backup/nexus-conf -v [host-folder]/nexus/db:/backup/nexus-db -v [host-folder]/nexus/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+> mkdir -p ${_rootFolder}/${IMAGE}/conf ${_rootFolder}/${IMAGE}/blobs ${_rootFolder}/${IMAGE}/db ${_rootFolder}/rsnapshot
+
+In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows (adapt this _rootFolder accordingly):
+
+> docker run -d --name ${IMAGE}-backup -v ${_rootFolder}/${IMAGE}/blobs:/backup/${IMAGE}-blobs -v ${_rootFolder}/${IMAGE}/conf:/backup/${IMAGE}-conf -v ${_rootFolder}/${IMAGE}/db:/backup/${IMAGE}-db -v ${_rootFolder}/${IMAGE}/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
 
 ## Launching Nexus
 
-> docker run -d -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT}  --volumes-from nexus-backup ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT}  -v ${_rootFolder}/${IMAGE}/conf:/backup/${IMAGE}-conf -v ${_rootFolder}/${IMAGE}/blobs:/backup/${IMAGE}-blobs -v ${_rootFolder}/${IMAGE}/db:/backup/${IMAGE}-db -v ${_rootFolder}/rsnapshot:/backup/${IMAGE}-rsnapshot ${NAMESPACE}/${IMAGE}:${TAG}
 
 ## Configuration
 
