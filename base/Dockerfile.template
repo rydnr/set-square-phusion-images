@@ -73,7 +73,7 @@ RUN mkdir /Dockerfiles && \
         echo > /var/lib/locales/supported.d/${_locale%_*} && \
         echo "${_locale}" >> /etc/locale.gen; \
         echo "${_locale} ${_locale#* }" >> /var/lib/locales/supported.d/${_locale%_*}; \
-      done && \
+      done; \
     fi && \
     /etc/my_init.d/01_change_default_locale.sh && \
     rm -f /etc/localtime && \
