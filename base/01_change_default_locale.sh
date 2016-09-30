@@ -94,7 +94,7 @@ function change_default_locale() {
   echo "export LC_CTYPE=\"${_locale% *}\"" >> /etc/bash.locale;
   echo "export LANG=\"${_locale%.*}\"" >> /etc/bash.locale;
   echo "export LANGUAGE=\"${_locale% *}\"" >> /etc/bash.locale;
-  locale-gen "${_locale}"
+  echo "${_locale} ${_locale#*.}" >> /etc/locale.gen;
   locale-gen
   dpkg-reconfigure locales
 }

@@ -1,0 +1,4 @@
+eggs-directory = ${PLONE3_HOME}/buildout-cache/eggs
+download-cache = ${PLONE3_HOME}/buildout-cache/downloads
+extends-cache = ${PLONE3_HOME}/buildout-cache/extends
+socket-timeout = 3

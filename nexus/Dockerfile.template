@@ -24,7 +24,7 @@ RUN chmod +x /etc/service/${IMAGE}/run && \
     useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false ${SERVICE_USER} && \
     cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
-    mkdir /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
+    mkdir -p /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
     rm -rf /tmp/nexus-${NEXUS_VERSION} /var/tmp/${NEXUS_ARTIFACT} && \
     ([ ! -d /backup ] && rm -rf /backup) && \
     mkdir -p /backup/${IMAGE}-conf /backup/${IMAGE}-blobs && \

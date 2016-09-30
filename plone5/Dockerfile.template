@@ -5,18 +5,18 @@ FROM ${BASE_IMAGE}:${TAG}
 @include("addon-toggles")
 
 ENV SERVICE_USER="${SERVICE_USER}" \
-    SERVICE_GROUP="${SERVICE_GROUP}"
+    SERVICE_GROUP="${SERVICE_GROUP}" \
     VIRTUAL_HOST="${PLONE_VIRTUAL_HOST}"
 
 RUN mkdir /etc/service/${IMAGE} && \
-    mkdir -p ${PLONE3_HOME}/.buildout && \
-    for d in eggs downloads extends; do mkdir -p ${PLONE3_HOME}/.buildout-cache/${d}; done && \
+    mkdir -p ${PLONE_HOME}/.buildout && \
+    for d in eggs downloads extends; do mkdir -p ${PLONE_HOME}/.buildout-cache/${d}; done && \
     cp -r /etc/service/.template/* /etc/service/${IMAGE} && \
     /usr/sbin/groupadd ${SERVICE_GROUP} && \
-    /usr/sbin/useradd -d ${PLONE3_HOME} -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Plone user" ${SERVICE_USER}
+    /usr/sbin/useradd -d ${PLONE_HOME} -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Plone user" ${SERVICE_USER}
 
 COPY service /etc/service/${IMAGE}/run
-COPY default.cfg ${PLONE3_HOME}/.buildout/default.cfg
+COPY default.cfg ${PLONE_HOME}/.buildout/default.cfg
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY plonebackup zeopack /etc/cron.d/
 
@@ -30,16 +30,16 @@ RUN ${APTGET_INSTALL} -u build-essential python-dev python-virtualenv libssl-dev
       python-setuptools libjpeg62-dev \
       libreadline-dev wv poppler-utils && \
     mkdir -p /opt && \
-    wget -O /opt/${PLONE3_FILE} ${PLONE3_DOWNLOAD_URL} && \
-    tar xvfz /opt/${PLONE3_FILE} -C /opt && \
-    cd /opt/${PLONE3_ARTIFACT} && \
-    ./install.sh standalone --target=${PLONE3_HOME} > ${PLONE3_HOME}/install.log && \
+    wget -O /opt/${PLONE_FILE} ${PLONE_DOWNLOAD_URL} && \
+    tar xvfz /opt/${PLONE_FILE} -C /opt && \
+    cd /opt/${PLONE_ARTIFACT} && \
+    ./install.sh standalone --target=${PLONE_HOME} > ${PLONE_HOME}/install.log && \
     cd && \
-    grep 'Username: ' ${PLONE3_HOME}/install.log > /username && \
-    grep 'Password: ' ${PLONE3_HOME}/install.log > /password && \
-    rm -rf /opt/${PLONE3_FILE} /opt/${PLONE3_ARTIFACT} && \
+    grep 'Username: ' ${PLONE_HOME}/install.log > /username && \
+    grep 'Password: ' ${PLONE_HOME}/install.log > /password && \
+    rm -rf /opt/${PLONE_FILE} /opt/${PLONE_ARTIFACT} && \
     ${APTGET_CLEANUP} && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${PLONE3_HOME}
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${PLONE_HOME}
 
 EXPOSE 8080
 

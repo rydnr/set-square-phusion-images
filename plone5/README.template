@@ -1,0 +1,7 @@
+Runs a Plone3 instance as a Docker container.
+It manages the required configuration of Plone3 applications,
+which can use this image to simplify their setup.
+
+Examples:
+- Run Plone3 to try out things manually:
+> docker run -it -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" ${NAMESPACE}/${IMAGE}:${TAG} /bin/bash

@@ -63,8 +63,11 @@ RUN mkdir /Dockerfiles && \
     /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER} && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
     ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes && \
-    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools localepurge apt-utils net-tools && \
+    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools localepurge apt-utils net-tools spf-tools-perl sudo && \
     SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
+    ln -s /etc/ssl/private/${IMAGE}-${TAG}.key /etc/exim4/exim.key && \
+    ln -s /etc/ssl/private/${IMAGE}-${TAG}.crt /etc/exim4/exim.crt && \
+    update-exim4.conf && \
     echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
     if [ -n "${LOCALES}" ]; then \
       for _locale in ${LOCALES}; do \

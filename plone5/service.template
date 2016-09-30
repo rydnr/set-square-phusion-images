@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd ${PLONE_HOME}
+
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${PLONE_HOME}
+cd ${PLONE_HOME}/zinstance
+
+exec 2>&1
+exec setuser ${SERVICE_USER} bin/plonectl fg
