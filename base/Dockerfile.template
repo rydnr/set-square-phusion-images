@@ -71,7 +71,7 @@ RUN mkdir /Dockerfiles && \
     echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
     if [ -n "${LOCALES}" ]; then \
       for _locale in ${LOCALES}; do \
-        /etc/my_init.d/01_install_locale.sh; \
+        /etc/my_init.d/01_install_locale.sh ${_locale}; \
       done; \
     fi
     /etc/my_init.d/02_change_default_locale.sh && \
