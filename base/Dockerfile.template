@@ -23,7 +23,7 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
 
 # /etc/my_init.d
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
-     01_change_default_locale.sh \
+     01_install_locale.sh 02_change_default_locale.sh \
      20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      21_tune_rsync_conf.sh 21_tune_rsync_conf.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
@@ -71,12 +71,10 @@ RUN mkdir /Dockerfiles && \
     echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
     if [ -n "${LOCALES}" ]; then \
       for _locale in ${LOCALES}; do \
-        ${APTGET_INSTALL} language-pack-${_locale%_*}-base && \
-        echo "${_locale}" >> /etc/locale.gen; \
-        echo "${_locale} ${_locale#* }" > /var/lib/locales/supported.d/${_locale%_*}; \
+        /etc/my_init.d/01_install_locale.sh; \
       done; \
-    fi && \
-    /etc/my_init.d/01_change_default_locale.sh && \
+    fi
+    /etc/my_init.d/02_change_default_locale.sh && \
     rm -f /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \

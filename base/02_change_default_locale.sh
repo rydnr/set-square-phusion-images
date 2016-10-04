@@ -102,5 +102,12 @@ function change_default_locale() {
 ## Main logic
 ## dry-wit hook
 function main() {
+  if [ -n "${LOCALES}" ]; then \
+      for _locale in ${LOCALES}; do \
+        ${APTGET_INSTALL} language-pack-${_locale%_*}-base && \
+            echo "${_locale}" >> /etc/locale.gen; \
+        echo "${_locale} ${_locale#* }" > /var/lib/locales/supported.d/${_locale%_*}; \
+      done; \
+  fi
   change_default_locale "${DEFAULT_LOCALE}";
 }
