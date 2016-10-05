@@ -5,7 +5,8 @@ FROM ${ROOT_IMAGE}
 ENV DEBIAN_FRONTEND="noninteractive" \
     TERM="linux" \
     PATH="${PATH}:/usr/local/bin" \
-    DEFAULT_LOCALE="${DEFAULT_LOCALE}"
+    DEFAULT_LOCALE="${DEFAULT_LOCALE}" \
+    DEFAULT_ENCODING="${DEFAULT_ENCODING}"
 
 @include("addon-toggles")
 
@@ -23,7 +24,8 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
 
 # /etc/my_init.d
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
-     01_install_locale.sh 02_change_default_locale.sh \
+     01_install_locale.sh 01_install_locale.inc.sh \
+     02_change_default_locale.sh 02_change_default_locale.inc.sh \
      20_create_rsnapshot_conf.sh 20_create_rsnapshot_conf.inc.sh \
      21_tune_rsync_conf.sh 21_tune_rsync_conf.inc.sh \
      30_create_monit_filesystem_check.sh 30_create_monit_filesystem_check.inc.sh \
@@ -39,6 +41,9 @@ COPY my_exec.d/cron my_exec.d/help my_exec.d/monit my_exec.d/rsnapshot \
      /etc/my_exec.d/
 
 COPY my_exec /sbin/my_exec
+COPY logger /etc/service/.template/log/run
+
+# cron
 COPY versioncheck.daily rsnapshot.daily /etc/cron.daily/
 COPY rsnapshot.weekly /etc/cron.weekly/rsnapshot.weekly
 COPY rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
@@ -52,30 +57,30 @@ RUN mkdir -p /etc/my_exec.d && \
     mkdir /etc/cron.now && \
     echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab
 
-COPY logger /etc/service/.template/log/run
-COPY service.cron /etc/service/cron/run
-COPY service.monit /etc/service/monit/run
-COPY service.exim4 /etc/service/exim4/run
-
 RUN mkdir /Dockerfiles && \
     /usr/sbin/usermod -d /backup ${BACKUP_USER} && \
     /usr/sbin/groupadd ${DOCKER_GROUP} && \
     /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER} && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
-    ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes && \
-    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools localepurge apt-utils net-tools spf-tools-perl sudo && \
-    SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
+    ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes
+
+RUN ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools localepurge apt-utils net-tools spf-tools-perl sudo && \
+    ${APTGET_CLEANUP}
+
+RUN SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.key /etc/exim4/exim.key && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.crt /etc/exim4/exim.crt && \
     update-exim4.conf && \
-    echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
-    if [ -n "${LOCALES}" ]; then \
+    echo 'source /etc/bash.locale' >> /etc/bash.bashrc
+RUN if [ -n "${LOCALES}" ]; then \
       for _locale in ${LOCALES}; do \
-        /etc/my_init.d/01_install_locale.sh ${_locale}; \
+        for _encoding in ${ENCODINGS}; do \
+          /etc/my_init.d/01_install_locale.sh ${_locale} ${_encoding}; \
+        done; \
       done; \
     fi
-    /etc/my_init.d/02_change_default_locale.sh && \
-    rm -f /etc/localtime && \
+RUN /etc/my_init.d/02_change_default_locale.sh ${DEFAULT_LOCALE} ${DEFAULT_ENCODING}
+RUN rm -f /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime && \
     cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
     chmod +x -- /usr/local/bin/help.base.sh /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \
@@ -99,16 +104,18 @@ RUN mkdir /Dockerfiles && \
     ln -s /usr/local/bin/backup-volumes.sh /etc/cron.hourly/backup-volumes && \
     for p in hourly daily weekly monthly; do \
       ln -s /usr/local/bin/backup-rsnapshot.sh /etc/cron.${p}/backup-rsnapshot; \
-    done && \
-    ${APTGET_CLEANUP}
+    done
 
-ENTRYPOINT ["/sbin/my_exec"]
-CMD ["/sbin/my_init"]
-
+COPY service.cron /etc/service/cron/run
+COPY service.monit /etc/service/monit/run
+COPY service.exim4 /etc/service/exim4/run
 COPY monit-syslog.conf /etc/monit/monitrc.d/syslog
 COPY monit-mail.conf.tmpl /var/local/monit-mail.conf.tmpl
 COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
 COPY exim.00_local_macros /etc/exim4/conf.d/00_local_macros
+
+ENTRYPOINT ["/sbin/my_exec"]
+CMD ["/sbin/my_init"]
 
 @include("copy-metadata")
 @include("symlinks")

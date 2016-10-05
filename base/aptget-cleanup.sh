@@ -80,15 +80,21 @@ function parseInput() {
 
 ## Removes unused packages from the system.
 ## Example:
-##   clean_packages
+##   autoremove_packages
 function autoremove_packages() {
+  local -i _rescode;
+
   logInfo -n "Removing unused packages";
   ${APTGET_REMOVE} > /dev/null
-  if [ $? -eq 0 ]; then
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
   fi
+
+  return ${_rescode};
 }
 
 ## Cleans up the system.
@@ -96,6 +102,7 @@ function autoremove_packages() {
 ##   clean_system
 function clean_system() {
   local -i _rescode;
+
   logInfo -n "Cleaning up the system";
   ${APTGET_CLEAN} > /dev/null
   _rescode=$?;
@@ -106,6 +113,7 @@ function clean_system() {
     logInfo -n "Autoremoving unused packages";
     ${APTGET_AUTOREMOVE} > /dev/null;
     _rescode=$?;
+
     if isTrue ${_rescode}; then
       logInfoResult SUCCESS "done";
     else
@@ -122,40 +130,58 @@ function clean_system() {
 ## Example:
 ##   remove_cache
 function delete_caches() {
+  local -i _rescode;
+
   logInfo -n "Deleting caches";
   ${APTGET_CLEAN} > /dev/null
-  if [ $? -eq 0 ]; then
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
   fi
+
+  return ${_rescode};
 }
 
 ## Truncates all log files.
 ## Example:
 ##   truncate_logs
 function truncate_logs() {
+  local -i _rescode;
+
   logInfo -n "Truncating log files";
   find /var/log -type f -name '*.log' -exec bash -c 'echo > {}' \;
-  if [ $? -eq 0 ]; then
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
   fi
+
+  return ${_rescode};
 }
 
 ## Wipes the contents of the /tmp.
 ## Example:
 ##   wipe_temporary_folder
 function wipe_temporary_folder() {
+  local -i _rescode;
+
   logInfo -n "Wiping /tmp";
-  rm -rf /tmp/*
-  if isTrue $?; then
+  rm -rf /tmp/*;
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
   fi
   rm -f /tmp/.apt* > /dev/null 2>&1
+
+  return ${_rescode};
 }
 
 ## Main logic
