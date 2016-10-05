@@ -74,6 +74,11 @@ RUN SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${I
     echo 'source /etc/bash.locale' >> /etc/bash.bashrc
 RUN if [ -n "${LOCALES}" ]; then \
       for _locale in ${LOCALES}; do \
+        ${APTGET_INSTALL} language-pack-${_locale%_*}-base; \
+      done; \
+      ${APTGET_CLEANUP} && \
+      rm -f /var/lib/locales/supported.d/* && \
+      for _locale in ${LOCALES}; do \
         for _encoding in ${ENCODINGS}; do \
           /etc/my_init.d/01_install_locale.sh ${_locale} ${_encoding}; \
         done; \
