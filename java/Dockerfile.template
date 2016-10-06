@@ -41,4 +41,3 @@ COPY logstash-default.conf /etc/logstash/conf.d/default.conf
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-

@@ -61,7 +61,7 @@ RUN mkdir -p /etc/my_exec.d && \
     chmod +x /usr/local/bin/*.sh /etc/my_init.d/*.sh && \
     mkdir /etc/cron.now && \
     echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab && \
-     mkdir /Dockerfiles && \
+    mkdir /Dockerfiles /opt && \
     /usr/sbin/usermod -d /backup ${BACKUP_USER} && \
     /usr/sbin/groupadd ${DOCKER_GROUP} && \
     /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER} && \
