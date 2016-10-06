@@ -11,6 +11,7 @@ ENV DOBACKUP="false" \
 COPY my_exec /sbin/my_exec
 
 RUN chmod +x /sbin/my_exec && \
+    mkdir /opt && \
     wget ${FLYWAYDB_URL} && \
     rm -f /etc/my_init.d/* && \
     (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \

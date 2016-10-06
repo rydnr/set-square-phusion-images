@@ -8,7 +8,7 @@ COPY liquibase.sh /usr/local/bin/liquibase
 
 ENTRYPOINT [ "/usr/local/bin/liquibase" ]
 
-RUN mkdir /opt/liquibase-${LIQUIBASE_VERSION} && \
+RUN mkdir -p /opt/liquibase-${LIQUIBASE_VERSION} && \
     cd /opt && \
     ln -s liquibase-${LIQUIBASE_VERSION} liquibase && \
     wget ${LIQUIBASE_URL} && \
