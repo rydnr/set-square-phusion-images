@@ -13,10 +13,9 @@
         DirectoryIndex index.php
         AllowOverride None
 
-        order deny,allow
-        deny from all
-
-        allow from all
+        Order allow,deny
+        Allow from all
+        Require all granted
 
         <IfModule mod_php5.c>
             php_flag magic_quotes_gpc Off

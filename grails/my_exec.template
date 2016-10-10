@@ -1,24 +1,11 @@
 #!/bin/bash
 
-_folder="/home/${SERVICE_USER}/workspace";
-
-_uid=$(stat -c '%u' /home/${SERVICE_USER}/workspace)
-_gid=$(stat -c '%g' /home/${SERVICE_USER}/workspace)
-_grailsGid=$(stat -c '%g' /home/${SERVICE_USER}/.grails)
-
-usermod -u ${_uid} ${SERVICE_USER} > /dev/null 2>&1
-groupmod -g ${_gid} ${SERVICE_GROUP} > /dev/null 2>&1
-usermod -g ${_gid} ${SERVICE_USER} > /dev/null 2>&1
-
 # Splitting executable from arguments
 _cmd="${1}";
 shift
 _cmd="${_cmd} ${@}";
 
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}/.grails &
-
-touch /var/log/${IMAGE}.log
-chown ${SERVICE_USER}:${SERVICE_GROUP} /var/log/${IMAGE}.log
+_folder="/opt/workspace";
 
 _projectFolder="${_folder}"
 
@@ -26,27 +13,13 @@ if [ -n ${PROJECT_NAME} ]; then
   _projectFolder="${_folder}/${PROJECT_NAME}"
 fi
 
+mkdir -p "${_projectFolder}";
+
 if [ -n "${GRAILS_ENV}" ]; then
-  _grailsEnv="-Dgrails.env=${GRAILS_ENV}";
+    _grailsEnv="-Dgrails.env=${GRAILS_ENV}";
 else
   _grailsEnv="";
 fi
 
-mkdir -p "${_projectFolder}";
-
-_exports="$(export)";
-
-cat << EOF > /tmp/runme
-#!/bin/bash
-
-${_exports}
-declare -x HOME="/home/${SERVICE_USER}"
-source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh
-cd ${_projectFolder}
-grails ${_grailsEnv} ${_cmd}
-EOF
-chmod +x /tmp/runme
-
-chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
+/usr/local/bin/run-as.sh -- ${_projectFolder} grails ${_grailsEnv} ${_cmd};
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet
-

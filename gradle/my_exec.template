@@ -5,16 +5,9 @@ _cmd="${1}";
 shift
 _cmd="${_cmd} ${@}";
 
-# chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER}/.gradle &
-
-_exports="$(export)";
-
-touch /var/log/${IMAGE}.log
-chown ${SERVICE_USER}:${SERVICE_GROUP} /var/log/${IMAGE}.log
-
 _dockerHost="${DOCKER_HOST:-unix:///run/docker.sock}"
 
-_folder="/home/${SERVICE_USER}/workspace";
+_folder="/opt/workspace";
 
 _projectFolder="${_folder}"
 
@@ -29,5 +22,5 @@ if [ -n "${_dockerApiVersion}" ]; then
   _dockerApiVersion="-DAPI_VERSION=${_dockerApiVersion} -Dapi.version=${_dockerApiVersion} -DDOCKER_API_VERSION=${_dockerApiVersion}"
 fi
 
-/usr/local/bin/run-as.sh ${_projectFolder} gradle -DDOCKER_HOST=${DOCKER_HOST} -DHOST_PROJECTDIR=${HOST_PROJECTDIR:-${_folder}} -DHOST_USERHOME=${HOST_USERHOME:-${HOME}} ${_dockerApiVersion} --gradle-user-home=/home/${SERVICE_USER}/.gradle ${_cmd};
+/usr/local/bin/run-as.sh -- ${_projectFolder} gradle -g /opt/workspace/.gradle -DDOCKER_HOST=${_dockerHost} -DHOST_PROJECTDIR=${HOST_PROJECTDIR:-${_folder}} -DHOST_USERHOME=${HOST_USERHOME:-${HOME}} ${_dockerApiVersion} ${_cmd};
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet

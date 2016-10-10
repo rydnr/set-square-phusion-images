@@ -1,5 +1,0 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<jenkins.model.JenkinsLocationConfiguration>
-  <adminAddress>jenkins@${DOMAIN}</adminAddress>
-  <jenkinsUrl>http://jenkinsng.osoco.es/</jenkinsUrl>
-</jenkins.model.JenkinsLocationConfiguration>

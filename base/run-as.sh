@@ -4,8 +4,7 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME [[-u|--userId=userId] [-g|--groupId=groupId]]? folder script
-$SCRIPT_NAME [[-u|--userId=userId] [-g|--groupId=groupId]]? folder command args
+$SCRIPT_NAME [[-u|--userId=userId] [-g|--groupId=groupId]]? folder command [args]*
 $SCRIPT_NAME [-h|--help]
 (c) 2016-today ACM-SL
     Distributed this under the GNU General Public License v3.
@@ -18,9 +17,8 @@ Where:
   * -u | --userId: The user id. Optional.
   * -g | --groupId: The group id. Optional.
   * folder: the folder where the command will be run.
-  * script: The script to run.
   * command: anything to run.
-  * args: Additional arguments to the command.
+  * args: the command arguments.
 Common flags:
     * -h | --help: Display this message.
     * -v: Increase the verbosity.
@@ -32,12 +30,13 @@ EOF
 ## Defines the errors.
 ## dry-wit hook
 function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-  addError "NO_FOLDER_SPECIFIED" "No folder specified";
-  addError "NO_SCRIPT_OR_COMMAND_SPECIFIED" "Neither script nor command are specified";
-  addError "CANNOT_CHANGE_UID" "Cannot change the uid of ";
-  addError "CANNOT_RETRIEVE_USER_UID_OF_FOLDER" "Cannot retrieve the user uid of ";
-  addError "CANNOT_RETRIEVE_GROUP_GID_OF_FOLDER" "Cannot retrieve the group gid of ";
+  addError INVALID_OPTION "Unrecognized option";
+  addError NO_FOLDER_SPECIFIED "No folder specified";
+  addError NO_COMMAND_SPECIFIED "No command specified";
+  addError CANNOT_CHANGE_UID "Cannot change the uid of ";
+  addError CANNOT_CHANGE_GID 'Cannot change the gid of ${_user} to ${_gid}';
+  addError CANNOT_RETRIEVE_USER_UID_OF_FOLDER "Cannot retrieve the user uid of ";
+  addError CANNOT_RETRIEVE_GROUP_GID_OF_FOLDER "Cannot retrieve the group gid of ";
 }
 
 ## Validates the input.
@@ -56,20 +55,23 @@ function checkInput() {
       -h | --help | -v | -vv | -q | -u | --userId | -g | --groupId)
          shift;
          ;;
+      --) shift;
+          break;
+          ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION ${_flag};
          ;;
     esac
   done
 
-  if isEmpty "${FOLDER}"; then
+  if [[ -z ${FOLDER} ]]; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_FOLDER_SPECIFIED;
   fi
 
-  if isEmpty ${COMMAND} && isEmpty ${SCRIPT}; then
+  if [[ -z ${COMMAND} ]]; then
     logDebugResult FAILURE "fail";
-    exitWithErrorCode NO_SCRIPT_OR_COMMAND_SPECIFIED;
+    exitWithErrorCode NO_COMMAND_SPECIFIED;
   else
     logDebugResult SUCCESS "valid";
   fi
@@ -90,6 +92,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
         shift;
         ;;
+      --)
+        shift;
+        break;
+        ;;
       -u | --userId)
         export USER_ID="${1}";
         shift;
@@ -101,24 +107,18 @@ function parseInput() {
     esac
   done
 
-  if isEmpty "${FOLDER}"; then
+  if [[ -z ${FOLDER} ]]; then
     FOLDER="${1}";
     shift;
   fi
 
-  if isEmpty "${SCRIPT}"; then
-    SCRIPT="${1}";
+  if [[ -z ${COMMAND} ]]; then
+    COMMAND="$1";
+    shift;
   fi
 
-  if [ ! -e "${SCRIPT}" ]; then
-    if isEmpty "${COMMAND}"; then
-      COMMAND="$1";
-      shift;
-    fi
-
-    if isEmpty "${ARGS}"; then
-      ARGS="$@";
-    fi
+  if [[ -z ${ARGS} ]]; then
+    ARGS="$@";
   fi
 }
 
@@ -130,23 +130,20 @@ function parseInput() {
 ##   update_service_user_account guest 1000 1000
 function update_account() {
   local _user="${1}";
-  local _userId="${2}";
-  local _groupId="${3}";
+  checkNotEmpty "user" "${_user}" 1;
 
-  logInfo -n "Changing ${SERVICE_USER}'s uid to ${_userId}";
-  usermod -u ${_userId} ${SERVICE_USER} > /dev/null 2>&1
-  if [ $? -eq ${TRUE} ]; then
-      logInfoResult SUCCESS "done";
-  else
-    logInfoResult FAILURE "failed";
+  local _userId="${2}";
+  checkNotEmpty "userId" "${_userId}" 2;
+
+  local _groupId="${3}";
+  checkNotEmpty "groupId" "${_groupId}" 3;
+
+  if ! updateUserUid ${_user} ${_userId}; then
     exitWithErrorCode CANNOT_CHANGE_UID "${_user}";
   fi
-  logInfo -n "Changing ${_user}'s primary group as ${_groupId}";
-  usermod -g ${_groupId} ${SERVICE_USER} > /dev/null 2>&1
-  if [ $? -eq ${TRUE} ]; then
-      logInfoResult SUCCESS "done";
-  else
-    logInfoResult FAILURE "unneeded";
+
+  if ! updateUserGid "${_user}" ${_groupId}; then
+      exitWithErrorCode CANNOT_CHANGE_GID "${_user} -> ${_groupId}";
   fi
 }
 
@@ -159,6 +156,7 @@ function main() {
   local _uidUser;
   local _temporaryUser;
   local _temporaryUid;
+  local _command;
 
   if isEmpty "${_uid}"; then
     retrieveOwnerUid "${FOLDER}";
@@ -168,32 +166,39 @@ function main() {
     exitWithErrorCode CANNOT_RETRIEVE_USER_UID_OF_FOLDER "${FOLDER}";
   fi
   if isEmpty "${_gid}"; then
-    retrieve_owner_gid "${FOLDER}";
+    retrieveOwnerGid "${FOLDER}";
     _gid="${RESULT}";
   fi
   if isEmpty "${_gid}"; then
     exitWithErrorCode CANNOT_RETRIEVE_GROUP_GID_OF_FOLDER "${FOLDER}";
   fi
-
-  retrieveUidFromUser "${SERVICE_USER}";
+  retrieveUidFromUser "${RUN_AS_USER}";
   _serviceUserId="${RESULT}";
 
-  if uidAlreadyExists "${_uid}"; then
+  if uidAlreadyExists "${_uid}" && [ "${_uid}" != "${_serviceUserId}" ]; then
     _restoreUid=${TRUE};
     retrieveUserFromUid "${_uid}";
     _uidUser="${RESULT}";
     _temporaryUser="temp$$";
     createUser "${_temporaryUser}";
+    retrieveUidFromUser "${_temporaryUser}";
     _temporaryUid="${RESULT}";
     deleteUser "${_temporaryUser}";
+    logInfo "Moving current user ${_uidUser} (${_uid}) to ${_temporaryUid}";
     update_account "${_uidUser}" "${_temporaryUid}" "${_gid}";
   fi
 
-  update_account "${SERVICE_USER}" "${_uid}" "${_gid}";
+  update_account "${RUN_AS_USER}" "${_uid}" "${_gid}";
 
-  runCommandAsUidGid "${SERVICE_USER}" "${_uid}" "${_gid}" "${FOLDER}" "${COMMAND}" "${ARGS}";
+  resolveCommandForUser "${RUN_AS_USER}" "${COMMAND}";
+  _command="${RESULT}";
+  if isEmpty "${_command}"; then
+     _command="${COMMAND}";
+  fi
 
-  update_account "${SERVICE_USER}" "${_serviceUserId}" "${_gid}";
+  runCommandAsUidGid "${_uid}" "${_gid}" "${FOLDER}" "${_command}" "${ARGS}";
+
+  update_account "${RUN_AS_USER}" "${_serviceUserId}" "${_gid}";
 
   if isTrue ${_restoreUid}; then
     update_account "${_uidUser}" "${_uid}" "${_gid}";

@@ -29,7 +29,10 @@ RUN (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_G
     wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
     echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
     ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
-    rabbitmq-plugins enable rabbitmq_management && \
+    rabbitmq-plugins enable --offline rabbitmq_management && \
+    for p in ${RABBITMQ_PLUGINS}; do \
+      rabbitmq-plugins enable rabbitmq_${p} --offline; \
+    done && \
     mv /var/lib/rabbitmq/mnesia /backup/${IMAGE}/data && \
     ln -s /backup/${IMAGE}/data/mnesia /var/lib/rabbitmq/mnesia && \
     ln -s /backup/${IMAGE}/data/mnesia /data/mnesia && \

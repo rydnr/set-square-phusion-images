@@ -22,21 +22,11 @@ EOF
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export LOCAL_VERSION_SCRIPT_UNAVAILABLE="The local-version script is not available";
-  export REMOTE_VERSION_SCRIPT_UNAVAILABLE="The remote-version script is not available";
-  export EMPTY_RESPONSE_FROM_LOCAL_VERSION_SCRIPT="Empty response from local-version script";
-  export EMPTY_RESPONSE_FROM_REMOTE_VERSION_SCRIPT="Empty response from remote-version script";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    CANNOT_RETRIEVE_SERVICE_VERSION \
-    LOCAL_VERSION_SCRIPT_UNAVAILABLE \
-    EMPTY_RESPONSE_FROM_LOCAL_VERSION_SCRIPT \
-    EMPTY_RESPONSE_FROM_REMOTE_VERSION_SCRIPT \
-  );
-
-  export ERROR_MESSAGES;
+  addError INVALID_OPTION "Unrecognized option";
+  addError LOCAL_VERSION_SCRIPT_UNAVAILABLE "The local-version script is not available";
+  addError REMOTE_VERSION_SCRIPT_UNAVAILABLE "The remote-version script is not available";
+  addError EMPTY_RESPONSE_FROM_LOCAL_VERSION_SCRIPT "Empty response from local-version script";
+  addError EMPTY_RESPONSE_FROM_REMOTE_VERSION_SCRIPT "Empty response from remote-version script";
 }
 
 ## Validates the input.
@@ -55,6 +45,9 @@ function checkInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --) shift;
+          break;
+          ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -69,6 +62,7 @@ function checkInput() {
       logDebugResult FAILURE "failed";
       exitWithErrorCode REMOTE_VERSION_SCRIPT_UNAVAILABLE;
   fi
+
   logDebugResult SUCCESS "valid";
 }
 
@@ -87,6 +81,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 }
@@ -96,12 +94,12 @@ function parseInput() {
 function retrieve_version() {
   local _result;
 
-  if [ -n "${SERVICE_VERSION}" ]; then
+  if ! isEmpty "${SERVICE_VERSION}"; then
     _result="${SERVICE_VERSION}";
-  elif [ -n "${SERVICE_PACKAGE}" ]; then
+  elif ! isEmpty "${SERVICE_PACKAGE}"; then
     _result="$(dpkg -p ${SERVICE_PACKAGE} | grep -e '^Version: ' | cut -d' ' -f2)";
   fi
-  if [ -z ${_result} ]; then
+  if isEmpty ${_result}; then
     exitWithErrorCode CANNOT_RETRIEVE_SERVICE_VERSION;
   fi
 
@@ -112,11 +110,11 @@ function retrieve_version() {
 ## dry-wit hook
 function main() {
   local _local=$("${LOCAL_VERSION_SCRIPT}");
-  if [ -z "${_local}" ]; then
+  if isEmpty "${_local}"; then
     exitWithErrorCode EMPTY_RESPONSE_FROM_LOCAL_VERSION_SCRIPT;
   fi
   local _remote=$("${REMOTE_VERSION_SCRIPT}");
-  if [ -z "${_remote}" ]; then
+  if isEmpty "${_remote}"; then
     exitWithErrorCode EMPTY_RESPONSE_FROM_REMOTE_VERSION_SCRIPT;
   fi
   if [ "${_remote}" == "${_local}" ]; then
@@ -126,3 +124,4 @@ function main() {
     echo "New version available: ${_remote}";
   fi
 }
+

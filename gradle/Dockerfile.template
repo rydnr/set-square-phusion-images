@@ -7,11 +7,15 @@ FROM ${REGISTRY}/${NAMESPACE}/sdkman:${TAG}
 COPY my_exec /sbin/my_exec
 
 RUN chmod +x /sbin/my_exec && \
-    gpasswd -a ${SERVICE_USER} root
+    gpasswd -a ${SERVICE_USER} root && \
+    mkdir -p /opt/workspace && \
+    ln -s /opt/workspace/.gradle /home/${SERVICE_USER}/.gradle && \
+    ln -s /opt/workspace /home/${SERVICE_USER}/workspace && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
 
 USER ${SERVICE_USER}
 
-ENV GRADLE_USER_HOME="/home/${SERVICE_USER}/.gradle" \
+ENV GRADLE_USER_HOME="/opt/workspace/.gradle" \
     DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
 
 RUN cd /home/${SERVICE_USER} && \
@@ -20,8 +24,8 @@ RUN cd /home/${SERVICE_USER} && \
 
 USER root
 
-VOLUME [ "/home/${SERVICE_USER}/.gradle" "/home/${SERVICE_USER}/workspace" ]
-WORKDIR /home/${SERVICE_USER}/workspace
+VOLUME [ "/opt/workspace" ]
+WORKDIR /opt/workspace
 
 EXPOSE 8080
 

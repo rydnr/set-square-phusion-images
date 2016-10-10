@@ -10,10 +10,6 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 
 @include("addon-toggles")
 
-# Packages
-RUN ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools localepurge apt-utils net-tools spf-tools-perl sudo && \
-    ${APTGET_CLEANUP}
-
 # /usr/local/bin
 COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cleanup.inc.sh \
      process-file.sh data copy.sh ssh.sh \
@@ -26,6 +22,13 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
      show help.base.sh display-dockerfile.sh \
      install-locale.sh install-locale.inc.sh \
      /usr/local/bin/
+
+# Packages
+RUN chmod +x ${APTGET_INSTALL} ${APTGET_CLEANUP} && \
+    mkdir -p /var/local/ && \
+    touch /var/local/docker-installed-packages.txt && \
+    ${APTGET_INSTALL} --update wget mailutils gettext monit rsnapshot exim4 sasl2-bin opendkim opendkim-tools localepurge apt-utils net-tools spf-tools-perl sudo && \
+    ${APTGET_CLEANUP}
 
 # /etc/my_init.d
 COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
@@ -61,7 +64,8 @@ RUN mkdir -p /etc/my_exec.d && \
     chmod +x /usr/local/bin/*.sh /etc/my_init.d/*.sh && \
     mkdir /etc/cron.now && \
     echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab && \
-    mkdir /Dockerfiles /opt && \
+    mkdir /Dockerfiles && \
+    (mkdir /opt || echo "/opt already exists") && \
     /usr/sbin/usermod -d /backup ${BACKUP_USER} && \
     /usr/sbin/groupadd ${DOCKER_GROUP} && \
     /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER} && \

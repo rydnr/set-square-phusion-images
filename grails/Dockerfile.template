@@ -8,8 +8,11 @@ COPY my_exec /sbin/my_exec
 
 RUN chmod +x /sbin/my_exec && \
     gpasswd -a ${SERVICE_USER} root && \
-    ${APTGET_INSTALL} -u wkhtmltopdf && \
-    ${APTGET_CLEANUP}
+    mkdir -p /opt/workspace && \
+    ln -s /opt/workspace/.grails /home/${SERVICE_USER}/.grails && \
+    ln -s /opt/workspace/.m2 /home/${SERVICE_USER}/.m2 && \
+    ln -s /opt/workspace /home/${SERVICE_USER}/workspace && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
 
 USER ${SERVICE_USER}
 
@@ -19,11 +22,21 @@ RUN cd /home/${NAMESPACE} && \
 
 USER root
 
-VOLUME [ "/home/${SERVICE_USER}/.grails" "/home/${SERVICE_USER}/workspace" ]
-WORKDIR /home/${SERVICE_USER}/workspace
+VOLUME [ "/opt/workspace" ]
+WORKDIR /opt/workspace
 
 EXPOSE 8080
 
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+
+
+
+
+
+
+
+
+
+

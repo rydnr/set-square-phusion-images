@@ -33,33 +33,17 @@ function checkRequirements() {
 
 # Error messages
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export AWK_NOT_INSTALLED="awk is not installed";
-  export ENVSUBST_NOT_INSTALLED="envsubst is not installed";
-  export TR_NOT_INSTALLED="tr is not installed";
-  export NO_DB_USER_SPECIFIED="The database user cannot be empty";
-  export NO_DB_NAME_SPECIFIED="The database name cannot be empty";
-  export NO_SQL_FOLDER_SPECIFIED="The SQL folder is mandatory";
-  export NO_SQL_FILES_FOUND="No SQL files found in ${SQL_FOLDER}";
-  export SQL_FILE_NOT_FOUND="The specified file does not exist";
-  export SQL_FILE_NOT_READABLE="The specified file is not readable";
-  export SQL_FILE_IS_NOT_A_FILE="The specified file is not a file";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    AWK_NOT_INSTALLED \
-    ENVSUBST_NOT_INSTALLED \
-    TR_NOT_INSTALLED \
-    NO_DB_USER_SPECIFIED \
-    NO_DB_NAME_SPECIFIED \
-    NO_SQL_FOLDER_SPECIFIED \
-    NO_SQL_FILES_FOUND \
-    SQL_FILE_NOT_FOUND \
-    SQL_FILE_NOT_READABLE \
-    SQL_FILE_IS_NOT_A_FILE \
-  );
-
-  export ERROR_MESSAGES;
+  addError INVALID_OPTION "Unrecognized option";
+  addError AWK_NOT_INSTALLED "awk is not installed";
+  addError ENVSUBST_NOT_INSTALLED "envsubst is not installed";
+  addError TR_NOT_INSTALLED "tr is not installed";
+  addError NO_DB_USER_SPECIFIED "The database user cannot be empty";
+  addError NO_DB_NAME_SPECIFIED "The database name cannot be empty";
+  addError NO_SQL_FOLDER_SPECIFIED "The SQL folder is mandatory";
+  addError NO_SQL_FILES_FOUND "No SQL files found in ${SQL_FOLDER}";
+  addError SQL_FILE_NOT_FOUND "The specified file does not exist";
+  addError SQL_FILE_NOT_READABLE "The specified file is not readable";
+  addError SQL_FILE_IS_NOT_A_FILE "The specified file is not a file";
 }
 
 ## Parses the input

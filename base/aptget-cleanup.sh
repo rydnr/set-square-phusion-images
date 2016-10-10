@@ -179,7 +179,7 @@ function wipe_temporary_folder() {
   else
     logInfoResult FAILURE "failed";
   fi
-  rm -f /tmp/.apt* > /dev/null 2>&1
+  rm -rf /tmp/.* > /dev/null 2>&1
 
   return ${_rescode};
 }

@@ -15,7 +15,10 @@ RUN chmod +x /sbin/my_exec && \
     (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
     (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "NodeJS user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
     mkdir -p /home/${SERVICE_USER} && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} && \
+    mkdir -p /opt/workspace && \
+    ln -s /opt/workspace /home/${SERVICE_USER}/workspace && \
+    ln -s /opt/workspace/.npm /home/${SERVICE_USER}/.npm && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} /opt/workspace && \
     curl --silent --location ${NODEJS_DOWNLOAD_URL} | bash - && \
     ${APTGET_INSTALL} nodejs build-essential libfontconfig1 && \
     AUX="${NODEJS_MODULES}" && if [ -n "${AUX}" ]; then \
@@ -25,8 +28,8 @@ RUN chmod +x /sbin/my_exec && \
     fi && \
     ${APTGET_CLEANUP}
 
-VOLUME [ "/home/${SERVICE_USER}/workspace" "/home/${SERVICE_USER}/.npm" ]
-WORKDIR /home/${SERVICE_USER}/workspace
+VOLUME [ "/opt/workspace" ]
+WORKDIR /opt/workspace
 
 @include("copy-metadata")
 @include("symlinks")

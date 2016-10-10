@@ -6,7 +6,7 @@ FROM ${NAMESPACE}/tomcat:${TAG}
 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY 50-rsync-jenkins-home.sh /etc/my_init.d/50-rsync-jenkins-home.sh
-COPY update-jenkins.sh \
+COPY update-jenkins.sh update-jenkins.inc.sh \
      generate-jenkins-plugin-configs.sh generate-jenkins-plugin-configs.inc.sh \
      /usr/local/bin/
 

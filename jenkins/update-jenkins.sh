@@ -22,13 +22,9 @@ EOF
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-  );
-
-  export ERROR_MESSAGES;
+  addError INVALID_OPTION "Unrecognized option";
+  addError CANNOT_UPDATE_JENKINS "Could not update Jenkins";
+  addError CANNOT_RETRIEVE_UPDATE_CENTER_JSON "Could not retrieve update-center.json file from ${JENKINS_UPDATE_CENTER_JSON}";
 }
 
 ## Validates the input.
@@ -47,6 +43,10 @@ function checkInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -71,6 +71,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 }
@@ -83,20 +87,20 @@ function parseInput() {
 ##     echo "update-center.json is located in ${RESULT}"
 ##   fi
 function retrieve_update_center_json() {
-  local _rescode=${TRUE};
+  local -i _rescode;
+
   createTempFile;
   local _result="${RESULT}";
 
   logDebug -n "Retrieving update-center.json from updates.jenkins-ci.org";
-  wget -q -O "${_result}" ${JENKINS_UC}/update-center.json
-  if [ $? -eq 0 ]; then
+  wget -q -O "${_result}" ${JENKINS_UPDATE_CENTER_JSON};
+  _rescode=$?;
+  if isTrue ${_rescode}; then
     logDebugResult SUCCESS "done";
+    export RESULT="${_result}";
   else
     logDebugResult FAILURE "failed";
-    _rescode=${FALSE};
   fi
-
-  export RESULT="${_result}";
 
   return ${_rescode};
 }
@@ -110,20 +114,22 @@ function retrieve_update_center_json() {
 ##   echo "Processed update-center.json: ${RESULT}"
 function process_update_center_json() {
   local _source="${1}";
-  local _rescode=${TRUE};
+  checkNotEmpty "source" "${_source}" 1;
+
+  local -i _rescode;
+
   createTempFile;
   local _result="${RESULT}";
 
   logDebug -n "Processing update-center.json";
   sed '1d;$d' "${_source}" > "${_result}";
-  if [ $? -eq 0 ]; then
+  _rescode=$?;
+  if isTrue ${_rescode}; then
     logDebugResult SUCCESS "done";
+    export RESULT="${_result}";
   else
     logDebugResult FAILURE "failed";
-    _rescode=${FALSE};
   fi
-
-  export RESULT="${_result}";
 
   return ${_rescode};
 }
@@ -137,16 +143,26 @@ function process_update_center_json() {
 ##   echo "Processed update-center.json: ${RESULT}"
 function update_jenkins() {
   local _source="${1}";
-  local _rescode=${TRUE};
+  checkNotEmpty "source" "${_source}" 1;
+
+  local -i _rescode;
 
   logDebug -n "Posting update-center.json";
   curl -X POST -H "Accept: application/json" -d @"${_source}" http://localhost:${VIRTUAL_PORT}/updateCenter/byId/default/postBack
-  mv "${_source}" /var/jenkins_home/updates/default.json
-  if [ $? -eq 0 ]; then
-    logDebugResult SUCCESS "done";
+  _rescode=$?;
+  if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+
+      logDebug -n "Overwritting Jenkins update configuration";
+      mv "${_source}" /var/jenkins_home/updates/default.json
+      _rescode=$?;
+      if isTrue ${_rescode}; then
+          logDebugResult SUCCESS "done";
+      else
+        logDebugResult FAILURE "failed";
+      fi
   else
     logDebugResult FAILURE "failed";
-    _rescode=${FALSE};
   fi
 
   return ${_rescode};

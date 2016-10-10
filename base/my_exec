@@ -5,10 +5,15 @@ if [ ! -e /README ]; then
     exit 1
 fi
 
-for s in /etc/my_exec.d/*; do
+if [ "${1}" == "bash" ]; then
+    shift;
+    bash $*;
+else
+  for s in /etc/my_exec.d/*; do
     source $s
-done
+  done
 
-trap 'run_help' ERR
+  trap 'run_help' ERR
 
-$*
+  $*
+fi
