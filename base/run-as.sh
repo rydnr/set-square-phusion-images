@@ -34,7 +34,7 @@ function defineErrors() {
   addError NO_FOLDER_SPECIFIED "No folder specified";
   addError NO_COMMAND_SPECIFIED "No command specified";
   addError CANNOT_CHANGE_UID "Cannot change the uid of ";
-  addError CANNOT_CHANGE_GID 'Cannot change the gid of ${_user} to ${_gid}';
+  addError CANNOT_CHANGE_GID 'Cannot change the gid of ';
   addError CANNOT_RETRIEVE_USER_UID_OF_FOLDER "Cannot retrieve the user uid of ";
   addError CANNOT_RETRIEVE_GROUP_GID_OF_FOLDER "Cannot retrieve the group gid of ";
 }
@@ -130,6 +130,10 @@ function parseInput() {
 ##   update_service_user_account guest 1000 1000
 function update_account() {
   local _user="${1}";
+  local _tempGroup;
+  local _deleteGroup=${FALSE};
+  local _tempGroup;
+
   checkNotEmpty "user" "${_user}" 1;
 
   local _userId="${2}";
@@ -142,8 +146,18 @@ function update_account() {
     exitWithErrorCode CANNOT_CHANGE_UID "${_user}";
   fi
 
+  if ! gidAlreadyExists "${_groupId}"; then
+    _tempGroup="temp$$";
+    createGroup "${_tempGroup}" "${_groupId}";
+    _deleteGroup=${TRUE};
+  fi
+
   if ! updateUserGid "${_user}" ${_groupId}; then
-      exitWithErrorCode CANNOT_CHANGE_GID "${_user} -> ${_groupId}";
+    exitWithErrorCode CANNOT_CHANGE_GID "${_user} -> ${_groupId}";
+  fi
+
+  if isTrue ${_deleteGroup}; then
+    deleteGroup "${_tempGroup}";
   fi
 }
 
@@ -172,6 +186,7 @@ function main() {
   if isEmpty "${_gid}"; then
     exitWithErrorCode CANNOT_RETRIEVE_GROUP_GID_OF_FOLDER "${FOLDER}";
   fi
+
   retrieveUidFromUser "${RUN_AS_USER}";
   _serviceUserId="${RESULT}";
 
@@ -184,7 +199,6 @@ function main() {
     retrieveUidFromUser "${_temporaryUser}";
     _temporaryUid="${RESULT}";
     deleteUser "${_temporaryUser}";
-    logInfo "Moving current user ${_uidUser} (${_uid}) to ${_temporaryUid}";
     update_account "${_uidUser}" "${_temporaryUid}" "${_gid}";
   fi
 

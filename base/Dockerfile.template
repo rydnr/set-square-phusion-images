@@ -15,7 +15,7 @@ COPY dry-wit aptget-install.sh aptget-install.inc.sh aptget-cleanup.sh aptget-cl
      process-file.sh data copy.sh ssh.sh \
      backup.sh backup-folder.sh backup-folder.inc.sh backup-volumes.sh backup-volumes.inc.sh \
      backup-rsnapshot.sh backup-rsnapshot.inc.sh \
-     check-version.sh check-version.inc.sh run-as.sh \
+     check-version.sh check-version.inc.sh run-as.sh run-as.inc.sh \
      local-ubuntu-version.sh remote-ubuntu-version.sh local-git-version.sh remote-git-version.sh \
      create_ssl_certificate_openssl.sh create_ssl_certificate.inc.sh \
      restart.sh volumes.sh volumes.inc.sh \

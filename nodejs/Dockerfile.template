@@ -18,6 +18,7 @@ RUN chmod +x /sbin/my_exec && \
     mkdir -p /opt/workspace && \
     ln -s /opt/workspace /home/${SERVICE_USER}/workspace && \
     ln -s /opt/workspace/.npm /home/${SERVICE_USER}/.npm && \
+    ln -s /opt/workspace/.local /home/${SERVICE_USER}/.local && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} /opt/workspace && \
     curl --silent --location ${NODEJS_DOWNLOAD_URL} | bash - && \
     ${APTGET_INSTALL} nodejs build-essential libfontconfig1 && \
