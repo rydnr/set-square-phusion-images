@@ -1,0 +1,1 @@
+37 0 * * * plone_daemon /usr/local/Plone/zeocluster/bin/snapshotbackup
