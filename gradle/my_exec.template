@@ -7,16 +7,6 @@ _cmd="${_cmd} ${@}";
 
 _dockerHost="${DOCKER_HOST:-unix:///run/docker.sock}"
 
-_folder="/opt/workspace";
-
-_projectFolder="${_folder}"
-
-if [ -n ${PROJECT_NAME} ]; then
-  _projectFolder="${_folder}/${PROJECT_NAME}"
-fi
-
-mkdir -p "${_projectFolder}";
-
 _dockerApiVersion="${DOCKER_API_VERSION:-${DEFAULT_DOCKER_API_VERSION}}"
 if [ -n "${_dockerApiVersion}" ]; then
   _dockerApiVersion="-DAPI_VERSION=${_dockerApiVersion} -Dapi.version=${_dockerApiVersion} -DDOCKER_API_VERSION=${_dockerApiVersion}"
@@ -34,6 +24,16 @@ _nodeJsTag="${NODEJS_TAG:-${TAG}}";
 if [ -n "${_nodeJsTag}" ]; then
   _nodeJsTag="-DNODEJS_TAG=\"${_nodeJsTag}\"";
 fi
+
+_folder="/opt/workspace";
+
+_projectFolder="${_folder}"
+
+if [ -n "${PROJECT_NAME}" ]; then
+  _projectFolder="${_folder}/${PROJECT_NAME}"
+fi
+
+mkdir -p "${_projectFolder}";
 
 exec /usr/local/bin/run-as.sh -- ${_projectFolder} gradle -g /opt/workspace/.gradle -DDOCKER_HOST=${_dockerHost} -DHOST_PROJECTDIR=${HOST_PROJECTDIR:-${_folder}} -DHOST_USERHOME=${HOST_USERHOME:-${HOME}} ${_dockerApiVersion} ${_gradleTag} ${_grailsTag} ${_nodeJsTag} ${_cmd};
 _rescode=$?

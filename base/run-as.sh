@@ -97,27 +97,29 @@ function parseInput() {
         break;
         ;;
       -u | --userId)
+        shift;
         export USER_ID="${1}";
         shift;
         ;;
       -g | --groupId)
+        shift;
         export GROUP_ID="${1}";
         shift;
         ;;
     esac
   done
 
-  if [[ -z ${FOLDER} ]]; then
+  if isEmpty "${FOLDER}" ; then
     FOLDER="${1}";
     shift;
   fi
 
-  if [[ -z ${COMMAND} ]]; then
+  if isEmpty "${COMMAND}"; then
     COMMAND="$1";
     shift;
   fi
 
-  if [[ -z ${ARGS} ]]; then
+  if isEmpty "${ARGS}"; then
     ARGS="$@";
   fi
 }
