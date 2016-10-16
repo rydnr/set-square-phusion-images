@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${BASE_IMAGE}:${TAG}
+FROM java:${TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -9,7 +9,8 @@ RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/$
 
 RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
     echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list && \
-    ${APTGET_INSTALL} --update elasticsearch
+    echo 'deb http://packages.elastic.co/logstash/2.2/debian stable main' | sudo tee /etc/apt/sources.list.d/logstash-2.2.x.list && \
+    ${APTGET_INSTALL} --update logstash
 #    ${APTGET_CLEANUP}
 #    chmod +x /etc/service/${IMAGE}/run
 
