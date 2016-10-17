@@ -11,6 +11,7 @@ base/21_tune_rsync_conf.sh
 base/40_create_ssl_certificate_openssl.inc.sh
 base/create-ssl-certificate.inc.sh
 base/create-ssl-certificate-openssl.inc.sh
+base/dry-wit
 base/exim.00_local_macros
 base/logger
 base/monit-mail.conf.template
