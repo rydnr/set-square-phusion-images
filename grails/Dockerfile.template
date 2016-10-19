@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/sdkman:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/sdkman:201610
 @include("maintainer")
 
 @include("addon-toggles")
@@ -9,16 +9,17 @@ COPY my_exec /sbin/my_exec
 RUN chmod +x /sbin/my_exec && \
     gpasswd -a ${SERVICE_USER} root && \
     mkdir -p /opt/workspace && \
-    ln -s /opt/workspace/.grails /home/${SERVICE_USER}/.grails && \
-    ln -s /opt/workspace/.m2 /home/${SERVICE_USER}/.m2 && \
-    ln -s /opt/workspace /home/${SERVICE_USER}/workspace && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
 
 USER ${SERVICE_USER}
 
 RUN cd /home/${NAMESPACE} && \
     source /home/${NAMESPACE}/.sdkman/bin/sdkman-init.sh && \
-    sdk install grails ${GRAILS_VERSION}
+    sdk install grails ${GRAILS_VERSION} && \
+    ln -s /opt/workspace/.grails /home/${SERVICE_USER}/.grails && \
+    ln -s /opt/workspace/.gradle /home/${SERVICE_USER}/.gradle && \
+    ln -s /opt/workspace/.m2 /home/${SERVICE_USER}/.m2 && \
+    ln -s /opt/workspace /home/${SERVICE_USER}/workspace
 
 USER root
 
@@ -30,13 +31,3 @@ EXPOSE 8080
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-
-
-
-
-
-
-
-
-
-

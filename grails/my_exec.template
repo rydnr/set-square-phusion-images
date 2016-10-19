@@ -21,5 +21,6 @@ fi
 
 mkdir -p "${_projectFolder}";
 
+/usr/local/bin/run-as.sh -- ${_folder} mkdir ${_folder}/.m2 ${_folder}/.grails ${_folder}/.gradle;
 /usr/local/bin/run-as.sh -- ${_projectFolder} grails ${_grailsEnv} ${_cmd};
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet
