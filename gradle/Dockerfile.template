@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/sdkman:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/sdkman:${SDKMAN_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -9,9 +9,7 @@ COPY my_exec /sbin/my_exec
 RUN chmod +x /sbin/my_exec && \
     gpasswd -a ${SERVICE_USER} root && \
     mkdir -p /opt/workspace && \
-    ln -s /opt/workspace/.gradle /home/${SERVICE_USER}/.gradle && \
-    ln -s /opt/workspace /home/${SERVICE_USER}/workspace && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
+    chown ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
 
 USER ${SERVICE_USER}
 
@@ -20,7 +18,9 @@ ENV GRADLE_USER_HOME="/opt/workspace/.gradle" \
 
 RUN cd /home/${SERVICE_USER} && \
     source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \
-    sdk install gradle ${GRADLE_VERSION}
+    sdk install gradle ${GRADLE_VERSION} && \
+    ln -s /opt/workspace/.gradle /home/${SERVICE_USER}/.gradle && \
+    ln -s /opt/workspace /home/${SERVICE_USER}/workspace
 
 USER root
 

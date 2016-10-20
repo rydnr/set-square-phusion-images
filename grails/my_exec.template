@@ -21,6 +21,13 @@ fi
 
 mkdir -p "${_projectFolder}";
 
-/usr/local/bin/run-as.sh -- ${_folder} mkdir ${_folder}/.m2 ${_folder}/.grails ${_folder}/.gradle;
-/usr/local/bin/run-as.sh -- ${_projectFolder} grails ${_grailsEnv} ${_cmd};
+for _dir in .grails .gradle .m2 .local; do
+  [ ! -e ${_folder}/${_dir} ] && mkdir ${_folder}/${_dir} > /dev/null 2>&1 && chown ${SERVICE_USER}:${SERVICE_GROUP} ${_folder}/${_dir} > /dev/null 2>&1
+done
+exec /usr/local/bin/run-as.sh -- ${_projectFolder} grails ${_grailsEnv} ${_cmd};
+_rescode=$?;
+if [ ${_rescode} -ne 0 ]; then
+    echo "Returning error code ${_rescode}";
+fi
+exit ${_rescode}
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet
