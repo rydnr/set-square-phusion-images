@@ -1,0 +1,23 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV FILEBEAT_HOME=/opt/filebeat-${FILEBEAT_VERSION}-x86_64 \
+    PATH=$PATH:${FILEBEAT_HOME}
+
+COPY my_exec /sbin/my_exec
+
+RUN chmod +x /sbin/my_exec && \
+    mkdir -p /etc/conf.d/filebeat && \
+    wget -O /opt/${FILEBEAT_ARTIFACT} ${FILEBEAT_DOWNLOAD_URL} && \
+    tar xvfz /opt/${FILEBEAT_ARTIFACT} -C /opt/ && \
+    rm -f ${FILEBEAT_ARTIFACT}
+
+COPY filebeat.yml ${FILEBEAT_HOME}/filebeat.yml
+ADD conf.d/ /etc/conf.d/filebeat/
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

@@ -1,0 +1,7 @@
+This image uses Filebeat to process the standard output of all containers running in the host, and
+sends them to a remote ElasticSearch server.
+
+Examples:
+
+- Run filebeat to process all containers running in this host, and send them to an ElasticSearch server in "elkes.${DOMAIN}":
+> docker run -d -v /var/run/docker.sock:/tmp/docker.sock:ro -e SHIPPER_NAME=elkes.${DOMAIN} --name docker-filebeat-$(hostname) --net=host ${NAMESPACE}/${IMAGE}:${TAG}

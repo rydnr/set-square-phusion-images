@@ -28,6 +28,8 @@ copyright-preamble.*
 Dockerfile
 */Dockerfile
 docs/set-square_overview.*
+filebeat-docker/conf.d/*.yml
+filebeat-docker/filebeat.yml
 firefox-sync/rc.local
 firefox-sync/rc.local
 firefox-sync/service
