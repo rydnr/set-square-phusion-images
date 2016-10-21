@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/java:${TAG}
+FROM ${NAMESPACE}/java:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -48,3 +48,4 @@ EXPOSE ${NEXUS_UI_HTTP_PORT} ${NEXUS_UI_HTTPS_PORT} ${NEXUS_DOCKER_REGISTRY_PORT
 @include("copy-metadata")
 @include("instructions")
 @include("symlinks")
+

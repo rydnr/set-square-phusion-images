@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" '${TAG}';
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "${TAG}";
 defineEnvVar JAVA_VERSION "The version of the Java VM" "8";
 defineEnvVar BOUNCY_CASTLE_VERSION "The version of Bouncy Castle" "154";
 defineEnvVar BOUNCY_CASTLE_ARTIFACT "The Bouncy Castle artifact" 'bcprov-jdk15on-${BOUNCY_CASTLE_VERSION}.jar';

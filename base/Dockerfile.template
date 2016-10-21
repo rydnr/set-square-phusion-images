@@ -74,6 +74,7 @@ RUN mkdir -p /etc/my_exec.d && \
     SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.key /etc/exim4/exim.key && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.crt /etc/exim4/exim.crt && \
+    sed -i "s/^dc_use_split_config='false'/dc_use_split_config='true'/g" /etc/exim4/update-exim4.conf && \
     update-exim4.conf && \
     chmod +x /usr/local/bin/install-locale.sh && \
     echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \

@@ -1,4 +1,4 @@
-overrideEnvVar ENABLE_LOGSTASH "true";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "${TAG}";
 defineEnvVar NEXUS_VERSION "The version of Sonatype Nexus" "3.0.1-01";
 defineEnvVar NEXUS_ARTIFACT \
              "The Nexus artifact" \
@@ -16,3 +16,4 @@ defineEnvVar NEXUS_DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry"
 defineEnvVar NEXUS_DOCKER_GROUP_PORT "The HTTPS port for the Dcoker group (proxy + registry)" "18444";
 defineEnvVar SERVICE_USER "The service user" "nexus";
 defineEnvVar SERVICE_GROUP "The service group" "nexus";
+overrideEnvVar ENABLE_LOGSTASH "true";
