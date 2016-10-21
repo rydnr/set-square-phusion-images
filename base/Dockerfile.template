@@ -65,7 +65,7 @@ RUN mkdir -p /etc/my_exec.d && \
     mkdir /etc/cron.now && \
     echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab && \
     mkdir /Dockerfiles && \
-    (mkdir /opt || echo "/opt already exists") && \
+    (mkdir /opt 2> /dev/null || echo "/opt already exists") && \
     /usr/sbin/usermod -d /backup ${BACKUP_USER} && \
     /usr/sbin/groupadd ${DOCKER_GROUP} && \
     /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER} && \
@@ -74,7 +74,7 @@ RUN mkdir -p /etc/my_exec.d && \
     SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.key /etc/exim4/exim.key && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.crt /etc/exim4/exim.crt && \
-    sed -i "s/^dc_use_split_config='false'/dc_use_split_config='true'/g" /etc/exim4/update-exim4.conf && \
+    sed -i "s/^dc_use_split_config='false'/dc_use_split_config='true'/g" /etc/exim4/update-exim4.conf.conf && \
     update-exim4.conf && \
     chmod +x /usr/local/bin/install-locale.sh && \
     echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
