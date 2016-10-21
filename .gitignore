@@ -16,6 +16,7 @@ base/exim.00_local_macros
 base/logger
 base/monit-mail.conf.template
 base/remote-rsyslogd.conf
+base/restart
 */.build*
 build*
 .build.inc.sh*
