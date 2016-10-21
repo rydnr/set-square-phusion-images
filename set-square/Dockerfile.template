@@ -1,0 +1,24 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="false"
+
+COPY my_exec /sbin/my_exec
+
+RUN chmod +x /sbin/my_exec && \
+    ${APTGET_INSTALL} -u --no-pin git && \
+    cd /usr/local/src && \
+    git clone https://github.com/rydnr/set-square.git && \
+    cd /usr/local/bin && \
+    ln -s /usr/local/src/set-square/build.sh . && \
+    ln -s /usr/local/src/set-square/build.inc.sh . && \
+    ${APTGET_CLEANUP}
+
+VOLUME [ "/home/set-square", "/var/run/docker.sock" ]
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

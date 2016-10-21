@@ -1,0 +1,8 @@
+#!/bin/bash
+
+_auxFolder=$(mktemp -d -p /tmp)
+cd ${_auxFolder}
+cp -r /usr/local/bin/set-square .
+ln -s set-square/* .
+rsync -avz /home/set-square/ .
+/usr/local/bin/run-as.sh /home/set-square ./build.sh $@

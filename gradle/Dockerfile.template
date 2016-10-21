@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/sdkman:${SDKMAN_IMAGE_TAG}
+FROM ${REGISTRY}/${NAMESPACE}/sdkman:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")

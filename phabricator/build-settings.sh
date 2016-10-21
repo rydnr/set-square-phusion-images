@@ -1,3 +1,4 @@
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "${TAG}";
 defineEnvVar PHABRICATOR_VIRTUAL_HOST "The virtual host of the Phabricator installation" "phabricator.${DOMAIN}";
 defineEnvVar PHABRICATOR_PORT "The port used by Phabricator" "8000";
 defineEnvVar PHABRICATOR_DB_NAME "The database name" "phabricator";

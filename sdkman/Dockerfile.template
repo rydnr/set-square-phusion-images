@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/java:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/java:${PARENT_IMAGE_TAG}
 MAINTAINER ${MAINTAINER}
 
 @include("maintainer")
