@@ -1,0 +1,13 @@
+ENV SERVICE_PACKAGE="${APACHE_SERVICE_PACKAGE}" \
+    SERVICE_USER="${APACHE_SERVICE_USER}" \
+    SERVICE_GROUP="${APACHE_SERVICE_GROUP}"
+
+#COPY apache-files/logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
+RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
+    ${APTGET_CLEANUP} && \
+    cd /usr/local/bin && \
+    ln -s check-version.sh check-version-apache.sh && \
+    ln -s local-ubuntu-version.sh local-version-apache.sh && \
+    ln -s remote-ubuntu-version.sh remote-version-apache.sh
+    

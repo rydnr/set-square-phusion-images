@@ -42,6 +42,10 @@ function checkInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -66,6 +70,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 
@@ -89,7 +97,7 @@ function main() {
   fi
 
   logDebug -n "Checking ${PACKAGE} local version";
-  _result="$(apt-cache madison ${_package}} | grep 'trusty' | grep 'Packages' | head -n 1 | awk '{print $3;}')";
+  _result="$(apt-cache madison ${_package} | grep 'Packages' | head -n 1 | awk '{print $3;}')";
   _rescode=$?;
   if ! isTrue ${_rescode}; then
     logDebugResult FAILURE "${_result}";

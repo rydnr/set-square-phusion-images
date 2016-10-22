@@ -4,24 +4,16 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-ENV SERVICE_PACKAGE="apache2" \
-    SERVICE_USER="www-data" \
-    SERVICE_GROUP="www-data" \
-    DOBACKUP="false"
+ENV DOBACKUP="false"
 
 RUN mkdir -p /etc/service/${IMAGE} /backup/${IMAGE}-www && \
     cp -r /etc/service/.template/* /etc/service/${IMAGE}
 
 COPY service /etc/service/${IMAGE}/run
-#COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
-RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
-    ${APTGET_CLEANUP} && \
-    cd /usr/local/bin && \
-    ln -s check-version.sh check-version-${IMAGE}.sh && \
-    ln -s local-ubuntu-version.sh local-version-${IMAGE}.sh && \
-    ln -s remote-ubuntu-version.sh remote-version-${IMAGE}.sh && \
-    rm -rf /var/www && \
+@include("apache")
+
+RUN rm -rf /var/www && \
     ln -s /backup/${IMAGE}-www /var/www && \
     chmod +x /etc/service/${IMAGE}/run
 
@@ -32,3 +24,4 @@ VOLUME /backup/${IMAGE}-www
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+
