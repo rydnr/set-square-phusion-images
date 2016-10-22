@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/java:${PARENT_IMAGE_TAG}
+FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -11,6 +11,8 @@ ENV DOBACKUP="true" \
     SERVICE_USER="${SERVICE_USER}" \
     SERVICE_GROUP="${SERVICE_GROUP}" \
     SSL_KEYSTORE_PATH="${SSL_KEYSTORE_FOLDER}/${IMAGE}.${SSL_KEYSTORE_TYPE}"
+
+@include("java")
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY INSTALL.tmpl /usr/local/share/INSTALL.tmpl

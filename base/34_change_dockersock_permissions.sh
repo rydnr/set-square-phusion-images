@@ -41,6 +41,10 @@ function checkInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -65,6 +69,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 }

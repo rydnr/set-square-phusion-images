@@ -9,6 +9,7 @@ base/10_append_backup_to_etc_hosts.inc.sh
 base/20_create_rsnapshot_conf.inc.sh
 base/21_tune_rsync_conf.sh
 base/40_create_ssl_certificate_openssl.inc.sh
+base/create_ssl_certificate.inc.sh
 base/create-ssl-certificate.inc.sh
 base/create-ssl-certificate-openssl.inc.sh
 base/dry-wit
@@ -85,6 +86,7 @@ nexus/50_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL
 nexus/INSTALL.tmpl
+nexus/java-files
 nodejs/my_exec
 observium/setup.sql
 phabricator/apache-vhost.conf
@@ -114,6 +116,7 @@ sdkman/setup.sql
 .templates/addon-toggles
 .templates/copy-metadata
 .templates/instructions
+.templates/java
 .templates/maintainer
 .templates/preamble
 .templates/preamble

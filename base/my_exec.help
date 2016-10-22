@@ -1,7 +1,11 @@
 #!/bin/bash
 
 function run_help() {
-  /usr/local/bin/help
+  if [ -e /usr/local/bin/help ]; then
+      /usr/local/bin/help
+  else
+    /usr/local/bin/help.base
+  fi
 }
 
 # trap 'run_help' ERR
