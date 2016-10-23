@@ -1,0 +1,3 @@
+RUN /usr/sbin/groupadd ${DOCKER_GROUP} && \
+    /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER}
+

@@ -1,0 +1,7 @@
+COPY create_ssl_certificate-files/create_ssl_certificate_openssl.sh \
+     create_ssl_certificate-files/create_ssl_certificate.inc.sh \
+     /usr/local/bin/
+
+RUN ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
+    chmod +x /usr/local/bin/create_ssl_certificate_openssl.sh
+

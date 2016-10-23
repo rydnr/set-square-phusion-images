@@ -1,0 +1,93 @@
+_namespace="${NAMESPACE}";
+if isEmpty "${_namespace}"; then
+  _namespace="${SQ_NAMESPACE}";
+fi
+_image="${SQ_IMAGE}";
+if isEmpty "${_image}"; then
+  _image="${SQ_IMAGE}";
+_domain="${DOMAIN}";
+if isEmpty "${_domain}"; then
+  _domain="${SQ_DOMAIN}";
+fi
+if isEmpty "${DOLLAR}{SSL_KEY_ALGORITHM}"; then
+  defineEnvVar SSL_KEY_ALGORITHM "The algorithm of the SSL key" "${SQ_SSL_KEY_ALGORITHM}";
+fi
+if isEmpty "${DOLLAR}{SSL_KEY_LENGTH}"; then
+  defineEnvVar SSL_KEY_LENGTH "The length of the SSL key" "${SQ_SSL_KEY_LENGTH}";
+fi
+if isEmpty "${DOLLAR}{SSL_KEY_ENCRYPTION}"; then
+  defineEnvVar SSL_KEY_ENCRYPTION "The encryption scheme for the key" "aes256";
+fi
+if isEmpty "${DOLLAR}{SSL_KEY_FOLDER}"; then
+  defineEnvVar SSL_KEY_FOLDER "The folder storing the SSL key pairs" "${SQ_SSL_KEY_FOLDER}";
+fi
+if isEmpty "${DOLLAR}{SSL_KEY_PASSWORD}"; then
+  if isEmpty "${SQ_SSL_KEY_PASSWORD}"; then
+    defineEnvVar SSL_KEY_PASSWORD "The key password" "${_namespace}-${_image}";
+  else
+    defineEnvVar SSL_KEY_PASSWORD "The key password" "${SQ_SSL_KEY_PASSWORD}";
+  fi
+fi
+if isEmpty "${DOLLAR}{SSL_KEYSTORE_FOLDER}"; then
+  defineEnvVar SSL_KEYSTORE_FOLDER "The folder storing the SSL keystore" "${SQ_SSL_KEYSTORE_FOLDER}";
+fi
+if isEmpty "${DOLLAR}{SSL_KEYSTORE_NAME}"; then
+  if isEmpty "${DOLLAR}{SQ_SSL_KEYSTORE_NAME}"; then
+    defineEnvVar SSL_KEYSTORE_NAME "The keystore name" "${_image}";
+  else
+    defineEnvVar SSL_KEYSTORE_NAME "The keystore name" "${SQ_SSL_KEYSTORE_NAME}";
+  fi
+fi
+if isEmpty "${DOLLAR}{SSL_KEYSTORE_PATH}"; then
+  defineEnvVar SSL_KEYSTORE_PATH "The keystore path" "${SQ_SSL_KEYSTORE_PATH}";
+fi
+if isEmpty "${DOLLAR}{SSL_KEYSTORE_TYPE}"; then
+  defineEnvVar SSL_KEYSTORE_TYPE "The type of the keystore" "${SQ_SSL_KEYSTORE_TYPE}";
+fi
+if isEmpty "${DOLLAR}{SSL_KEYSTORE_PASSWORD}"; then
+  if isEmpty "${SQ_SSL_KEYSTORE_PASSWORD}"; then
+    defineEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" "${_namespace}-${_image}";
+  else
+    defineEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" "${SQ_SSL_KEYSTORE_PASSWORD}";
+  fi
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_ALIAS}"; then
+  defineEnvVar SSL_CERTIFICATE_ALIAS "The alias of the SSL certificate" "${_image}";
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_COMMON_NAME}"; then
+  defineEnvVar SSL_CERTIFICATE_COMMON_NAME "The common name for the SSL certificate" '${_image}.${_domain}';
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_WILDCARD_COMMON_NAME}"; then
+  defineEnvVar SSL_CERTIFICATE_WILDCARD_COMMON_NAME "The wildcard version of the common name for the SSL certificate" '*.${_domain}';
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_ORGANIZATIONAL_UNIT}"; then
+  defineEnvVar SSL_CERTIFICATE_ORGANIZATIONAL_UNIT "The organizational unit for the SSL certificate" "${SQ_SSL_CERTIFICATE_ORGANIZATIONAL_UNIT}";
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_ORGANIZATION}"; then
+  defineEnvVar SSL_CERTIFICATE_ORGANIZATION "The organization behind the SSL certificate" "${SQ_SSL_CERTIFICATE_ORGANIZATION}";
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_LOCALITY}"; then
+  defineEnvVar SSL_CERTIFICATE_LOCALITY "The locality information in the SSL certificate" "${SQ_SSL_CERTIFICATE_LOCALITY}";
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_STATE}"; then
+  defineEnvVar SSL_CERTIFICATE_STATE "The state information in the SSL certificate" "${SQ_SSL_CERTIFICATE_STATE}";
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_COUNTRY}"; then
+  defineEnvVar SSL_CERTIFICATE_COUNTRY "The country information in the SSL certificate" "${SQ_SSL_CERTIFICATE_COUNTRY}";
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_SUBJECT}"; then
+  defineEnvVar SSL_CERTIFICATE_SUBJECT "The subject of the SSL certificate" '/C=${SSL_CERTIFICATE_COUNTRY}/ST=${SSL_CERTIFICATE_STATE}/L=${SSL_CERTIFICATE_LOCALITY}/O=${SSL_CERTIFICATE_ORGANIZATION}/OU=${SSL_CERTIFICATE_ORGANIZATIONAL_UNIT}/CN=${SSL_CERTIFICATE_COMMON_NAME}';
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_DNAME}"; then
+  defineEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" 'CN=${SSL_CERTIFICATE_WILDCARD_COMMON_NAME}, OU=${SSL_CERTIFICATE_ORGANIZATIONAL_UNIT}, O=${SSL_CERTIFICATE_ORGANIZATION}, L=${SSL_CERTIFICATE_LOCALITY}, S=${SSL_CERTIFICATE_STATE}, C=${SSL_CERTIFICATE_COUNTRY}';
+fi
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_EXPIRATION_DAYS}"; then
+  defineEnvVar SSL_CERTIFICATE_EXPIRATION_DAYS "The number of days until the certificate expires" "${SQ_SSL_CERTIFICATE_EXPIRATION_DAYS}";
+fi
+if isEmpty "${DOLLAR}{SSL_JAVA_SIGN_ALGORITHM}"; then
+  defineEnvVar SSL_JAVA_SIGN_ALGORITHM "The algorithm used to sign the SSL certificate" "${SQ_SSL_JAVA_SIGN_ALGORITHM}";
+fi
+if isEmpty "${DOLLAR}{SSL_SAN_EXTENSIONS}"; then
+  defineEnvVar SSL_SAN_EXTENSIONS "The SAN extensions for the SSL certificate" 'dns:${SSL_CERTIFICATE_COMMON_NAME},dns:*.${SSL_CERTIFICATE_COMMON_NAME},dns:*.${_image}.${_domain},dns:*.${_domain}';
+fi
+

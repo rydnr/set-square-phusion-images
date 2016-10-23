@@ -1,0 +1,11 @@
+COPY cron-files/my_exec.d /etc/my_exec.d/cron
+
+COPY cron-files/versioncheck.daily /etc/cron.daily/
+
+RUN mkdir -p /etc/service/cron/log && \
+    mkdir /etc/cron.now && \
+    echo "* *     * * *   root    cd / && run-parts --report /etc/cron.now" >> /etc/crontab && \
+    cp /etc/service/.template/log/run /etc/service/cron/log/run
+
+COPY cron-files/service /etc/service/cron/run
+

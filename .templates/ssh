@@ -1,0 +1,8 @@
+COPY ssh-files/my_exec.d /etc/my_exec.d/ssh
+COPY ssh-files/ssh.sh /usr/local/bin/ssh.sh
+
+RUN mkdir -p /etc/service/sshd/log && \
+    ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-public && \
+    ln -s -- /usr/local/bin/ssh.sh /usr/local/bin/ssh-private && \
+    cp /etc/service/.template/log/run /etc/service/sshd/log/run
+

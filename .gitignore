@@ -5,6 +5,7 @@ abc/*
 android-studio/my_exec
 artifactory/entrypoint.sh
 backup/
+**/backup-files
 base/10_append_backup_to_etc_hosts.inc.sh
 base/20_create_rsnapshot_conf.inc.sh
 base/21_tune_rsync_conf.sh
@@ -24,12 +25,16 @@ build*
 .build-settings.sh
 */.build-settings.sh
 .build.sh.*
+**/check-version-files
 */copyright-preamble.*
 copyright-preamble.*
 */copyright-preamble.acmsl.txt
+**/create_ssl_certificate-files/create_ssl_certificate.inc.sh
+**/cron-files
 Dockerfile
 */Dockerfile
 docs/set-square_overview.*
+*/exit-files/exim.00_local_macros
 filebeat-docker/conf.d/*.yml
 filebeat-docker/filebeat.yml
 firefox-sync/rc.local
@@ -54,6 +59,7 @@ grails/service
 grails/setup.sql
 graphite/local_settings.py
 */help
+**/install-files
 java/41_create_ssl_certificate_keytool.inc.sh
 java/my_exec
 java/my_exec
@@ -66,6 +72,7 @@ jenkins/settings.xml
 */LICENSE.*
 **/LICENSE
 LICENSE.*
+**/locale-files
 *.log
 mariadb/admin.sh
 mariadb/backup.sh
@@ -82,6 +89,7 @@ mariadb/setup.sql
 mariadb/shutdown.sh
 mariadb/upgrade.sh
 mariadb/watch-ddls
+**/monit-files
 nexus/50_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL
@@ -111,13 +119,16 @@ postgresql/setup.sql
 rabbitmq/rc.local
 rabbitmq/service
 */README
+**/rsnapshot-files
 .rt-client.sh-push.lock
 .rt-projects
 sdkman/setup.sql
+**/ssh-files
 .templates/addon-toggles
 .templates/addon-toggles
 .templates/apache
 .templates/copy-metadata
+.templates/install
 .templates/instructions
 .templates/java
 .templates/maintainer

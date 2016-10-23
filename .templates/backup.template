@@ -1,0 +1,13 @@
+# Requires cron
+COPY backup-files/backup.sh \
+     backup-files/backup-folder.sh \
+     backup-files/backup-folder.inc.sh \
+     backup-files/backup-volumes.sh \
+     backup-files/backup-volumes.inc.sh \
+     /usr/local/bin/
+
+RUN /usr/sbin/usermod -d /backup ${BACKUP_USER} && \
+    ln -s -- /usr/local/bin/backup.sh /usr/local/bin/backup && \
+    ln -s /usr/local/bin/backup-volumes.sh /etc/cron.hourly/backup-volumes
+
+COPY backup-files/backup-volumes.sh backup-files/backup-volumes.inc.sh /usr/local/bin

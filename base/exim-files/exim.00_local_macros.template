@@ -1,0 +1,6 @@
+DKIM_CANON = relaxed
+DKIM_SELECTOR = ${IMAGE}-${TAG}
+DKIM_DOMAIN = ${DOMAIN}
+DKIM_FILE = /etc/ssl/private/${IMAGE}-${TAG}.pem
+MAIN_TLS_ENABLE = yes
+CHECK_RCPT_SPF = true
