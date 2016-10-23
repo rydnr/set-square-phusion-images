@@ -1,12 +1,12 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/apache:${PARENT_IMAGE_TAG}
+FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
-RUN mv /etc/service/apache/run /etc/service/apache/run-apache
+#RUN mv /etc/service/apache/run /etc/service/apache/run-apache
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
-COPY service /etc/service/apache/run
+COPY service /etc/service/${IMAGE}/run
 COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper help.phabricator.sh \
      /usr/local/bin/
 COPY phabricator-ssh-hook.sh sshd_config.phabricator /var/local/
@@ -23,31 +23,30 @@ ENV SERVICE="apache" \
     DOBACKUP="true" \
     DEFAULT_LOCALE="en_US.UTF-8"
 
-RUN ${APTGET_INSTALL} -u git libapache2-mod-php5 dpkg-dev \
-        php5 php5-mysql php5-gd php5-dev php5-curl php-apc php5-cli php5-json imagemagick && \
-    ${APTGET_INSTALL} --no-pin mysql-server python-pip openjdk-7-jre-headless && \
+@include("apache")
+
+RUN ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
+        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick && \
+    ${APTGET_INSTALL} --no-pin mysql-server python-pip openjdk-8-jre-headless && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    mysql_install_db && \
-    chmod +x /etc/service/apache/run && \
+    chmod +x /etc/service/${IMAGE}/run && \
     mkdir /usr/local/share/liquibase && \
-    cd /opt && \
-    git clone https://github.com/phacility/libphutil.git && \
-    git clone https://github.com/phacility/arcanist.git && \
-    git clone https://github.com/phacility/phabricator.git && \
-    for p in libphputil arcanist phabricator; do \
+    for p in libphutil arcanist phabricator; do \
+      cd /opt ; \
+      git clone https://github.com/phacility/${p}.git; \
       cd /opt/${p} && git checkout stable; \
     done && \
     a2dissite 000-default.conf && \
     a2enmod rewrite && \
-    php5enmod mcrypt && \
-    apt-get source php5 && \
-    cd $(ls -1F | grep '^php5-.*/$')/ext/pcntl && phpize && ./configure && make && make install && \
+    ${APTGET_INSTALL} php-mcrypt && \
+    phpenmod mcrypt && \
     ln -s /backup/${IMAGE}-repo /var/repo && \
     ln -s /backup/${IMAGE}-local /var/local/phabricator && \
     chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} /var/local/phabricator /var/repo && \
-    sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php5/apache2/php.ini && \
-    sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php5/apache2/php.ini && \
+    sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php/7.0/apache2/php.ini && \
+    sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php/7.0/apache2/php.ini && \
+    pip install --upgrade pip && \
     pip install pygments && \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user && \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git && \
@@ -107,7 +106,7 @@ RUN ${APTGET_INSTALL} -u git libapache2-mod-php5 dpkg-dev \
     ${APTGET_CLEANUP} && \
     rm -rf /var/lib/mysql && \
     rm -rf /opt/liquibase* && \
-    rm -rf /opt/php5* && \
+    rm -rf /opt/php* && \
     for s in /opt/libphutil/bin/*; do \
       ln -s $s /usr/local/bin/; \
     done && \
@@ -134,3 +133,4 @@ VOLUME /backup/rsnapshot
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+

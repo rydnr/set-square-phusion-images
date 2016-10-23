@@ -89,6 +89,7 @@ nexus/INSTALL.tmpl
 nexus/java-files
 nodejs/my_exec
 observium/setup.sql
+phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
 phabricator/INSTALL

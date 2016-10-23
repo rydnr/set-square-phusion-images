@@ -64,12 +64,12 @@ function checkInput() {
     esac
   done
 
-  if [[ -z ${FOLDER} ]]; then
+  if isEmpty "${FOLDER}"; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_FOLDER_SPECIFIED;
   fi
 
-  if [[ -z ${COMMAND} ]]; then
+  if isEmpty "${COMMAND}"; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_COMMAND_SPECIFIED;
   else
