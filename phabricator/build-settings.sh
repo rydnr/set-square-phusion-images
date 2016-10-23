@@ -1,6 +1,8 @@
 defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "latest";
-defineEnvVar GITHUB_STABLE_VERSION "The latest hash of the stable branch in github" "$(base/remote-git-version.sh -r https://github.com/phacility/phabricator.git stable)";
-overrideEnvVar TAG '${GITHUB_STABLE_VERSION}';
+defineEnvVar GITHUB_PHABRICATOR_HASH "The hash of Phabricator's stable branch in github" "$(base/remote-git-version.sh -r https://github.com/phacility/phabricator.git stable)";
+overrideEnvVar TAG '${GITHUB_PHABRICATOR_HASH}';
+defineEnvVar GITHUB_ARCANIST_HASH "The hash of Arcanist's stable branch in github" "$(base/remote-git-version.sh -r https://github.com/phacility/arcanist.git stable)";
+defineEnvVar GITHUB_LIBPHUTIL_HASH "The hash of Libphutil's stable branch in github" "$(base/remote-git-version.sh -r https://github.com/phacility/libphutil.git stable)";
 defineEnvVar PHABRICATOR_VIRTUAL_HOST "The virtual host of the Phabricator installation" "phabricator.${DOMAIN}";
 defineEnvVar PHABRICATOR_PORT "The port used by Phabricator" "8000";
 defineEnvVar PHABRICATOR_DB_NAME "The database name" "phabricator";

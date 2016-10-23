@@ -32,11 +32,18 @@ RUN ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     chmod +x /etc/service/${IMAGE}/run && \
     mkdir /usr/local/share/liquibase && \
-    for p in libphutil arcanist phabricator; do \
-      cd /opt ; \
-      git clone https://github.com/phacility/${p}.git; \
-      cd /opt/${p} && git checkout stable; \
-    done && \
+    cd /opt && \
+    git clone https://github.com/phacility/libphutil.git && \
+    cd /opt/libphutil && \
+    git checkout ${GITHUB_LIBPHUTIL_HASH} && \
+    cd /opt && \
+    git clone https://github.com/phacility/arcanist.git && \
+    cd /opt/arcanist && \
+    git checkout ${GITHUB_ARCANIST_HASH} && \
+    cd /opt && \
+    git clone https://github.com/phacility/phabricator.git && \
+    cd /opt/phabricator && \
+    git checkout ${GITHUB_PHABRICATOR_HASH} && \
     a2dissite 000-default.conf && \
     a2enmod rewrite && \
     ${APTGET_INSTALL} php-mcrypt && \

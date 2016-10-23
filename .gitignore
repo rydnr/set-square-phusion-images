@@ -115,6 +115,7 @@ rabbitmq/service
 .rt-projects
 sdkman/setup.sql
 .templates/addon-toggles
+.templates/addon-toggles
 .templates/apache
 .templates/copy-metadata
 .templates/instructions
