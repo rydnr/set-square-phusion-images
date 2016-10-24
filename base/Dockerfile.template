@@ -8,46 +8,26 @@ ENV DEBIAN_FRONTEND="noninteractive" \
 
 @include("addon-toggles")
 
-# /usr/local/bin
-COPY dry-wit process-file.sh data copy.sh \
-     run-as.sh run-as.inc.sh \
-     restart.sh volumes.sh volumes.inc.sh \
-     /usr/local/bin/
-
-RUN mkdir -p /etc/my_exec.d && \
-    mkdir -p /etc/service/.template/log; \
-    chmod +x /usr/local/bin/*.sh /etc/my_init.d/*.sh && \
-    mkdir /Dockerfiles && \
-    ln -s /usr/local/bin/volumes.sh /usr/local/bin/volumes && \
-    cd /bin && rm -f /bin/sh && ln -s /bin/bash sh
-
-COPY logger /etc/service/.template/log/run
-
-RUN chmod +x /etc/service/.template/log/run
 
 @include("install")
 
-# /etc/my_init.d
-COPY 00_chown_volumes.sh 00_chown_volumes.inc.sh \
-     21_tune_rsync_conf.sh 21_tune_rsync_conf.inc.sh \
-     34_change_dockersock_permissions.sh 34_change_dockersock_permissions.inc.sh \
-     /etc/my_init.d/
-
-COPY my_exec.d/syslog /etc/my_exec.d/
-COPY my_exec /sbin/my_exec
-
+# Housekeeping
+@include("common")
+@include("syslog")
+@include("rsyslog")
+@include("volumes")
 #@include("help")
-@include("cron")
 @include("locale")
-@include("monit")
-@include("rsnapshot")
-@include("ssh")
 @include("create_ssl_certificate")
-@include("exim")
 @include("backup")
 @include("check-version")
 
-COPY remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
+# Extra services
+@include("cron")
+@include("monit")
+@include("rsnapshot")
+@include("ssh")
+@include("exim")
 
 ENTRYPOINT ["/sbin/my_exec"]
 CMD ["/sbin/my_init"]

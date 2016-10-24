@@ -1,0 +1,3 @@
+defineEnvVar DOCKER_USER "The Docker group" "docker";
+defineEnvVar DOCKER_GROUP "The Docker group" "docker";
+

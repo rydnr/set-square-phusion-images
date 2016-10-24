@@ -1,3 +1,5 @@
+# apache template
+
 ENV SERVICE_PACKAGE="${APACHE_SERVICE_PACKAGE}" \
     SERVICE_USER="${APACHE_SERVICE_USER}" \
     SERVICE_GROUP="${APACHE_SERVICE_GROUP}"
@@ -11,3 +13,5 @@ RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
     ln -s local-ubuntu-version.sh local-version-apache.sh && \
     ln -s remote-ubuntu-version.sh remote-version-apache.sh
     
+# End of apache template
+

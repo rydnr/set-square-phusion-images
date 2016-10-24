@@ -1,14 +1,18 @@
-# Requires create_ssl_certificate template
+# exim template
+# - requires: create_ssl_certificate
 
 RUN ${APTGET_INSTALL} --update mailutils exim4 sasl2-bin opendkim opendkim-tools apt-utils net-tools spf-tools-perl && \
-    ${APTGET_CLEANUP} && \
-    mkdir -p /etc/service/exim4/log; \
+    ${APTGET_CLEANUP}
+
+RUN mkdir -p /etc/service/exim4/log; \
     SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.key /etc/exim4/exim.key && \
     ln -s /etc/ssl/private/${IMAGE}-${TAG}.crt /etc/exim4/exim.crt && \
     cp /etc/service/.template/log/run /etc/service/exim4/log/run
 
-COPY service.exim4 /etc/service/exim4/run
+COPY exim-files/service.exim4 /etc/service/exim4/run
 COPY exim-files/exim.00_local_macros /etc/exim4/conf.d/00_local_macros
-COPY exim-files/my_exec.d.exim4 /etc/my_exec.d/exim4
+COPY exim-files/my_exec.d /etc/my_exec.d/exim4
+
+# End of exim template
 

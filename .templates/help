@@ -1,3 +1,5 @@
+# help template
+
 COPY help-files/help.base.sh \
      help-files/show \
      help-files/display-dockerfile.sh \
@@ -12,4 +14,6 @@ RUN chmod +x -- /usr/local/bin/help.base.sh && \
     chmod +x -- /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \
     ln -s -- /usr/local/bin/display-dockerfile.sh /usr/local/bin/Dockerfile && \
     ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile
+
+# End of help template
 

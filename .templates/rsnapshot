@@ -1,4 +1,6 @@
-# Requires cron template
+# rsnapshot template
+# - requires: cron
+
 COPY rsnapshot-files/backup-rsnapshot.sh rsnapshot-files/backup-rsnapshot.inc.sh \
      /usr/local/bin/
 
@@ -21,4 +23,5 @@ RUN ${APTGET_INSTALL} --update rsnapshot && \
       ln -s /usr/local/bin/backup-rsnapshot.sh /etc/cron.${p}/backup-rsnapshot; \
     done
 
+# End of rsnapshot template
 

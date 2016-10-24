@@ -1,0 +1,23 @@
+# common template
+COPY common-files/dry-wit process-file.sh \
+     common-files/data \
+     common-files/copy.sh \
+     common-files/run-as.sh \
+     common-files/run-as.inc.sh \
+     common-files/restart.sh \
+     /usr/local/bin/
+
+# /usr/local/bin
+RUN mkdir -p /etc/my_exec.d && \
+    mkdir -p /etc/service/.template/log; \
+    chmod +x /usr/local/bin/*.sh /etc/my_init.d/*.sh && \
+    mkdir /Dockerfiles && \
+    cd /bin && rm -f /bin/sh && ln -s /bin/bash sh
+
+COPY common-files/logger /etc/service/.template/log/run
+COPY common-files/my_exec /sbin/my_exec
+
+RUN chmod +x /etc/service/.template/log/run
+
+# End of common template
+

@@ -1,4 +1,5 @@
-# Requires cron
+# backup template
+# - requires cron
 COPY backup-files/backup.sh \
      backup-files/backup-folder.sh \
      backup-files/backup-folder.inc.sh \
@@ -11,3 +12,11 @@ RUN /usr/sbin/usermod -d /backup ${BACKUP_USER} && \
     ln -s /usr/local/bin/backup-volumes.sh /etc/cron.hourly/backup-volumes
 
 COPY backup-files/backup-volumes.sh backup-files/backup-volumes.inc.sh /usr/local/bin
+
+# COPY backup-files/10_append_backup_to_etc_hosts.sh \
+#      backup-files/10_append_backup_to_etc_hosts.inc.sh \
+#      backup-files/22_add_backup_host_to_etc_hosts.sh \
+#      /etc/my_init.d/
+
+# End of backup template
+

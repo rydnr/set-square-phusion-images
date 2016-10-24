@@ -1,5 +1,10 @@
+# instructions template
+
 # For instructions on how to use this image, please run
 # docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
 
 # Environment variables used when building this image:
 @include_env
+
+# End of instructions template
+

@@ -1,0 +1,4 @@
+# syslog template
+COPY syslog-files/my_exec.d /etc/my_exec.d/
+# End of syslog template
+

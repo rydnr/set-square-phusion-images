@@ -29,11 +29,13 @@ build*
 */copyright-preamble.*
 copyright-preamble.*
 */copyright-preamble.acmsl.txt
+*/create_ssl_certificate-files/*
 **/create_ssl_certificate-files/create_ssl_certificate.inc.sh
 **/cron-files
 Dockerfile
 */Dockerfile
 docs/set-square_overview.*
+*/exim-files/*
 */exit-files/exim.00_local_macros
 filebeat-docker/conf.d/*.yml
 filebeat-docker/filebeat.yml
@@ -127,10 +129,13 @@ sdkman/setup.sql
 .templates/addon-toggles
 .templates/addon-toggles
 .templates/apache
+.templates/backup
 .templates/copy-metadata
+.templates/exim-files/exim.00_local_macros
 .templates/install
 .templates/instructions
 .templates/java
+.templates/locale
 .templates/maintainer
 .templates/preamble
 .templates/preamble
@@ -142,3 +147,4 @@ tt-rss/create-db.inc.sh
 tt-rss/create-ttrss-database.sql
 tt-rss/create-ttrss-user.sql
 tt-rss/setup.sql
+*/volumes-files/*

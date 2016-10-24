@@ -1,0 +1,3 @@
+defineEnvVar GMAIL_USER_FOR_SMTP_RELAY "The gmail user for sending locally-generated emails through gmail" "";
+defineEnvVar GMAIL_PASSWORD_FOR_SMTP_RELAY "The password for sending locally-generated emails through gmail" "";
+

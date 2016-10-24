@@ -1,0 +1,11 @@
+# volumes template
+COPY volumes-files/volumes.sh \
+     volumes-files/volumes.inc.sh \
+     /usr/local/bin/
+
+COPY volumes-files/00_chown_volumes.sh \
+     volumes-files/00_chown_volumes.inc.sh \
+     /etc/my_init.d/
+
+# End of volumes template
+

@@ -1,0 +1,3 @@
+# rsyslog template
+COPY rsyslog-files/remote-rsyslogd.conf /etc/rsyslog.d/10-rsyslog.conf
+# End of rsyslog template

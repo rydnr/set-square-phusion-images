@@ -1,3 +1,5 @@
+# check-version template
+
 COPY check-version-files/check-version.sh \
      check-version-files/check-version.inc.sh \
      check-version-files/check-git-version.sh \
@@ -7,5 +9,13 @@ COPY check-version-files/check-version.sh \
      check-version-files/remote-ubuntu-version.sh \
      check-version-files/remote-git-version.sh \
      check-version-files/local-version.sh \
-     /usr/local/bin
+     /usr/local/bin/
+
+# COPY check-version-files/current-version.sh \
+#      get-versions.sh \
+#      latest.inc.sh \
+#      latest.sh \
+#      /usr/local/bin/
+
+# End of check-version template
 

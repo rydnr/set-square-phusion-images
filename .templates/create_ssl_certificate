@@ -1,7 +1,15 @@
+# create_ssl_certificate template
+
 COPY create_ssl_certificate-files/create_ssl_certificate_openssl.sh \
      create_ssl_certificate-files/create_ssl_certificate.inc.sh \
      /usr/local/bin/
 
 RUN ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_openssl.inc.sh && \
     chmod +x /usr/local/bin/create_ssl_certificate_openssl.sh
+
+# COPY create_ssl_certificate-files/40_create_ssl_certificate_openssl.sh \
+#       create_ssl_certificate-files/40_create_ssl_certificate_openssl.inc.sh \
+#       /etc/my_init.d/
+
+# End of create_ssl_certificate template
 

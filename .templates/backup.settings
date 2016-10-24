@@ -1,0 +1,11 @@
+defineEnvVar BACKUP_HOST_SUFFIX \
+             "The prefix of the backup host to send the backup files" \
+             '-backup.${DOMAIN}';
+defineEnvVar BACKUP_USER "The backup user" "backup";
+defineEnvVar CUSTOM_BACKUP_SCRIPTS_FOLDER \
+             "The folder with the custom backup scripts" \
+             "/usr/local/bin";
+defineEnvVar CUSTOM_BACKUP_SCRIPTS_PREFIX "The prefix of all custom backup scripts" "backup-";
+defineEnvVar BACKUP_USER "The backup user" "backup";
+defineEnvVar BACKUP_GROUP "The backup group" '${BACKUP_USER}';
+

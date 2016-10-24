@@ -1,3 +1,5 @@
+# locale template
+
 ENV DEFAULT_LOCALE="${DEFAULT_LOCALE}" \
     DEFAULT_ENCODING="${DEFAULT_ENCODING}"
 
@@ -28,4 +30,6 @@ RUN ${APTGET_INSTALL} --update localepurge && \
     /etc/my_init.d/02_change_default_locale.sh ${DEFAULT_LOCALE} ${DEFAULT_ENCODING} && \
     rm -f /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
+
+# End of locale template
 

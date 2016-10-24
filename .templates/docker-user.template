@@ -1,3 +1,11 @@
+# docker-user template
+
 RUN /usr/sbin/groupadd ${DOCKER_GROUP} && \
     /usr/sbin/useradd -g ${DOCKER_GROUP} -G ${DOCKER_GROUP} -s /bin/false -c "Docker user" ${DOCKER_USER}
+
+COPY docker-user-files/34_change_dockersock_permissions.sh \
+     docker-user-files/34_change_dockersock_permissions.inc.sh \
+     /etc/my_init.d/
+
+# End of docker-user template
 

@@ -1,0 +1,5 @@
+defineEnvVar DEFAULT_LOCALE "The default locale" "en_US";
+defineEnvVar LOCALES "The supported locales" '${DEFAULT_LOCALE} es_ES es_ES@euro';
+defineEnvVar DEFAULT_ENCODING "The default encoding" "UTF-8";
+defineEnvVar ENCODINGS "The supported encodings" '${DEFAULT_ENCODING} ISO-8859-1 ISO-8859-15';
+defineEnvVar TIMEZONE "The timezone" "Etc/UTC";
