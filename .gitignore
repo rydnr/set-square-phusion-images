@@ -26,6 +26,7 @@ build*
 */.build-settings.sh
 .build.sh.*
 **/check-version-files
+*/common-files
 */copyright-preamble.*
 copyright-preamble.*
 */copyright-preamble.acmsl.txt
@@ -122,10 +123,12 @@ rabbitmq/rc.local
 rabbitmq/service
 */README
 **/rsnapshot-files
+*/rsyslog-files
 .rt-client.sh-push.lock
 .rt-projects
 sdkman/setup.sql
 **/ssh-files
+*/syslog-files
 .templates/addon-toggles
 .templates/addon-toggles
 .templates/apache
