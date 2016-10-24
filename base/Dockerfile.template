@@ -18,10 +18,10 @@ FROM ${ROOT_IMAGE}
 
 # Extra services
 @include("cron")
+@include("exim")
 @include("monit")
 @include("rsnapshot")
 @include("ssh")
-@include("exim")
 
 ENTRYPOINT ["/sbin/my_exec"]
 CMD ["/sbin/my_init"]
