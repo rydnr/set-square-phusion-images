@@ -1,5 +1,5 @@
 # install template
-
+ENV DEBIAN_FRONTEND="noninteractive"
 COPY install-files/aptget-install.sh \
      install-files/aptget-install.inc.sh \
      install-files/aptget-cleanup.sh \
@@ -13,4 +13,3 @@ RUN chmod +x ${APTGET_INSTALL} ${APTGET_CLEANUP} && \
     ${APTGET_CLEANUP}
 
 # End of install template
-

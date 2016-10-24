@@ -64,6 +64,7 @@ graphite/local_settings.py
 */help
 **/install-files
 java/41_create_ssl_certificate_keytool.inc.sh
+*/java-files
 java/my_exec
 java/my_exec
 java/remote-syslogd.conf
@@ -144,6 +145,7 @@ sdkman/setup.sql
 .templates/preamble
 tern/my_exec
 tomcat/entrypoint.sh
+*/tomcat-files
 tt-rss/apache-vhost.conf
 tt-rss/config.php
 tt-rss/create-db.inc.sh

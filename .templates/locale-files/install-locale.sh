@@ -140,7 +140,7 @@ function install_locale() {
      _extra="";
   fi
 
-  DEBIAN_FRONTEND="noninteractive" apt-get install -y language-pack-${_lang}-base
+  DEBIAN_FRONTEND="noninteractive" apt-get install -y --reinstall language-pack-${_lang}-base
   logInfo -n "Checking if ${_lang}_${_country} is supported";
   if is_locale_supported "${_lang}_${_country}${_extra}"; then
       logInfoResult SUCCESS "valid";

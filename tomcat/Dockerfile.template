@@ -1,40 +1,11 @@
 @include("preamble")
-FROM ${NAMESPACE}/java:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/base:${TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
-COPY service /etc/service/${IMAGE}/run
-RUN chmod +x /etc/service/${IMAGE}/run
-COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-
-ENV SERVICE_USER="${SERVICE_USER}" \
-    SERVICE_GROUP="${SERVICE_USER}"
-
-RUN (groupadd ${SERVICE_GROUP} || echo "Group ${SERVICE_GROUP}" already exists) && \
-    (/usr/sbin/useradd -d ${TOMCAT_HOME} -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Apache Tomcat user" ${SERVICE_USER} || echo "User ${SERVICE_USER} already exists") && \
-    mkdir -p /opt && \
-    wget -O /opt/${TOMCAT_FILE} ${TOMCAT_DOWNLOAD_URL} && \
-    tar xvfz /opt/${TOMCAT_FILE} -C /opt && \
-    ln -s /opt/${TOMCAT_FOLDER} ${TOMCAT_HOME} && \
-    mkdir /var/lock/tomcat /var/run/tomcat ${TOMCAT_HOME}/contexts && \
-    cd /var/log && ln -s ${TOMCAT_HOME}/logs tomcat && \
-    chmod 755 /var/run/tomcat && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lock/tomcat /var/run/tomcat /var/log/tomcat ${TOMCAT_HOME} /opt/${TOMCAT_FOLDER} && \
-    rm -f /opt/${TOMCAT_FILE} && \
-    chmod +x /etc/service/${IMAGE}/run && \
-    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' /opt/tomcat/conf/context.xml && \
-    ${APTGET_INSTALL} -np make gcc openssl libssl-dev libapr1-dev && \
-    cd /usr/local/src && wget -O ${APR_FILE} ${APR_DOWNLOAD_URL} && \
-    tar xvfz ${APR_FILE} && cd ${APR_FOLDER} && \
-    ./configure && make && make install && \
-    cd /usr/local/src && wget -O ${TOMCAT_NATIVE_FILE} ${TOMCAT_NATIVE_DOWNLOAD_URL} && \
-    tar xvfz ${TOMCAT_NATIVE_FILE} && cd ${TOMCAT_NATIVE_FOLDER}/native && \
-    ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java && make && make install && \
-    ${APTGET_CLEANUP}
-
-COPY setenv.sh ${TOMCAT_HOME}/bin/setenv.sh
+@include("java")
+@include("tomcat")
 
 EXPOSE 8080
 
