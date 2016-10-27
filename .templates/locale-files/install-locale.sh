@@ -104,16 +104,74 @@ function parseInput() {
 ## -> *: The locale identifier.
 ## <- 0/${TRUE} if the locale is supported; 1/${FALSE} otherwise.
 ## Example:
-##  if is_locale_supported "en_US"; then
-##    echo "en_US is supported"
+##  if is_locale_supported "en_US" "UTF-8"; then
+##    echo "en_US with UTF-8 is supported"
 ##  fi
 function is_locale_supported() {
-  local _locale="${*}";
+  local _locale="${1}";
+  local _encoding="${2}";
+  local -i _rescode;
+
+  if [ -f ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*} ]; then
+      if is_locale_file_available "${_locale}"; then
+          if is_locale_available_in_language_file "${_locale}" "${_encoding}"; then
+              _rescode=${TRUE};
+          else
+            _rescode=${FALSE};
+            echo "not is_locale_available_in_language_file ${_locale} ${_encoding}"
+          fi
+      else
+        _rescode=${FALSE};
+        echo "not is_locale_file_available ${_locale}"
+      fi
+  else
+    _rescode=${FALSE};
+    echo "not -f ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*}"
+  fi
+
+  return ${_rescode};
+}
+
+## Checks if the locale file is available.
+## -> 1: The locale.
+## <- 0/${TRUE} if the locale file exists; 1/${FALSE} otherwise.
+## Example:
+##  if is_locale_file_available "en_US"; then
+##    echo "English-US is available"
+##  fi
+function is_locale_file_available() {
+  local _locale="$1";
   local -i _rescode;
 
   if [ -f ${AVAILABLE_LOCALES_FOLDER}/${_locale} ]; then
       _rescode=${TRUE};
   else
+    _rescode=${FALSE};
+  fi
+
+  return ${_rescode};
+}
+
+## Checks if given locale + encoding is supported.
+## -> 1: The locale.
+## -> 2: The encoding.
+## <- 0/${TRUE} if the language is supported; 1/${FALSE} otherwise.
+## <- RESULT: The supported locales.
+## Example:
+##  is_locale_available_in_language_file "en_US" "UTF-8";
+##  echo "Supported English locales: ${RESULT}";
+function is_locale_available_in_language_file() {
+  local _locale="$1";
+  local _encoding="$2";
+  local -i _rescode;
+  local _language;
+
+  if is_locale_file_available "${_locale}"; then
+      grep "${_locale}\(\.${_encoding}\)\? ${_encoding}" ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*} > /dev/null 2>&1;
+      _rescode=$?;
+      echo "grep \"${_locale}\(\.${_encoding}\)\? ${_encoding}\" ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*} -> ${_rescode}";
+  else
+    echo "not is_locale_file_available"
     _rescode=${FALSE};
   fi
 
@@ -141,8 +199,8 @@ function install_locale() {
   fi
 
   DEBIAN_FRONTEND="noninteractive" apt-get install -y --reinstall language-pack-${_lang}-base
-  logInfo -n "Checking if ${_lang}_${_country} is supported";
-  if is_locale_supported "${_lang}_${_country}${_extra}"; then
+  logInfo -n "Checking if ${_locale} ${_encoding} is supported";
+  if is_locale_supported "${_locale}" "${_encoding}"; then
       logInfoResult SUCCESS "valid";
       logInfo "Generating '${_lang}_${_country}${_extra} ${_encoding}' locale";
       echo "${_lang}_${_country}${_extra} ${_encoding}" >> ${LOCALEGEN};
