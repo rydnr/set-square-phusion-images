@@ -4,7 +4,7 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-ENV SERVICE_PACKAGE="mariadb-server" \
+ENV SERVICE_PACKAGE="mysql-server" \
     SERVICE_USER="mysql" \
     SERVICE_GROUP="mysql" \
     DOBACKUP="true" \
@@ -13,9 +13,9 @@ ENV SERVICE_PACKAGE="mariadb-server" \
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
-COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
-COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
-COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh admin.sh \
+COPY backup-${IMAGE}.sh \
+     bootstrap-db.sh bootstrap-db.inc.sh \
+     apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh admin.sh \
      /usr/local/bin/
 
 @include("create_ssl_certificate")
@@ -25,20 +25,19 @@ COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 #ADD conf.d /etc/mysql/conf.d
 
-#RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
-#RUN add-apt-repository \'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
-#RUN apt-get install software-properties-common
 RUN ([ ! -d /backup ] && rm -f /backup) && \
+    export CONFIG_FILE=/etc/mysql/${IMAGE}.conf.d/mysqld.cnf && \
     mkdir -p /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump && \
-    ${APTGET_INSTALL} --update mariadb-server=${TAG} bc && \
-    sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s/^log_error/#log_error/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s|^datadir.*|datadir = /backup/${IMAGE}-db|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s|# ssl-cert\s*.*|ssl-cert=/etc/ssl/private/${IMAGE}.crt|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s|# ssl-key\s*.*|ssl-key=/etc/ssl/private/${IMAGE}.key|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
+    ${APTGET_INSTALL} --update ${IMAGE}-server=${TAG} bc && \
+    sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" ${CONFIG_FILE} && \
+    sed -i -e"s/^log_error/#log_error/" ${CONFIG_FILE} && \
+    sed -i -e"s|^datadir.*|datadir = /backup/${IMAGE}-db|" ${CONFIG_FILE} && \
+    sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" ${CONFIG_FILE} && \
+    sed -i -e"s|# ssl-cert\s*.*|# ssl-cert=/etc/ssl/private/${IMAGE}.crt|" ${CONFIG_FILE} && \
+    sed -i -e"s|# ssl-key\s*.*|# ssl-key=/etc/ssl/private/${IMAGE}.key|" ${CONFIG_FILE} && \
+    echo 'explicit_defaults_for_timestamp=1' >> ${CONFIG_FILE} && \
     ${APTGET_CLEANUP} && \
-    /usr/local/bin/create_ssl_certificate_openssl.sh && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
     rm -rf /var/lib/mysql && \
     ln -s /backup/${IMAGE}-db /var/lib/mysql && \
     update-rc.d mysql disable && \

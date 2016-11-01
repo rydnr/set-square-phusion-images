@@ -9,7 +9,7 @@ bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
 bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
 bin/config set phpmailer.smtp-host ${SMTP_HOST:-localhost}
 
-sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php5/apache2/php.ini
+sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php/7.0/apache2/php.ini
 chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo
 rsync -avz /var/local/mysql/conf.d/ /var/local/conf.d/
 rsync -avz /var/local/conf.d/ /var/local/mysql/conf.d/
@@ -25,6 +25,6 @@ sed -i "s/^Listen 80$/Listen ${VIRTUAL_PORT}/g" /etc/apache2/ports.conf
 
 /usr/sbin/sshd -f /var/local/sshd_config.phabricator
 
-a2ensite 001-phabricator.conf && /etc/service/apache/run-apache
+a2ensite 001-phabricator.conf && /usr/local/bin/run-apache
 
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet

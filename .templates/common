@@ -9,6 +9,7 @@ COPY common-files/dry-wit \
      common-files/run-as.sh \
      common-files/run-as.inc.sh \
      common-files/restart.sh \
+     common-files/envvar.sh \
      /usr/local/bin/
 
 RUN mkdir -p /etc/my_exec.d && \

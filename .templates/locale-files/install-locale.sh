@@ -112,21 +112,26 @@ function is_locale_supported() {
   local _encoding="${2}";
   local -i _rescode;
 
+  checkNotEmpty "locale" "${_locale}" 1;
+  checkNotEmpty "encoding" "${_encoding}" 2;
+
+  echo "${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*}";
+
   if [ -f ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*} ]; then
       if is_locale_file_available "${_locale}"; then
           if is_locale_available_in_language_file "${_locale}" "${_encoding}"; then
               _rescode=${TRUE};
           else
             _rescode=${FALSE};
-            echo "not is_locale_available_in_language_file ${_locale} ${_encoding}"
+#            _debugEcho "not is_locale_available_in_language_file ${_locale} ${_encoding}"
           fi
       else
         _rescode=${FALSE};
-        echo "not is_locale_file_available ${_locale}"
+#        _debugEcho "not is_locale_file_available ${_locale}"
       fi
   else
     _rescode=${FALSE};
-    echo "not -f ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*}"
+#    _debugEcho "not -f ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*}"
   fi
 
   return ${_rescode};
@@ -140,14 +145,38 @@ function is_locale_supported() {
 ##    echo "English-US is available"
 ##  fi
 function is_locale_file_available() {
-  local _locale="$1";
+  local _locale="${1}";
   local -i _rescode;
+
+  checkNotEmpty "locale" "${_locale}" 1;
 
   if [ -f ${AVAILABLE_LOCALES_FOLDER}/${_locale} ]; then
       _rescode=${TRUE};
   else
     _rescode=${FALSE};
   fi
+
+  return ${_rescode};
+}
+
+## Checks if locale requires appending the encoding or not.
+## -> 1: the locale.
+## -> 2: the encoding.
+## <- 0/${TRUE} if the locale requires the encoding suffix; 1/${FALSE} otherwise.
+## Example:
+##    if locale_requires_encoding_suffix "${locale}" "${encoding}"; then
+##      locale Definition="${locale}.${encoding}";
+##    fi
+function locale_requires_encoding_suffix() {
+  local _locale="${1}";
+  local _encoding="${2}";
+  local -i _rescode;
+
+  checkNotEmpty "locale" "${_locale}" 1;
+  checkNotEmpty "encoding" "${_encoding}" 2;
+
+  grep "${_locale}.${_encoding} ${_encoding}" "${SUPPORTED_LOCALES_FILE}" > /dev/null 2>&1;
+  _rescode=$?;
 
   return ${_rescode};
 }
@@ -166,12 +195,18 @@ function is_locale_available_in_language_file() {
   local -i _rescode;
   local _language;
 
+  checkNotEmpty "locale" "${_locale}" 1;
+  checkNotEmpty "encoding" "${_encoding}" 2;
+
   if is_locale_file_available "${_locale}"; then
-      grep "${_locale}\(\.${_encoding}\)\? ${_encoding}" ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*} > /dev/null 2>&1;
-      _rescode=$?;
-      echo "grep \"${_locale}\(\.${_encoding}\)\? ${_encoding}\" ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*} -> ${_rescode}";
+      if locale_requires_encoding_suffix "${_locale}" "${_encoding}"; then
+          _rescode=${TRUE}; # Implicit since it greps the same file.
+      else
+        grep "${_locale} ${_encoding}" ${SUPPORTED_LOCALES_FILE} > /dev/null 2>&1;
+        _rescode=$?;
+      fi
   else
-    echo "not is_locale_file_available"
+#    _debugEcho "not is_locale_file_available"
     _rescode=${FALSE};
   fi
 
@@ -190,23 +225,31 @@ function install_locale() {
   local _encoding="${2}";
   local _rescode=${FALSE};
 
-  local _lang="${_locale%_*}";
-  local _country="${_locale#*_}";
-  _country="${_country%@*}";
-  local _extra="${_locale#*@}";
-  if [ "${_extra}" == "${_locale}" ]; then
-     _extra="";
-  fi
+  checkNotEmpty "locale" "${_locale}" 1;
+  checkNotEmpty "encoding" "${_encoding}" 2;
 
-  DEBIAN_FRONTEND="noninteractive" apt-get install -y --reinstall language-pack-${_lang}-base
+  local _lang="${_locale%_*}";
+
+  logInfo -n "Checking if ${_locale} is already installed";
+  if is_locale_supported "${_locale}" "${_encoding}"; then
+      logInfoResult SUCCESS "installed";
+  else
+    logInfoResult SUCCESS "missing";
+    DEBIAN_FRONTEND="noninteractive" apt-get install -y --reinstall language-pack-${_lang}-base
+  fi
   logInfo -n "Checking if ${_locale} ${_encoding} is supported";
   if is_locale_supported "${_locale}" "${_encoding}"; then
       logInfoResult SUCCESS "valid";
-      logInfo "Generating '${_lang}_${_country}${_extra} ${_encoding}' locale";
-      echo "${_lang}_${_country}${_extra} ${_encoding}" >> ${LOCALEGEN};
-      echo "${_lang}_${_country}${_extra}.${_encoding} ${_encoding}" >> ${LOCALEGEN};
-      locale-gen
-      dpkg-reconfigure locales
+      if locale_requires_encoding_suffix "${_locale}" "${_encoding}"; then
+          logInfo "Generating '${_locale}.${_encoding} ${_encoding}' locale";
+          echo "${_locale}.${_encoding} ${_encoding}" >> ${LOCALEGEN};
+          locale-gen "${_locale}.${_encoding}"
+      else
+        logInfo "Generating '${_locale} ${_encoding}' locale";
+        echo "${_locale} ${_encoding}" >> ${LOCALEGEN};
+        locale-gen "${_locale}"
+      fi
+#      dpkg-reconfigure locales
       localepurge
       _rescode=${TRUE};
   else

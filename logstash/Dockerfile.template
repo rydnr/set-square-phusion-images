@@ -1,18 +1,15 @@
 @include("preamble")
-FROM java:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 #COPY service /etc/service/${IMAGE}/run
+RUN chmod +x /etc/service/${IMAGE}/run
 
-RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
-    echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list && \
-    echo 'deb http://packages.elastic.co/logstash/2.2/debian stable main' | sudo tee /etc/apt/sources.list.d/logstash-2.2.x.list && \
-    ${APTGET_INSTALL} --update logstash
-#    ${APTGET_CLEANUP}
-#    chmod +x /etc/service/${IMAGE}/run
+@include("java")
+@include("logstash")
 
 #EXPOSE 9200
 

@@ -41,6 +41,10 @@ function checkInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -65,40 +69,68 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 }
-## Changes the ownership of a Docker volume.
+
+## Changes the ownership of a Docker volume specification.
 ## -> 1: The user.
 ## -> 2: The group.
 ## -> 3: The volume folder.
+## <- 0/${TRUE} if all volumes are processed successfully; 1/${FALSE} otherwise.
+## <- ERROR: The error message, if any.
 ## Example:
-##   chown_volume mysql mysql /var/lib/mysql
+##   if chown_volume mysql mysql /var/lib/mysql; then
+##     echo "Permissions on /var/lib/mysql changed successfully";
+##   fi
 function chown_volume() {
   local _user="${1}";
   local _group="${2}";
   local _volume="${3}";
-  local _single=0;
+  local _rescode=${TRUE};
+  local _single;
   local _item;
+  local _oldIFS;
+  local _aux;
+
+  checkNotEmpty "user" "${_user}" 1;
+  checkNotEmpty "group" "${_group}" 2;
+  checkNotEmpty "volume" "${_volume}" 3;
 
   if [ "${_volume#[}" == "${_volume}" ]; then
-      _single=0; # true, single
+      _single=${TRUE};
   else
-    _single=1; # false, multiple
+    _single=${FALSE};
   fi
 
-  if [ ${_single} -eq 0 ]; then
+  if isTrue ${_single}; then
     _volume="$(echo ${_volume} | sed 's ^"  g' | sed 's "$  g')";
-    chown -R ${_user}:${_group} "${_volume}";
+    chown -R ${_user}:${_group} "${_volume}" > /dev/null 2>&1;
+    _rescode=$?;
+    if isFalse ${_rescode}; then
+        export ERROR="$(chown -R ${_user}:${_group} "${_volume}" 2>&1)";
+    fi
   else
-    local _oldIFS="${IFS}";
+    _oldIFS="${IFS}";
     IFS='"';
     for _item in $(echo ${_volume} | tr -d '[],'); do
       _item="$(echo ${_item} | sed 's ^"  g' | sed 's "$  g')";
       chown -R ${_user}:${_group} "${_item}";
+      _aux=$?;
+      if isTrue ${_rescode}; then
+          _rescode=${_aux};
+      else
+        export ERROR="$(chown -R ${_user}:${_group} "${_item}" 2>&1)";
+      fi
     done
     IFS="${_oldIFS}";
   fi
+
+  return ${_rescode};
 }
 
 ## Processes the volumes from a given Dockerfile.
@@ -115,12 +147,16 @@ function process_volumes() {
   local _item;
   local _volumes;
 
+  checkNotEmpty "user" "${_user}" 1;
+  checkNotEmpty "group" "${_group}" 2;
+  checkNotEmpty "dockerfile" "${_dockerfile}" 3;
+
   grep -e '^\s*VOLUME\s' "${_dockerfile}" > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
       local _oldIFS="${IFS}";
       IFS=$'\n';
       _volumes="$(grep -e '^\s*VOLUME\s' "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g')";
-      _volumes="$(echo ${_volumes} | tr -d '[' | tr -d ']')";
+      _volumes="$(echo ${_volumes} | tr -d '[' | tr -d ']' | tr -d ',' | tr -d '\"')";
       for _aux in ${_volumes}; do
         IFS=$' ';
         for _entry in ${_aux}; do
@@ -137,12 +173,12 @@ function process_volumes() {
 ## dry-wit hook
 function main() {
   local _user="${SERVICE_USER}";
-  if [ -z ${SERVICE_USER} ]; then
+  if isEmpty "${SERVICE_USER}"; then
     logInfo "SERVICE_USER environment variable not found. Assuming root.";
     _user="root";
   fi
   local _group="${SERVICE_GROUP}";
-  if [ -z ${SERVICE_GROUP} ]; then
+  if isEmpty "${SERVICE_GROUP}"; then
     logInfo "SERVICE_GROUP environment variable not found. Assuming ${_user}.";
     _group="${_user}";
   fi
@@ -150,3 +186,4 @@ function main() {
     process_volumes "${_user}" "${_group}" "${DOCKERFILES_LOCATION}/${p}";
   done
 }
+

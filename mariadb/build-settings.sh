@@ -10,4 +10,4 @@ overrideEnvVar ENABLE_CRON false;
 overrideEnvVar ENABLE_MONIT true;
 overrideEnvVar ENABLE_RSNAPSHOT false;
 overrideEnvVar ENABLE_SYSLOG true;
-#overrideEnvVar ENABLE_LOGSTASH false;
+overrideEnvVar ENABLE_LOGSTASH true;

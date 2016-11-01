@@ -1,0 +1,45 @@
+This image runs MySQL with minimal configuration,
+after removing unneeded objects and applying some safe practices.
+
+Examples:
+
+- Run a MySQL stand-alone instance:
+> docker run -d --name db -h db ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MySQL instance, to be used outside Docker containers:
+> docker run -d -p [port]:3306 --name db -h db ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MySQL instance, disabling the "strict mode":
+> docker run -d --name db -h db -e DISABLE_STRICT_MODE=true ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MySQL instance, using the alternate boolean syntax:
+> docker run -d --name db -h db -e ALTERNATE_BOOLEAN_SYNTAX=true ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MySQL instance, with a different pool size factor:
+> docker run -d --name db -h db -e INNODB_POOL_SIZE_FACTOR=0.5 ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run a MySQL instance with specific configuration:
+> docker run -d --name db -h db -v [my-db-conf]:/etc/mysql/my.cnf ${NAMESPACE}/${IMAGE}:${TAG}
+
+# Backup
+
+The built-in backup mechanism generates a dump of the database to a file under /backup/${IMAGE}-dump/.
+A cron process synchronizes the dump files to a remote server ${IMAGE}{BACKUP_HOST_SUFFIX},
+which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT).
+
+It copies the contents of /backup/${IMAGE}-db and /backup/rsnapshot too.
+
+## Preparation
+
+In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another MySQL container as follows:
+
+> docker run -d --name [app]-db-backup -h [app]-db-backup -v [host-folder]/${IMAGE}/db:/backup/${IMAGE}-db -v [host-folder]/${IMAGE}/dump:/backup/dump -v [host-folder]/${IMAGE}/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+
+## Recovery
+
+The recovery process involves retrieving the dump files, and run ${NAMESPACE}/mariadb-bootstrap.
+
+> gunzip [hostname]-YYYY-MM-DD-hh-mm-ss.sql.gz
+> docker run -it -v ${PWD}:/sql ${NAMESPACE}/mariadb-bootstrap
+
+Afterwards, the database is ready to accept incoming connections.

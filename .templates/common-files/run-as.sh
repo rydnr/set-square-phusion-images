@@ -220,3 +220,4 @@ function main() {
     update_account "${_uidUser}" "${_uid}" "${_gid}";
   fi
 }
+

@@ -1,5 +1,5 @@
 if isEmpty "${DOLLAR}{SSL_KEY_ALGORITHM}"; then
-  if isEmpty "${DOLLAR}${SQ_SSL_KEY_ALGORITHM}"; then
+  if isEmpty "${DOLLAR}{SQ_SSL_KEY_ALGORITHM}"; then
     defineEnvVar SSL_KEY_ALGORITHM "The algorithm of the SSL key" "${SSL_KEY_ALGORITHM}";
   else
     defineEnvVar SSL_KEY_ALGORITHM "The algorithm of the SSL key" "${SQ_SSL_KEY_ALGORITHM}";

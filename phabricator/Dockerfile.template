@@ -4,7 +4,8 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-#RUN mv /etc/service/apache/run /etc/service/apache/run-apache
+@include("apache")
+
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/${IMAGE}/run
 COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper help.phabricator.sh \
@@ -21,17 +22,25 @@ ENV SERVICE="apache" \
     VIRTUAL_PORT=8000 \
     TIMEZONE="${DEFAULT_TIMEZONE}" \
     DOBACKUP="true" \
-    DEFAULT_LOCALE="en_US.UTF-8"
+    DEFAULT_LOCALE="en_US" \
+    DEFAULT_ENCODING="UTF-8"
 
-@include("apache")
+COPY apache-files/service /usr/local/bin/run-apache
+COPY php7.patch /usr/local/src/php7.patch
 
-RUN ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
-        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick && \
-    ${APTGET_INSTALL} --no-pin mysql-server python-pip openjdk-8-jre-headless && \
+RUN chmod +x /usr/local/bin/run-apache && \
+    ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
+        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring && \
+    ${APTGET_INSTALL} --no-pin mysql-server=${MYSQL_VERSION} python-pip openjdk-8-jre-headless && \ 
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     chmod +x /etc/service/${IMAGE}/run && \
     mkdir /usr/local/share/liquibase && \
+    cd /opt && \
+    git clone https://github.com/phacility/phabricator.git && \
+    cd /opt/phabricator && \
+    git checkout ${GITHUB_PHABRICATOR_HASH} && \
+    patch -p0 < /usr/local/src/php7.patch && \
     cd /opt && \
     git clone https://github.com/phacility/libphutil.git && \
     cd /opt/libphutil && \
@@ -40,10 +49,6 @@ RUN ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
     git clone https://github.com/phacility/arcanist.git && \
     cd /opt/arcanist && \
     git checkout ${GITHUB_ARCANIST_HASH} && \
-    cd /opt && \
-    git clone https://github.com/phacility/phabricator.git && \
-    cd /opt/phabricator && \
-    git checkout ${GITHUB_PHABRICATOR_HASH} && \
     a2dissite 000-default.conf && \
     a2enmod rewrite && \
     ${APTGET_INSTALL} php-mcrypt && \
@@ -100,12 +105,12 @@ RUN ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
     wget ${LIQUIBASE_URL} && \
     tar xvf ${LIQUIBASE_ARTIFACT} -C /opt/liquibase && \
     cd /opt/liquibase/lib && \
-    wget ${MARIADB_JDBC_DRIVER_URL} && \
+    wget ${MYSQL_JDBC_DRIVER_URL} && \
     mkdir -p /usr/local/share/sql/databases && \
     for s in $(cat /usr/local/share/liquibase/phabricator-schemas.txt); do \
       mkdir -p /usr/local/share/liquibase/${s} && \
       echo "Extracting database ${s}"; \
-      /opt/liquibase/liquibase --driver=org.mariadb.jdbc.Driver --username=root --password=secret --url="jdbc:mysql://localhost/${s}?user=root" --changeLogFile=/usr/local/share/liquibase/${s}/changelog.yml generateChangeLog; \
+      /opt/liquibase/liquibase --driver=${MYSQL_JDBC_DRIVER} --username=root --password=secret --url="jdbc:mysql://localhost/${s}?user=root" --changeLogFile=/usr/local/share/liquibase/${s}/changelog.yml generateChangeLog; \
       mysqldump -d -u root -psecret -h localhost --create-options --add-drop-database -B --events --routines --triggers ${s} > /usr/local/share/sql/databases/${s}.sql; \
     done && \
     mysqldump -u root -psecret -h localhost --create-options --add-drop-database --events --routines --triggers --databases $(mysql -u root -psecret --skip-column-names -e "SET SESSION group_concat_max_len=10000; SELECT GROUP_CONCAT(schema_name SEPARATOR ' ') FROM information_schema.schemata WHERE schema_name NOT IN ('mysql','performance_schema','information_schema');") > /usr/local/share/sql/phabricator.sql && \
