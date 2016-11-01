@@ -9,8 +9,7 @@ RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
     cd /usr/local/bin && \
     ln -sf check-version.sh check-version-apache.sh && \
     ln -sf local-ubuntu-version.sh local-version-apache.sh && \
-    ln -sf remote-ubuntu-version.sh remote-version-apache.sh && \
-    mkdir -p /etc/service/apache
+    ln -sf remote-ubuntu-version.sh remote-version-apache.sh
     
 #COPY apache-files/logstash.conf /etc/logstash/conf.d/apache.conf
 

@@ -30,7 +30,7 @@ COPY php7.patch /usr/local/src/php7.patch
 
 RUN chmod +x /usr/local/bin/run-apache && \
     ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
-        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring && \
+        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php-apcu && \
     ${APTGET_INSTALL} --no-pin mysql-server=${MYSQL_VERSION} python-pip openjdk-8-jre-headless && \ 
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
@@ -58,6 +58,8 @@ RUN chmod +x /usr/local/bin/run-apache && \
     chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} /var/local/phabricator /var/repo && \
     sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php/7.0/apache2/php.ini && \
     sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php/7.0/apache2/php.ini && \
+    echo 'always_populate_raw_post_data=-1' >> /etc/php/7.0/apache2/php.ini && \
+
     pip install --upgrade pip && \
     pip install pygments && \
     /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user && \

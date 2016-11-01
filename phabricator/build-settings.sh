@@ -21,7 +21,7 @@ defineEnvVar MYSQL_VERSION "The MariaDB version" "5.7.16-0ubuntu0.16.04.1";
 defineEnvVar MYSQL_JDBC_DRIVER_VERSION "The version of the JDBC driver for MySQL" "6.0.5";
 defineEnvVar MYSQL_JDBC_DRIVER_ARTIFACT "The name of the MySQL JDBC driver artifact" 'mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}.jar';
 defineEnvVar MYSQL_JDBC_DRIVER_URL "The url of the MySQL JDBC driver artifact" 'http://central.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_JDBC_DRIVER_VERSION}/${MYSQL_JDBC_DRIVER_ARTIFACT}';
-defineEnvVar MYSQL_JDBC_DRIVER "The class name of the JDBC driver for MySQL" "com.mysql.jdbc.Driver";
+defineEnvVar MYSQL_JDBC_DRIVER "The class name of the JDBC driver for MySQL" "com.mysql.cj.jdbc.Driver";
 defineEnvVar DEFAULT_TIMEZONE "The default timezone. See http://php.net/manual/en/timezones.php" "Europe/Madrid";
 defineEnvVar BACKUP_HOST_SSH_PORT \
              "The SSH port of the backup host" \

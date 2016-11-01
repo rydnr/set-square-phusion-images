@@ -8,6 +8,7 @@ bin/config set mysql.user ${PHABRICATOR_DB_USER}
 bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
 bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
 bin/config set phpmailer.smtp-host ${SMTP_HOST:-localhost}
+bin/storage upgrade --force
 
 sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php/7.0/apache2/php.ini
 chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo
