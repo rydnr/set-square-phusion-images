@@ -1,0 +1,5 @@
+#!/bin/bash
+
+rsync -az /backup/elasticsearch-data/ /usr/share/elasticsearch/data/
+
+exec /usr/local/bin/run-as.sh /backup/elasticsearch-data elasticsearch $@
