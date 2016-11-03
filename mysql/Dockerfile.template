@@ -23,7 +23,7 @@ COPY backup-${IMAGE}.sh \
 @include("logstash")
 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-#ADD conf.d /etc/mysql/conf.d
+#ADD conf.d /etc/mysql/
 
 RUN ([ ! -d /backup ] && rm -f /backup) && \
     export CONFIG_FILE=/etc/mysql/${IMAGE}.conf.d/mysqld.cnf && \

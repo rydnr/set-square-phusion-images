@@ -27,8 +27,8 @@ cat <<EOF > /etc/mysql/conf.d/mysqld_innodb_buffer_pool_size.cnf
 innodb_buffer_pool_size=${_poolSize}
 EOF
 
-rsync -avz /etc/mysql/conf.d/ /var/local/conf.d/
-rsync -avz /var/local/conf.d/ /etc/mysql/conf.d/
+rsync -az /etc/mysql/conf.d/ /var/local/mysql/conf.d/
+rsync -az /var/local/mysql/conf.d/ /etc/mysql/conf.d/
 
 mkdir /var/run/mysql
 chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/run/mysql

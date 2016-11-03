@@ -12,8 +12,8 @@ bin/storage upgrade --force
 
 sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php/7.0/apache2/php.ini
 chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo
-rsync -avz /var/local/mysql/conf.d/ /var/local/conf.d/
-rsync -avz /var/local/conf.d/ /var/local/mysql/conf.d/
+rsync -az /var/local/mysql/conf.d/ /var/local/conf.d/
+rsync -az /var/local/conf.d/ /var/local/mysql/conf.d/
 
 echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
 chown -R daemon-user /var/tmp/phd /var/repo /backup/phabricator-repo /var/local/phabricator /backup/phabricator-local

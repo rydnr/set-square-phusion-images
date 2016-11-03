@@ -189,7 +189,7 @@ function print_create_db_user_bootstrap() {
 
 ## Prints the bootstrap SQL to change the password of the Phabricator database user.
 function print_change_db_password_bootstrap() {
-  echo "update mysql.user set password=PASSWORD('${PHABRICATOR_DB_PASSWORD}') where user='${PHABRICATOR_DB_USER}';";
+  echo "SET PASSWORD FOR '${PHABRICATOR_DB_USER}'@'%' = PASSWORD('${PHABRICATOR_DB_PASSWORD}');";
   echo 'flush privileges;';
 }
 
