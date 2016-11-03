@@ -36,6 +36,7 @@ copyright-preamble.*
 Dockerfile
 */Dockerfile
 docs/set-square_overview.*
+elasticsearch/service
 */exim-files/*
 */exit-files/exim.00_local_macros
 filebeat-docker/conf.d/*.yml
@@ -94,6 +95,8 @@ mariadb/shutdown.sh
 mariadb/upgrade.sh
 mariadb/watch-ddls
 **/monit-files
+mysql/admin.sh
+mysql/backup-mysql.sh
 nexus/50_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL
