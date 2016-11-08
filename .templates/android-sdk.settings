@@ -1,0 +1,8 @@
+defineEnvVar ANDROID_SDK_VERSION "The version of the Android SDK" "r24.4.1";
+defineEnvVar ANDROID_BUILD_TOOLS_VERSION "The version of the Android build tools" "23.0.3";
+defineEnvVar ANDROID_SDK_FILENAME "The Android SDK filename" 'android-sdk_${ANDROID_SDK_VERSION}-linux.tgz';
+defineEnvVar ANDROID_SDK_URL "The Android SDK url" 'http://dl.google.com/android/${ANDROID_SDK_FILENAME}';
+defineEnvVar ANDROID_API_LEVELS "The Android API levels" "android-15,android-16,android-17,android-18,android-19,android-20,android-21,android-22,android-23,android-24";
+defineEnvVar GOOGLE_APIS_INTEL_X86_ATOM_SYSTEM_IMAGE_ARTIFACT "The artifact of the Google APIs Intel x86 Atom System Image" 'sysimg_x86-23_r16.zip';
+defineEnvVar GOOGLE_APIS_INTEL_X86_ATOM_SYSTEM_IMAGE_URL "The url of Google APIs Intel x86 Atom System Image" 'https://dl.google.com/android/repository/sys-img/google_apis/${GOOGLE_APIS_INTEL_X86_ATOM_SYSTEM_IMAGE_ARTIFACT}';
+defineEnvVar JAVA_VERSION "The Java version" "8";

@@ -1,15 +1,14 @@
 @include("preamble")
-FROM ${NAMESPACE}/android-sdk:${TAG}
+FROM ${REGISTRY}/${NAMESPACE}/base-gui:${BASE_GUI_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
 ENV DOBACKUP="false" \
     SERVICE_USER="developer" \
-    SERVICE_GROUP="developers" \
-    PATH="${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:/opt/android-studio/bin" \
-    AWT_TOOLKIT="MToolkit" \
-    _JAVA_AWT_WM_NONREPARENTING="1"
+    SERVICE_GROUP="developers"
+
+@include("android-sdk")
 
 COPY my_exec /sbin/my_exec
 
@@ -23,15 +22,18 @@ RUN chmod +x /sbin/my_exec && \
     cd /tmp && wget ${ANDROID_STUDIO_URL} && \
     cd /opt && jar xvf /tmp/${ANDROID_STUDIO_FILENAME} && \
     chmod a+x /opt/android-studio/bin/studio.sh /opt/android-studio/bin/fsnotifier64 && \
-    mkdir /data && ln -s /data /home/developer/AndroidStudioProjects && \
+    mkdir /data && \
+    ln -s /data /home/${SERVICE_USER}/AndroidStudioProjects && \
+    ln -s /data /root/AndroidStudioProjects && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/${SERVICE_USER} /data /opt/android-sdk-linux && \
     echo "${SERVICE_USER} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${SERVICE_USER} && \
     chmod 0440 /etc/sudoers.d/${SERVICE_USER} && \
+    ln -s /home/${SERVICE_USER}/.AndroidStudio${ANDROID_STUDIO_COMMERCIAL_MAJOR_VERSION} /root && \
     ${APTGET_CLEANUP}
 
 VOLUME /data
 
-COPY log4j.xml log4j.dtd studio.vmoptions /home/developer/.AndroidStudio2.1/
+COPY log4j.xml log4j.dtd studio.vmoptions /home/${SERVICE_USER}/.AndroidStudio${ANDROID_STUDIO_COMMERCIAL_MAJOR_VERSION}/
 
 @include("copy-metadata")
 @include("symlinks")

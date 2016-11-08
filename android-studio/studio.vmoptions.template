@@ -1,0 +1,1 @@
+-Dlog4j.configuration=/home/${SERVICE_USER}/.AndroidStudio${ANDROID_STUDIO_COMMERCIAL_MAJOR_VERSION}/log4j.xml

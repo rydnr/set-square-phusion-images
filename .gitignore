@@ -3,6 +3,7 @@
 *#
 abc/*
 android-studio/my_exec
+android-studio/studio.vmoptions
 artifactory/entrypoint.sh
 backup/
 **/backup-files
@@ -135,6 +136,7 @@ sdkman/setup.sql
 */syslog-files
 .templates/addon-toggles
 .templates/addon-toggles
+.templates/android-sdk
 .templates/apache
 .templates/backup
 .templates/copy-metadata
@@ -144,6 +146,7 @@ sdkman/setup.sql
 .templates/java
 .templates/locale
 .templates/maintainer
+.templates/plone5
 .templates/preamble
 .templates/preamble
 tern/my_exec

@@ -1,0 +1,27 @@
+ENV ANDROID_HOME="/opt/android-sdk-linux" \
+    PATH="${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools" \
+    AWT_TOOLKIT="MToolkit" \
+    _JAVA_AWT_WM_NONREPARENTING="1"
+
+RUN dpkg --add-architecture i386 && \
+    yes | add-apt-repository ppa:webupd8team/java && \
+    ${APTGET_INSTALL} --update libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 && \
+    echo oracle-java${JAVA_VERSION}-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections && \
+    ${APTGET_INSTALL} --update python-software-properties git vim ant qemu-kvm libvirt-bin ubuntu-vm-builder bridge-utils && \
+    (${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer libxi6 oracle-java${JAVA_VERSION}-set-default || \
+     ${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer libxi6 oracle-java${JAVA_VERSION}-set-default ) && \
+    cd /usr/lib/jvm && ln -s java-${JAVA_VERSION}-oracle java && \
+    ${APTGET_CLEANUP} && \
+    cd /opt && \
+    wget -q ${ANDROID_SDK_URL} && \
+    tar -xzf ${ANDROID_SDK_FILENAME} && \
+    rm ${ANDROID_SDK_FILENAME} && \
+    echo y | ${ANDROID_HOME}/tools/android update sdk --no-ui -a --filter tools,platform-tools,${ANDROID_API_LEVELS},build-tools-${ANDROID_BUILD_TOOLS_VERSION} && \
+    (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
+    (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Android user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/android-sdk-linux && \
+    for u in root ${SERVICE_USER}; do \
+      for g in libvirtd kvm; do \
+        adduser ${u} ${g}; \
+      done; \
+    done

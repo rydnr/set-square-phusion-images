@@ -1,3 +1,16 @@
 #!/bin/bash
 
-/usr/local/bin/run-as.sh /data /opt/android-studio/bin/studio.sh
+if [ "${1}" -ne "/sbin/my_init" ]; then
+    echo "Running ${@}";
+    $@;
+else
+  # studio.sh needs to be run as root
+  # /usr/local/bin/run-as.sh /data /opt/android-studio/bin/studio.sh
+  # That's why we need to restore permissions on exit.
+  _hostUid="$(stat -c '%u' /data)";
+  _hostGid="$(stat -c '%g' /data)";
+
+  trap "chown -R ${_hostUid}:${_hostGid} /data" SIGHUP SIGINT SIGTERM
+
+  /opt/android-studio/bin/studio.sh
+fi

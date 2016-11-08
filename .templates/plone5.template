@@ -1,0 +1,39 @@
+# ENV VIRTUAL_HOST="${PLONE_VIRTUAL_HOST}"
+
+#RUN ${APTGET_INSTALL} -u build-essential python-dev libjpeg-dev libxslt1-dev poppler-utils zlib1g-dev wv libjpeg-dev libxml2-dev libreadline6-dev libssl-dev python-pip && \
+#    pip install --upgrade pip && \
+#    for i in setuptools accesscontrol App documenttemplate docutils initgroups interface mechanize missing multimapping nt_svcutils OFS signals structuredtext tempstorage ThreadLock zlog zodbcode zope2 zserver zc.buildout Pillow; do \
+#      pip install ${i}; \
+#    done && \
+
+RUN mkdir -p ${PLONE5_HOME}/.buildout && \
+    for d in eggs downloads extends; do mkdir -p ${PLONE5_HOME}/.buildout-cache/${d}; done && \
+    ${APTGET_INSTALL} -u python-pip build-essential python-dev python-virtualenv libssl-dev libxml2-dev libxslt1-dev libbz2-dev python-tk python-gdbm libxslt1-dev \
+      python-setuptools libjpeg62-dev \
+      libreadline-dev wv poppler-utils && \
+    mkdir -p /opt && \
+    wget -O /opt/${PLONE5_FILE} ${PLONE5_DOWNLOAD_URL} && \
+    tar xvfz /opt/${PLONE5_FILE} -C /opt && \
+    cd /opt/${PLONE5_ARTIFACT} && \
+    pip install --upgrade pip && \
+    pip install zope.formlib && \
+    pip install zope.container && \
+    pip install plone.resource && \
+    pip install Products.PloneLanguageTool && \
+    pip install Products.CMFPlone && \
+    pip install Products.CMFActionIcons && \
+    pip install Products.RichDocument && \
+    pip install Products.GenericSetup && \
+    pip install Products.Kupu && \
+    pip install quintagroup.seoptimizer && \
+    ./install.sh standalone --target=${PLONE5_HOME} > ${PLONE5_HOME}/install.log && \
+    cd && \
+    grep 'Username: ' ${PLONE5_HOME}/install.log > /username && \
+    grep 'Password: ' ${PLONE5_HOME}/install.log > /password && \
+    rm -rf /opt/${PLONE5_FILE} /opt/${PLONE5_ARTIFACT} && \
+    ${APTGET_CLEANUP} && \
+    chown -R plone_daemon:plone_daemon ${PLONE5_HOME}
+
+COPY plone5-files/default.cfg ${PLONE5_HOME}/.buildout/default.cfg
+COPY plone5-files/logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+COPY plone5-files/plonebackup plone5-files/zeopack /etc/cron.d/
