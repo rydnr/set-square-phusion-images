@@ -1,10 +1,8 @@
 COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_generate_logstash_forwarder_crt.inc.sh /etc/my_init.d/
 
 RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
-    echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list && \
-    echo 'deb http://packages.elastic.co/logstash/2.2/debian stable main' | sudo tee /etc/apt/sources.list.d/logstash-2.2.x.list && \
-    ${APTGET_INSTALL} --update logstash && \
-    apt-get install --reinstall logstash && \
+    echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list && \
+    ${APTGET_INSTALL} --update filebeat && \
     ${APTGET_CLEANUP}
 
 COPY logstash-files/02-beats-input.conf \

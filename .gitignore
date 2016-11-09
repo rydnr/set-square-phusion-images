@@ -42,6 +42,7 @@ elasticsearch/service
 */exit-files/exim.00_local_macros
 filebeat-docker/conf.d/*.yml
 filebeat-docker/filebeat.yml
+*/filebeat-files
 firefox-sync/rc.local
 firefox-sync/rc.local
 firefox-sync/service
@@ -80,6 +81,7 @@ jenkins/settings.xml
 LICENSE.*
 **/locale-files
 *.log
+*/logstash-files
 mariadb/admin.sh
 mariadb/backup.sh
 mariadb/backup.sh
@@ -141,14 +143,17 @@ sdkman/setup.sql
 .templates/backup
 .templates/copy-metadata
 .templates/exim-files/exim.00_local_macros
+.templates/filebeat
 .templates/install
 .templates/instructions
 .templates/java
 .templates/locale
+.templates/logstash
 .templates/maintainer
 .templates/plone5
 .templates/preamble
 .templates/preamble
+.templates/service_user
 tern/my_exec
 tomcat/entrypoint.sh
 */tomcat-files

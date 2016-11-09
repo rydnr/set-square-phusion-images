@@ -1,6 +1,0 @@
-RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
-    echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list && \
-    echo 'deb http://packages.elastic.co/logstash/2.2/debian stable main' | sudo tee /etc/apt/sources.list.d/logstash-2.2.x.list && \
-    /usr/local/bin/aptget-install.sh -vv  --update logstash && \
-    /usr/local/bin/aptget-cleanup.sh -v 
-    

@@ -12,9 +12,14 @@ ENV DOBACKUP="true" \
     SERVICE_GROUP="${SERVICE_GROUP}" \
     SSL_KEYSTORE_PATH="${SSL_KEYSTORE_FOLDER}/${IMAGE}.${SSL_KEYSTORE_TYPE}"
 
+@include("create_ssl_certificate")
+@include("service_user")
 @include("java")
+@include("logstash")
+@include("filebeat")
 
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE} && \
+    /usr/local/bin/create_ssl_certificate_keytool.sh
 COPY INSTALL.tmpl /usr/local/share/INSTALL.tmpl
 COPY service /etc/service/${IMAGE}/run
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
@@ -23,7 +28,6 @@ COPY 50_update_nexus_ssl_config.sh 50_update_nexus_ssl_config.inc.sh \
      /etc/my_init.d/
 
 RUN chmod +x /etc/service/${IMAGE}/run && \
-    useradd -r -u 200 -m -c "nexus role account" -d /sonatype-work -s /bin/false ${SERVICE_USER} && \
     cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
     mkdir -p /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \

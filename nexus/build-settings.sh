@@ -18,3 +18,10 @@ defineEnvVar NEXUS_DOCKER_GROUP_PORT "The HTTPS port for the Dcoker group (proxy
 defineEnvVar SERVICE_USER "The service user" "nexus";
 defineEnvVar SERVICE_GROUP "The service group" "nexus";
 overrideEnvVar ENABLE_LOGSTASH "true";
+defineEnvVar SERVICE_USER_HOME \
+             'The home of the ${SERVICE_USER} user' \
+             '/sonatype-work';
+defineEnvVar SERVICE_USER_SHELL \
+             'The shell of the ${SERVICE_USER} user' \
+             '/bin/false';
+
