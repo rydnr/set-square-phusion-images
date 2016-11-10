@@ -16,6 +16,7 @@ base/create-ssl-certificate.inc.sh
 base/create-ssl-certificate-openssl.inc.sh
 base/dry-wit
 base/exim.00_local_macros
+base/help-files
 base/logger
 base/monit-mail.conf.template
 base/remote-rsyslogd.conf

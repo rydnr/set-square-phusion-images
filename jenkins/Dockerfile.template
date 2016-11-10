@@ -26,6 +26,8 @@ ENV SERVICE_USER="jenkins" \
     DOBACKUP="true" \
     DEFAULT_LOCALE="en_US.UTF-8"
 
+@include("java")
+@include("create_ssl")
 RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/service/update-jenkins && \
     mkdir -p ${JENKINS_HOME} /var/jenkins_home && \
     usermod -l ${SERVICE_USER} ${TOMCAT_USER}  && \
