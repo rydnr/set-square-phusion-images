@@ -26,3 +26,6 @@ defineEnvVar DEFAULT_TIMEZONE "The default timezone. See http://php.net/manual/e
 defineEnvVar BACKUP_HOST_SSH_PORT \
              "The SSH port of the backup host" \
              "$(grep -e phabricator sshports.txt || echo phabricator 22 | awk '{print $2;}')";
+defineEnvVar INVALID_PATCHES \
+             "Patches that are invalid for some reason" \
+             "resources/sql/autopatches/20161026.calendar.01.importtriggers.sql";

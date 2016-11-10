@@ -81,6 +81,15 @@ RUN chmod +x /usr/local/bin/run-apache && \
     bin/config set mysql.user root && \
     bin/config set mysql.pass secret && \
     mysqladmin -u root password 'secret' && \
+    for f in $(find resources/sql/autopatches/ -name '*.sql' -exec grep 'CREATE TABLE {$NAMESPACE}' \{} /dev/null \; | cut -d':' -f 1); do \
+      sed -i 's/CREATE TABLE {$NAMESPACE}/CREATE TABLE IF NOT EXISTS {$NAMESPACE}/g' ${f}; \
+    done && \
+    if [ -n "${INVALID_PATCHES}" ]; then \
+      mkdir invalid-patches && \
+      for p in ${INVALID_PATCHES}; do \
+        mv ${p} invalid-patches/; \
+      done; \
+    fi && \
     bin/storage upgrade --force && \
     bin/config set storage.local-disk.path /var/local/phabricator && \
     chmod 755 /var/local/phabricator-ssh-hook.sh && \
