@@ -10,7 +10,7 @@ FROM ${ROOT_IMAGE}
 @include("syslog")
 @include("rsyslog")
 @include("volumes")
-#@include("help")
+@include("help")
 @include("locale")
 @include("create_ssl_certificate")
 @include("backup")
