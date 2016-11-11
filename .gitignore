@@ -160,6 +160,7 @@ sdkman/setup.sql
 .templates/rabbitmq
 .templates/sdkman
 .templates/service_user
+.templates/tomcat
 tern/my_exec
 tomcat/entrypoint.sh
 */tomcat-files
