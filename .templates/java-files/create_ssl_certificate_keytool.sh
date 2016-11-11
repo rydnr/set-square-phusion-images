@@ -108,10 +108,23 @@ function generateAndSignCertificate() {
           -sigalg "${SSL_JAVA_SIGN_ALGORITHM}";
 #          -ext "SAN=${SSL_SAN_EXTENSIONS}";
 
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
+    echo keytool -keystore "${SSL_KEYSTORE_PATH}" \
+            -alias "${SSL_CERTIFICATE_ALIAS}" \
+            -genkey \
+            -noprompt \
+            -dname "${SSL_CERTIFICATE_DNAME}" \
+            -keyalg "${SSL_KEY_ALGORITHM}" \
+            -keypass "${SSL_KEY_PASSWORD}" \
+            -storepass "${SSL_KEYSTORE_PASSWORD}" \
+            -storetype "${SSL_KEYSTORE_TYPE}" \
+            -keysize ${SSL_KEY_LENGTH} \
+            -validity ${SSL_CERTIFICATE_EXPIRATION_DAYS} \
+            -sigalg "${SSL_JAVA_SIGN_ALGORITHM}";
+    #          -ext "SAN=${SSL_SAN_EXTENSIONS}";
     exitWithErrorCode CANNOT_SIGN_SSL_CERTIFICATE;
   fi
 
@@ -131,7 +144,7 @@ function updateFolderPermissions() {
 
   chown -R ${_user}:${_group} ${_dir};
 
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
       logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
@@ -146,3 +159,4 @@ function main() {
   generateAndSignCertificate;
   updateFolderPermissions "${SSL_KEYSTORE_FOLDER}" "${SERVICE_USER}" "${SERVICE_GROUP}";
 }
+

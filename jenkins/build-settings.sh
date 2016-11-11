@@ -1,5 +1,6 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "${TAG}";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201611";
 defineEnvVar JENKINS_VERSION "The Jenkins version" "2.30";
+defineEnvVar TAG "The image tag" '${JENKINS_VERSION}';
 defineEnvVar JENKINS_ARTIFACT "The Jenkins artifact" 'jenkins-war-${JENKINS_VERSION}.war';
 defineEnvVar JENKINS_DOWNLOAD_URL \
              "The url to download Jenkins" \
@@ -19,6 +20,10 @@ defineEnvVar TOMCAT_USER \
 defineEnvVar TOMCAT_GROUP \
              "The Tomcat group" \
              'tomcat';
+defineEnvVar SERVICE_USER "The service user" "jenkins";
+defineEnvVar SERVICE_GROUP "The service group" "jenkins";
+defineEnvVar SERVICE_USER_HOME "The service user home" '${JENKINS_HOME}';
+defineEnvVar SERVICE_USER_SHELL "The shell of the service user" "/bin/bash";
 defineEnvVar DEFAULT_JENKINS_MEMORY_MIN "The default Xms setting" "-Xms512m";
 defineEnvVar DEFAULT_JENKINS_MEMORY_MAX "The default Xmx setting" "-Xmx1024m";
 defineEnvVar JENKINS_DEFAULT_VIRTUAL_HOST "The default virtual host for Jenkins" 'jenkins.${DOMAIN}';
