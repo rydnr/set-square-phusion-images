@@ -15,6 +15,12 @@ RUN chmod +x /sbin/my_exec
 @include("service_user")
 @include("nodejs")
 
+RUN mkdir -p /opt/workspace && \
+    ln -s /opt/workspace ${SERVICE_USER_HOME}/workspace && \
+    ln -s /opt/workspace/.npm ${SERVICE_USER_HOME}/.npm && \
+    ln -s /opt/workspace/.local ${SERVICE_USER_HOME}/.local && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
+
 VOLUME [ "/opt/workspace" ]
 WORKDIR /opt/workspace
 

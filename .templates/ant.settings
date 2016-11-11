@@ -1,0 +1,2 @@
+defineEnvVar ANT_VERSION "The default Ant version" "1.9.7";
+defineEnvVar ANT_VERSIONS "The versions of Ant" '${ANT_VERSION}';

@@ -1,0 +1,2 @@
+defineEnvVar GRAILS_VERSION "The Grails default version" "3.1.12";
+defineEnvVar GRAILS_VERSIONS "The versions of Grails to include" '${GRAILS_VERSION} 2.5.5';

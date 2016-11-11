@@ -1,0 +1,5 @@
+# maven:
+#   - requires:
+#     - sdkman
+RUN su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh && sdk selfupdate force && sdk install maven ${MAVEN_VERSION} && if [ -n \"${MAVEN_VERSIONS}\" ]; then for p in ${MAVEN_VERSIONS}; do yes no | sdk i maven \${p}; done; fi';
+# end of maven template

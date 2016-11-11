@@ -1,0 +1,2 @@
+defineEnvVar MAVEN_VERSION "The Maven version" "3.3.9";
+defineEnvVar MAVEN_VERSIONS "The versions of Maven to include" '${MAVEN_VERSION}';

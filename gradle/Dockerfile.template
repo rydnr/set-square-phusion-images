@@ -9,6 +9,9 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("sdkman")
 @include("gradle")
 
+ENV GRADLE_USER_HOME="/opt/workspace/.gradle" \
+    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
+
 COPY gradle-files/run-gradle /sbin/my_exec
 
 RUN chmod +x /sbin/my_exec && \

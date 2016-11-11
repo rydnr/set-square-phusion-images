@@ -1,7 +1,5 @@
 # gradle:
 #   - requires:
 #     - sdkman
-ENV GRADLE_USER_HOME="/opt/workspace/.gradle" \
-    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
-
-RUN su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh && sdk selfupdate force && sdk install gradle ${GRADLE_VERSION}'
+RUN su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh && sdk selfupdate force && sdk install gradle ${GRADLE_VERSION}  && if [ -n \"${GRADLE_VERSIONS}\" ]; then for p in ${GRADLE_VERSIONS}; do yes no | sdk i gradle \${p}; done; fi';
+# end of gradle template

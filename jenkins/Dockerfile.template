@@ -6,9 +6,6 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY 50-rsync-jenkins-home.sh /etc/my_init.d/50-rsync-jenkins-home.sh
-COPY update-jenkins.sh update-jenkins.inc.sh \
-     generate-jenkins-plugin-configs.sh generate-jenkins-plugin-configs.inc.sh \
-     /usr/local/bin/
 
 ENV SERVICE_USER="jenkins" \
     SERVICE_GROUP="jenkins" \
@@ -33,6 +30,8 @@ ENV SERVICE_USER="jenkins" \
 @include("tomcat")
 @include("apr")
 @include("git")
+@include("sdkman")
+@include("gradle")
 @include("phabricator")
 @include("jenkins")
 
@@ -48,13 +47,7 @@ ADD init.groovy.d/ /var/jenkins_home/init.groovy.d/
 # TODO: gem install bouncy-castle-java
 # /home/jenkins/identity.key.enc not found
 
-COPY update-jenkins-service /etc/service/update-jenkins/run
-COPY context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
-COPY config /etc/default/tomcat
-COPY ssh-config /opt/tomcat/.ssh/config
-COPY known_hosts /opt/tomcat/.ssh/known_hosts
-COPY jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
-COPY hudson.tasks.Mailer.xml config.xml /var/jenkins_home/
+COPY jenkins-files/update-jenkins-service /etc/service/update-jenkins/run
 
 VOLUME [ "/backup/jenkins-home", "/backup/rsnapshot" ]
 
