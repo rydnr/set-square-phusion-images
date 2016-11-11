@@ -1,28 +1,23 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/sdkman:${PARENT_IMAGE_TAG}
+FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
-COPY my_exec /sbin/my_exec
+@include("service_user")
+@include("java")
+@include("sdkman")
+@include("gradle")
+
+COPY gradle-files/run-gradle /sbin/my_exec
 
 RUN chmod +x /sbin/my_exec && \
     gpasswd -a ${SERVICE_USER} root && \
     mkdir -p /opt/workspace && \
     chown ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
 
-USER ${SERVICE_USER}
-
-ENV GRADLE_USER_HOME="/opt/workspace/.gradle" \
-    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
-
-RUN cd /home/${SERVICE_USER} && \
-    source /home/${SERVICE_USER}/.sdkman/bin/sdkman-init.sh && \
-    sdk install gradle ${GRADLE_VERSION} && \
-    ln -s /opt/workspace/.gradle /home/${SERVICE_USER}/.gradle && \
-    ln -s /opt/workspace /home/${SERVICE_USER}/workspace
-
-USER root
+RUN su - ${SERVICE_USER} 'ln -s /opt/workspace/.gradle /home/${SERVICE_USER}/.gradle && \
+    ln -s /opt/workspace /home/${SERVICE_USER}/workspace';
 
 VOLUME [ "/opt/workspace" ]
 WORKDIR /opt/workspace

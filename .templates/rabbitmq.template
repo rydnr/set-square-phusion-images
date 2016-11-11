@@ -1,0 +1,10 @@
+RUN wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
+    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
+    ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
+    rabbitmq-plugins enable --offline rabbitmq_management && \
+    for p in ${RABBITMQ_PLUGINS}; do \
+      rabbitmq-plugins enable rabbitmq_${p} --offline; \
+    done
+
+# Expose ports.
+EXPOSE 5672 15672 5671 5672 5671 4369 25672 1883 8883 61613 61614

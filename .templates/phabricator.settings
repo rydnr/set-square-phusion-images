@@ -1,0 +1,4 @@
+defineEnvVar GITHUB_PHABRICATOR_HASH "The hash of Phabricator's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/phabricator.git stable)";
+overrideEnvVar TAG '${GITHUB_PHABRICATOR_HASH}';
+defineEnvVar GITHUB_ARCANIST_HASH "The hash of Arcanist's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/arcanist.git stable)";
+defineEnvVar GITHUB_LIBPHUTIL_HASH "The hash of Libphutil's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/libphutil.git stable)";

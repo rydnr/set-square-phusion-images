@@ -1,0 +1,17 @@
+# phabricator:
+#   - requires:
+#     - git
+RUN cd /opt && \
+    git clone https://github.com/phacility/phabricator.git && \
+    cd /opt/phabricator && \
+    git checkout ${GITHUB_PHABRICATOR_HASH} && \
+    patch -p0 < /usr/local/src/php7.patch && \
+    cd /opt && \
+    git clone https://github.com/phacility/libphutil.git && \
+    cd /opt/libphutil && \
+    git checkout ${GITHUB_LIBPHUTIL_HASH} && \
+    cd /opt && \
+    git clone https://github.com/phacility/arcanist.git && \
+    cd /opt/arcanist && \
+    git checkout ${GITHUB_ARCANIST_HASH} && \
+    chmod +x /opt/arcanist/bin/arc

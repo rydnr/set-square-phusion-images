@@ -1,32 +1,32 @@
 # tomcat template
 # - requires: java
-RUN mkdir /etc/service/tomcat && cp -r /etc/service/.template/* /etc/service/tomcat
-COPY tomcat-files/service /etc/service/tomcat/run
-RUN chmod +x /etc/service/tomcat/run
-COPY tomcat-files/logstash.conf /etc/logstash/conf.d/tomcat.conf
+RUN mkdir /etc/service/jenkins && cp -r /etc/service/.template/* /etc/service/jenkins
+COPY tomcat-files/service /etc/service/jenkins/run
+RUN chmod +x /etc/service/jenkins/run
+COPY tomcat-files/logstash.conf /etc/logstash/conf.d/jenkins.conf
 
-ENV SERVICE_USER="tomcat" \
-    SERVICE_GROUP="tomcat"
+ENV SERVICE_USER="jenkins" \
+    SERVICE_GROUP="jenkins"
 
-RUN (groupadd tomcat || echo "Group tomcat" already exists) && \
-    (/usr/sbin/useradd -d /opt/tomcat -g tomcat -G tomcat -s /bin/bash -c "Apache Tomcat user" tomcat || echo "User tomcat already exists") && \
+RUN (groupadd jenkins || echo "Group jenkins" already exists) && \
+    (/usr/sbin/useradd -d /opt/tomcat -g jenkins -G jenkins -s /bin/bash -c "Apache Tomcat user" jenkins || echo "User jenkins already exists") && \
     mkdir -p /opt && \
-    wget -O /opt/apache-tomcat-8.5.5.tar.gz http://apache.mirrors.pair.com/tomcat/tomcat-8/v8.5.5/bin/apache-tomcat-8.5.5.tar.gz && \
-    tar xvfz /opt/apache-tomcat-8.5.5.tar.gz -C /opt && \
-    ln -s /opt/apache-tomcat-8.5.5 /opt/tomcat && \
+    wget -O /opt/${TOMCAT_FILE} ${TOMCAT_DOWNLOAD_URL} && \
+    tar xvfz /opt/${TOMCAT_FILE} -C /opt && \
+    ln -s /opt/${TOMCAT_FOLDER} /opt/tomcat && \
     mkdir /var/lock/tomcat /var/run/tomcat /opt/tomcat/contexts && \
     cd /var/log && ln -s /opt/tomcat/logs tomcat && \
     chmod 755 /var/run/tomcat && \
-    chown -R tomcat:tomcat /var/lock/tomcat /var/run/tomcat /var/log/tomcat /opt/tomcat /opt/apache-tomcat-8.5.5 && \
-    rm -f /opt/apache-tomcat-8.5.5.tar.gz && \
-    chmod +x /etc/service/tomcat/run && \
-    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="10000" />\n</Context>|g' /opt/tomcat/conf/context.xml && \
+    chown -R jenkins:jenkins /var/lock/tomcat /var/run/tomcat /var/log/tomcat /opt/tomcat /opt/${TOMCAT_FOLDER} && \
+    rm -f /opt/${TOMCAT_FILE} && \
+    chmod +x /etc/service/jenkins/run && \
+    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' /opt/tomcat/conf/context.xml && \
     /usr/local/bin/aptget-install.sh -vv  -np make gcc openssl libssl-dev libapr1-dev && \
-    cd /usr/local/src && wget -O apr-1.5.2.tar.gz http://www.us.apache.org/dist//apr/apr-1.5.2.tar.gz && \
-    tar xvfz apr-1.5.2.tar.gz && cd apr-1.5.2 && \
+    cd /usr/local/src && wget -O ${APR_FILE} ${APR_DOWNLOAD_URL} && \
+    tar xvfz ${APR_FILE} && cd ${APR_FOLDER} && \
     ./configure && make && make install && \
-    cd /usr/local/src && wget -O tomcat-native-1.2.8-src.tar.gz http://www.us.apache.org/dist/tomcat/tomcat-connectors/native/1.2.8/source/tomcat-native-1.2.8-src.tar.gz && \
-    tar xvfz tomcat-native-1.2.8-src.tar.gz && cd tomcat-native-1.2.8-src/native && \
+    cd /usr/local/src && wget -O ${TOMCAT_NATIVE_FILE} ${TOMCAT_NATIVE_DOWNLOAD_URL} && \
+    tar xvfz ${TOMCAT_NATIVE_FILE} && cd ${TOMCAT_NATIVE_FOLDER}/native && \
     ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java && make && make install && \
     /usr/local/bin/aptget-cleanup.sh -v 
 

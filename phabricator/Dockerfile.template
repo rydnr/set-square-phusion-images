@@ -5,6 +5,8 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 
 @include("apache")
+@include("git")
+@include("phabricator")
 
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/${IMAGE}/run
@@ -29,26 +31,13 @@ COPY apache-files/service /usr/local/bin/run-apache
 COPY php7.patch /usr/local/src/php7.patch
 
 RUN chmod +x /usr/local/bin/run-apache && \
-    ${APTGET_INSTALL} -u git libapache2-mod-php dpkg-dev \
+    ${APTGET_INSTALL} -u libapache2-mod-php dpkg-dev \
         php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring && \
     ${APTGET_INSTALL} --no-pin mysql-server=${MYSQL_VERSION} python-pip openjdk-8-jre-headless && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     chmod +x /etc/service/${IMAGE}/run && \
     mkdir /usr/local/share/liquibase && \
-    cd /opt && \
-    git clone https://github.com/phacility/phabricator.git && \
-    cd /opt/phabricator && \
-    git checkout ${GITHUB_PHABRICATOR_HASH} && \
-    patch -p0 < /usr/local/src/php7.patch && \
-    cd /opt && \
-    git clone https://github.com/phacility/libphutil.git && \
-    cd /opt/libphutil && \
-    git checkout ${GITHUB_LIBPHUTIL_HASH} && \
-    cd /opt && \
-    git clone https://github.com/phacility/arcanist.git && \
-    cd /opt/arcanist && \
-    git checkout ${GITHUB_ARCANIST_HASH} && \
     a2dissite 000-default.conf && \
     a2enmod rewrite && \
     ${APTGET_INSTALL} php-mcrypt && \
@@ -156,4 +145,3 @@ VOLUME /backup/rsnapshot
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-
