@@ -15,12 +15,13 @@ defineEnvVar NEXUS_UI_HTTP_PORT "The default HTTP por for Nexus" "8081";
 defineEnvVar NEXUS_UI_HTTPS_PORT "The default HTTPS por for Nexus" "8083";
 defineEnvVar NEXUS_DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry" "18443";
 defineEnvVar NEXUS_DOCKER_GROUP_PORT "The HTTPS port for the Dcoker group (proxy + registry)" "18444";
+defineEnvVar NEXUS_WORK_FOLDER "The work folder used in Nexus" "/opt/sonatype/sonatype-work";
 defineEnvVar SERVICE_USER "The service user" "nexus";
 defineEnvVar SERVICE_GROUP "The service group" "nexus";
 overrideEnvVar ENABLE_LOGSTASH "true";
 defineEnvVar SERVICE_USER_HOME \
              'The home of the ${SERVICE_USER} user' \
-             '/sonatype-work';
+             '/opt/sonatype/nexus/sonatype-work';
 defineEnvVar SERVICE_USER_SHELL \
              'The shell of the ${SERVICE_USER} user' \
              '/bin/false';

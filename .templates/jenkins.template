@@ -7,10 +7,7 @@
 #     - phabricator
 RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/service/update-jenkins && \
     mkdir -p ${JENKINS_HOME} /var/jenkins_home && \
-    usermod -l ${SERVICE_USER} ${TOMCAT_USER}  && \
-    usermod -d ${JENKINS_HOME} ${SERVICE_USER}  && \
-    groupmod -n ${SERVICE_GROUP} ${TOMCAT_GROUP}  && \
-    ln -s /backup/jenkins-home /home/jenkins  && \
+    ln -s /backup/jenkins-home ${JENKINS_HOME} && \
     echo "${SERVICE_USER}:${JENKINS_PASSWORD}" | chpasswd  && \
     mkdir -p /var/jenkins_home/.m2 /usr/share/jenkins/ref  && \
     wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL}  && \
@@ -20,14 +17,13 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     sed -i '/<\/tomcat-users>/i \  <user username="jenkins-admin" password="${JENKINS_PASSWORD}" roles="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml  && \
     [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml  && \
     rm -rf ${TOMCAT_HOME}/webapps/*  && \
-    mv /etc/service/tomcat /etc/service/jenkins  && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f  && \
     chmod -R g+w /var/jenkins_home ${TOMCAT_HOME}/.jenkins  && \
     mkdir ${TOMCAT_HOME}/.ssh  && \
     chmod 700 ${TOMCAT_HOME}/.ssh  && \
     chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh  && \
     mkdir -p /var/jenkins_home/plugins /var/jenkins_home/updates  && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 /home/jenkins && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/jenkins_home ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 ${JENKINS_HOME} && \
     cd /var/jenkins_home/plugins/ && \
     for m in ${JENKINS_MODULES}; do \
       echo "Downloading ${m} plugin"; \

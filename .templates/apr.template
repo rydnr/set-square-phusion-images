@@ -1,0 +1,11 @@
+# apr template
+# - requires:
+#   - java
+RUN ${APTGET_INSTALL} -np make gcc openssl libssl-dev libapr1-dev && \
+    cd /usr/local/src && wget -O ${APR_FILE} ${APR_DOWNLOAD_URL} && \
+    tar xvfz ${APR_FILE} && cd ${APR_FOLDER} && \
+    ./configure && make && make install && \
+    cd /usr/local/src && wget -O ${TOMCAT_NATIVE_FILE} ${TOMCAT_NATIVE_DOWNLOAD_URL} && \
+    tar xvfz ${TOMCAT_NATIVE_FILE} && cd ${TOMCAT_NATIVE_FOLDER}/native && \
+    ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java && make && make install && \
+    ${APTGET_CLEANUP}

@@ -6,6 +6,7 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${TAG}
 
 @include("java")
 @include("tomcat")
+@include("apr")
 
 EXPOSE 8080
 

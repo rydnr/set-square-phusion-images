@@ -31,9 +31,13 @@ ENV SERVICE_USER="jenkins" \
 @include("create_ssl_certificate")
 @include("service_user")
 @include("tomcat")
+@include("apr")
+@include("git")
+@include("phabricator")
 @include("jenkins")
 
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE} && \
+    mv /etc/service/tomcat /etc/service/jenkins
 COPY tomcat-files/service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 COPY tomcat-files/logstash.conf /etc/logstash/conf.d/jenkins.conf
@@ -60,3 +64,4 @@ EXPOSE 50000
 @include("copy-metadata")
 @include("instructions")
 @include("symlinks")
+

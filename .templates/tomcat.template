@@ -9,16 +9,7 @@ RUN mkdir -p /opt && \
     chmod 755 /var/run/tomcat && \
     chown -R jenkins:jenkins /var/lock/tomcat /var/run/tomcat /var/log/tomcat /opt/tomcat /opt/${TOMCAT_FOLDER} && \
     rm -f /opt/${TOMCAT_FILE} && \
-    chmod +x /etc/service/jenkins/run && \
-    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' /opt/tomcat/conf/context.xml && \
-    /usr/local/bin/aptget-install.sh -vv  -np make gcc openssl libssl-dev libapr1-dev && \
-    cd /usr/local/src && wget -O ${APR_FILE} ${APR_DOWNLOAD_URL} && \
-    tar xvfz ${APR_FILE} && cd ${APR_FOLDER} && \
-    ./configure && make && make install && \
-    cd /usr/local/src && wget -O ${TOMCAT_NATIVE_FILE} ${TOMCAT_NATIVE_DOWNLOAD_URL} && \
-    tar xvfz ${TOMCAT_NATIVE_FILE} && cd ${TOMCAT_NATIVE_FOLDER}/native && \
-    ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java && make && make install && \
-    /usr/local/bin/aptget-cleanup.sh -v
+    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' /opt/tomcat/conf/context.xml
 
 COPY tomcat-files/setenv.sh /opt/tomcat/bin/setenv.sh
 # End of tomcat template

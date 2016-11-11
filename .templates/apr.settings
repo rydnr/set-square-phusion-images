@@ -1,0 +1,8 @@
+defineEnvVar APR_VERSION "The version of Apache Portable Runtime" "1.5.2";
+defineEnvVar APR_FOLDER "The APR folder" 'apr-${APR_VERSION}';
+defineEnvVar APR_FILE "The APR file" '${APR_FOLDER}.tar.gz';
+defineEnvVar APR_DOWNLOAD_URL "The url to download APR" 'http://www.us.apache.org/dist//apr/${APR_FILE}';
+defineEnvVar TOMCAT_NATIVE_VERSION "The version of Tomcat Native" "1.2.10";
+defineEnvVar TOMCAT_NATIVE_FOLDER "The Tomcat Native folder" 'tomcat-native-${TOMCAT_NATIVE_VERSION}-src';
+defineEnvVar TOMCAT_NATIVE_FILE "The Tomcat Native file" '${TOMCAT_NATIVE_FOLDER}.tar.gz';
+defineEnvVar TOMCAT_NATIVE_DOWNLOAD_URL "The url to download Tomcat Native" 'http://www.us.apache.org/dist/tomcat/tomcat-connectors/native/${TOMCAT_NATIVE_VERSION}/source/${TOMCAT_NATIVE_FILE}';

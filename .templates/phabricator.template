@@ -1,6 +1,8 @@
 # phabricator:
 #   - requires:
 #     - git
+COPY phabricator-files/php7.patch /usr/local/src/
+
 RUN cd /opt && \
     git clone https://github.com/phacility/phabricator.git && \
     cd /opt/phabricator && \

@@ -1,3 +1,24 @@
+_debugEcho "Sourcing tomcat.settings";
 defineEnvVar TOMCAT_HOME "The home directory of Tomcat" "/opt/tomcat";
 defineEnvVar TOMCAT_USER "The Tomcat user" 'tomcat';
 defineEnvVar TOMCAT_GROUP "The Tomcat group" 'tomcat';
+defineEnvVar TOMCAT_MAJOR_VERSION \
+             "The major version of Tomcat" \
+             "8";
+defineEnvVar TOMCAT_VERSION \
+             "The version of the Apache Tomcat server" \
+             "8.5.8" \
+             'curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/ | grep folder.gif | tail -n 1 | cut -d ">" -f 3 | cut -d "/" -f 1 | sed "s_^v__g"';
+defineEnvVar TOMCAT_CACHE_MAX_SIZE \
+             "The maximum size of the static resource cache in kilobytes" \
+             "10000";
+defineEnvVar TOMCAT_FOLDER \
+             "The Tomcat folder" \
+             'apache-tomcat-${TOMCAT_VERSION}';
+defineEnvVar TOMCAT_FILE \
+             "The Tomcat file" \
+             '${TOMCAT_FOLDER}.tar.gz';
+defineEnvVar TOMCAT_DOWNLOAD_URL \
+             "The url to download Tomcat" \
+             'http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/${TOMCAT_FILE}';
+

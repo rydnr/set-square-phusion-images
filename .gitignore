@@ -142,6 +142,7 @@ sdkman/setup.sql
 .templates/addon-toggles
 .templates/android-sdk
 .templates/apache
+.templates/apr
 .templates/backup
 .templates/copy-metadata
 .templates/exim-files/exim.00_local_macros
@@ -154,6 +155,7 @@ sdkman/setup.sql
 .templates/locale
 .templates/logstash
 .templates/maintainer
+.templates/phabricator
 .templates/plone5
 .templates/preamble
 .templates/preamble
