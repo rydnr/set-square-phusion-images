@@ -1,0 +1,3 @@
+defineEnvVar TOMCAT_HOME "The home directory of Tomcat" "/opt/tomcat";
+defineEnvVar TOMCAT_USER "The Tomcat user" 'tomcat';
+defineEnvVar TOMCAT_GROUP "The Tomcat group" 'tomcat';
