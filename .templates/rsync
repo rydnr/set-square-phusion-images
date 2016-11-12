@@ -1,8 +1,5 @@
-# rsync template
-
+# v rsync
 COPY rsync-files/21_tune_rsync_conf.sh \
      rsync-files/21_tune_rsync_conf.inc.sh \
      /etc/my_init.d/
-
-# End of rsync template
-
+# ^ rsync

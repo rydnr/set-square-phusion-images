@@ -250,17 +250,20 @@ function appendWorkDir() {
 }
 
 ## Enables the Jetty HTTPS configuration.
-## -> 1: The custom.properties file location.
+## -> 1: The nexus-default.properties file location.
+## -> 2: The nexus.properties file location.
 ## Example:
-##   enableJettyHttpsConfig "/opt/sonatype/nexus/etc/custom.properties"
+##   enableJettyHttpsConfig "/opt/sonatype/nexus/etc/nexus-default.properties" "/opt-sonatype/nexus/etc/nexus.properties"
 function enableJettyHttpsConfig() {
   local _file="${1}";
+  local _output="${2}";
 
   checkNotEmpty "file" "${_file}" 1;
+  checkNotEmpty "output" "${_output}" 2;
 
   logInfo -n "Enabling Jetty-https in ${_file}";
-  sed -i "s|nexus-args=\(.*\)|nexus-args=\1,\${karaf.base}/etc/jetty/jetty-https.xml|g" "${_file}";
-  if [ $? -eq 0 ]; then
+  grep 'nexus-args' "${_file}" | sed "s|nexus-args=\(.*\)|nexus-args=\1,\${jetty.etc}/jetty-https.xml|g" >> "${_output}";
+  if isTrue $?; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
@@ -282,9 +285,9 @@ function main() {
   updateKeyStorePath "${SSL_KEYSTORE_PATH}" "${JETTY_HTTPS_CONFIG_FILE}";
   updateKeyStorePassword "${_keyStorePassword}" "${JETTY_HTTPS_CONFIG_FILE}";
   updateKeyPassword "${_keyPassword}" "${JETTY_HTTPS_CONFIG_FILE}";
-  appendHttpsConnectorPort "${NEXUS_CONFIG_FILE}" "${NEXUS_DOCKER_GROUP_PORT}";
   appendLogConfigDir "${NEXUS_SYSTEM_PROPERTIES_FILE}" "${NEXUS_LOG_CONFIG_DIR}";
   appendWorkDir "${NEXUS_SYSTEM_PROPERTIES_FILE}" "${NEXUS_WORK_DIR}";
-  enableJettyHttpsConfig "${NEXUS_CONFIG_FILE}";
+  enableJettyHttpsConfig "${NEXUS_DEFAULT_CONFIG_FILE}" "${NEXUS_CONFIG_FILE}";
+  appendHttpsConnectorPort "${NEXUS_CONFIG_FILE}" "${NEXUS_DOCKER_GROUP_PORT}";
 }
 

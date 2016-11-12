@@ -4,7 +4,8 @@ defineEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" '${SQ_SSL_KEYSTORE_PA
 defineEnvVar SSL_KEY_PASSWORD "The key password" '${SQ_SSL_KEY_PASSWORD}';
 defineEnvVar SSL_KEYSTORE_PATH "The keystore path" '${SQ_SSL_KEY_FOLDER}/${SQ_SSL_KEYSTORE_NAME}.jks';
 #defineEnvVar NEXUS_CONFIG_FILE "The Nexus config file" "/opt/sonatype/nexus/etc/org.sonatype.nexus.cfg";
-defineEnvVar NEXUS_CONFIG_FILE "The Nexus config file" "/opt/sonatype/nexus/etc/nexus.properties";
+defineEnvVar NEXUS_CONFIG_FILE "The Nexus config file" "/opt/sonatype/sonatype-work/nexus3/etc/nexus.properties";
+defineEnvVar NEXUS_DEFAULT_CONFIG_FILE "The Nexus config file" "/opt/sonatype/nexus/etc/nexus-default.properties";
 defineEnvVar NEXUS_PROPERTIES_FILE "The Nexus properties file" "/opt/sonatype/nexus/etc/custom.properties";
 defineEnvVar NEXUS_UI_HTTPS_PORT "The HTTPS port for the Nexus UI" "${NEXUS_UI_HTTPS_PORT}";
 defineEnvVar NEXUS_DOCKER_REGISTRY_PORT "The HTTPS port for the Docker registry" "${NEXUS_DOCKER_REGISTRY_PORT}";

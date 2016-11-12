@@ -6,22 +6,22 @@
   </activeProfiles>
   <servers>
     <server>
-      <id>acmsl-libs-releases</id>
+      <id>${NAMESPACE}-libs-releases</id>
       <username>${JENKINS_USER}</username>
       <password>${JENKINS_ENCRYPTED_PASSWORD}</password>
     </server>
     <server>
-      <id>acmsl-libs-snapshots</id>
+      <id>${NAMESPACE}-libs-snapshots</id>
       <username>${JENKINS_USER}</username>
       <password>${JENKINS_ENCRYPTED_PASSWORD}</password>
     </server>
     <server>
-      <id>acmsl-plugin-releases</id>
+      <id>${NAMESPACE}-plugin-releases</id>
       <username>${JENKINS_USER}</username>
       <password>${JENKINS_ENCRYPTED_PASSWORD}</password>
     </server>
     <server>
-      <id>acmsl-plugin-snapshots</id>
+      <id>${NAMESPACE}-plugin-snapshots</id>
       <username>${JENKINS_USER}</username>
       <password>${JENKINS_ENCRYPTED_PASSWORD}</password>
     </server>
@@ -30,7 +30,7 @@
     <mirror>
       <mirrorOf>*</mirrorOf>
       <name>everything</name>
-      <url>http://maven.acm-sl.org/everything</url>
+      <url>http://maven.${DOMAIN}/everything</url>
       <id>everything</id>
     </mirror>
   </mirrors>
@@ -42,15 +42,15 @@
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
-          <id>acmsl-libs-releases</id>
-          <name>acmsl-libs-releases</name>
-          <url>http://maven.acm-sl.org/libs-releases-local</url>
+          <id>${NAMESPACE}-libs-releases</id>
+          <name>${NAMESPACE}-libs-releases</name>
+          <url>http://maven.${DOMAIN}/libs-releases-local</url>
         </repository>
         <repository>
           <snapshots />
-          <id>acmsl-libs-snapshots</id>
-          <name>acmsl-libs-snapshots</name>
-          <url>http://maven.acm-sl.org/libs-snapshots-local</url>
+          <id>${NAMESPACE}-libs-snapshots</id>
+          <name>${NAMESPACE}-libs-snapshots</name>
+          <url>http://maven.${DOMAIN}/libs-snapshots-local</url>
         </repository>
       </repositories>
       <pluginRepositories>
@@ -58,17 +58,19 @@
           <snapshots>
             <enabled>false</enabled>
           </snapshots>
-          <id>acmsl-plugins-releases</id>
-          <name>acmsl-plugins-releases</name>
-          <url>http://maven.acm-sl.org/plugins-releases-local</url>
+          <id>${NAMESPACE}-plugins-releases</id>
+          <name>${NAMESPACE}-plugins-releases</name>
+          <url>http://maven.${DOMAIN}/plugins-releases-local</url>
         </pluginRepository>
         <pluginRepository>
           <snapshots />
-          <id>acmsl-plugins-snapshots</id>
-          <name>acmsl-plugins-snapshots</name>
-          <url>http://maven.acm-sl.org/plugins-snapshots-local</url>
+          <id>${NAMESPACE}-plugins-snapshots</id>
+          <name>${NAMESPACE}-plugins-snapshots</name>
+          <url>http://maven.${DOMAIN}/plugins-snapshots-local</url>
         </pluginRepository>
       </pluginRepositories>
     </profile>
   </profiles>
 </settings>
+
+

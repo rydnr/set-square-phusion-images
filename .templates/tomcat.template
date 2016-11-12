@@ -1,5 +1,6 @@
-# tomcat template
-# - requires: java
+# v tomcat
+# - requires:
+#   - java
 RUN mkdir -p /opt && \
     wget -O /opt/${TOMCAT_FILE} ${TOMCAT_DOWNLOAD_URL} && \
     tar xvfz /opt/${TOMCAT_FILE} -C /opt && \
@@ -12,4 +13,4 @@ RUN mkdir -p /opt && \
     sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' /opt/tomcat/conf/context.xml
 
 COPY tomcat-files/setenv.sh /opt/tomcat/bin/setenv.sh
-# End of tomcat template
+# ^ tomcat

@@ -1,3 +1,4 @@
+# v nodejs
 # From https://github.com/nodejs/node-v0.x-archive/wiki/Installing-Node.js-via-package-manager#debian-and-ubuntu-based-linux-distributions
 RUN curl --silent --location ${NODEJS_DOWNLOAD_URL} | bash - && \
     ${APTGET_INSTALL} nodejs build-essential libfontconfig1 && \
@@ -7,3 +8,4 @@ RUN curl --silent --location ${NODEJS_DOWNLOAD_URL} | bash - && \
       done; \
     fi && \
     ${APTGET_CLEANUP}
+# ^ nodejs

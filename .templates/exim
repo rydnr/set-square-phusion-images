@@ -1,6 +1,6 @@
-# exim template
-# - requires: create_ssl_certificate
-
+# v exim
+# - requires:
+#   - create_ssl_certificate
 RUN ${APTGET_INSTALL} --update mailutils exim4 sasl2-bin opendkim opendkim-tools apt-utils net-tools spf-tools-perl && \
     ${APTGET_CLEANUP}
 
@@ -13,6 +13,5 @@ RUN mkdir -p /etc/service/exim4/log; \
 COPY exim-files/service.exim4 /etc/service/exim4/run
 COPY exim-files/exim.00_local_macros /etc/exim4/conf.d/00_local_macros
 COPY exim-files/my_exec.d /etc/my_exec.d/exim4
-
-# End of exim template
+# ^ exim
 

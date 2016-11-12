@@ -75,7 +75,9 @@ java/my_exec
 java/remote-syslogd.conf
 jenkins/50-rsync-jenkins-home.sh
 jenkins/config.xml
+jenkins/gradle-files
 jenkins/hudson.tasks.Mailer.xml
+jenkins/jenkins-files
 jenkins/jenkins.plugins.slack.SlackNotifier.xml
 jenkins/phabricator-files
 jenkins/prepare-release.sh

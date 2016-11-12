@@ -1,4 +1,4 @@
-# install template
+# v install
 ENV DEBIAN_FRONTEND="noninteractive"
 COPY install-files/aptget-install.sh \
      install-files/aptget-install.inc.sh \
@@ -11,5 +11,4 @@ RUN chmod +x ${APTGET_INSTALL} ${APTGET_CLEANUP} && \
     touch /var/local/docker-installed-packages.txt && \
     ${APTGET_INSTALL} --update wget gettext sudo && \
     ${APTGET_CLEANUP}
-
-# End of install template
+# ^ install

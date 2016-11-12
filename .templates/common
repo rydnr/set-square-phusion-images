@@ -1,4 +1,4 @@
-# common template
+# v common
 ENV TERM="linux" \
     PATH="${PATH}:/usr/local/bin"
 
@@ -22,5 +22,4 @@ COPY common-files/logger /etc/service/.template/log/run
 RUN chmod +x /etc/service/.template/log/run
 
 COPY common-files/my_exec /sbin/my_exec
-
-# End of common template
+# ^ common

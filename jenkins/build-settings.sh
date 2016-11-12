@@ -10,5 +10,5 @@ defineEnvVar JENKINS_ENCRYPTED_PASSWORD "The Jenkins password, encrypted" "secre
 defineEnvVar JENKINS_RELEASE_ISSUE_REF "Text referencing a 'Release issue', to be used in commits done by Jenkins while releasing artifacts. ex: 'Ref T10' for Phabricator, 'refs #33' for Trac or Redmine" "";
 defineEnvVar SERVICE_USER "The service user" "jenkins";
 defineEnvVar SERVICE_GROUP "The service group" "jenkins";
-defineEnvVar SERVICE_USER_HOME "The service user home" '/home/${SERVICE_USER}';
+defineEnvVar SERVICE_USER_HOME "The service user home" '/home/jenkins';
 defineEnvVar SERVICE_USER_SHELL "The shell of the service user" "/bin/bash";

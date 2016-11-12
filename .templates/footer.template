@@ -1,5 +1,4 @@
-# footer template
-
+# v footer
 COPY README /README
 COPY ${LICENSE_FILE} /LICENSE
 COPY ${COPYRIGHT_PREAMBLE_FILE} /copyright.txt
@@ -8,6 +7,5 @@ COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
 
 # For instructions on how to use this image, please run
 # docker run -it ${NAMESPACE}/${IMAGE}:${TAG} help
-
-# End of footer template
+# ^ footer
 

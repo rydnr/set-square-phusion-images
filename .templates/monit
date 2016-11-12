@@ -1,4 +1,4 @@
-# monit template
+# v monit
 COPY monit-files/30_create_monit_filesystem_check.sh \
      monit-files/30_create_monit_filesystem_check.inc.sh \
      monit-files/31_create_monit_http_conf.sh \
@@ -20,6 +20,5 @@ RUN ${APTGET_INSTALL} --update monit && \
     mkdir -p /etc/service/monit/log && \
     cp /etc/service/.template/log/run /etc/service/monit/log/run && \
     sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc
-
-# End of monit template
+# ^ monit
 

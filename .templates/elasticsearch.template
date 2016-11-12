@@ -1,0 +1,33 @@
+# v elaticsearch
+# - requires:
+#   - java
+# From github.com/docker-library/elasticsearch/5.0/Dockerfile
+ENV GOSU_VERSION=1.7 \
+    PATH=/usr/share/elasticsearch/bin:$PATH \
+    ELASTICSEARCH_VERSION=${ELASTICSEARCH_VERSION} \
+    ES_JAVA_OPTS="-Xms1g -Xmx1g"
+
+RUN set -x && \
+	  wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture)" && \
+    wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$(dpkg --print-architecture).asc" && \
+    export GNUPGHOME="$(mktemp -d)" && \
+    gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4 && \
+    gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu && \
+    rm -r "$GNUPGHOME" /usr/local/bin/gosu.asc && \
+    chmod +x /usr/local/bin/gosu && \
+    gosu nobody true && \
+    apt-key adv --keyserver ha.pool.sks-keyservers.net --recv-keys 46095ACC8548582C1A2699A9D27D666CD88E42B4 && \
+    echo 'deb https://artifacts.elastic.co/packages/${ELASTICSEARCH_MAJOR_VERSION}.x/apt stable main' > /etc/apt/sources.list.d/elasticsearch.list && \
+    ${APTGET_INSTALL} -u apt-transport-https elasticsearch=${ELASTICSEARCH_VERSION} && \
+    ${APTGET_CLEANUP} && \
+    cd /usr/share/elasticsearch && \
+    set -ex && \
+    for path in ./data ./logs ./config ./config/scripts; do \
+      mkdir -p "$path"; \
+      chown -R ${SERVICE_USER}:${SERVICE_USER} "$path"; \
+    done && \
+
+COPY elasticsearch-files/config /usr/share/elasticsearch/config
+
+EXPOSE 9200 9300
+# ^ elasticsearch

@@ -1,5 +1,4 @@
-# cron template
-
+# v cron
 COPY cron-files/my_exec.d /etc/my_exec.d/cron
 
 COPY cron-files/versioncheck.daily /etc/cron.daily/
@@ -13,6 +12,4 @@ COPY cron-files/service /etc/service/cron/run
 
 # COPY cron-files/23_create_cron_symlinks.sh \
 #      /etc/my_init.d/
-
-# End of cron template
-
+# ^ cron

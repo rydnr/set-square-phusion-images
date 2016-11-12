@@ -1,4 +1,4 @@
-# apr template
+# v apr
 # - requires:
 #   - java
 RUN ${APTGET_INSTALL} -np make gcc openssl libssl-dev libapr1-dev && \
@@ -9,3 +9,4 @@ RUN ${APTGET_INSTALL} -np make gcc openssl libssl-dev libapr1-dev && \
     tar xvfz ${TOMCAT_NATIVE_FILE} && cd ${TOMCAT_NATIVE_FOLDER}/native && \
     ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java && make && make install && \
     ${APTGET_CLEANUP}
+# ^ apr

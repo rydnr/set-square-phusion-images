@@ -1,3 +1,4 @@
+# v plone5
 # ENV VIRTUAL_HOST="${PLONE_VIRTUAL_HOST}"
 
 #RUN ${APTGET_INSTALL} -u build-essential python-dev libjpeg-dev libxslt1-dev poppler-utils zlib1g-dev wv libjpeg-dev libxml2-dev libreadline6-dev libssl-dev python-pip && \
@@ -37,3 +38,4 @@ RUN mkdir -p ${PLONE5_HOME}/.buildout && \
 COPY plone5-files/default.cfg ${PLONE5_HOME}/.buildout/default.cfg
 COPY plone5-files/logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY plone5-files/plonebackup plone5-files/zeopack /etc/cron.d/
+# ^ plone5

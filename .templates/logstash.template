@@ -1,3 +1,4 @@
+# v logstash
 COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_generate_logstash_forwarder_crt.inc.sh /etc/my_init.d/
 
 RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
@@ -13,3 +14,4 @@ COPY logstash-files/02-beats-input.conf \
      /etc/logstash/conf.d/
 
 EXPOSE 5044
+# ^ logstash

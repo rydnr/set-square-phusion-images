@@ -1,5 +1,5 @@
-# gradle:
-#   - requires:
-#     - sdkman
+# v gradle:
+# - requires:
+#   - sdkman
 RUN su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh && sdk selfupdate force && sdk install gradle ${GRADLE_VERSION}  && if [ -n \"${GRADLE_VERSIONS}\" ]; then for p in ${GRADLE_VERSIONS}; do yes no | sdk i gradle \${p}; done; fi';
-# end of gradle template
+# ^ gradle

@@ -1,3 +1,4 @@
+# v android-sdk
 ENV ANDROID_HOME="/opt/android-sdk-linux" \
     PATH="${PATH}:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools" \
     AWT_TOOLKIT="MToolkit" \
@@ -25,3 +26,4 @@ RUN dpkg --add-architecture i386 && \
         adduser ${u} ${g}; \
       done; \
     done
+# ^ android-sdk

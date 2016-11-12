@@ -9,8 +9,8 @@ ENV DOBACKUP="true" \
     VIRTUAL_HOST="${NEXUS_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT="${NEXUS_UI_HTTP_PORT}"
 
-@include("create_ssl_certificate")
 @include("service_user")
+@include("create_ssl_certificate")
 @include("java")
 @include("logstash")
 @include("filebeat")
@@ -26,18 +26,17 @@ COPY 50_update_nexus_ssl_config.sh 50_update_nexus_ssl_config.inc.sh \
 RUN chmod +x /etc/service/${IMAGE}/run && \
     cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
     cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
-    mkdir -p /opt/sonatype && mv /tmp/nexus-* /opt/sonatype/nexus && \
+    mkdir -p /opt/sonatype/sonatype-work/nexus3 && mv /tmp/nexus-* /opt/sonatype/nexus && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype ${NEXUS_WORK_FOLDER} && \
     rm -rf /tmp/nexus-${NEXUS_VERSION} /var/tmp/${NEXUS_ARTIFACT} && \
     ([ ! -d /backup ] && rm -rf /backup) && \
-    mkdir -p /backup/${IMAGE}-conf /backup/${IMAGE}-blobs && \
+    mkdir -p /backup/${IMAGE}-conf /backup/${IMAGE}-blobs ${NEXUS_WORK_FOLDER} && \
     ln -s /backup/${IMAGE}-conf ${NEXUS_WORK_FOLDER}/etc && \
     ln -s /backup/${IMAGE}-blobs ${NEXUS_WORK_FOLDER}/blobs && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype ${NEXUS_WORK_FOLDER} && \
     sed -i "s/^-Xms.*/-Xms${NEXUS_MIN_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions && \
     sed -i "s/^-Xmx.*/-Xmx${NEXUS_MAX_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    /usr/local/bin/create_ssl_certificate_openssl.sh
-RUN \
+    /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /usr/local/bin/create_ssl_certificate_keytool.sh && \
     chmod +x /etc/my_init.d/50_update_nexus_ssl_config.sh && \
     mkdir -p /opt/sonatype/nexus/etc/ssl && \

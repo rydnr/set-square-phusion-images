@@ -1,11 +1,8 @@
-# envvars template
-
+# v envvars
 ENV ENABLE_CRON=${ENABLE_CRON} \
     ENABLE_MONIT=${ENABLE_MONIT} \
     ENABLE_RSNAPSHOT=${ENABLE_RSNAPSHOT} \
     ENABLE_SSH=${ENABLE_SSH} \
     ENABLE_SYSLOG=${ENABLE_SYSLOG} \
     ENABLE_LOGSTASH=${ENABLE_LOGSTASH}
-
-# End of envvars template
-
+# ^ envvars

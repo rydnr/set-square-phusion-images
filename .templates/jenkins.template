@@ -1,15 +1,15 @@
-# jenkins:
-#   - requires:
-#     - java
-#     - service_user
-#     - tomcat
-#     - git
-#     - phabricator
-#     - gradle
-#     - groovy
-#     - maven
-#     - ant
-#     - nodejs
+# v jenkins:
+# - requires:
+#   - java
+#   - service_user
+#   - tomcat
+#   - git
+#   - phabricator
+#   - gradle
+#   - groovy
+#   - maven
+#   - ant
+#   - nodejs
 COPY jenkins-files/update-jenkins.sh jenkins-files/update-jenkins.inc.sh \
      jenkins-files/generate-jenkins-plugin-configs.sh jenkins-files/generate-jenkins-plugin-configs.inc.sh \
      /usr/local/bin/
@@ -45,7 +45,7 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     su - ${SERVICE_USER} -c '/opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL}'  && \
     mkdir -p ${SERVICE_USER_HOME}/init.groovy.d  && \
     chmod +x /usr/local/bin/generate-jenkins-plugin-configs.sh  && \
-    su - ${SERVICE_USER} -c 'curl -s "https://get.sdkman.io" | bash && source "${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh" && \
+    su - ${SERVICE_USER} -c 'curl -s "https://get.sdkman.io" | bash && source "${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh"' && \
     su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} " && \
 su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS}" && \
     su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS}"  && \
@@ -64,3 +64,4 @@ COPY jenkins-files/ssh-config ${JENKINS_HOME}/.ssh/config
 COPY jenkins-files/known_hosts ${JENKINS_HOME}/.ssh/known_hosts
 COPY jenkins-files/jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
 COPY jenkins-files/hudson.tasks.Mailer.xml jenkins-files/config.xml ${SERVICE_USER_HOME}/
+# ^ jenkins

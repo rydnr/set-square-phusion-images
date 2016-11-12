@@ -1,7 +1,7 @@
-# phabricator:
-#   - requires:
-#     - git
-#     - install
+# v phabricator
+# - requires:
+#   - git
+#   - install
 COPY phabricator-files/php7.patch /usr/local/src/
 
 RUN cd /opt && \
@@ -20,3 +20,4 @@ RUN cd /opt && \
     cd /opt/arcanist && \
     git checkout ${GITHUB_ARCANIST_HASH} && \
     chmod +x /opt/arcanist/bin/arc
+# ^ phabricator

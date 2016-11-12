@@ -5,8 +5,13 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${TAG}
 @include("addon-toggles")
 
 @include("java")
+@include("service_user")
 @include("tomcat")
 @include("apr")
+
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE} && \
+COPY tomcat-files/service /etc/service/${IMAGE}/run
+RUN chmod +x /etc/service/${IMAGE}/run
 
 EXPOSE 8080
 
