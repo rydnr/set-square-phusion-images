@@ -25,33 +25,17 @@ EOF
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export TOOL_IS_MANDATORY="Tool is mandatory";
-  export UNSUPPORTED_TOOL="Unsupported tool. Only gradle, groovy, grails, maven and ant are supported";
-  export JENKINS_HOME_IS_UNDEFINED="JENKINS_HOME environment variable is undefined";
-  export CANNOT_CREATE_GRADLE_CONFIG_FILE="Cannot create Gradle configuration file";
-  export CANNOT_CREATE_GROOVY_CONFIG_FILE="Cannot create Groovy configuration file";
-  export CANNOT_CREATE_GRAILS_CONFIG_FILE="Cannot create Grails configuration file";
-  export CANNOT_CREATE_MAVEN_CONFIG_FILE="Cannot create Maven configuration file";
-  export CANNOT_CREATE_ANT_CONFIG_FILE="Cannot create Ant configuration file";
-  export CANNOT_CREATE_SLACK_CONFIG_FILE="Cannot create Slack configuration file";
-  export CANNOT_CREATE_NODEJS_CONFIG_FILE="Cannot create NodeJS configuration file";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    TOOL_IS_MANDATORY \
-    UNSUPPORTED_TOOL \
-    JENKINS_HOME_IS_UNDEFINED \
-    CANNOT_CREATE_GRADLE_CONFIG_FILE \
-    CANNOT_CREATE_GROOVY_CONFIG_FILE \
-    CANNOT_CREATE_GRAILS_CONFIG_FILE \
-    CANNOT_CREATE_MAVEN_CONFIG_FILE \
-    CANNOT_CREATE_ANT_CONFIG_FILE \
-    CANNOT_CREATE_SLACK_CONFIG_FILE \
-    CANNOT_CREATE_NODEJS_CONFIG_FILE \
-  );
-
-  export ERROR_MESSAGES;
+  addError INVALID_OPTION "Unrecognized option";
+  addError TOOL_IS_MANDATORY "Tool is mandatory";
+  addError UNSUPPORTED_TOOL "Unsupported tool. Only gradle, groovy, grails, maven and ant are supported";
+  addError JENKINS_HOME_IS_UNDEFINED "JENKINS_HOME environment variable is undefined";
+  addError CANNOT_CREATE_GRADLE_CONFIG_FILE "Cannot create Gradle configuration file";
+  addError CANNOT_CREATE_GROOVY_CONFIG_FILE "Cannot create Groovy configuration file";
+  addError CANNOT_CREATE_GRAILS_CONFIG_FILE "Cannot create Grails configuration file";
+  addError CANNOT_CREATE_MAVEN_CONFIG_FILE "Cannot create Maven configuration file";
+  addError CANNOT_CREATE_ANT_CONFIG_FILE "Cannot create Ant configuration file";
+  addError CANNOT_CREATE_SLACK_CONFIG_FILE "Cannot create Slack configuration file";
+  addError CANNOT_CREATE_NODEJS_CONFIG_FILE "Cannot create NodeJS configuration file";
 }
 
 ## Validates the input.
@@ -70,13 +54,17 @@ function checkInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
     esac
   done
 
-  if [[ -z "${TOOL}" ]]; then
+  if isEmpty "${TOOL}"; then
     logDebugResult FAILURE "failed";
     exitWithErrorCode TOOL_IS_MANDATORY;
   fi
@@ -88,7 +76,7 @@ function checkInput() {
        ;;
   esac
 
-  if [ -z "${JENKINS_HOME}" ]; then
+  if isEmpty "${JENKINS_HOME}"; then
     logDebugResult FAILURE "failed";
     exitWithErrorCode JENKINS_HOME_IS_UNDEFINED;
   fi
@@ -111,15 +99,19 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 
-  if [[ -z "${TOOL}" ]]; then
+  if isEmpty "${TOOL}"; then
     export TOOL="${1}";
     shift;
   fi
 
-  if [[ -z "${VERSIONS}" ]]; then
+  if isEmpty "${VERSIONS}"; then
     export VERSIONS="$@";
     shift;
   fi
@@ -419,10 +411,9 @@ EOF
 ## Main logic
 ## dry-wit hook
 function main() {
+  local -i _sdkTool=${TRUE};
+
   source ~/.sdkman/bin/sdkman-init.sh;
-  for v in ${VERSIONS:- }; do
-    yes no | sdk i ${TOOL} ${v}
-  done
 
   case ${TOOL} in
     gradle)
@@ -442,9 +433,17 @@ function main() {
       ;;
     slack)
       generate_slack_config "${JENKINS_HOME}";
+      _sdkTool=${FALSE};
       ;;
     nodejs)
       generate_nodejs_config "${JENKINS_HOME}";
+      _sdkTool=${FALSE};
       ;;
   esac
+
+  if isTrue ${_sdkTool}; then
+    for v in ${VERSIONS:- }; do
+       yes no | sdk i ${TOOL} ${v}
+    done
+  fi
 }

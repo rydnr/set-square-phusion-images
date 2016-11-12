@@ -4,16 +4,17 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
+@include("service_user")
+@include("gosu")
+@include("tini")
+@include("elk-common")
+@include("kibana")
+
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 
-@include("java")
-@include("gosu")
-@include("elk-common")
-@include("logstash")
-
-CMD ["-e", ""]
+CMD ["kibana""]
 
 @include("copy-metadata")
 @include("symlinks")

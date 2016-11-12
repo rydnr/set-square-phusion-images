@@ -143,6 +143,7 @@ function process_update_center_json() {
 ##   echo "Processed update-center.json: ${RESULT}"
 function update_jenkins() {
   local _source="${1}";
+
   checkNotEmpty "source" "${_source}" 1;
 
   local -i _rescode;
@@ -154,7 +155,7 @@ function update_jenkins() {
       logDebugResult SUCCESS "done";
 
       logDebug -n "Overwritting Jenkins update configuration";
-      mv "${_source}" /var/jenkins_home/updates/default.json
+      mv "${_source}" ${JENKINS_HOME}/updates/default.json
       _rescode=$?;
       if isTrue ${_rescode}; then
           logDebugResult SUCCESS "done";
@@ -171,10 +172,13 @@ function update_jenkins() {
 ## Main logic
 ## dry-wit hook
 function main() {
-  retrieve_update_center_json;
-  local _jsonFile="${RESULT}";
-
-  process_update_center_json "${_jsonFile}";
-
-  update_jenkins "${_jsonFile}";
+  local _jsonFile;
+  if retrieve_update_center_json; then
+      _jsonFile="${RESULT}";
+      process_update_center_json "${_jsonFile}";
+      update_jenkins "${_jsonFile}";
+  else
+    exitWithErrorCode CANNOT_RETRIEVE_UPDATE_CENTER_JSON "${JENKINS_UPDATE_CENTER_JSON}";
+  fi
 }
+

@@ -15,4 +15,4 @@ defineEnvVar SSL_KEYSTORE_PATH "The keystore path" "${SQ_SSL_KEYSTORE_PATH}";
 defineEnvVar ADDITIONAL_SETTINGS_PATH "The location of the file with additional settings" "/usr/local/bin/create_ssl_certificate.inc.sh";
 defineEnvVar NEXUS_SYSTEM_PROPERTIES_FILE "The nexus.properties file for Nexus" "/opt/sonatype/nexus/etc/nexus.properties";
 defineEnvVar NEXUS_LOG_CONFIG_DIR "The folder with logging configuration for Nexus" "/backup/nexus-conf/";
-defineEnvVar NEXUS_WORK_DIR "The folder where Nexus stores runtime data" "/sonatype-work/";
+defineEnvVar NEXUS_WORK_DIR "The folder where Nexus stores runtime data" "/opt/sonatype/sonatype-work/nexus3/";

@@ -1,0 +1,7 @@
+# Kibana
+
+This image runs Kibana.
+
+# Example:
+
+docker run -d --name ${IMAGE} -e ELASTICSEARCHURL=[elasticsearch-container] ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

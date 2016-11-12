@@ -1,0 +1,2 @@
+defineEnvVar KIBANA_MAJOR "The Kibana major version" "5.0";
+defineEnvVar KIBANA_VERSION "The Kibana version" '${KIBANA_MAJOR}.0';

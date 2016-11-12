@@ -1,0 +1,7 @@
+# Logstash
+
+This image runs logstash.
+
+# Example:
+
+docker run -d --name ${IMAGE} ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

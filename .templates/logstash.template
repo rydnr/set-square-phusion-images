@@ -1,12 +1,21 @@
 # v logstash
+# - requires:
+#   - java
+#   - gosu
+#   - elk-common
+ENV LS_SETTINGS_DIR=/etc/logstash \
+    LOGSTASH_VERSION="${LOGSTASH_VERSION}" \
+    PATH=/usr/share/logstash/bin:$PATH
+
 COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_generate_logstash_forwarder_crt.inc.sh /etc/my_init.d/
 
-RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
-    echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | tee -a /etc/apt/sources.list && \
-    echo 'deb http://packages.elastic.co/logstash/2.2/debian stable main' | sudo tee /etc/apt/sources.list.d/logstash-2.2.x.list && \
-    ${APTGET_INSTALL} --update logstash && \
-    apt-get install --reinstall logstash && \
-    ${APTGET_CLEANUP}
+RUN  mkdir -p /usr/local/lib && \
+	   ln -s /usr/lib/*/libzmq.so.3 /usr/local/lib/libzmq.so && \
+     ${APTGET_INSTALL} -u logstash=${LOGSTASH_VERSION} && \
+     ${APTGET_CLEANUP} && \
+     if [ -f "$LS_SETTINGS_DIR/logstash.yml" ]; then \
+       sed -ri 's!^(path.log|path.config):!#&!g' "$LS_SETTINGS_DIR/logstash.yml"; \
+     fi
 
 COPY logstash-files/02-beats-input.conf \
      logstash-files/10-syslog-filter.conf \

@@ -7,7 +7,7 @@ defineEnvVar JENKINS_PHABRICATOR_URL "The Phabricator url should Jenkins uses it
 _jm="";
 _jm+="ace-editor analysis-core ansible async-http-client authentication-tokens aws-java-sdk aws-lambda ";
 _jm+="bouncycastle-api branch-api build-pipeline build-pipeline-plugin build-with-parameters ";
-_jm+="cloudbees-folder codedeploy conditional-buildstep credentials credentials-binding ";
+_jm+="cloudbees-folder codedeploy copyartifact conditional-buildstep credentials credentials-binding ";
 _jm+="deploy deployment-notification display-url-api docker-commons docker-build-step dockerhub-notification docker-workflow downstream-buildview durable-task ";
 _jm+="email-ext emailext-template ";
 _jm+="fail-the-build-plugin ";
