@@ -27,7 +27,7 @@ EOF
 function defineErrors() {
   addError INVALID_OPTION "Unrecognized option";
   addError TOOL_IS_MANDATORY "Tool is mandatory";
-  addError UNSUPPORTED_TOOL "Unsupported tool. Only gradle, groovy, grails, maven and ant are supported";
+  addError UNSUPPORTED_TOOL "Only gradle, groovy, grails, maven and ant are supported. Unsupported ";
   addError JENKINS_HOME_IS_UNDEFINED "JENKINS_HOME environment variable is undefined";
   addError CANNOT_CREATE_GRADLE_CONFIG_FILE "Cannot create Gradle configuration file";
   addError CANNOT_CREATE_GROOVY_CONFIG_FILE "Cannot create Groovy configuration file";
@@ -72,7 +72,7 @@ function checkInput() {
     gradle | groovy | grails | maven | ant | slack | nodejs )
        ;;
     *) logDebugResult FAILURE "failed";
-       exitWithErrorCode UNSUPPORTED_TOOL;
+       exitWithErrorCode UNSUPPORTED_TOOL "${TOOL}";
        ;;
   esac
 
