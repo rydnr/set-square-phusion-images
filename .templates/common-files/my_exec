@@ -13,7 +13,10 @@ else
     source $s
   done
 
-  trap 'run_help' ERR
+  if [ -e /etc/my_exec.d/help ]; then
+      source /etc/my_exec.d/help
+      trap 'run_help' ERR
+  fi
 
   $*
 fi

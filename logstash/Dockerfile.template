@@ -8,10 +8,10 @@ RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/$
 COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 
-@include("logstash")
 @include("java")
 @include("gosu")
 @include("elk-common")
+@include("logstash")
 
 CMD ["-e", ""]
 

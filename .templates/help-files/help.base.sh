@@ -19,7 +19,7 @@ https://github.com/rydnr/set-square
 The Dockerfiles used to build this image can be inspected.
 This Dockerfile:
 > docker run -it ${_namespace}/${_image}:${_tag} Dockerfile
-or 
+or
 > docker run -it ${_namespace}/${_image}:${_tag} Dockerfile ${_namespace}-${_image}.${_tag}
 Its parents (in order):
 EOF

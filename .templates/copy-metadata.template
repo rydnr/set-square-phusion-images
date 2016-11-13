@@ -1,5 +1,7 @@
 # v copy-metadata
 COPY README LICENSE /
+COPY copyright-preamble.txt /copyright.txt
+COPY LICENSE /LICENSE
+COPY Dockerfile /Dockerfiles/Dockerfile
 COPY Dockerfile /Dockerfiles/${NAMESPACE}-${IMAGE}.${TAG}
-COPY ${COPYRIGHT_PREAMBLE_FILE} /Dockerfiles/copyright-preamble.txt
 # ^ copy-metadata

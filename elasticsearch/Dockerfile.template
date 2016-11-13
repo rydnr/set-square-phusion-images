@@ -7,6 +7,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 
+@include("service_user")
 @include("java")
 @include("gosu")
 @include("elk-common")

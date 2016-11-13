@@ -14,7 +14,7 @@ RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/$
 COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 
-CMD ["kibana""]
+CMD ["kibana"]
 
 @include("copy-metadata")
 @include("symlinks")

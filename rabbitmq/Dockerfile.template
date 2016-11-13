@@ -11,7 +11,8 @@ ENV DOBACKUP="true" \
     RABBITMQ_LOG_BASE=/data/log \
     LOG_BASE=/data/log \
     RABBITMQ_MNESIA_BASE=/backup/${IMAGE}/data/mnesia \
-    MNESIA_BASE=/backup/${IMAGE}/data/mnesia
+    MNESIA_BASE=/backup/${IMAGE}/data/mnesia \
+    RABBITMQ_NODENAME=${IMAGE}
 
 @include("service_user")
 
@@ -31,7 +32,7 @@ RUN mkdir -p /backup/${IMAGE}/data /data && \
     ln -s /data/log /var/log/rabbitmq && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data && \
     echo "[{rabbit, [{loopback_users, []}]}]." > /etc/rabbitmq/rabbitmq.config && \
-    ${APTGET_CLEANUP}
+    echo 'NODENAME=${NODENAME}' >> /etc/rabbitmq/rabbitmq-env.conf
 
 # Define mount points.
 VOLUME ["/backup/${IMAGE}/data/mnesia"]
