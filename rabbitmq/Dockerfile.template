@@ -24,7 +24,7 @@ COPY service /etc/service/${IMAGE}/run
 # From official RabbitMQ Dockerfile: https://github.com/dockerfile/rabbitmq/blob/master/Dockerfile
 
 # Install RabbitMQ.
-RUN mkdir -p /backup/${IMAGE}/data /data && \
+RUN mkdir -p /backup/${IMAGE}/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/${IMAGE}/data/mnesia && \
     mv /var/lib/rabbitmq/mnesia /backup/${IMAGE}/data && \
     ln -s /backup/${IMAGE}/data/mnesia /var/lib/rabbitmq/mnesia && \
     ln -s /backup/${IMAGE}/data/mnesia /data/mnesia && \
@@ -36,6 +36,8 @@ RUN mkdir -p /backup/${IMAGE}/data /data && \
 
 # Define mount points.
 VOLUME ["/backup/${IMAGE}/data/mnesia"]
+
+EXPOSE 5672 15672
 
 @include("copy-metadata")
 @include("symlinks")

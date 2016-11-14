@@ -14,6 +14,7 @@ RUN chmod +x /sbin/my_exec
 
 @include("service_user")
 @include("nodejs")
+@include("aws")
 
 RUN mkdir -p /opt/workspace && \
     ln -s /opt/workspace ${SERVICE_USER_HOME}/workspace && \
