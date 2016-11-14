@@ -52,6 +52,10 @@ function checkInput() {
         -h | --help | -v | -vv | -q | --quiet)
          shift;
          ;;
+        --)
+          shift;
+          break;
+          ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -76,6 +80,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q | --quiet)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 }
@@ -91,6 +99,9 @@ function extract_ports() {
   local _result=();
   local _aux;
   local _single;
+
+  checkNotEmpty "dockerfile" "${_dockerfile}" 1;
+
   local _oldIFS="${IFS}";
   IFS=$'\n';
   for _aux in $(grep EXPOSE "${_dockerfile}" | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
@@ -109,13 +120,21 @@ function extract_ports() {
 function main() {
   local _ports;
   echo 'check host localhost with address 0.0.0.0' > ${MONIT_CONF_FILE}
-  extract_ports "${DOCKERFILES_LOCATION}/Dockerfile";
-  _ports="${RESULT}";
-  for _port in ${_ports}; do
-    logInfo -n "Creating Monit check for ${_port} port (exposed in ${DOCKERFILES_LOCATION}/Dockerfile)";
-    cat <<EOF >> ${MONIT_CONF_FILE}
+
+  local _oldIFS="${IFS}";
+  IFS=$' ';
+  for d in ${DOCKERFILES_LOCATION}/*; do
+    IFS="${_oldIFS}";
+    extract_ports "${DOCKERFILES_LOCATION}/${d}";
+    _ports="${RESULT}";
+    IFS=$' ';
+    for _port in ${_ports}; do
+      IFS="${_oldIFS}";
+      logInfo -n "Creating Monit check for ${_port} port (exposed in ${DOCKERFILES_LOCATION}/${d})";
+      cat <<EOF >> ${MONIT_CONF_FILE}
 	if failed port ${_port} with timeout ${PORT_TIMEOUT} then alert
 EOF
-    logInfoResult SUCCESS "done";
+      logInfoResult SUCCESS "done";
+    done
   done
 }

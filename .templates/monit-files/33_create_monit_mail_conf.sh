@@ -50,6 +50,10 @@ function checkInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -74,6 +78,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 }
@@ -81,7 +89,8 @@ function parseInput() {
 ## Main logic
 ## dry-wit hook
 function main() {
-  if [[ -z "${SMTP_HOST}" ]]; then
+
+  if isEmpty "${SMTP_HOST}"; then
     export SMTP_HOST="localhost";
   fi
 

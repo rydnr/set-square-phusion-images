@@ -2,14 +2,6 @@
 
 set -e
 
-# Add logstash as command if needed
-if [ "${1:0:1}" = '-' ]; then
-	set -- logstash "$@"
-fi
-
-# Run as user "${SERVICE_USER}" if the command is "logstash"
-if [ "$1" = 'logstash' ]; then
-	set -- gosu ${SERVICE_USER} "$@"
-fi
+set -- gosu ${SERVICE_USER} logstash "$@"
 
 exec "$@"

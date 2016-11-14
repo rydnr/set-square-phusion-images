@@ -1,7 +1,7 @@
-# Logstash
+* Logstash
 
 This image runs logstash.
 
-# Example:
+* Example:
 
-docker run -d --name ${IMAGE} ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+docker run -d --name ${IMAGE} --link [elasticsearch]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
