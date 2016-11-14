@@ -1,0 +1,8 @@
+# v aws
+# - Requires:
+#   - unzip
+#   - python
+#   - pip
+RUN pip install awscli && \
+    ${APTGET_INSTALL} -u groff && ${APTGET_CLEANUP}
+# ^ aws

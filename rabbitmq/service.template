@@ -7,6 +7,8 @@ rsync -az /data/ ${SERVICE_USER_DATA}/data/
 rsync -az ${SERVICE_USER_HOME}/backup/ /backup/
 rsync -az ${SERVICE_USER_HOME}/data/ /data/
 
+echo "NODENAME=${SQ_RABBITMQ_NODENAME}" >> /etc/rabbitmq/rabbitmq-env.conf
+
 _exports="$(export)";
 
 cat << EOF > /tmp/runme

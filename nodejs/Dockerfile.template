@@ -1,29 +1,29 @@
 @include("preamble")
-FROM ${BASE_IMAGE}:${BASE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
 COPY my_exec /sbin/my_exec
 
-ENV DOBACKUP="false" \
-    SERVICE_USER="${SERVICE_USER}" \
-    SERVICE_GROUP="${SERVICE_GROUP}"
+ENV DOBACKUP="false"
 
 RUN chmod +x /sbin/my_exec
 
 @include("service_user")
 @include("nodejs")
+@include("python")
+@include("pip")
 @include("aws")
 
-RUN mkdir -p /opt/workspace && \
-    ln -s /opt/workspace ${SERVICE_USER_HOME}/workspace && \
-    ln -s /opt/workspace/.npm ${SERVICE_USER_HOME}/.npm && \
-    ln -s /opt/workspace/.local ${SERVICE_USER_HOME}/.local && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
+RUN mkdir -p /work && \
+    for d in .npm .local .aws; do \
+      ln -s /work/${d} ${SERVICE_USER_HOME}/${d}; \
+    done && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /work
 
-VOLUME [ "/opt/workspace" ]
-WORKDIR /opt/workspace
+VOLUME [ "/work" ]
+WORKDIR /work
 
 @include("copy-metadata")
 @include("symlinks")

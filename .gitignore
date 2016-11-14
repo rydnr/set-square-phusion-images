@@ -166,6 +166,7 @@ sdkman/setup.sql
 .templates/locale
 .templates/logstash
 .templates/maintainer
+.templates/nodejs
 .templates/phabricator
 .templates/plone5
 .templates/preamble
