@@ -125,7 +125,7 @@ function main() {
   IFS=$' ';
   for d in ${DOCKERFILES_LOCATION}/*; do
     IFS="${_oldIFS}";
-    extract_ports "${DOCKERFILES_LOCATION}/${d}";
+    extract_ports "${d}";
     _ports="${RESULT}";
     IFS=$' ';
     for _port in ${_ports}; do

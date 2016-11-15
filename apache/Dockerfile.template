@@ -9,7 +9,7 @@ ENV DOBACKUP="false"
 RUN mkdir -p /etc/service/${IMAGE} /backup/${IMAGE}-www && \
     cp -r /etc/service/.template/* /etc/service/${IMAGE}
 
-COPY service /etc/service/${IMAGE}/run
+COPY apache-files/service /etc/service/${IMAGE}/run
 
 @include("apache")
 

@@ -1,0 +1,13 @@
+* Padlock
+
+This image runs padlock.io service.
+
+* Usage
+
+- Run ${IMAGE} with the default virtualhost:
+
+  docker run -d --name ${PADLOCK_VIRTUALHOST} -p 8080:8080 ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run ${IMAGE} with a different virtualhost:
+
+  docker run -d --name ${IMAGE} -e PADLOCK_VIRTUALHOST=padlock.example.com -p 8080:8080 ${NAMESPACE}/${IMAGE}:${TAG}

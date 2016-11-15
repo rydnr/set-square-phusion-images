@@ -7,7 +7,7 @@ _tag="$(head -n 1 /Dockerfiles/Dockerfile | sed 's_^#\s\+__g' | cut -d'/' -f 2 |
 cat <<EOF
 ${_namespace}/${_image}:${_tag}
 EOF
-cat /Dockerfiles/copyright-preamble.txt
+cat /Dockerfiles/copyright.txt
 
 [ -f /README ] && NAMESPACE="${_namespace}" IMAGE="${_image}" TAG="${_tag}" envsubst '${NAMESPACE} ${IMAGE} ${TAG}' < /README
 
@@ -19,7 +19,7 @@ https://github.com/rydnr/set-square
 The Dockerfiles used to build this image can be inspected.
 This Dockerfile:
 > docker run -it ${_namespace}/${_image}:${_tag} Dockerfile
-or 
+or
 > docker run -it ${_namespace}/${_image}:${_tag} Dockerfile ${_namespace}-${_image}.${_tag}
 Its parents (in order):
 EOF

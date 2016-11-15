@@ -6,23 +6,33 @@ function usage() {
 cat <<EOF
 $SCRIPT_NAME
 $SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
+(c) 2016-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
 
-Creates symlinks for all cron jobs under /usr/local/bin folder.
+Creates Padlock virtual host configuration for Apache.
 
 Common flags:
     * -h | --help: Display this message.
+    * -X:e | --X:eval-defaults: whether to eval all default values, which potentially slows down the script unnecessarily.
     * -v: Increase the verbosity.
     * -vv: Increase the verbosity further.
     * -q | --quiet: Be silent.
 EOF
 }
 
+## Defines the requirements
+## dry-wit hook
+function defineReq() {
+  checkReq "process-file.sh" PROCESSFILE_NOT_INSTALLED;
+}
+
 ## Defines the errors
 ## dry-wit hook
 function defineErrors() {
-  addError INVALID_OPTION "Unrecognized option";
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "PROCESSFILE_NOT_INSTALLED" "process-file.sh is not installed";
+
+  export ERROR_MESSAGES;
 }
 
 ## Validates the input.
@@ -38,7 +48,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q)
+      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
          shift;
          ;;
       --)
@@ -66,7 +76,7 @@ function parseInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q)
+      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
          shift;
          ;;
       --)
@@ -77,36 +87,17 @@ function parseInput() {
   done
 }
 
-## Checks whether backups are enabled as a whole.
-## <- RESULT: 0 if so, 1 otherwise.
-## Example:
-##   is_backup_enabled -> false
-##   # assuming the environment variable is DOBACKUP
-##   export DOBACKUP=0; is_backup_enabled -> true
-function is_backup_enabled() {
-  local _result;
-  _evalVar "${ENABLE_BACKUP_ENVIRONMENT_VARIABLE}";
-  local _dobackup="${RESULT}";
-  if [ -z ${_dobackup+x} ]; then
-    _result=0;
-  else
-    result=1;
-  fi
-  return ${_result};
-}
-
 ## Main logic
 ## dry-wit hook
 function main() {
-  if is_backup_enabled; then
-    for period in hourly daily weekly monthly; do
-      logInfo -n "Enabling ${period} cron jobs";
-      for f in /usr/local/bin/backup*.${period}; do
-        ln -sf ${f} /etc/cron.${period}/$(basename $f) 2> /dev/null;
-      done
-      logInfoResult SUCCESS "done";
-    done
-  else
-    logInfo "Backup disabled for this image.";
+
+  if isEmpty "${PADLOCK_DOMAIN}"; then
+      export PADLOCK_DOMAIN="${SQ_PADLOCK_DOMAIN}";
   fi
+
+  if isEmpty "${PADLOCK_VIRTUALHOST}"; then
+      export PADLOCK_VIRTUALHOST="${SQ_PADLOCK_VIRTUALHOST}";
+  fi
+
+  process-file.sh -o ${PADLOCK_APACHE_VHOST_FILE} ${PADLOCK_APACHE_VHOST_TEMPLATE_FILE}
 }
