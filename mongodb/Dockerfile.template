@@ -1,35 +1,29 @@
 @include("preamble")
-FROM ${BASE_IMAGE}:${TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
-COPY rc.local /etc/rc.local
+ENV DOBACKUP="true" \
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
 
-# From http://docs.docker.com/examples/mongodb/
-# From http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
+@include("service_user")
+@include("create_ssl_certificate")
+@include("mongodb")
 
-# Installation:
-# Import MongoDB public GPG key AND create a MongoDB list file
-#RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/10gen.list
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
-    echo "deb http://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/${MONGODB_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list && \
-    ${APTGET_INSTALL} --update mongodb-org && \
-    echo "mongodb-org hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-server hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-shell hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-mongos hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-tools hold" | sudo dpkg --set-selections && \
-    mkdir -p /data/db && \
-    chown -R mongodb:mongodb /data && \
-    chmod +x /etc/rc.local && \
-    ${APTGET_CLEANUP}
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+COPY service /etc/service/${IMAGE}/run
+COPY create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
 
-# Expose port 27017 from the container to the host
-EXPOSE 27017
+RUN chmod +x /etc/service/${IMAGE}/run && \
+    chmod +x /etc/my_init.d/56_create_bootstrap_cron_job.sh && \
+    mkdir -p /backup/${IMAGE}/db && \
+    sed -i "s|^  dbPath:\(.*\)$|  dbpath: /backup/${IMAGE}/db|g" /etc/mongod.conf && \
+    sed -i "s|^  bindIp:\(.*\)$|  bindIp: 0.0.0.0|g" /etc/mongod.conf
+#    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/${IMAGE}.pem|g" /etc/mongod.conf
 
-# Cannot define the volume here, only in leaf Dockerfiles
-# VOLUME /data/db
+VOLUME /backup/${IMAGE}/db
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

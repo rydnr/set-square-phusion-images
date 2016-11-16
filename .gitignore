@@ -106,6 +106,8 @@ mariadb/setup.sql
 mariadb/shutdown.sh
 mariadb/upgrade.sh
 mariadb/watch-ddls
+mongodb/create_bootstrap_cron_job.sh
+mongodb/service
 **/monit-files
 mysql/admin.sh
 mysql/backup-mysql.sh
@@ -116,6 +118,7 @@ nexus/INSTALL.tmpl
 nexus/java-files
 nodejs/my_exec
 observium/setup.sql
+padlock/apache-files
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
@@ -135,8 +138,11 @@ postgresql/process-sqls.sh
 postgresql/service
 postgresql/setup.sh
 postgresql/setup.sql
+rabbitmq/create_bootstrap_cron_job.sh
 rabbitmq/rc.local
 rabbitmq/service
+rabbitmq/skel.inc.sh
+rabbitmq/skel.sh
 */README
 **/rsnapshot-files
 */rsyslog-files
@@ -166,6 +172,7 @@ sdkman/setup.sql
 .templates/locale
 .templates/logstash
 .templates/maintainer
+.templates/mongodb
 .templates/nodejs
 .templates/phabricator
 .templates/plone5

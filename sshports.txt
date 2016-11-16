@@ -5,3 +5,5 @@ phabricator  2224
 nexus        2225
 rabbitmq     2226
 calibre2opds 2227
+mysql        2228
+mongodb      2229
