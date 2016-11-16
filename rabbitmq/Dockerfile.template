@@ -17,6 +17,9 @@ ENV DOBACKUP="true" \
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+COPY skel.sh /usr/local/bin/skel.sh
+COPY skel.inc.sh /usr/local/bin/skel.inc.sh
+COPY create_bootstrap_cron_job.sh /etc/my_init.d/55_create_bootstrap_cron_job.sh
 
 @include("rabbitmq")
 # From official RabbitMQ Dockerfile: https://github.com/dockerfile/rabbitmq/blob/master/Dockerfile
@@ -31,7 +34,8 @@ RUN mkdir -p /backup/${IMAGE}/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USE
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data && \
     echo '[{rabbit, [{' >> /etc/rabbitmq/rabbitmq.config && \
     echo '    loopback_users, []' >> /etc/rabbitmq/rabbitmq.config && \
-    echo '  }]}].' >> /etc/rabbitmq/rabbitmq.config
+    echo '  }]}].' >> /etc/rabbitmq/rabbitmq.config && \
+    chmod +x /usr/local/bin/skel.sh
 
 # Define mount points.
 VOLUME ["/backup/${IMAGE}/data/mnesia"]

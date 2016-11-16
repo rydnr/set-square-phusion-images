@@ -1,0 +1,11 @@
+defineEnvVar BOOTSTRAPPED_FILE "The file indicating the RabbitMQ instance has already been bootstrapped" "/backup/rabbitmq/data/mnesia/.${IMAGE}.bootstrapped";
+defineEnvVar LOCK_FILE "The file indicating there's an ongoing bootstrap process" "/var/lock/${IMAGE}-bootstrap.lock";
+defineEnvVar RABBITMQ_NODENAME "The RabbitMQ nodename" "${NODENAME}";
+if isEmpty "${RABBITMQ_NODENAME}"; then
+  overrideEnvVar RABBITMQ_NODENAME "${RABBITMQ_NODENAME}";
+fi
+if isEmpty "${RABBITMQ_NODENAME}"; then
+  overrideEnvVar RABBITMQ_NODENAME "${SQ_RABBITMQ_NODENAME}";
+fi
+defineEnvVar BOOTSTRAP_SCRIPTS "Custom bootstrap scripts" "";
+overrideEnvVar BOOTSTRAP_SCRIPTS "${BOOTSTRAP_SCRIPTS} tbox";
