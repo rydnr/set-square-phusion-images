@@ -26,23 +26,18 @@ EOF
 # Requirements
 function checkRequirements() {
   checkReq envsubst ENVSUBST_NOT_INSTALLED;
+  checkReq awk AWK_NOT_INSTALLED;
+  checkReq cut CUT_NOT_INSTALLED;
 }
- 
+
 # Error messages
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export ENVSUBST_NOT_INSTALLED="envsubst is not installed";
-  export NO_INPUT_FILE_SPECIFIED="The input file is mandatory";
-  export NO_OUTPUT_FILE_SPECIFIED="The output file is mandatory";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    ENVSUBST_NOT_INSTALLED \
-    NO_INPUT_FILE_SPECIFIED \
-    NO_OUTPUT_FILE_SPECIFIED \
-  );
-
-  export ERROR_MESSAGES;
+  addError INVALID_OPTION "Unrecognized option";
+  addError ENVSUBST_NOT_INSTALLED "envsubst is not installed";
+  addError AWK_NOT_INSTALLED "awk is not installed";
+  addError CUT_NOT_INSTALLED "cut is not installed";
+  addError NO_INPUT_FILE_SPECIFIED "The input file is mandatory";
+  addError NO_OUTPUT_FILE_SPECIFIED "The output file is mandatory";
 }
 
 ## Parses the input
@@ -65,6 +60,10 @@ function parseInput() {
          OUTPUT_FILE="${1}";
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 
@@ -92,6 +91,10 @@ function checkInput() {
          ;;
       -o | --output)
          ;;
+      --)
+        shift;
+        break;
+        ;;
       *) logDebugResult FAILURE "fail";
          exitWithErrorCode INVALID_OPTION ${_flag};
          ;;
