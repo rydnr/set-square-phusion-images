@@ -86,11 +86,12 @@ function checkInput() {
 ## dry-wit hook
 function main() {
 
-  if [ -e /usr/local/bin/${IMAGE}-bootstrap.sh ]; then
-      cat <<EOF > /etc/cron.d/${IMAGE}-bootstrap
+  if [ -e /usr/local/bin/${SQ_IMAGE}-bootstrap.sh ]; then
+      cat <<EOF > /etc/cron.d/${SQ_IMAGE}-bootstrap
+SHELL=/bin/bash
 PATH=/bin:/usr/bin:/usr/sbin:/usr/local/bin
 
-1/* * * * * root /usr/local/bin/${IMAGE}-bootstrap.sh && rm -f /etc/cron.d/${IMAGE}-bootstrap
+* * * * * root /usr/local/bin/${SQ_IMAGE}-bootstrap.sh && rm -f /etc/cron.d/${SQ_IMAGE}-bootstrap
 EOF
   fi
 }

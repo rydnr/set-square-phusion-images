@@ -105,14 +105,16 @@ function extract_ports() {
   local _oldIFS="${IFS}";
   IFS=$'\n';
   for _aux in $(grep EXPOSE "${_dockerfile}" | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
-    IFS="${_oldIFS}";
+    IFS=$' ';
     for p in ${_aux}; do
+      IFS="${_oldIFS}";
       if ! arrayContainsElement "${p}" "${_result[@]}"; then
         _result[${#_result[@]}]="${p}";
       fi
     done
   done
-  export RESULT=${_result[@]}
+
+  export RESULT=${_result[@]};
 }
 
 ## Main logic
