@@ -46,7 +46,6 @@ filebeat-docker/conf.d/*.yml
 filebeat-docker/filebeat.yml
 */filebeat-files
 firefox-sync/rc.local
-firefox-sync/rc.local
 firefox-sync/service
 firefox-sync/setup.sql
 firefox-sync/syncserver.ini
@@ -72,8 +71,8 @@ graphite/local_settings.py
 java/41_create_ssl_certificate_keytool.inc.sh
 */java-files
 java/my_exec
-java/my_exec
 java/remote-syslogd.conf
+java-service/start.sh
 jenkins/50-rsync-jenkins-home.sh
 jenkins/config.xml
 jenkins/gradle-files
@@ -92,7 +91,6 @@ LICENSE.*
 */logstash-files
 logstash/service
 mariadb/admin.sh
-mariadb/backup.sh
 mariadb/backup.sh
 mariadb/bootstrap-db
 mariadb-bootstrap/my_exec
@@ -152,7 +150,6 @@ sdkman/setup.sql
 **/ssh-files
 */syslog-files
 .templates/addon-toggles
-.templates/addon-toggles
 .templates/android-sdk
 .templates/apache
 .templates/apr
@@ -176,7 +173,6 @@ sdkman/setup.sql
 .templates/nodejs
 .templates/phabricator
 .templates/plone5
-.templates/preamble
 .templates/preamble
 .templates/rabbitmq
 .templates/sdkman
