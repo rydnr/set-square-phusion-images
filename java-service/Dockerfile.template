@@ -13,6 +13,7 @@ ENV DOBACKUP="false" \
 @include("service_user")
 @include("java")
 
+COPY service /etc/service/${IMAGE}/run
 COPY start.sh start.inc.sh ${APP_HOME}/
 RUN chmod +x ${APP_HOME}/start.sh
 

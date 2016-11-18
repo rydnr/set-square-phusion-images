@@ -121,5 +121,5 @@ function main() {
     JAVA_OPTS="${JAVA_OPTS} -Dfile.encoding=${ENCODING}";
   fi
 
-  $(which java) ${JAVA_OPTS} -jar ${APP_HOME}/${APP}
+  $(which java) ${JAVA_OPTS} -jar ${APP_HOME}/${APP} ${JAVA_ARGS}
 }
