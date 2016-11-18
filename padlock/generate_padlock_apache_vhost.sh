@@ -100,4 +100,6 @@ function main() {
   fi
 
   process-file.sh -o ${PADLOCK_APACHE_VHOST_FILE} ${PADLOCK_APACHE_VHOST_TEMPLATE_FILE}
+
+  a2ensite $(basename ${PADLOCK_APACHE_VHOST_FILE} .conf);
 }

@@ -3,6 +3,8 @@ ENV SERVICE_PACKAGE="${APACHE_SERVICE_PACKAGE}"
 
 RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
     ${APTGET_CLEANUP} && \
+    mkdir -p /var/run/apache2 /var/lock/apache2 && \
+    chown ${APACHE_SERVICE_USER}:${APACHE_SERVICE_GROUP} /var/run/apache2 /var/lock/apache2 && \
     cd /usr/local/bin && \
     ln -sf check-version.sh check-version-apache.sh && \
     ln -sf local-ubuntu-version.sh local-version-apache.sh && \
@@ -10,4 +12,3 @@ RUN ${APTGET_INSTALL} --update ${SERVICE_PACKAGE} && \
     
 #COPY apache-files/logstash.conf /etc/logstash/conf.d/apache.conf
 # ^ apache
-

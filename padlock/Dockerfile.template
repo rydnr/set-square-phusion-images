@@ -8,6 +8,7 @@ ENV DOBACKUP="true" \
     PADLOCK_DOMAIN="${DOMAIN}" \
     PADLOCK_VIRTUALHOST="padlock.${PADLOCK_DOMAIN}"
 
+@include("service_user")
 @include("nodejs")
 @include("python")
 @include("git")
@@ -26,12 +27,15 @@ RUN chmod +x /etc/service/${IMAGE}/run /etc/my_init.d/50_generate_padlock_vhost.
     cd /opt/ && git clone https://github.com/maklesoft/padlock.git && \
     npm install -g gulp-cli && \
     npm install -g bower && \
-    cd padlock && git checkout ${PADLOCKIO_VERSION} && \
-    for d in .npm .local .aws; do \
-      ln -s /work/${d} ${SERVICE_USER_HOME}/${d}; \
-    done
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock && \
+    su - ${SERVICE_USER} ' \
+      cd /opt/padlock && git checkout ${PADLOCKIO_VERSION} && \
+      npm install && \
+      cd app && bower install'
 
 VOLUME [ "/backup/${IMAGE}/data" ]
+
+EXPOSE 80
 
 @include("copy-metadata")
 @include("symlinks")
