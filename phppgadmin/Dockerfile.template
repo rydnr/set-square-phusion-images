@@ -1,12 +1,18 @@
 @include("preamble")
-FROM ${NAMESPACE}/apache:${TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
+@include("apache")
+
 COPY apache-vhost.conf /etc/apache2/sites-available/phppgadmin.conf
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 && \
+COPY apache-files/service /etc/service/${IMAGE}/run
+
+RUN cp -r /etc/service/.template/* /etc/service/${IMAGE} && \
+    chmod +x /etc/service/${IMAGE}/run && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 && \
     echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
     ${APTGET_INSTALL} postgresql-client-${POSTGRESQL_VERSION} phppgadmin && \
     ${APTGET_CLEANUP} && \

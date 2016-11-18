@@ -121,6 +121,7 @@ phabricator/apache-vhost.conf
 phabricator/bootstrap
 phabricator/INSTALL
 phabricator/service
+phppgadmin/apache-files
 phppgadmin/apache-vhost.conf
 plone3/default.cfg
 plone3/service
