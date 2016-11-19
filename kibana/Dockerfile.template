@@ -1,20 +1,15 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
+FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
-
 @include("addon-toggles")
-
 @include("service_user")
 @include("gosu")
 @include("tini")
 @include("elk-common")
 @include("kibana")
+@include("service")
 
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
-COPY service /etc/service/${IMAGE}/run
-RUN chmod +x /etc/service/${IMAGE}/run
-
-CMD ["kibana"]
+EXPOSE 5601
 
 @include("copy-metadata")
 @include("symlinks")
