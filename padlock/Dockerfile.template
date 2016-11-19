@@ -16,22 +16,27 @@ ENV DOBACKUP="true" \
 
 COPY padlock-vhost.apache.tmpl /usr/local/src/padlock-vhost.apache.tmpl
 
-RUN mkdir -p /etc/service/${IMAGE} /backup/${IMAGE}-www && \
-    cp -r /etc/service/.template/* /etc/service/${IMAGE}
-
 COPY apache-files/service /etc/service/${IMAGE}/run
 COPY generate_padlock_apache_vhost.sh /etc/my_init.d/50_generate_padlock_vhost.sh
 COPY generate_padlock_apache_vhost.inc.sh /etc/my_init.d/50_generate_padlock_vhost.inc.sh
 
-RUN chmod +x /etc/service/${IMAGE}/run /etc/my_init.d/50_generate_padlock_vhost.sh && \
+RUN cp -r /etc/service/.template/* /etc/service/${IMAGE} && \
+    chmod +x /etc/service/${IMAGE}/run /etc/my_init.d/50_generate_padlock_vhost.sh && \
+    rm -rf /opt/padlock && \
     cd /opt/ && git clone https://github.com/maklesoft/padlock.git && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock && \
     npm install -g gulp-cli && \
     npm install -g bower && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock && \
-    su - ${SERVICE_USER} ' \
-      cd /opt/padlock && git checkout ${PADLOCKIO_VERSION} && \
+    a2dissite 000-default && \
+    a2ensite padlock
+
+USER ${SERVICE_USER}
+RUN   cd /opt/padlock && git checkout ${PADLOCKIO_VERSION} && \
       npm install && \
-      cd app && bower install'
+      gulp stylus && \
+      cd app && bower install
+
+USER root
 
 VOLUME [ "/backup/${IMAGE}/data" ]
 
