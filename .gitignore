@@ -159,6 +159,7 @@ sdkman/setup.sql
 .templates/elk-common
 .templates/exim-files/exim.00_local_macros
 .templates/filebeat
+.templates/go
 .templates/gosu
 .templates/gradle
 .templates/install
@@ -176,6 +177,7 @@ sdkman/setup.sql
 .templates/preamble
 .templates/rabbitmq
 .templates/sdkman
+.templates/service
 .templates/service_user
 .templates/tini
 .templates/tomcat

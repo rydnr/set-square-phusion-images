@@ -1,8 +1,4 @@
 # v logstash
-# - requires:
-#   - java
-#   - gosu
-#   - elk-common
 ENV LS_SETTINGS_DIR=/etc/logstash \
     LOGSTASH_VERSION="${LOGSTASH_VERSION}" \
     PATH=/usr/share/logstash/bin:$PATH
@@ -12,15 +8,16 @@ COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_gene
 RUN  mkdir -p /usr/local/lib && \
 	   ln -s /usr/lib/*/libzmq.so.3 /usr/local/lib/libzmq.so && \
      ${APTGET_INSTALL} -u logstash=${LOGSTASH_VERSION} && \
-     ${APTGET_CLEANUP} && \
-     if [ -f "$LS_SETTINGS_DIR/logstash.yml" ]; then \
-       sed -ri 's!^(path.log|path.config):!#&!g' "$LS_SETTINGS_DIR/logstash.yml"; \
-     fi
+     ${APTGET_CLEANUP}
+RUN  sed -ri "s;^(\#\s*)?(path\.data:).*;\2 /backup/${IMAGE}/data;" ${LS_SETTINGS_DIR}/logstash.yml
+RUN  grep -q "^path\.data: /backup/${IMAGE}/data\$" ${LS_SETTINGS_DIR}/logstash.yml
 
 COPY logstash-files/02-beats-input.conf \
      logstash-files/10-syslog-filter.conf \
      logstash-files/30-elasticsearch-output.conf \
      /etc/logstash/conf.d/
+
+VOLUME /backup/${IMAGE}/data
 
 EXPOSE 5044
 # ^ logstash

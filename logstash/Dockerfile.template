@@ -3,17 +3,14 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
-
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
-COPY service /etc/service/${IMAGE}/run
-RUN chmod +x /etc/service/${IMAGE}/run
-
+@include("service_user")
 @include("java")
 @include("gosu")
 @include("elk-common")
 @include("logstash")
+@include("service")
 
-CMD ["-e", ""]
+RUN /usr/local/bin/create_ssl_certificate_openssl.sh
 
 @include("copy-metadata")
 @include("symlinks")

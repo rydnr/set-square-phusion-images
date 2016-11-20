@@ -1,7 +1,35 @@
-* Logstash
+= Logstash
 
 This image runs logstash.
 
-* Example:
+== Configuration
 
-docker run -d --name ${IMAGE} --link [elasticsearch]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+This image can be customized via environment variables. See https://github.com/elastic/logstash/blob/master/config/logstash.yml for details.
+
+- NODE_NAME: See node.name in logstash.yml
+- PIPELINE_WORKERS: See pipeline.workers in logstash.yml
+- PIPELINE_OUTPUT_WORKERS: See pipeline.output.workers in logstash.yml
+- PIPELINE_BATCH_SIZE: See pipeline.batch.size in logstash.yml
+- PIPELINE_BATCH_DELAY: See pipeline.batch.delay in logstash.yml
+- PIPELINE_UNSAFE_SHUTDOWN: See pipeline.unsafe.shutdown in logstash.yml
+- PATH_CONFIG: See path.config in logstash.yml
+- CONFIG_STRING: See config.string in logstash.yml
+- CONFIG_TEST_AND_EXIT: See config.test_and_exit in logstash.yml
+- CONFIG_RELOAD_AUTOMATIC: See config.reload.automatic in logstash.yml
+- CONFIG_RELOAD_INTERVAL: See config.reload.interval in logstash.yml
+- CONFIG_DEBUG: See config.debug in logstash.yml
+- QUEUE_TYPE: See queue.type in logstash.yml
+- PATH_QUEUE: See path.queue in logstash.yml
+- QUEUE_PAGE_CAPACITY: See queue.capacity in logstash.yml
+- QUEUE_MAX_EVENTS: See queue.max_events in logstash.yml
+- HTTP_HOST: See http.host in logstash.yml
+- HTTP_PORT: See http.port in logstash.yml
+- LOG_LEVEL: See log.level in logstash.yml
+- PATH_LOGS: See path.logs in logstash.yml
+- PATH_PLUGINS: See path.plugins in logstash.yml
+
+== Examples
+
+  docker run -d --name ${IMAGE} --link [elasticsearch]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+  docker run -d --name ${IMAGE} -e NODE_NAME=logstash-1 -e HTTP_HOST=0.0.0.0 -e HTTP_PORT=9600-9700 -e LOG_LEVEL=DEBUG

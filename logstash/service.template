@@ -2,6 +2,89 @@
 
 set -e
 
-set -- gosu ${SERVICE_USER} logstash "$@"
+if [ -n "${NODE_NAME}" ]; then
+    sed -ri "s;^(\#\s*)?(node\.name:).*;\2 ${NODE_NAME};" /etc/logstash/logstash.yml
+fi
 
-exec "$@"
+if [ -n "${PIPELINE_WORKERS}" ]; then
+    sed -ri "s;^(\#\s*)?(pipeline\.workers:).*;\2 ${PIPELINE_WORKERS};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PIPELINE_OUTPUT_WORKERS}" ]; then
+    sed -ri "s;^(\#\s*)?(pipeline\.output\.workers:).*;\2 ${PIPELINE_OUTPUT_WORKERS};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PIPELINE_BATCH_SIZE}" ]; then
+    sed -ri "s;^(\#\s*)?(pipeline\.batch\.size:).*;\2 ${PIPELINE_BATCH_SIZE};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PIPELINE_BATCH_DELAY}" ]; then
+    sed -ri "s;^(\#\s*)?(pipeline\.batch\.delay:).*;\2 ${PIPELINE_BATCH_DELAY};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PIPELINE_UNSAFE_SHUTDOWN}" ]; then
+    sed -ri "s;^(\#\s*)?(pipeline\.unsafe\.shutdown:).*;\2 ${PIPELINE_UNSAFE_SHUTDOWN};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PATH_CONFIG}" ]; then
+    sed -ri "s;^(\#\s*)?(path\.config:).*;\2 ${PATH_CONFIG};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${CONFIG_STRING}" ]; then
+    sed -ri "s;^(\#\s*)?(path\.config:).*;\2 ${CONFIG_STRING};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${CONFIG_TEST_AND_EXIT}" ]; then
+    sed -ri "s;^(\#\s*)?(config\.test_and_exit:).*;\2 ${CONFIG_TEST_AND_CONFIG};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${CONFIG_RELOAD_AUTOMATIC}" ]; then
+    sed -ri "s;^(\#\s*)?(config\.reload.automatic:).*;\2 ${CONFIG_RELOAD_AUTOMATIC};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${CONFIG_RELOAD_INTERVAL}" ]; then
+    sed -ri "s;^(\#\s*)?(config\.reload.interval:).*;\2 ${CONFIG_RELOAD_INTERVAL};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${CONFIG_DEBUG}" ]; then
+    sed -ri "s;^(\#\s*)?(config\.debug:).*;\2 ${CONFIG_DEBUG};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${QUEUE_TYPE}" ]; then
+    sed -ri "s;^(\#\s*)?(queue\.type:).*;\2 ${QUEUE_TYPE};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PATH_QUEUE}" ]; then
+    sed -ri "s;^(\#\s*)?(path\.queue:).*;\2 ${PATH_QUEUE};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${QUEUE_PAGE_CAPACITY}" ]; then
+    sed -ri "s;^(\#\s*)?(queue\.page_capacity:).*;\2 ${QUEUE_PAGE_CAPACITY};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${QUEUE_MAX_EVENTS}" ]; then
+    sed -ri "s;^(\#\s*)?(queue\.max_events:).*;\2 ${QUEUE_MAX_EVENTS};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${HTTP_HOST}" ]; then
+    sed -ri "s;^(\#\s*)?(http\.host:).*;\2 \"${HTTP_HOST}\";" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${HTTP_PORT}" ]; then
+    sed -ri "s;^(\#\s*)?(http\.port:).*;\2 ${HTTP_PORT};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${LOG_LEVEL}" ]; then
+    sed -ri "s;^(\#\s*)?(log\.level:).*;\2 ${LOG_LEVEL};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PATH_LOGS}" ]; then
+    sed -ri "s;^(\#\s*)?(path\.logs:).*;\2 ${PATH_LOGS};" /etc/logstash/logstash.yml
+fi
+
+if [ -n "${PATH_PLUGINS}" ]; then
+    sed -ri "s;^(\#\s*)?(path\.plugins:).*;\2 ${PATH_PLUGINS};" /etc/logstash/logstash.yml
+fi
+
+chpst -u ${SERVICE_USER} logstash "$@"
+
