@@ -1,8 +1,13 @@
 @include("preamble")
-FROM ${NAMESPACE}/apache:${TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
+ENV SERVICE="apache-files/service"
+
 @include("addon-toggles")
+@include("service_user")
+@include("apache")
+@include("service")
 
 COPY requirements.txt /opt/requirements.txt
 
@@ -17,4 +22,5 @@ RUN ${APTGET_INSTALL} python python-pip python-dev build-essential && \
 EXPOSE 8000
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

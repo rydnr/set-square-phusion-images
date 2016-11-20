@@ -9,16 +9,11 @@ ENV DOBACKUP="false" \
     SERVICE_GROUP="developers"
 
 @include("android-sdk")
+@include("service_user")
 
 COPY my_exec /sbin/my_exec
 
-#COPY service /usr/local/bin/${IMAGE}
-
 RUN chmod +x /sbin/my_exec && \
-    (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
-    (/usr/sbin/groupadd docker 2> /dev/null || echo "Group docker already exists") && \
-    (/usr/sbin/useradd -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -s /bin/bash -c "Development user" ${SERVICE_USER} 2> /dev/null || echo "User ${SERVICE_USER} already exists") && \
-    mkdir -p /home/${SERVICE_USER} && \
     cd /tmp && wget ${ANDROID_STUDIO_URL} && \
     cd /opt && jar xvf /tmp/${ANDROID_STUDIO_FILENAME} && \
     chmod a+x /opt/android-studio/bin/studio.sh /opt/android-studio/bin/fsnotifier64 && \

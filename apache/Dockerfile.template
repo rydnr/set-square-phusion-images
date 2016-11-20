@@ -4,18 +4,14 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-ENV DOBACKUP="false"
-
-RUN mkdir -p /etc/service/${IMAGE} /backup/${IMAGE}-www && \
-    cp -r /etc/service/.template/* /etc/service/${IMAGE}
-
-COPY apache-files/service /etc/service/${IMAGE}/run
+ENV DOBACKUP="false" \
+    SERVICE="apache-files/service"
 
 @include("apache")
+@include("service")
 
 RUN rm -rf /var/www && \
-    ln -s /backup/${IMAGE}-www /var/www && \
-    chmod +x /etc/service/${IMAGE}/run
+    ln -s /backup/${IMAGE}-www /var/www
 
 EXPOSE 80
 

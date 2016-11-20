@@ -1,27 +1,35 @@
 @include("preamble")
-FROM ${NAMESPACE}/tomcat:${TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
-RUN groupadd artifactory && \
-    useradd -s /bin/bash -g artifactory -G artifactory,tomcat -m -c "Artifactory user" artifactory && \
-    wget -O ${TOMCAT_HOME}/webapps/${ARTIFACTORY_FILE} ${ARTIFACTORY_DOWNLOAD_URL} && \
+ENV SERVICE_USER="artifactory" \
+    SERVICE_GROUP="artifactory" \
+    SERVICE_USER_HOME="/home/artifactory" \
+    SERVICE_USER_SHELL="/bin/bash" \
+    SERVICE="tomcat-files/service"
+
+@include("service_user")
+@include("tomcat")
+@include("service")
+
+RUN wget -O ${TOMCAT_HOME}/webapps/${ARTIFACTORY_FILE} ${ARTIFACTORY_DOWNLOAD_URL} && \
     mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome && \
     cd /home/ && /usr/lib/jvm/java/bin/jar -xvf ${TOMCAT_HOME}/webapps/${ARTIFACTORY_FILE} && \
-    rm -rf /home/artifactory && mv /home/artifactory-oss-${ARTIFACTORY_VERSION} /home/artifactory && \
+    rm -rf ${SERVICE_USER_HOME} && mv /home/artifactory-oss-${ARTIFACTORY_VERSION} ${SERVICE_USER_HOME} && \
     mkdir -p ${TOMCAT_HOME}/.artifactory && \
-    cd ${TOMCAT_HOME}/.artifactory && /usr/lib/jvm/java/bin/jar -xvf /home/artifactory/webapps/artifactory.war && \
+    cd ${TOMCAT_HOME}/.artifactory && /usr/lib/jvm/java/bin/jar -xvf ${SERVICE_USER_HOME}/webapps/artifactory.war && \
     rm -rf ${TOMCAT_HOME}/webapps/* && \
-    chown -R artifactory:tomcat /home/artifactory ${TOMCAT_HOME}/.artifactory && \
-    chmod -R g+w /home/artifactory ${TOMCAT_HOME}/.artifactory && \
-    mv /etc/service/tomcat /etc/service/artifactory
-    
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.artifactory && \
+    chmod -R g+w ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.artifactory
+
 COPY context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
-COPY artifactory-.bashrc /home/artifactory/.bashrc
+COPY artifactory-.bashrc ${SERVICE_USER_HOME}/.bashrc
 COPY config /etc/default/tomcat
 
-VOLUME /home/artifactory
+VOLUME /backup/${IMAGE}/db
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

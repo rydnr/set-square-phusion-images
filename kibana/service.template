@@ -1,11 +1,6 @@
 #!/bin/bash
 set -e
 
-# Add kibana as command if needed
-if [[ "$1" == -* ]]; then
-	set -- kibana "$@"
-fi
-
 if [ -n "${SERVER_BASEPATH}" ]; then
     sed -ri "s;^(\#\s*)?(server\.basePath:).*;\2 \"${SERVER_BASEPATH}\";" /etc/kibana/kibana.yml
 fi
