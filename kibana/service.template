@@ -6,13 +6,98 @@ if [[ "$1" == -* ]]; then
 	set -- kibana "$@"
 fi
 
-# Run as user "${SERVICE_USER}" if the command is "kibana"
-if [ "$1" = '${SERVICE_USER}' ]; then
-	if [ -n "${ELASTICSEARCH_URL}" ]; then
-		sed -ri "s!^(\#\s*)?(elasticsearch\.url:).*!\2 '${ELASTICSEARCH_URL}'!" /etc/kibana/kibana.yml
-	fi
-
-	set -- gosu ${SERVICE_USER} tini -- "$@"
+if [ -n "${SERVER_BASEPATH}" ]; then
+    sed -ri "s;^(\#\s*)?(server\.basePath:).*;\2 \"${SERVER_BASEPATH}\";" /etc/kibana/kibana.yml
 fi
 
-exec "$@"
+if [ -n "${SERVER_MAXPAYLOADBYTES}" ]; then
+    sed -ri "s;^(\#\s*)?(server\.maxPayloadBytes:).*;\2 ${SERVER_MAXPAYLOADBYTES};" /etc/kibana/kibana.yml
+fi
+
+if [ -z "${SERVER_NAME}" ]; then
+    SERVER_NAME="${SQ_SERVER_NAME}";
+fi
+
+sed -ri "s;^(\#\s*)?(server\.name:).*;\2 \"${SERVER_NAME}\";" /etc/kibana/kibana.yml
+
+if [ -n "${ELASTICSEARCH_URL}" ]; then
+		sed -ri "s;^(\#\s*)?(elasticsearch\.url:).*;\2 \"${ELASTICSEARCH_URL}\";" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_PRESERVEHOST}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticsearch\.preserveHost:).*;\2 ${ELASTICSEARCH_PRESERVEHOST};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${KIBANA_INDEX}" ]; then
+    sed -ri "s;^(\#\s*)?(kibana\.index:).*;\2 \"${KIBANA_INDEX}\";" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${KIBANA_DEFAULTAPPID}" ]; then
+    sed -ri "s;^(\#\s*)?(kibana\.defaultAppId:).*;\2 \"${KIBANA_DEFAULTAPPID}\";" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_USERNAME}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.username:).*;\2 \"${ELASTICSEARCH_USERNAME}\";" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_PASSWORD}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.password:).*;\2 \"${ELASTICSEARCH_PASSWORD}\";" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_SSL_CERT}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticsearch\.ssl\.cert:).*;\2 ${ELASTICSEARCH_SSL_CERT};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_SSL_KEY}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticsearch\.ssl\.key:).*;\2 ${ELASTICSEARCH_SSL_KEY};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_SSL_CA}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticsearch\.ssl\.ca:).*;\2 ${ELASTICSEARCH_SSL_CA};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_SSL_VERIFY}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.ssl\.verify:).*;\2 ${ELASTICSEARCH_SSL_VERIFY};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_PINGTIMEOUT}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.pingTimeout:).*;\2 ${ELASTICSEARCH_PINGTIMEOUT};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_REQUESTTIMEOUT}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.requestTimeout:).*;\2 ${ELASTICSEARCH_REQUESTTIMEOUT};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_REQUESTHEADERSWHITELIST}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.requestHeadersWhitelist:).*;\2 ${ELASTICSEARCH_REQUESTHEADERSWHITELIST};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_CUSTOMHEADERS}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.customHeaders:).*;\2 ${ELASTICSEARCH_CUSTOMHEADERS};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_SHARDTIMEOUT}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.shardTimeout:).*;\2 ${ELASTICSEARCH_SHARDTIMEOUT};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${ELASTICSEARCH_STARTUPTIMEOUT}" ]; then
+    sed -ri "s;^(\#\s*)?(elasticseach\.startupTimeout:).*;\2 ${ELASTICSEARCH_STARTUPTIMEOUT};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${LOGGING_SILENT}" ]; then
+    sed -ri "s;^(\#\s*)?(logging\.silent:).*;\2 ${LOGGING_SILENT};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${LOGGING_QUIET}" ]; then
+    sed -ri "s;^(\#\s*)?(logging\.quiet:).*;\2 ${LOGGING_QUIET};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${LOGGING_VERBOSE}" ]; then
+    sed -ri "s;^(\#\s*)?(logging\.verbose:).*;\2 ${LOGGING_VERBOSE};" /etc/kibana/kibana.yml
+fi
+
+if [ -n "${OPS_INTERVAL}" ]; then
+    sed -ri "s;^(\#\s*)?(ops\.interval:).*;\2 ${OPS_INTERVAL};" /etc/kibana/kibana.yml
+fi
+
+chpst -u ${SERVICE_USER} -- kibana "$@"

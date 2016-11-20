@@ -1,0 +1,6 @@
+# v service
+COPY ${SERVICE} /etc/service/${IMAGE}/run
+
+RUN cp -r /etc/service/.template/* /etc/service/${IMAGE}/ && \
+    chmod +x /etc/service/${IMAGE}/run
+# ^ service

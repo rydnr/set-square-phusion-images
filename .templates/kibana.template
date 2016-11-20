@@ -1,18 +1,21 @@
 # v kibana
-# - requires:
-#   - service_user
-#   - gosu
-#   - tini
-#   - elk-common
-ENV KIBANA_MAJOR=5.0 \
-    KIBANA_VERSION=5.0.0 \
-    PATH=/usr/share/kibana/bin:$PATH
+ENV KIBANA_MAJOR=${KIBANA_MAJOR} \
+    KIBANA_VERSION=${KIBANA_VERSION} \
+    PATH=/usr/share/kibana/bin:$PATH \
+    SERVER_NAME=${SERVER_NAME}
 
- RUN ${APTGET_INSTALL} -u kibana=${KIBANA_VERSION} && \
-     sed -ri "s!^(\#\s*)?(server\.host:).*!\2 '0.0.0.0'!" /etc/kibana/kibana.yml && \
+RUN ${APTGET_INSTALL} -u kibana=${KIBANA_VERSION} && \
+     ${APTGET_CLEANUP} && \
+     sed -ri "s;^(\#\s*)?(server\.host:).*;\2 '0.0.0.0';" /etc/kibana/kibana.yml && \
      grep -q "^server\.host: '0.0.0.0'\$" /etc/kibana/kibana.yml && \
-     sed -ri "s!^(\#\s*)?(elasticsearch\.url:).*!\2 'http://elasticsearch:9200'!" /etc/kibana/kibana.yml && \
-      grep -q "^elasticsearch\.url: 'http://elasticsearch:9200'\$" /etc/kibana/kibana.yml
+     sed -ri 's;^(\#\s*)?(elasticsearch\.url:).*;\2 "http://elasticsearch:9200";' /etc/kibana/kibana.yml && \
+     grep -q '^elasticsearch\.url: "http://elasticsearch:9200"$' /etc/kibana/kibana.yml && \
+     sed -ri "s;^(\#\s*)?(server\.ssl\.cert:).*;#\2 /etc/ssl/private/${IMAGE}.crt;" /etc/kibana/kibana.yml && \
+     grep -q "^#server\.ssl\.cert: /etc/ssl/private/${IMAGE}.crt$" /etc/kibana/kibana.yml && \
+     sed -ri "s;^(\#\s*)?(server\.ssl\.key:).*;#\2 /etc/ssl/private/${IMAGE}.key;" /etc/kibana/kibana.yml && \
+     grep -q "^#server\.ssl\.key: /etc/ssl/private/${IMAGE}.key$" /etc/kibana/kibana.yml && \
+     sed -ri "s;^(\#\s*)?(logging\.dest:).*;\2 stdout;" /etc/kibana/kibana.yml && \
+     grep -q "^logging\.dest: stdout$" /etc/kibana/kibana.yml
 
 EXPOSE 5601
 # ^ kibana

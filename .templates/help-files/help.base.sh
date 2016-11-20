@@ -7,7 +7,7 @@ _tag="$(head -n 1 /Dockerfiles/Dockerfile | sed 's_^#\s\+__g' | cut -d'/' -f 2 |
 cat <<EOF
 ${_namespace}/${_image}:${_tag}
 EOF
-cat /Dockerfiles/copyright-preamble.txt
+cat /copyright.txt
 
 [ -f /README ] && NAMESPACE="${_namespace}" IMAGE="${_image}" TAG="${_tag}" envsubst '${NAMESPACE} ${IMAGE} ${TAG}' < /README
 
@@ -26,7 +26,7 @@ EOF
 
 for d in \
     $(  ls -t /Dockerfiles/* \
-      | grep -v -e '^/Dockerfiles/copyright-preamble.txt$' \
+      | grep -v -e '^/Dockerfiles/copyright.txt$' \
       | grep -v -e '^/Dockerfiles/Dockerfile$' \
       | grep -v -e "^/Dockerfiles/${_namespace}-${_image}\.${_tag}$"); do
   echo "> docker run -it ${_namespace}/${_image}:${_tag} Dockerfile $(basename $d)";

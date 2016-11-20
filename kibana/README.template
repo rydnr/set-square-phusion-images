@@ -1,7 +1,49 @@
-# Kibana
+= Kibana
 
 This image runs Kibana.
 
-# Example:
+== Configuration
 
-docker run -d --name ${IMAGE} -e ELASTICSEARCHURL=[elasticsearch-container] ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+This image can be customized via environment variables. See https://github.com/elastic/kibana/blob/master/config/kibana.yml for details.
+
+- SERVER_BASEPATH: server.basePath in kibana.yml
+- SERVER_MAXPAYLOADBYTES: server.maxPayloadBytes in kibana.yml
+- SERVER_NAME: server.name in kibana.yml
+- ELASTICSEARCH_URL: elasticsearch.url in kibana.yml
+- ELASTICSEARCH_PRESERVEHOST: elasticsearch.preserveHost in kibana.yml
+- KIBANA_INDEX: kibana.index in kibana.yml
+- KIBANA_DEFAULAPPID: kibana.defaultAppId in kibana.yml
+- ELASTICSEARCH_USERNAME: elasticsearch.username in kibana.yml
+- ELASTICSEARCH_PASSWORD: elasticsearch.password in kibana.yml
+- ELASTICSEARCH_SSL_VERIFY: elasticsearch.ssl.verify in kibana.yml
+- ELASTICSEARCH_PINGTIMEOUT: elasticsearch.pingTimeout in kibana.yml
+- ELASTICSEARCH_REQUESTTIMEOUT: elasticsearch.requestTimeout in kibana.yml
+- ELASTICSEARCH_REQUESTHEADERSWHITELIST: elasticsearch.requestHeadersWhitelist in kibana.yml
+- ELASTICSEARCH_CUSTOMHEADERS: elasticsearch.customHeaders in kibana.yml
+- ELASTICSEARCH_SHARDTIMEOUT: elasticsearch.shardTimeout in kibana.yml
+- ELASTICSEARCH_STARTUPTIMEOUT: elasticsearch.startupTimeout in kibana.yml
+- LOGGING_SILENT: logging.silent in kibana.yml
+- LOGGING_QUIET: logging.quiet in kibana.yml
+- LOGGING_VERBOSE: logging.verbose in kibana.yml
+- OPS_INTERVAL: ops.interval in kibana.yml
+
+To communicate with ElasticSearch using SSL, you'll need to provide ElasticSearch's server certificate and PEM files:
+
+- ELASTICSEARCH_SSL_CERT: path to a volume-mounted certificate file.
+- ELASTICSEARCH_SSL_KEY: path to a volume-mounted key file.
+- ELASTICSEARCH_SSL_CA: path to a volume-mounted CA file.
+
+== Examples
+
+  docker run -d --name ${IMAGE} -p 5601:5601 --link [elasticsearch-container]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+  docker run -d --name ${IMAGE} -p 5601:5601 -e ELASTICSEARCH_URL=http://el.example.com  ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+  docker run -d --name ${IMAGE} -p 5601:5601 --link [elasticsearch-container]:elasticsearch -e SERVER_NAME=kibana.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+  docker run -d --name ${IMAGE} -p 5601:5601 --link [elasticsearch-container]:elasticsearch \
+    -e ELASTICSEARCH_SSL_CERT=/etc/ssl/private/client.crt -v /path/to/elasticsearch/client.crt:/etc/ssl/private/client.crt:ro \
+    -e ELASTICSEARCH_SSL_KEY=/etc/ssl/private/client.key -v /path/to/elasticsearch/client.key:/etc/ssl/private/client.key:ro \
+    -e ELASTICSEARCH_SSL_CA=/etc/ssl/private/ca.pem -v /path/to/elasticsearch/ca.pem:/etc/ssl/private/ca.pem:ro \
+    ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+

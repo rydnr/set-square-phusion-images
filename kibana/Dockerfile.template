@@ -3,11 +3,16 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 @include("addon-toggles")
 @include("service_user")
+@include("create_ssl_certificate")
 @include("gosu")
 @include("tini")
 @include("elk-common")
 @include("kibana")
 @include("service")
+
+ENV SERVER_NAME=${SERVER_NAME}
+
+RUN /usr/local/bin/create_ssl_certificate_openssl.sh
 
 EXPOSE 5601
 

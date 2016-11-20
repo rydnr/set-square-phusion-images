@@ -1,0 +1,5 @@
+- requires:
+  - service_user
+  - gosu
+  - elk-common
+  - create_ssl_certificate
