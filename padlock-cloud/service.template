@@ -1,0 +1,6 @@
+#!/bin/bash
+
+/usr/local/bin/process-file.sh -o /etc/${IMAGE}/config.yaml /usr/local/src/${IMAGE}.tmpl
+
+exec 2>&1
+exec sudo - ${SERVICE_USER} /usr/local/bin/padlock-cloud runserver --cors

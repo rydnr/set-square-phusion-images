@@ -116,6 +116,8 @@ nexus/java-files
 nodejs/my_exec
 observium/setup.sql
 padlock/apache-files
+padlock-cloud/config.tmpl
+padlock-cloud/service
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap

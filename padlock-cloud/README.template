@@ -1,0 +1,9 @@
+= Padlock Cloud
+
+This image runs Padlock Cloud as a Docker container.
+
+= Usage
+
+- Run Padlock Cloud
+
+  docker run -d --name padlock-cloud -p 443:443 -v [data-dir]:/backup/${IMAGE}/db -e ERRORS_EMAIL="me@${DOMAIN}" ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

@@ -1,0 +1,14 @@
+---
+server:
+  assets_path: assets
+  port: 443
+  tls_cert: /etc/ssl/private/${IMAGE}.crt
+  tls_key: /etc/ssl/private/${IMAGE}.key
+  base_url: https://${PADLOCK_CLOUD_DOMAIN}
+  cors: false
+leveldb:
+  path: /backup/${IMAGE}/db
+log:
+  log_file: /var/log/${IMAGE}/${IMAGE}.log
+  err_file: /var/log/${IMAGE}/errors.log
+  notify_errors: ${ERRORS_EMAIL}

@@ -1,0 +1,33 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="true" \
+    PADLOCK_CLOUD_DOMAIN="${DOMAIN}" \
+    PADLOCK_VIRTUALHOST="cloud.${PADLOCK_CLOUD_DOMAIN}" \
+    GOPATH=/usr/share/go \
+    PATH="${PATH}:${GOPATH}/bin"
+
+@include("service_user")
+@include("create_ssl_certificate")
+@include("go")
+@include("service")
+
+COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
+
+RUN mkdir -p ${GOPATH} /var/log/${IMAGE} /etc/${IMAGE} && \
+    cd /opt && \
+    go get github.com/maklesoft/padlock-cloud && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh
+
+# chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud
+
+VOLUME [ "/backup/${IMAGE}/db" ]
+
+EXPOSE 80
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
