@@ -108,6 +108,7 @@ mongodb/create_bootstrap_cron_job.sh
 mongodb/service
 mysql/admin.sh
 mysql/backup-mysql.sh
+mysql/conf.d
 nexus/50_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL
