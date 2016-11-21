@@ -175,6 +175,7 @@ sdkman/setup.sql
 .templates/maintainer
 .templates/mongodb
 .templates/monit-files/31_create_monit_http_conf.inc.sh
+.templates/monit-files/enable-monit-ssl.sh
 .templates/monit-files/monit-http.conf
 .templates/monit-files/monit-mail.conf.tmpl
 .templates/nodejs
