@@ -1,0 +1,13 @@
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201611";
+defineEnvVar UBUNTU_VERSION "The version available in Ubuntu" "$(docker run --rm -it ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG} remote-ubuntu-version mysql-server | sed 's/[^0-9a-zA-Z\._-]//g')";
+overrideEnvVar TAG '${UBUNTU_VERSION}';
+defineEnvVar MYSQL_ROOT_PASSWORD "The password for the root user" "${RANDOM_PASSWORD}";
+defineEnvVar MYSQL_ADMIN_USER "The admin user" "dbadmin";
+defineEnvVar MYSQL_ADMIN_PASSWORD "The password for the admin user" "${RANDOM_PASSWORD}";
+defineEnvVar MYSQL_ADMIN_PRIVILEGES "The default privileges for the admin user" "ALL PRIVILEGES";
+defineEnvVar INNODB_DEFAULT_POOL_SIZE_FACTOR "The default pool size factor for InnoDB" "0.4";
+overrideEnvVar ENABLE_CRON false;
+overrideEnvVar ENABLE_MONIT true;
+overrideEnvVar ENABLE_RSNAPSHOT false;
+overrideEnvVar ENABLE_SYSLOG true;
+overrideEnvVar ENABLE_LOGSTASH true;
