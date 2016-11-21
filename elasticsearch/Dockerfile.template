@@ -1,17 +1,12 @@
 @include("preamble")
 FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
-
 @include("addon-toggles")
-
-RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
-COPY service /etc/service/${IMAGE}/run
-
 @include("service_user")
 @include("java")
-@include("gosu")
 @include("elk-common")
 @include("elasticsearch")
+@include("service")
 
 VOLUME /backup/elasticsearch-data
 

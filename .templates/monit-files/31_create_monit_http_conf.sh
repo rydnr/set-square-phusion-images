@@ -56,6 +56,9 @@ function checkInput() {
       -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
          shift;
          ;;
+      --) shift;
+          break;
+          ;;
       *) logDebugResult FAILURE "failed";
          exitWithErrorCode INVALID_OPTION;
          ;;
@@ -80,6 +83,10 @@ function parseInput() {
       -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
          shift;
          ;;
+      --)
+        shift;
+        break;
+        ;;
     esac
   done
 }
@@ -91,14 +98,16 @@ function parseInput() {
 ##   echo "The /16 subnet for eth0 is ${RESULT}"
 function retrieve_eth0_subnet_16() {
   local _result;
+
   logInfo -n "Finding out the /16 subnet for eth0";
   _result="$(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.0/24\n", $1, $2, $3);}')";
-  if [[ -n ${_result} ]]; then
+
+  if isEmpty ${_result}; then
+      logInfoResult FAILED "failed";
+      exitWithErrorCode CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0;
+  else
     logInfoResult SUCCESS "${_result}";
     export RESULT="${_result}";
-  else
-    logInfoResult FAILED "failed";
-    exitWithErrorCode CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0;
   fi
 }
 
@@ -106,18 +115,32 @@ function retrieve_eth0_subnet_16() {
 ## dry-wit hook
 function main() {
   local _subnet;
+  local _key;
+
+  logDebug -n "Checking SSL certificate for monit";
+  _key=$(find /etc/ssl/private/ -name 'monit-*.key');
+  if isEmpty "${_key}"; then
+      logDebugResult FAILURE "failed";
+  fi
+
   retrieve_eth0_subnet_16;
   _subnet="${RESULT}";
 
-  logInfo -n "Creating monit configuration for enabling web interface on port ${MONIT_HTTP_PORT}";
+  logInfo -n "Creating Monit configuration for enabling web interface on port ${MONIT_HTTP_PORT}";
   cat <<EOF > ${MONIT_CONF_FILE}
 set httpd port ${MONIT_HTTP_PORT} and
    use address 0.0.0.0
+EOF
+  if isNotEmpty "${_key}"; then
+      cat <<EOF >> ${MONIT_CONF_FILE}
    SSL ENABLE
-   PEMFILE /etc/ssl/private/monit-${SQ_IMAGE}-${SQ_TAG}.pem
-   allow localhost
-   allow ${_subnet}
-   allow ${MONIT_HTTP_USER}:"${MONIT_HTTP_PASSWORD}"
+   PEMFILE ${_key}
+EOF
+  fi
+  cat <<EOF >> ${MONIT_CONF_FILE}
+   ALLOWSELFCERTIFICATION
+   ALLOW ${_subnet}
+   ALLOW ${MONIT_HTTP_USER}:"${MONIT_HTTP_PASSWORD}"
 
 #check host local_monit with address 0.0.0.0
 #   if failed port ${MONIT_HTTP_PORT} protocol http with timeout ${MONIT_HTTP_TIMEOUT} then alert

@@ -35,6 +35,7 @@ function defineErrors() {
   addError "CANNOT_GENERATE_SSL_CERTIFICATE" "Cannot generate the SSL certificate";
   addError "CANNOT_SIGN_SSL_CERTIFICATE" "Cannot sign the SSL certificate";
   addError "CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS" "Cannot update the permissions of ${SSL_KEY_FOLDER}";
+  addError "CANNOT_UPDATE_SSL_KEY_PERMISSIONS" "Cannot update the permissions of the generated key file in ${SSL_KEY_FOLDER}";
   addError "SSL_CERTIFICATE_ALIAS_IS_MANDATORY" "SSL_CERTIFICATE_ALIAS environment variable is mandatory";
   addError "SSL_KEY_ENCRYPTION_IS_MANDATORY" "SSL_KEY_ENCRYPTION environment variable is mandatory";
   addError "SSL_KEY_PASSWORD_IS_MANDATORY" "SSL_KEY_PASSWORD environment variable is mandatory";
@@ -240,6 +241,28 @@ function updateFolderPermissions() {
   fi
 }
 
+## Changes the permissions of given SSL key.
+## -> 1: The key file to update.
+function updateSslKeyPermissions() {
+  local _keyFile="${1}";
+  local _output;
+
+  checkNotEmpty "keyFile" "${_keyFile}" 1;
+
+  logInfo -n "Fixing permissions of ${_dir}";
+
+  _output="$(chmod 0700 ${_keyFile})";
+
+  if isTrue $?; then
+      logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    logInfo "chmod 0700 ${_keyFile}";
+    logInfo "${_output}";
+    exitWithErrorCode CANNOT_UPDATE_SSL_KEY_PERMISSIONS;
+  fi
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
@@ -252,4 +275,6 @@ function main() {
   generateCertificate "${SSL_KEY_FOLDER}" "${_key}" "${_csr}";
 
   updateFolderPermissions "${SSL_KEY_FOLDER}" "${SERVICE_USER}" "${SERVICE_GROUP}";
+
+  updateSslKeyPermissions "${_key}";
 }

@@ -4,8 +4,6 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 @include("service_user")
 @include("create_ssl_certificate")
-@include("gosu")
-@include("tini")
 @include("elk-common")
 @include("kibana")
 @include("service")
