@@ -3,5 +3,25 @@
 rsync -az /backup/elasticsearch-data/ /usr/share/elasticsearch/data/
 rsync -az /usr/share/elasticsearch/data/ /backup/elasticsearch-data/
 
+_confFile=/etc/elasticsearch/elasticsearch.yml
+
+if [ -n "${CLUSTER_NAME}" ]; then
+  sed -ri "s;^(\#\s*)?(cluster\.name:).*;\2 ${CLUSTER_NAME};" ${_confFile}
+fi
+
+if [ -n "${NODE_NAME}" ]; then
+  sed -ri "s;^(\#\s*)?(node\.name:).*;\2 ${NODE_NAME};" ${_confFile}
+fi
+
+sed -ri "s;^(\#\s*)?(bootstrap\.memory_lock:).*;\2 ${BOOSTRAP_MEMORYLOCK};" ${_confFile}
+
+for attr in $(export | grep NODE_ATTR | cut -d'=' -f 1 | tr '[:upper:]' '[:lower:]' | tr '_' '.'); do
+  _name=$(echo ${attr} | cut -d'=' -f 1 | tr '[:upper:]' '[:lower:]' | tr '_' '.');
+  _value=$(echo ${attr} | cut -d'=' -f 2);
+  echo "${name}=${value}" >> ${_confFile}
+done
+
+sed -ri "s;^(\#\s*)?(discovery\.zen\.minimum_master_nodes:).*;\2 ${DISCOVERY_ZEN_MINIMUMMASTERNODES};" ${_confFile}
+
 #exec /usr/local/bin/run-as.sh -u $(id -u ${SERVICE_USER}) -g $(id -g ${SERVICE_GROUP}) /backup/elasticsearch-data elasticsearch $@
 exec chpst -u ${SERVICE_USER} elasticsearch $@
