@@ -4,4 +4,4 @@ rsync -az /backup/elasticsearch-data/ /usr/share/elasticsearch/data/
 rsync -az /usr/share/elasticsearch/data/ /backup/elasticsearch-data/
 
 #exec /usr/local/bin/run-as.sh -u $(id -u ${SERVICE_USER}) -g $(id -g ${SERVICE_GROUP}) /backup/elasticsearch-data elasticsearch $@
-exec elasticsearch $@
+exec chpst -u ${SERVICE_USER} elasticsearch $@
