@@ -4,7 +4,7 @@ This image runs ElasticSearch.
 
 It requires some tuning in the host system to work, tough:
 
-sudo sysctl -w vm.max_map_count=262144
+  sudo sysctl -w vm.max_map_count=262144
 
 # Example:
 

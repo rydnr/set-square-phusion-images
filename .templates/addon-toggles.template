@@ -8,5 +8,7 @@ ENV ENABLE_CRON=${ENABLE_CRON} \
     ENABLE_SYSLOG=${ENABLE_SYSLOG} \
     ENABLE_LOCAL_SMTP=${ENABLE_LOCAL_SMTP} \
     ENABLE_LOGSTASH=${ENABLE_LOGSTASH}
+
+RUN if [ "${ENABLE_SSH}" == "false" ]; then mkdir -p /etc/service/sshd; touch /etc/service/sshd/down; fi
 # ^ addon-toggles
 

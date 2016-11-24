@@ -1,10 +1,15 @@
 # v filebeat
 #COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_generate_logstash_forwarder_crt.inc.sh /etc/my_init.d/
 
+COPY filebeat-files/service /etc/service/filebeat/run
+
 RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
     echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list && \
     ${APTGET_INSTALL} --update filebeat && \
-    ${APTGET_CLEANUP}
+    ${APTGET_CLEANUP} && \
+    (/usr/sbin/groupadd filebeat || echo -n "") && \
+    /usr/sbin/useradd -g filebeat -G filebeat -c "filebeat user" filebeat && \
+    chmod +x /etc/service/filebeat/run
 
 #COPY logstash-files/02-beats-input.conf \
 #     logstash-files/10-syslog-filter.conf \

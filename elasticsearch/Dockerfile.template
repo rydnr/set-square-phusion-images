@@ -11,6 +11,8 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 ENV BOOTSTRAP_MEMORYLOCK=${BOOSTRAP_MEMORYLOCK} \
     DISCOVERY_ZEN_MINIMUMMASTERNODES=${DISCOVERY_ZEN_MINIMUMMASTERNODES}
 
+COPY elasticsearch-files/check-host.sh /etc/my_init.d/00_check_host.sh
+
 RUN sed -ri "s;^(\#\s*)?(path\.data:).*;\2 /backup/${IMAGE}/data;" /etc/elasticsearch/elasticsearch.yml && \
     sed -ri "s;^(\#\s*)?(path\.logs:).*;\2 /var/log/${IMAGE};" /etc/elasticsearch/elasticsearch.yml && \
     sed -ri "s;^(\#\s*)?(network\.host:).*;\2 0\.0\.0\.0;" /etc/elasticsearch/elasticsearch.yml
