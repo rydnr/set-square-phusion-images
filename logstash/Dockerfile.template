@@ -9,8 +9,6 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("logstash")
 @include("service")
 
-RUN /usr/local/bin/create_ssl_certificate_openssl.sh
-
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")

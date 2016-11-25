@@ -1,0 +1,1 @@
+defineEnvVar METRICBEAT_VERSION "The version of metricbeat" "5.0.1";

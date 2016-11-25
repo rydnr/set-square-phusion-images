@@ -1,0 +1,11 @@
+# Packetbeat
+
+This image runs Packetbeat.
+
+# Usage:
+
+- Running ${IMAGE} binding the elasticsearch container.
+  docker run -d --name ${IMAGE} -v /var/run/docker.sock:/var/run/docker.sock --link [elasticsearch-container]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Running ${IMAGE} providing the DNS entry for elasticsearch.
+  docker run -d --name ${IMAGE} -v /var/run/docker.sock:/var/run/docker.sock -e ELASTICSEARCH_HOST=el.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

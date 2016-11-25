@@ -1,0 +1,9 @@
+# Metricbeat
+
+This image runs Metricbeat.
+
+# Usage:
+
+  docker run -d --name ${IMAGE} --link [elasticsearch-container]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+  docker run -d --name ${IMAGE} -e ELASTICSEARCH_HOST=el.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

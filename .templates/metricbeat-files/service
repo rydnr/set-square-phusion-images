@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec chpst -u metricbeat metricbeat -c /etc/metricbeat/metricbeat.yml $@

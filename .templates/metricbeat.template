@@ -1,0 +1,11 @@
+# v metricbeat
+COPY metricbeat-files/service /etc/service/metricbeat/run
+
+RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
+    echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list && \
+    ${APTGET_INSTALL} --update metricbeat && \
+    ${APTGET_CLEANUP} && \
+    (/usr/sbin/groupadd metricbeat || echo -n "") && \
+    /usr/sbin/useradd -g metricbeat -G metricbeat -c "metricbeat user" metricbeat && \
+    chmod +x /etc/service/metricbeat/run
+# ^ metricbeat

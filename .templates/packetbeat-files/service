@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec chpst -u packetbeat packetbeat -c /etc/packetbeat/packetbeat.yml $@

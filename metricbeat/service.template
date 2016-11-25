@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/usr/local/bin/process-file.sh -o /etc/metricbeat/metricbeat.yml /usr/local/src/metricbeat.yml.tmpl
+
+exec chpst -u ${SERVICE_USER} /usr/local/bin/metricbeat -e -path.config /etc/metricbeat
