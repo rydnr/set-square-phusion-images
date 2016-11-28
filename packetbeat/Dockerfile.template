@@ -2,14 +2,14 @@
 FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 @include("addon-toggles")
-@include("service_user")
 @include("service")
-@include("metricbeat")
+
+COPY packetbeat.yml.tmpl /usr/local/share/packetbeat.yml.tmpl
+
+@include("packetbeat")
 
 ENV ELASTICSEARCH_HOST="elasticsearch" \
     ELASTICSEARCH_PORT="9200"
-
-COPY packetbeat.yml /etc/packetbeat/packetbeat.yml
 
 VOLUME /backup/${IMAGE}/data
 
