@@ -9,21 +9,23 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("sdkman")
 @include("gradle")
 
-ENV GRADLE_USER_HOME="/opt/workspace/.gradle" \
-    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
-
 COPY gradle-files/run-gradle /sbin/my_exec
+
+ENV WORKSPACE="${WORKSPACE}" \
+    GRADLE_USER_HOME="${WORKSPACE}/.gradle" \
+    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
 
 RUN chmod +x /sbin/my_exec && \
     gpasswd -a ${SERVICE_USER} root && \
-    mkdir -p /opt/workspace && \
-    chown ${SERVICE_USER}:${SERVICE_GROUP} /opt/workspace
+    mkdir -p ${WORKSPACE} && \
+    chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE}
 
-RUN su - ${SERVICE_USER} 'ln -s /opt/workspace/.gradle /home/${SERVICE_USER}/.gradle && \
-    ln -s /opt/workspace /home/${SERVICE_USER}/workspace';
+RUN su - ${SERVICE_USER} -c \
+      'ln -s ${GRADLE_USER_HOME} /home/${SERVICE_USER}/.gradle && \
+       ln -s ${WORKSPACE} /home/${SERVICE_USER}/workspace';
 
-VOLUME [ "/opt/workspace" ]
-WORKDIR /opt/workspace
+VOLUME [ "${WORKSPACE}" ]
+WORKDIR ${WORKSPACE}
 
 EXPOSE 8080
 

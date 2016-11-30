@@ -3,10 +3,10 @@ This image runs "gradle run" on a host-supplied Gradle project.
 Examples:
 
 - For an isolated Gradle project: 
-> docker run -it -v [my-gradle-project-folder]:/home/${NAMESPACE}/work --hostname [my-project-name] -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -it -v [my-gradle-project-folder]:${WORKSPACE} --hostname [my-project-name] -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
 
 - If the Gradle project belongs to a bigger project, you need to specify the project name explicitly:
-> docker run -d -e PROJECT_NAME=[project-folder-name] -v [root-folder]:/home/${NAMESPACE}/work -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -e PROJECT_NAME=[project-folder-name] -v [root-folder]:${WORKSPACE} -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Run gradle with custom options:
-> docker run -it -e GRADLE_OPTS="run --debug --stacktrace" -v [my-gradle-project-folder]:/home/${NAMESPACE}/work --hostname [my-project-name] -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -it -e GRADLE_OPTS="run --debug --stacktrace" -v [my-gradle-project-folder]:${WORKSPACE} --hostname [my-project-name] -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}
