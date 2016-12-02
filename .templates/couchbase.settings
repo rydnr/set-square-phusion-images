@@ -1,0 +1,5 @@
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201612";
+defineEnvVar COUCHBASE_VERSION "The version of Couchbase" "4.1.1";
+defineEnvVar COUCHBASE_ARTIFACT "The Couchbase package" 'couchbase-server-community_${COUCHBASE_VERSION}-ubuntu14.04_amd64.deb';
+defineEnvVar COUCHBASE_DOWNLOAD_URL "The url of the Couchbase artifact" 'http://packages.couchbase.com/releases/${COUCHBASE_VERSION/${COUCHBASE_ARTIFACT}';
+defineEnvVar COUCHBASE_DIGEST "The sha256 digest of the Couchbase package" "a7bc3b08e2f5ad13c4456fc47a4b3e0b577db17f8c704f4607fe0d69d107c2b3";
