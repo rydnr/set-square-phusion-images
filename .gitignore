@@ -172,6 +172,7 @@ sdkman/setup.sql
 .templates/install
 .templates/instructions
 .templates/java
+.templates/jce
 .templates/jenkins
 .templates/kibana
 .templates/locale

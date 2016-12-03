@@ -1,0 +1,5 @@
+#!/bin/bash
+
+export HOME=${SERVICE_USER_HOME}
+source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh
+gradle $@

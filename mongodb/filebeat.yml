@@ -3,7 +3,7 @@ output:
     hosts: ["elasticsearch:9200"]
     worker: 1
 
-    index: "rabbitmq"
+    index: "mongodb"
 
     template:
      path: "filebeat.template.json"
@@ -14,7 +14,7 @@ shipper:
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
 # If this options is not defined, the hostname is used.
-  name: rabbitmq
+  name: mongodb
 
 
 ############################# Logging #########################################

@@ -11,6 +11,7 @@ ENV DOBACKUP="true" \
 @include("create_ssl_certificate")
 @include("mongodb")
 @include("service")
+@include("filebeat")
 
 COPY create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
 
