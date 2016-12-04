@@ -1,6 +1,7 @@
 # v logstash
 ENV LS_SETTINGS_DIR=/etc/logstash \
     LOGSTASH_VERSION="${LOGSTASH_VERSION}" \
+    LS_HOME=/usr/share/logstash \
     PATH=/usr/share/logstash/bin:$PATH
 
 COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_generate_logstash_forwarder_crt.inc.sh /etc/my_init.d/
@@ -8,14 +9,45 @@ COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_gene
 RUN  mkdir -p /usr/local/lib && \
 	   ln -s /usr/lib/*/libzmq.so.3 /usr/local/lib/libzmq.so && \
      ${APTGET_INSTALL} -u logstash=${LOGSTASH_VERSION} && \
-     ${APTGET_CLEANUP}
-RUN  sed -ri "s;^(\#\s*)?(path\.data:).*;\2 /backup/${IMAGE}/data;" ${LS_SETTINGS_DIR}/logstash.yml
-RUN  grep -q "^path\.data: /backup/${IMAGE}/data\$" ${LS_SETTINGS_DIR}/logstash.yml
+     ${APTGET_CLEANUP} && \
+     sed -ri "s;^(\#\s*)?(path\.data:).*;\2 /backup/${IMAGE}/data;" ${LS_SETTINGS_DIR}/logstash.yml && \
+     grep -q "^path\.data: /backup/${IMAGE}/data\$" ${LS_SETTINGS_DIR}/logstash.yml
+
+RUN  if [ -n "${LOGSTASH_CODEC_PLUGINS}" ]; then \
+       echo "Installing Logstash codec plugins" && \
+       for p in ${LOGSTASH_CODEC_PLUGINS}; do \
+         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+       done; \
+     fi; \
+     if [ -n "${LOGSTASH_FILTER_PLUGINS}" ]; then \
+       echo "Installing Logstash filter plugins" && \
+       for p in ${LOGSTASH_FILTER_PLUGINS}; do \
+         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+       done; \
+     fi; \
+     if [ -n "${LOGSTASH_INPUT_PLUGINS}" ]; then \
+       echo "Installing Logstash input plugins" && \
+       for p in ${LOGSTASH_INPUT_PLUGINS}; do \
+         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+       done; \
+     fi; \
+     if [ -n "${LOGSTASH_OUTPUT_PLUGINS}" ]; then \
+       echo "Installing Logstash output plugins" && \
+       for p in ${LOGSTASH_OUTPUT_PLUGINS}; do \
+         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+       done; \
+     fi; \
+     if [ -n "${LOGSTASH_PATTERNS_PLUGINS}" ]; then \
+       echo "Installing Logstash patterns plugins" && \
+       for p in ${LOGSTASH_PATTERNS_PLUGINS}; do \
+         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+       done; \
+     fi
 
 COPY logstash-files/02-beats-input.conf \
      logstash-files/10-syslog-filter.conf \
      logstash-files/30-elasticsearch-output.conf \
-     /etc/logstash/conf.d/
+     ${LS_SETTINGS_DIR}/conf.d/
 
 VOLUME /backup/${IMAGE}/data
 
