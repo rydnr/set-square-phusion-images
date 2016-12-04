@@ -4,12 +4,14 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 @include("service")
 
-COPY packetbeat.yml.tmpl /usr/local/share/packetbeat.yml.tmpl
+COPY packetbeat.elasticsearch.yml.tmpl packetbeat.logstash.yml.tmpl /usr/local/share/
 
 @include("packetbeat")
 
 ENV ELASTICSEARCH_HOST="elasticsearch" \
-    ELASTICSEARCH_PORT="9200"
+    ELASTICSEARCH_PORT="9200" \
+    LOGSTASH_HOST="logstash" \
+    LOGSTASH_PORT="5044"
 
 VOLUME /backup/${IMAGE}/data
 

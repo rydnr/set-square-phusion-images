@@ -1,5 +1,13 @@
 #!/bin/bash
 
-/usr/local/bin/process-file.sh -o /etc/packetbeat/packetbeat.yml /usr/local/share/packetbeat.yml.tmpl
+if [ "${ENABLE_ELASTICSEARCH}" == "true" ]; then
+    curl -XPUT 'http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
+fi
+
+_templateFile="/usr/local/share/packetbeat.elasticsearch.yml.tmpl";
+if [ "${ENABLE_LOGSTASH}" == "true" ]; then
+    _templateFile="/usr/local/share/packetbeat.logstash.yml.tmpl";
+fi
+/usr/local/bin/process-file.sh -o /etc/packetbeat/packetbeat.yml ${_templateFile}
 
 exec chpst -u packetbeat packetbeat -c /etc/packetbeat/packetbeat.yml $@

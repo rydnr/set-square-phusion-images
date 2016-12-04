@@ -96,7 +96,7 @@ packetbeat.protocols.nfs:
 
 # The name of the shipper that publishes the network data. It can be used to group
 # all the transactions sent by a single shipper in the web interface.
-#name:
+name: packetbeat-${HOSTNAME}
 
 # The tags of the shipper are included in their own field with each
 # transaction published.
@@ -112,20 +112,14 @@ packetbeat.protocols.nfs:
 # Configure what outputs to use when sending the data collected by the beat.
 # Multiple outputs may be used.
 
-#-------------------------- Elasticsearch output ------------------------------
-output.elasticsearch:
-  # Array of hosts to connect to.
-  hosts: ["${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
+output:
+  console:
+    pretty: true
 
-  # Optional protocol and basic auth credentials.
-  #protocol: "https"
-  #username: "elastic"
-  #password: "changeme"
-
-#----------------------------- Logstash output --------------------------------
-#output.logstash:
-  # The Logstash hosts
-  #hosts: ["localhost:5044"]
+  logstash:
+    # The Logstash hosts
+    enabled: true
+    hosts: ["${LOGSTASH_HOST}:${LOGSTASH_PORT}"]
 
   # Optional SSL. By default is off.
   # List of root certificates for HTTPS server verifications
