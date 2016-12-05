@@ -1,5 +1,6 @@
 # v couchbase
 COPY couchbase-files/dummy.sh /usr/local/bin/
+
 RUN ${APTGET_INSTALL} python-httplib2 chrpath lsof lshw sysstat net-tools numactl && \
     ${APTGET_CLEANUP} && \
     wget -N ${COUCHBASE_DOWNLOAD_URL} && \
