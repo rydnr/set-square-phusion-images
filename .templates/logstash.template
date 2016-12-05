@@ -52,4 +52,5 @@ COPY logstash-files/02-beats-input.conf \
 VOLUME /backup/${IMAGE}/data
 
 EXPOSE 5044
+EXPOSE 9600
 # ^ logstash

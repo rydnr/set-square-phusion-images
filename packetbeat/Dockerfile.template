@@ -4,7 +4,8 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 @include("service")
 
-COPY packetbeat.elasticsearch.yml.tmpl packetbeat.logstash.yml.tmpl /usr/local/share/
+COPY packetbeat.common.yml.tmpl packetbeat.elasticsearch.yml.tmpl packetbeat.logstash.yml.tmpl packetbeat.logging.yml.tmpl \
+     /usr/local/share/
 
 @include("packetbeat")
 

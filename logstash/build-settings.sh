@@ -2,6 +2,10 @@ defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201612";
 defineEnvVar LOGSTASH_VERSION "The logstash version" "1:5.0.2-1";
 overrideEnvVar TAG '5.0.2';
 overrideEnvVar ENABLE_LOGSTASH "false";
+overrideEnvVar ENABLE_LOCAL_SMTP "false";
+overrideEnvVar ENABLE_CRON "false";
+overrideEnvVar ENABLE_RSNAPSHOT "false";
+overrideEnvVar ENABLE_SYSLOG "true";
 defineEnvVar LOGSTASH_CODEC_PLUGINS_ALL "The space-separated list of Logstash codec plugins to install" "logstash-codec-collectd logstash-codec-dots logstash-codec-edn logstash-codec-edn_lines logstash-codec-es_bulk logstash-codec-fluent logstash-codec-graphite logstash-codec-json logstash-codec-json_lines logstash-codec-line logstash-codec-msgpack logstash-codec-multiline logstash-codec-netflow logstash-codec-plain logstash-codec-rubydebug";
 defineEnvVar LOGSTASH_CODEC_PLUGINS "The space-separated list of Logstash codec plugins to install" "logstash-codec-json logstash-codec-multiline";
 defineEnvVar LOGSTASH_FILTER_PLUGINS_ALL "The space-separated list of all available Logstash filter plugins" "logstash-filter-clone logstash-filter-csv logstash-filter-date logstash-filter-dns logstash-filter-drop logstash-filter-fingerprint logstash-filter-geoip logstash-filter-grok logstash-filter-json logstash-filter-kv logstash-filter-metrics logstash-filter-mutate logstash-filter-ruby logstash-filter-sleep logstash-filter-split logstash-filter-syslog_pri logstash-filter-throttle logstash-filter-urldecode logstash-filter-useragent logstash-filter-uuid logstash-filter-xml";
@@ -16,3 +20,4 @@ defineEnvVar SERVICE_USER "The logstash user" "logstash";
 defineEnvVar SERVICE_GROUP "The logstash group" "logstash";
 defineEnvVar SERVICE_USER_HOME "The home of the logstash user" "/usr/share/logstash";
 defineEnvVar SERVICE_USER_SHELL "The shell of the logstash user" "/bin/bash";
+

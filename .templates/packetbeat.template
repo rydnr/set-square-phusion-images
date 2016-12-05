@@ -5,9 +5,10 @@ RUN if [ ! -e /usr/local/share/packetbeat.elasticsearch.yml.tmpl ]; then echo "/
     if [ ! -e /usr/local/share/packetbeat.logstash.yml.tmpl ]; then echo "/usr/local/share/packetbeat.logstash.yml.tmpl is mandatory"; exit 1; fi && \
     wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
     echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list && \
-    ${APTGET_INSTALL} --update packetbeat && \
+    ${APTGET_INSTALL} --update packetbeat=${PACKETBEAT_VERSION} && \
     ${APTGET_CLEANUP} && \
     (/usr/sbin/groupadd packetbeat || echo -n "") && \
     /usr/sbin/useradd -g packetbeat -G packetbeat -c "packetbeat user" packetbeat && \
-    chmod +x /etc/service/packetbeat/run
+    chmod +x /etc/service/packetbeat/run && \
+    setcap cap_net_raw,cap_net_admin=eip /usr/bin/packetbeat
 # ^ packetbeat

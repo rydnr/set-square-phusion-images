@@ -1,13 +1,28 @@
 #!/bin/bash
 
-if [ "${ENABLE_ELASTICSEARCH}" == "true" ]; then
+grep "elasticsearch" /etc/hosts > /dev/null 2>&1
+_elasticSearchEnabled=$?;
+
+if [ ${_elasticSearchEnabled} -eq 0 ]; then
     curl -XPUT 'http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/packetbeat' -d@/etc/packetbeat/packetbeat.template.json
 fi
 
-_templateFile="/usr/local/share/packetbeat.elasticsearch.yml.tmpl";
-if [ "${ENABLE_LOGSTASH}" == "true" ]; then
-    _templateFile="/usr/local/share/packetbeat.logstash.yml.tmpl";
-fi
-/usr/local/bin/process-file.sh -o /etc/packetbeat/packetbeat.yml ${_templateFile}
+grep "logstash" /etc/hosts > /dev/null 2>&1
+_logstashEnabled=$?;
 
-exec chpst -u packetbeat packetbeat -c /etc/packetbeat/packetbeat.yml $@
+_templateFolder="/usr/local/share/";
+/usr/local/bin/process-file.sh -o /etc/packetbeat/packetbeat.yml ${_templateFolder}/packetbeat.common.yml.tmpl;
+if [ ${_elasticSearchEnabled} -eq 0 ]; then
+    /usr/local/bin/process-file.sh -o /etc/packetbeat/packetbeat.elasticsearch.yml ${_templateFolder}/packetbeat.elasticsearch.yml.tmpl;
+    cat /etc/packetbeat/packetbeat.elasticsearch.yml >> /etc/packetbeat/packetbeat.yml
+fi
+if [ ${_logstashEnabled} -eq 0 ]; then
+    /usr/local/bin/process-file.sh -o /etc/packetbeat/packetbeat.logstash.yml ${_templateFolder}/packetbeat.logstash.yml.tmpl;
+    cat /etc/packetbeat/packetbeat.logstash.yml >> /etc/packetbeat/packetbeat.yml
+fi
+
+/usr/local/bin/process-file.sh -o /etc/packetbeat/packetbeat.logging.yml ${_templateFolder}/packetbeat.logging.yml.tmpl;
+cat /etc/packetbeat/packetbeat.logging.yml >> /etc/packetbeat/packetbeat.yml
+
+#exec chpst -u packetbeat packetbeat -c /etc/packetbeat/packetbeat.yml $@
+exec packetbeat -c /etc/packetbeat/packetbeat.yml $@

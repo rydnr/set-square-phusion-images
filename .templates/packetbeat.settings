@@ -1,1 +1,1 @@
-defineEnvVar PACKETBEAT_VERSION "The version of packetbeat" "5.0.1";
+defineEnvVar PACKETBEAT_VERSION "The version of packetbeat" "1.3.1";

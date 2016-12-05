@@ -162,6 +162,7 @@ sdkman/setup.sql
 .templates/apr
 .templates/backup
 .templates/copy-metadata
+.templates/couchbase
 .templates/elasticsearch
 .templates/elk-common
 .templates/exim-files/exim.00_local_macros

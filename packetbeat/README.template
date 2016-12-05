@@ -5,13 +5,13 @@ This image runs Packetbeat, and sends information either to elasticsearch or log
 # Usage:
 
 - Running ${IMAGE} binding the elasticsearch container.
-  docker run -d --name ${IMAGE} -v /var/run/docker.sock:/var/run/docker.sock --link [elasticsearch-container]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+  docker run -d --name ${IMAGE} --link [elasticsearch-container]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
 
 - Running ${IMAGE} providing the DNS entry for elasticsearch.
-  docker run -d --name ${IMAGE} -v /var/run/docker.sock:/var/run/docker.sock -e ELASTICSEARCH_HOST=el.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+  docker run -d --name ${IMAGE} -e ELASTICSEARCH_HOST=el.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
 
 - Running ${IMAGE} binding the logstash container.
-  docker run -d --name ${IMAGE} -v /var/run/docker.sock:/var/run/docker.sock -e ENABLE_LOGSTASH=true --link [logstash-container]:logstash ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+  docker run -d --name ${IMAGE} --link [logstash-container]:logstash ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
 
 - Running ${IMAGE} providing the DNS entry for logstash.
-  docker run -d --name ${IMAGE} -v /var/run/docker.sock:/var/run/docker.sock -e ENABLE_LOGSTASH=true -e LOGSTASH_HOST=lg.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+  docker run -d --name ${IMAGE} -e LOGSTASH_HOST=lg.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

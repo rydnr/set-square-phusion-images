@@ -115,7 +115,7 @@ function is_locale_supported() {
   checkNotEmpty "locale" "${_locale}" 1;
   checkNotEmpty "encoding" "${_encoding}" 2;
 
-  echo "${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*}";
+#  _debugEcho "${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*}";
 
   if [ -f ${SUPPORTED_LOCALES_FOLDER}/${_locale%%_*} ]; then
       if is_locale_file_available "${_locale}"; then
