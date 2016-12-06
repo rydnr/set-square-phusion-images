@@ -2,14 +2,15 @@
 FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 @include("addon-toggles")
-@include("service_user")
 @include("service")
 @include("metricbeat")
 
 ENV ELASTICSEARCH_HOST="elasticsearch" \
-    ELASTICSEARCH_PORT="9200"
+    ELASTICSEARCH_PORT="9200" \
+    LOGSTASH_HOST="logstash" \
+    LOGSTASH_PORT="5044"
 
-COPY metricbeat.yml /etc/metricbeat/metricbeat.yml
+COPY metricbeat.common.yml.tmpl metricbeat.elasticsearch.yml.tmpl metricbeat.logstash.yml.tmpl metricbeat.logging.yml.tmpl /usr/local/share/
 
 VOLUME /backup/${IMAGE}/data
 

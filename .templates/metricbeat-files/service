@@ -1,3 +1,28 @@
 #!/bin/bash
 
-exec chpst -u metricbeat metricbeat -c /etc/metricbeat/metricbeat.yml $@
+grep "elasticsearch" /etc/hosts > /dev/null 2>&1
+_elasticSearchEnabled=$?;
+
+if [ ${_elasticSearchEnabled} -eq 0 ]; then
+    curl -XPUT 'http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/metricbeat' -d@/etc/metricbeat/metricbeat.template.json
+fi
+
+grep "logstash" /etc/hosts > /dev/null 2>&1
+_logstashEnabled=$?;
+
+_templateFolder="/usr/local/share/";
+/usr/local/bin/process-file.sh -o /etc/metricbeat/metricbeat.yml ${_templateFolder}/metricbeat.common.yml.tmpl;
+if [ ${_elasticSearchEnabled} -eq 0 ]; then
+    /usr/local/bin/process-file.sh -o /etc/metricbeat/metricbeat.elasticsearch.yml ${_templateFolder}/metricbeat.elasticsearch.yml.tmpl;
+    cat /etc/metricbeat/metricbeat.elasticsearch.yml >> /etc/metricbeat/metricbeat.yml
+fi
+if [ ${_logstashEnabled} -eq 0 ]; then
+    /usr/local/bin/process-file.sh -o /etc/metricbeat/metricbeat.logstash.yml ${_templateFolder}/metricbeat.logstash.yml.tmpl;
+    cat /etc/metricbeat/metricbeat.logstash.yml >> /etc/metricbeat/metricbeat.yml
+fi
+
+/usr/local/bin/process-file.sh -o /etc/metricbeat/metricbeat.logging.yml ${_templateFolder}/metricbeat.logging.yml.tmpl;
+cat /etc/metricbeat/metricbeat.logging.yml >> /etc/metricbeat/metricbeat.yml
+
+#exec chpst -u metricbeat metricbeat -c /etc/metricbeat/metricbeat.yml $@
+exec /usr/bin/metricbeat.sh -c /etc/metricbeat/metricbeat.yml $@
