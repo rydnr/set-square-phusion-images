@@ -1,0 +1,9 @@
+output:
+  elasticsearch:
+    hosts: ["${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}"]
+    worker: 1
+
+    index: "${IMAGE}"
+
+    template:
+     path: "filebeat.template.json"

@@ -1,0 +1,36 @@
+#!/bin/bash
+
+grep "elasticsearch" /etc/hosts > /dev/null 2>&1
+_elasticSearchEnabled=$?;
+
+if [ ${_elasticSearchEnabled} -eq 0 ]; then
+    curl -XPUT 'http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/filebeat' -d@/etc/filebeat/filebeat.template.json
+fi
+
+grep "logstash" /etc/hosts > /dev/null 2>&1
+_logstashEnabled=$?;
+
+_templateFolder="/usr/local/share/";
+
+if [ ${_elasticSearchEnabled} -eq 0 ]; then
+  /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.elasticsearch.yml ${_templateFolder}/filebeat.elasticsearch.yml.tmpl;
+else
+  touch /etc/filebeat/filebeat.elasticsearch.yml
+fi
+
+if [ ${_logstashEnabled} -eq 0 ]; then
+  /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.logstash.yml ${_templateFolder}/filebeat.logstash.yml.tmpl;
+else
+  touch /etc/filebeat/filebeat.logstash.yml
+fi
+
+for f in common shipper logging; do
+  /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.${f}.yml ${_templateFolder}/filebeat.${f}.yml.tmpl;
+done
+
+for f in common elasticsearch logstash shipper logging; do
+  cat /etc/filebeat/filebeat.${f}.yml >> /etc/filebeat/filebeat.yml
+done
+
+#exec chpst -u filebeat filebeat -c /etc/filebeat/filebeat.yml $@
+exec filebeat -c /etc/filebeat/filebeat.yml $@

@@ -11,10 +11,10 @@ RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key 
     /usr/sbin/useradd -g filebeat -G filebeat -c "filebeat user" filebeat && \
     chmod +x /etc/service/filebeat/run
 
-#COPY logstash-files/02-beats-input.conf \
-#     logstash-files/10-syslog-filter.conf \
-#     logstash-files/30-elasticsearch-output.conf \
-#     /etc/logstash/conf.d/
-
-EXPOSE 5044
+COPY filebeat-files/filebeat.common.yml.tmpl \
+     filebeat-files/filebeat.elasticsearch.yml.tmpl \
+     filebeat-files/filebeat.logstash.yml.tmpl \
+     filebeat-files/filebeat.shipper.yml.tmpl \
+     filebeat-files/filebeat.logging.yml.tmpl \
+     /usr/local/share/
 # ^ filebeat
