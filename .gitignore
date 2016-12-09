@@ -128,6 +128,7 @@ phabricator/apache-vhost.conf
 phabricator/bootstrap
 phabricator/INSTALL
 phabricator/service
+pharo/service
 phppgadmin/apache-files
 phppgadmin/apache-vhost.conf
 plone3/default.cfg
@@ -188,6 +189,7 @@ sdkman/setup.sql
 .templates/nodejs
 .templates/packetbeat
 .templates/phabricator
+.templates/pharo
 .templates/plone5
 .templates/preamble
 .templates/rabbitmq

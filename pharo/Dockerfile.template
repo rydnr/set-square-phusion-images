@@ -1,0 +1,12 @@
+@include("preamble")
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+@include("service_user")
+@include("service")
+@include("pharo")
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

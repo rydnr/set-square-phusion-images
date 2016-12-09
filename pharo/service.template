@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd /work
+
+chpst -u ${SERVICE_USER} pharo-ui $@
