@@ -8,7 +8,7 @@
   <installations2>
     <hudson.plugins.groovy.GroovyInstallation>
       <name>groovy</name>
-      <home>/var/jenkins_home/.sdkman/candidates/groovy/current</home>
+      <home>/home/jenkins/.sdkman/candidates/groovy/current</home>
       <properties/>
     </hudson.plugins.groovy.GroovyInstallation>
   </installations2>

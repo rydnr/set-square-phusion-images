@@ -1,5 +1,5 @@
 defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201612";
-defineEnvVar JENKINS_VERSION "The Jenkins version" "2.34";
+defineEnvVar JENKINS_VERSION "The Jenkins version" "2.35";
 defineEnvVar TAG "The image tag" '${JENKINS_VERSION}';
 defineEnvVar JENKINS_ARTIFACT "The Jenkins artifact" 'jenkins-war-${JENKINS_VERSION}.war';
 defineEnvVar JENKINS_DOWNLOAD_URL \

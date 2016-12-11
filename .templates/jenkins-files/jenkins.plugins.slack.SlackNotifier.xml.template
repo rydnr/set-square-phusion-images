@@ -3,5 +3,5 @@
   <teamDomain>${SLACK_TEAM_DOMAIN}</teamDomain>
   <token>${SLACK_TOKEN}</token>
   <room>${SLACK_ROOM}</room>
-  <buildServerUrl>http://TravelPlan.osoco.es/</buildServerUrl>
+  <buildServerUrl>${SLACK_BUILD_SERVER_URL}</buildServerUrl>
 </jenkins.plugins.slack.SlackNotifier_-DescriptorImpl>

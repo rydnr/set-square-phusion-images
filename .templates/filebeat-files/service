@@ -24,11 +24,18 @@ else
   touch /etc/filebeat/filebeat.logstash.yml
 fi
 
+_shipper=${SHIPPER_NAME};
+if [ -z "${_shipper}" ]; then
+    export SHIPPER_NAME="${SQ_IMAGE}";
+fi
+
 for f in common shipper logging; do
   /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.${f}.yml ${_templateFolder}/filebeat.${f}.yml.tmpl;
 done
 
-for f in common elasticsearch logstash shipper logging; do
+rm -f /etc/filebeat/filebeat.yml
+
+for f in elasticsearch logstash shipper logging; do
   cat /etc/filebeat/filebeat.${f}.yml >> /etc/filebeat/filebeat.yml
 done
 

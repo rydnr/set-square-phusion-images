@@ -2,6 +2,7 @@
 #COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_generate_logstash_forwarder_crt.inc.sh /etc/my_init.d/
 
 COPY filebeat-files/service /etc/service/filebeat/run
+COPY filebeat-files/check_input.sh /etc/my_init.d/55_filebeat_checks.sh
 
 RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
     echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list && \
@@ -9,7 +10,7 @@ RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key 
     ${APTGET_CLEANUP} && \
     (/usr/sbin/groupadd filebeat || echo -n "") && \
     /usr/sbin/useradd -g filebeat -G filebeat -c "filebeat user" filebeat && \
-    chmod +x /etc/service/filebeat/run
+    chmod +x /etc/service/filebeat/run /etc/my_init.d/55_filebeat_checks.sh
 
 COPY filebeat-files/filebeat.common.yml.tmpl \
      filebeat-files/filebeat.elasticsearch.yml.tmpl \

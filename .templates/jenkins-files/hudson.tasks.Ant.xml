@@ -3,7 +3,7 @@
   <installations>
     <hudson.tasks.Ant_-AntInstallation>
       <name>ant</name>
-      <home>/var/jenkins_home/.sdkman/candidates/ant/current</home>
+      <home>/home/jenkins/.sdkman/candidates/ant/current</home>
       <properties/>
     </hudson.tasks.Ant_-AntInstallation>
   </installations>

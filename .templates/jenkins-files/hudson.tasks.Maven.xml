@@ -3,7 +3,7 @@
   <installations>
     <hudson.tasks.Maven_-MavenInstallation>
       <name>maven</name>
-      <home>/var/jenkins_home/.sdkman/candidates/maven/current</home>
+      <home>/home/jenkins/.sdkman/candidates/maven/current</home>
       <properties/>
     </hudson.tasks.Maven_-MavenInstallation>
   </installations>

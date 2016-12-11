@@ -3,9 +3,9 @@
   <installations>
     <hudson.plugins.gradle.GradleInstallation>
       <name>gradle</name>
-      <home>/var/jenkins_home/.sdkman/candidates/gradle/current</home>
+      <home>/home/jenkins/.sdkman/candidates/gradle/current</home>
       <properties/>
-      <gradleHome>/var/jenkins_home/.sdkman/candidates/gradle/current</gradleHome>
+      <gradleHome>/home/jenkins/.sdkman/candidates/gradle/current</gradleHome>
     </hudson.plugins.gradle.GradleInstallation>
   </installations>
 </hudson.plugins.gradle.Gradle_-DescriptorImpl>

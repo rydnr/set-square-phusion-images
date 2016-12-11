@@ -127,9 +127,9 @@ function generate_gradle_config() {
   <installations>
     <hudson.plugins.gradle.GradleInstallation>
       <name>gradle</name>
-      <home>/var/jenkins_home/.sdkman/candidates/gradle/current</home>
+      <home>/home/jenkins/.sdkman/candidates/gradle/current</home>
       <properties/>
-      <gradleHome>/var/jenkins_home/.sdkman/candidates/gradle/current</gradleHome>
+      <gradleHome>/home/jenkins/.sdkman/candidates/gradle/current</gradleHome>
     </hudson.plugins.gradle.GradleInstallation>
 EOF
 
@@ -137,9 +137,9 @@ EOF
     cat <<EOF >> ${_outputFile}
     <hudson.plugins.gradle.GradleInstallation>
       <name>gradle-${v}</name>
-      <home>/var/jenkins_home/.sdkman/candidates/gradle/${v}</home>
+      <home>/home/jenkins/.sdkman/candidates/gradle/${v}</home>
       <properties/>
-      <gradleHome>/var/jenkins_home/.sdkman/candidates/gradle/${v}</gradleHome>
+      <gradleHome>/home/jenkins/.sdkman/candidates/gradle/${v}</gradleHome>
     </hudson.plugins.gradle.GradleInstallation>
 EOF
   done
@@ -178,7 +178,7 @@ function generate_groovy_config() {
   <installations2>
     <hudson.plugins.groovy.GroovyInstallation>
       <name>groovy</name>
-      <home>/var/jenkins_home/.sdkman/candidates/groovy/current</home>
+      <home>/home/jenkins/.sdkman/candidates/groovy/current</home>
       <properties/>
     </hudson.plugins.groovy.GroovyInstallation>
 EOF
@@ -187,7 +187,7 @@ EOF
     cat <<EOF >> ${_outputFile}
     <hudson.plugins.groovy.GroovyInstallation>
       <name>groovy-${v}</name>
-      <home>/var/jenkins_home/.sdkman/candidates/groovy/${v}</home>
+      <home>/home/jenkins/.sdkman/candidates/groovy/${v}</home>
       <properties/>
     </hudson.plugins.groovy.GroovyInstallation>
 EOF
@@ -222,7 +222,7 @@ function generate_grails_config() {
   <installations>
     <com.g2one.hudson.grails.GrailsInstallation>
       <name>grails-current</name>
-      <home>/var/jenkins_home/.sdkman/candidates/grails/current</home>
+      <home>/home/jenkins/.sdkman/candidates/grails/current</home>
       <properties/>
     </com.g2one.hudson.grails.GrailsInstallation>
 EOF
@@ -231,7 +231,7 @@ EOF
     cat <<EOF >> ${_outputFile}
     <com.g2one.hudson.grails.GrailsInstallation>
       <name>grails-${v}</name>
-      <home>/var/jenkins_home/.sdkman/candidates/grails/${v}</home>
+      <home>/home/jenkins/.sdkman/candidates/grails/${v}</home>
       <properties/>
     </com.g2one.hudson.grails.GrailsInstallation>
 EOF
@@ -266,7 +266,7 @@ function generate_maven_config() {
   <installations>
     <hudson.tasks.Maven_-MavenInstallation>
       <name>maven</name>
-      <home>/var/jenkins_home/.sdkman/candidates/maven/current</home>
+      <home>/home/jenkins/.sdkman/candidates/maven/current</home>
       <properties/>
     </hudson.tasks.Maven_-MavenInstallation>
 EOF
@@ -275,7 +275,7 @@ EOF
     cat <<EOF >> ${_outputFile}
     <hudson.tasks.Maven_-MavenInstallation>
       <name>maven-${v}</name>
-      <home>/var/jenkins_home/.sdkman/candidates/maven/${v}</home>
+      <home>/home/jenkins/.sdkman/candidates/maven/${v}</home>
       <properties/>
     </hudson.tasks.Maven_-MavenInstallation>
 EOF
@@ -310,7 +310,7 @@ function generate_ant_config() {
   <installations>
     <hudson.tasks.Ant_-AntInstallation>
       <name>ant</name>
-      <home>/var/jenkins_home/.sdkman/candidates/ant/current</home>
+      <home>/home/jenkins/.sdkman/candidates/ant/current</home>
       <properties/>
     </hudson.tasks.Ant_-AntInstallation>
 EOF
@@ -319,7 +319,7 @@ EOF
     cat <<EOF >> ${_outputFile}
     <hudson.tasks.Ant_-AntInstallation>
       <name>ant-${v}</name>
-      <home>/var/jenkins_home/.sdkman/candidates/ant/${v}</home>
+      <home>/home/jenkins/.sdkman/candidates/ant/${v}</home>
       <properties/>
     </hudson.tasks.Ant_-AntInstallation>
 EOF

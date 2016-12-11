@@ -29,6 +29,7 @@ defineEnvVar JENKINS_MODULES "The space-separated list of Jenkins modules to inc
 defineEnvVar SLACK_TEAM_DOMAIN "The team domain in Slack" "${NAMESPACE}";
 defineEnvVar SLACK_TOKEN "The Slack token" "secret";
 defineEnvVar SLACK_ROOM "The Slack room" "${DOMAIN}";
+defineEnvVar SLACK_BUILD_SERVER_URL "The Slack build server url" 'http://slack.${SLACK_TEAM_DOMAIN}';
 defineEnvVar SWARM_CLIENT_VERSION "The version of the Swarm client" "2.2";
 defineEnvVar SWARM_CLIENT_ARTIFACT "The Swarm client artifact" 'swarm-client-${SWARM_CLIENT_VERSION}-jar-with-dependencies.jar';
 defineEnvVar SWARM_CLIENT_DOWNLOAD_URL "The url to download the Swarm agent" 'https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/${SWARM_CLIENT_ARTIFACT}';
