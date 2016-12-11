@@ -1,4 +1,13 @@
 # v pharo
-RUN apt-add-repository -y ppa:pharo/stable && \
-    ${APTGET_INSTALL} -u pharo-vm-desktop
+ENV PATH=${PATH}:/opt/pharo
+
+RUN dpkg --add-architecture i386 && \
+    ${APTGET_INSTALL} -u  libx11-6:i386 libgl1-mesa-glx:i386 libfontconfig1:i386 libssl1.0.0:i386 && \
+    ${APTGET_INSTALL} -np unzip && \
+    ${APTGET_CLEANUP} && \
+    cd /opt && \
+    wget ${PHARO_DOWNLOAD_URL} && \
+    unzip ${PHARO_ARTIFACT} && \
+    ln -s ${PHARO_FOLDER} pharo && \
+    rm -f ${PHARO_ARTIFACT}
 # ^ pharo
