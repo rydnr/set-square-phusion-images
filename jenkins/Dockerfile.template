@@ -40,7 +40,7 @@ COPY tomcat-files/service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 COPY tomcat-files/logstash.conf /etc/logstash/conf.d/jenkins.conf
 
-ADD init.groovy.d/ /var/jenkins_home/init.groovy.d/
+ADD init.groovy.d/ /home/jenkins/init.groovy.d/
 
 # TODO: add cron job for mvn versions:update-properties
 # TODO: gem install bouncy-castle-java
@@ -56,12 +56,3 @@ EXPOSE 50000
 @include("copy-metadata")
 @include("instructions")
 @include("symlinks")
-
-
-
-
-
-
-
-
-

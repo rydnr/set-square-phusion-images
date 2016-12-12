@@ -372,7 +372,7 @@ function generate_slack_config() {
   <teamDomain>${SLACK_TEAM_DOMAIN:-${SQ_SLACK_TEAM_DOMAIN}}</teamDomain>
   <token>${SLACK_TOKEN:-${SQ_SLACK_TOKEN}}</token>
   <room>${SLACK_ROOM:-${SQ_SLACK_ROOM}}</room>
-  <buildServerUrl>http://${VIRTUAL_HOST}</buildServerUrl>
+  <buildServerUrl>${SLACK_BUILD_SERVER_URL}</buildServerUrl>
 </jenkins.plugins.slack.SlackNotifier_-DescriptorImpl>
 EOF
 }
@@ -413,7 +413,7 @@ EOF
 function main() {
   local -i _sdkTool=${TRUE};
 
-  source ~/.sdkman/bin/sdkman-init.sh;
+  source ${JENKINS_HOME}/.sdkman/bin/sdkman-init.sh;
 
   case ${TOOL} in
     gradle)

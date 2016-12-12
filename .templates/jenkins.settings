@@ -26,6 +26,7 @@ _jm+="s3 scm-api script-security sidebar-update-notification slack slack-uploade
 _jm+="token-macro ";
 _jm+="websocket workflow-aggregator workflow-api workflow-basic-steps workflow-cps workflow-cps-global-lib workflow-durable-task-step workflow-job workflow-multibranch workflow-remote-loader workflow-scm-step workflow-step-api workflow-support ";
 defineEnvVar JENKINS_MODULES "The space-separated list of Jenkins modules to include out-of-the-box" "${_jm}";
+defineEnvVar SLACK_CONFIG_FILE "The slack config file" "jenkins.plugins.slack.SlackNotifier.xml";
 defineEnvVar SLACK_TEAM_DOMAIN "The team domain in Slack" "${NAMESPACE}";
 defineEnvVar SLACK_TOKEN "The Slack token" "secret";
 defineEnvVar SLACK_ROOM "The Slack room" "${DOMAIN}";
