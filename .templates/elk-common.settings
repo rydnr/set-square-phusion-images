@@ -1,2 +1,2 @@
-defineEnvVar ELK_VERSION "The version of ELK" "5.0.2";
+defineEnvVar ELK_VERSION "The version of ELK" "5.1.1";
 defineEnvVar ELK_MAJOR_VERSION "The major version of ELK" "5";

@@ -161,6 +161,7 @@ sdkman/setup.sql
 .templates/android-sdk
 .templates/apache
 .templates/apr
+.templates/aws
 .templates/backup
 .templates/copy-metadata
 .templates/couchbase

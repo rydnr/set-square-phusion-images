@@ -10,5 +10,5 @@ defineEnvVar JCE_POLICY_DOWNLOAD_URL "The URL to download JCE" 'http://download.
 defineEnvVar JAVA_HEAP_MIN "The minimum Java heap" "512m";
 defineEnvVar JAVA_HEAP_MAX "The maximum Java heap" "1024m";
 defineEnvVar JAVA_OPTS "Additional Java opts" "";
-defineEnvVar LOGSTASH_VERSION "The Logstash version" "2.3";
+defineEnvVar LOGSTASH_VERSION "The logstash version" "1:5.1.1-1";
 overrideEnvVar ENABLE_LOGSTASH true;
