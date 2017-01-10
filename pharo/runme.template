@@ -1,0 +1,19 @@
+#!/bin/bash
+
+_arg=$1;
+shift;
+_folder=$(dirname ${_arg} 2> /dev/null)
+_file=$(basename ${_arg} 2> /dev/null)
+
+_folderMapping="";
+_fileArg="";
+
+if [ -n "${_folder}" ]; then
+    _folderMapping="-v ${_folder}:/work"
+    _fileArg="/work/${_file}"
+fi
+
+cat <<EOF
+docker run -it --rm -v /tmp/.X11-unix:/tmp/.X11-unix -v /tmp/.docker.xauth:/tmp/.docker.xauth -e XAUTHORITY=/tmp/.docker.xauth ${_folderMapping} ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} ${_fileArg} $@;
+EOF
+

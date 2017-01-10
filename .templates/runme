@@ -1,0 +1,3 @@
+# v runme
+COPY runme /usr/local/bin/runme
+# ^ runme

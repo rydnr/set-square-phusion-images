@@ -8,9 +8,11 @@ COPY help-files/help.base.sh \
 COPY help-files/my_exec.d /etc/my_exec.d/help
 
 RUN chmod +x -- /usr/local/bin/help.base.sh && \
-    ln -s -- /usr/local/bin/help.base.sh /usr/local/bin/-h && \
-    ln -s -- /usr/local/bin/help.base.sh /usr/local/bin/--help && \
+    for f in "help" "-h" "--help"; do \
+      ln -s -- /usr/local/bin/help.base.sh /usr/local/bin/"${f}"; \
+    done && \
     chmod +x -- /usr/local/bin/display-dockerfile.sh /usr/local/bin/show && \
-    ln -s -- /usr/local/bin/display-dockerfile.sh /usr/local/bin/Dockerfile && \
-    ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile
+    for f in "show" "Dockerfile" "dockerfile" "-d" "--dockerfile"; do \
+      ln -s -- /usr/local/bin/display-dockerfile.sh /usr/local/bin/"${f}"; \
+    done
 # ^ help

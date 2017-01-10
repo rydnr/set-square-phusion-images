@@ -1,11 +1,12 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/base-gui:201612
+FROM ${REGISTRY}/${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 @include("service_user")
 @include("service")
 @include("pharo")
+@include("runme")
 
 RUN rm -f /sbin/my_exec && ln -s /etc/service/pharo/run /sbin/my_exec
 

@@ -154,6 +154,7 @@ rabbitmq/skel.sh
 */rsyslog-files
 .rt-client.sh-push.lock
 .rt-projects
+*/runme
 sdkman/setup.sql
 **/ssh-files
 */syslog-files
