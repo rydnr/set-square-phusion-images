@@ -1,0 +1,9 @@
+#!/bin/bash
+
+grep "rabbitmq" /etc/hosts > /dev/null 2>&1
+_rabbitmq=$?;
+
+if [ ${_rabbitmq} -ne 0 ]; then
+  echo "You must specify the rabbitmq instance to test via a Docker link named 'rabbitmq'";
+else
+  java -jar ${
