@@ -1,0 +1,4 @@
+# v redis
+RUN ${APTGET_INSTALL} -u redis-server=${REDIS_VERSION} && \
+    ${APTGET_CLEANUP}
+# ^ redis

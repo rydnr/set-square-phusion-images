@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201612";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201701";
 defineEnvVar ELASTICSEARCH_VERSION "The version of ElasticSearch" "5.0.2";
 defineEnvVar ELASTICSEARCH_MAJOR_VERSION "The major version of ElasticSearch" "5";
 defineEnvVar TAG "The elasticsearch tag" '${ELASTICSEARCH_VERSION}';

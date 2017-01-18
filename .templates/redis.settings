@@ -1,0 +1,1 @@
+defineEnvVar REDIS_VERSION "The version of Redis" "2:3.0.6-1";

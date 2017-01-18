@@ -1,0 +1,11 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+@include("addon-toggles")
+@include("redis")
+
+VOLUME /backup/${IMAGE}/data
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
