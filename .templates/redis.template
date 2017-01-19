@@ -1,4 +1,4 @@
 # v redis
-RUN ${APTGET_INSTALL} -u redis-server=${REDIS_VERSION} && \
+RUN ${APTGET_INSTALL} -u redis-server=${UBUNTU_REDIS_VERSION} && \
     ${APTGET_CLEANUP}
 # ^ redis

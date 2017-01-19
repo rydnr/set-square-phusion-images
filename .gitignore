@@ -196,6 +196,7 @@ sdkman/setup.sql
 .templates/plone5
 .templates/preamble
 .templates/rabbitmq
+.templates/redis
 .templates/sdkman
 .templates/service
 .templates/service_user
