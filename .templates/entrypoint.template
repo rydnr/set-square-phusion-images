@@ -1,0 +1,3 @@
+#v entrypoint
+ENTRYPOINT ${ENTRYPOINT}
+#^ entrypoint

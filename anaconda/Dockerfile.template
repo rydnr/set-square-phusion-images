@@ -9,17 +9,16 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 RUN cd /tmp && \
     ${APTGET_INSTALL} -u bzip2 && \
     wget ${ANACONDA_DOWNLOAD_URL} && \
-    bash ${ANACONDA_ARTIFACT} -b -p ${SERVICE_USER_HOME} && \
+    bash ${ANACONDA_ARTIFACT} -b -p /tmp/anaconda && \
+    mv /tmp/anaconda/* ${SERVICE_USER_HOME}/ && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} && \
-    ${APTGET_CLEANUP}
-#    rm -f ${ANACONDA_ARTIFACT} && \
+    ${APTGET_CLEANUP} && \
+    rm -f ${ANACONDA_ARTIFACT}
 
 WORKDIR ${SERVICE_USER_HOME}
-
-USER ${SERVICE_USER}
-
-ENTRYPOINT /bin/bash
 
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+@include("entrypoint")
+@include("image_user")
