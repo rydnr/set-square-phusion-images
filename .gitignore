@@ -151,6 +151,7 @@ rabbitmq/service
 rabbitmq/skel.inc.sh
 rabbitmq/skel.sh
 */README
+riemann/service
 **/rsnapshot-files
 */rsyslog-files
 .rt-client.sh-push.lock
