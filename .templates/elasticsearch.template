@@ -2,8 +2,8 @@
 # From github.com/docker-library/elasticsearch/5.0/Dockerfile
 ENV PATH=${ELASTICSEARCH_HOME}/bin:$PATH \
     ELASTICSEARCH_VERSION=${ELASTICSEARCH_VERSION} \
-    ES_MAX_HEAP="${ES_MAX_HEAP}"
-    ES_MIN_HEAP="${ES_MIN_HEAP}"
+    ES_MAX_HEAP="${ES_MAX_HEAP}" \
+    ES_MIN_HEAP="${ES_MIN_HEAP}" \
     ES_JAVA_OPTS="${ES_JAVA_OPTS}"
 
 RUN mkdir /opt && \

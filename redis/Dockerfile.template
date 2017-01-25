@@ -7,7 +7,8 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("service_user")
 
 RUN sed -i -e 's/^bind 127\.0\.0\.1/#bind 127\.0\.0\.1/g' /etc/redis/redis.conf && \
-    sed -i -e 's|^dir /var/lib/redis|dir /backup/${IMAGE}/data|g' /etc/redis/redis.conf
+    sed -i -e 's|^dir /var/lib/redis|dir /backup/${IMAGE}/data|g' /etc/redis/redis.conf && \
+    sed -i -e 's|^daemonize yes|daemonize no|g' /etc/redis/redis.conf
 
 VOLUME /backup/${IMAGE}/data
 
