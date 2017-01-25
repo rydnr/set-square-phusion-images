@@ -11,6 +11,7 @@ RUN cd /tmp && \
     ${APTGET_CLEANUP} && \
     rm -rf ${SERVICE_USER_HOME} && \
     wget ${ANACONDA_DOWNLOAD_URL} && \
+    rm -rf ${SERVICE_USER_HOME} && \
     bash ${ANACONDA_ARTIFACT} -b -p ${SERVICE_USER_HOME} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} && \
     rm -f ${ANACONDA_ARTIFACT} && \

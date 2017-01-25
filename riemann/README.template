@@ -1,0 +1,14 @@
+# Riemann Docker image
+Runs Riemann inside a Docker container.
+
+# Examples
+- Run Riemann with default settings:
+  docker run -d --name riemann -p 5555:5555 -p 5556:5556 ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Riemann with custom settings:
+  docker run -d --name riemann -p 5555:5555 -p 5556:5556 -v [config-folder]:/etc/riemann/conf.d ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Riemann with the REPL server enabled:
+  mkdir /tmp/riemann.d;
+  echo '(repl-server {:host "0.0.0.0"})' >> /tmp/riemann.d/repl.config
+  docker run -d --name riemann -p 5555:5555 -p 5556:5556 -p 5557:5557 -v /tmp/riemann.d:/etc/riemann/conf.d ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

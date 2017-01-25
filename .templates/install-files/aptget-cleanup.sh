@@ -171,7 +171,7 @@ function wipe_temporary_folder() {
   local -i _rescode;
 
   logInfo -n "Wiping /tmp";
-  rm -rf /tmp/*;
+  find /tmp -type f -exec rm -f {} \; > /dev/null 2>&1
   _rescode=$?;
 
   if isTrue ${_rescode}; then
@@ -179,7 +179,6 @@ function wipe_temporary_folder() {
   else
     logInfoResult FAILURE "failed";
   fi
-  rm -rf /tmp/.* > /dev/null 2>&1
 
   return ${_rescode};
 }

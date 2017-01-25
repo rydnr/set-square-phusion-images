@@ -1,0 +1,27 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+@include("addon-toggles")
+@include("service_user")
+@include("java")
+@include("service")
+
+ENV RIEMANN_VERSION ${RIEMANN_VERSION}
+
+ADD ${RIEMANN_URL} /tmp/
+RUN echo "${RIEMANN_DIGEST} /tmp/${RIEMANN_ARTIFACT}" \
+    > /tmp/riemann_${RIEMANN_VERSION}.md5 && \
+    md5sum -c /tmp/riemann_${RIEMANN_VERSION}.md5 && \
+    dpkg -i /tmp/${RIEMANN_ARTIFACT} && \
+    rm /tmp/riemann* && \
+    mkdir -p /etc/riemann/conf.d
+
+COPY riemann.config /etc/riemann/
+
+VOLUME /etc/riemann/conf.d
+
+EXPOSE 5555 5556
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
