@@ -4,6 +4,7 @@ rsync -az /backup/elasticsearch-data/ ${ELASTICSEARCH_HOME}/data/
 rsync -az ${ELASTICSEARCH_HOME}/data/ /backup/elasticsearch-data/
 
 _confFile=/etc/elasticsearch/elasticsearch.yml
+_jvmFile=/etc/elasticsearch/jvm.options
 
 if [ -n "${CLUSTER_NAME}" ]; then
   sed -ri "s;^(\#\s*)?(cluster\.name:).*;\2 ${CLUSTER_NAME};" ${_confFile}
@@ -14,6 +15,18 @@ if [ -n "${NODE_NAME}" ]; then
 fi
 
 sed -ri "s;^(\#\s*)?(bootstrap\.memory_lock:).*;\2 ${BOOSTRAP_MEMORYLOCK};" ${_confFile}
+
+_minHeap="${MIN_HEAP}";
+if [ -z "${_minHeap}" ]; then
+  _minHeap="${ELASTICSEARCH_MIN_HEAP}";
+fi
+sed -ri "s;^(\#\s*)?(-Xms).*;-Xms${_minHeap};" ${_jvmFile};
+
+_maxHeap="${MAX_HEAP}";
+if [ -z "${_maxHeap}" ]; then
+  _maxHeap="${ELASTICSEARCH_MAX_HEAP}";
+fi
+sed -ri "s;^(\#\s*)?(-Xmx).*;-Xmx${_maxHeap};" ${_jvmFile};
 
 for attr in $(export | grep NODE_ATTR | cut -d'=' -f 1 | tr '[:upper:]' '[:lower:]' | tr '_' '.'); do
   _name=$(echo ${attr} | cut -d'=' -f 1 | tr '[:upper:]' '[:lower:]' | tr '_' '.');

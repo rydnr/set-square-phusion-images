@@ -14,3 +14,7 @@ It requires some tuning in the host system to work, tough:
 - Run Elasticsearch specifying a custom cluster and node name.
 
   docker run -d --name ${IMAGE} -p 9200:9200 -e CLUSTER_NAME=mycluster -e NODE_NAME=mynode ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run ElasticSearch with custom heap settings.
+
+  docker run -d --name ${IMAGE} -p 9200:9200 -e MIN_HEAP=3g -e MAX_HEAP=4g ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

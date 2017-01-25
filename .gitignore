@@ -151,6 +151,7 @@ rabbitmq/service
 rabbitmq/skel.inc.sh
 rabbitmq/skel.sh
 */README
+redis/service
 riemann/service
 **/rsnapshot-files
 */rsyslog-files
@@ -170,11 +171,13 @@ sdkman/setup.sql
 .templates/couchbase
 .templates/elasticsearch
 .templates/elk-common
+.templates/entrypoint
 .templates/exim-files/exim.00_local_macros
 .templates/filebeat
 .templates/go
 .templates/gosu
 .templates/gradle
+.templates/image_user
 .templates/install
 .templates/instructions
 .templates/java

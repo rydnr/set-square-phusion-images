@@ -2,7 +2,9 @@
 # From github.com/docker-library/elasticsearch/5.0/Dockerfile
 ENV PATH=${ELASTICSEARCH_HOME}/bin:$PATH \
     ELASTICSEARCH_VERSION=${ELASTICSEARCH_VERSION} \
-    ES_JAVA_OPTS="-Xms1g -Xmx1g"
+    ES_MAX_HEAP="${ES_MAX_HEAP}"
+    ES_MIN_HEAP="${ES_MIN_HEAP}"
+    ES_JAVA_OPTS="${ES_JAVA_OPTS}"
 
 RUN mkdir /opt && \
     cd /opt && \
@@ -17,8 +19,6 @@ RUN mkdir /opt && \
       mkdir -p "$path"; \
       chown -R ${SERVICE_USER}:${SERVICE_USER} "$path"; \
     done
-
-COPY elasticsearch-files/config ${ELASTICSEARCH_HOME}/config
 
 EXPOSE 9200 9300
 # ^ elasticsearch

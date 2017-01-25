@@ -6,3 +6,7 @@ FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("service_user")
 @include("java")
 @include("elk-common")
+@include("service")
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

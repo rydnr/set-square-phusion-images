@@ -32,4 +32,4 @@ This image can be customized via environment variables. See https://github.com/e
 
   docker run -d --name ${IMAGE} --link [elasticsearch]:elasticsearch ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
 
-  docker run -d --name ${IMAGE} -e NODE_NAME=logstash-1 -e HTTP_HOST=0.0.0.0 -e HTTP_PORT=9600-9700 -e LOG_LEVEL=DEBUG
+  docker run -d --name ${IMAGE} -e NODE_NAME=logstash-1 -e HTTP_HOST=0.0.0.0 -e HTTP_PORT=9600-9700 -e LOG_LEVEL=DEBUG ${REGISTRY}/${NAMESPACE}:${TAG}
