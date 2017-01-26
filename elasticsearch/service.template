@@ -1,6 +1,6 @@
 #!/bin/bash
 
-rsync -az /backup/elasticsearch-data/ ${ELASTICSEARCH_HOME}/data/
+rsync -az /backup/elasticsearch/data/ ${ELASTICSEARCH_HOME}/data/
 rsync -az ${ELASTICSEARCH_HOME}/data/ /backup/elasticsearch-data/
 
 _confFile=/etc/elasticsearch/elasticsearch.yml
@@ -14,17 +14,27 @@ if [ -n "${NODE_NAME}" ]; then
   sed -ri "s;^(\#\s*)?(node\.name:).*;\2 ${NODE_NAME};" ${_confFile}
 fi
 
-sed -ri "s;^(\#\s*)?(bootstrap\.memory_lock:).*;\2 ${BOOSTRAP_MEMORYLOCK};" ${_confFile}
+_memoryLock="${BOOTSTRAP_MEMORYLOCK}";
+if [ -z "${_memoryLock}" ]; then
+  _memoryLock="${SQ_BOOTSTRAP_MEMORYLOCK}";
+fi
+sed -ri "s;^(\#\s*)?(bootstrap\.memory_lock:).*;\2 ${_memoryLock};" ${_confFile}
 
-_minHeap="${MIN_HEAP}";
+_minMasterNodes="${DISCOVERY_ZEN_MINIMUMMASTERNODES}";
+if [ -z "${_minMasterNodes}" ]; then
+  _minMasterNodes="${SQ_DISCOVERY_ZEN_MINIMUMMASTERNODES}";
+fi
+sed -ri "s;^(\#\s*)?(discovery\.zen\.minimum_master_nodes:).*;\2 ${_minMasterNodes};" ${_confFile}
+
+_minHeap="${HEAP_MIN}";
 if [ -z "${_minHeap}" ]; then
-  _minHeap="${ELASTICSEARCH_MIN_HEAP}";
+  _minHeap="${SQ_JAVA_HEAP_MIN}";
 fi
 sed -ri "s;^(\#\s*)?(-Xms).*;-Xms${_minHeap};" ${_jvmFile};
 
-_maxHeap="${MAX_HEAP}";
+_maxHeap="${HEAP_MAX}";
 if [ -z "${_maxHeap}" ]; then
-  _maxHeap="${ELASTICSEARCH_MAX_HEAP}";
+  _maxHeap="${SQ_JAVA_HEAP_MAX}";
 fi
 sed -ri "s;^(\#\s*)?(-Xmx).*;-Xmx${_maxHeap};" ${_jvmFile};
 
@@ -34,7 +44,5 @@ for attr in $(export | grep NODE_ATTR | cut -d'=' -f 1 | tr '[:upper:]' '[:lower
   echo "${name}=${value}" >> ${_confFile}
 done
 
-sed -ri "s;^(\#\s*)?(discovery\.zen\.minimum_master_nodes:).*;\2 ${DISCOVERY_ZEN_MINIMUMMASTERNODES};" ${_confFile}
-
-#exec /usr/local/bin/run-as.sh -u $(id -u ${SERVICE_USER}) -g $(id -g ${SERVICE_GROUP}) /backup/elasticsearch-data elasticsearch $@
-exec chpst -u ${SERVICE_USER} elasticsearch $@
+exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} /backup/elasticsearch/data elasticsearch $@
+#exec chpst -u ${SERVICE_USER} elasticsearch $@
