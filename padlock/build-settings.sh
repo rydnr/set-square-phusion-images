@@ -1,5 +1,5 @@
-defineEnvVar PADLOCKIO_VERSION "The padlock version" "v1.2.0-beta.1";
-defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201611";
+defineEnvVar PADLOCKIO_VERSION "The padlock version" "v1.2.0-beta.2";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201701";
 overrideEnvVar TAG '${PADLOCKIO_VERSION}';
 defineEnvVar PADLOCK_DOMAIN "The padlock domain" '${DOMAIN}';
 defineEnvVar SERVICE_USER "The user service" "padlock";

@@ -7,7 +7,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 ENV DOBACKUP="true" \
     PADLOCK_CLOUD_DOMAIN="${DOMAIN}" \
     PADLOCK_VIRTUALHOST="cloud.${PADLOCK_CLOUD_DOMAIN}" \
-    GOPATH=/usr/share/go \
+    GOPATH=/opt/go \
     PATH="${PATH}:${GOPATH}/bin"
 
 @include("service_user")
@@ -17,7 +17,8 @@ ENV DOBACKUP="true" \
 
 COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
 
-RUN mkdir -p ${GOPATH} /var/log/${IMAGE} /etc/${IMAGE} && \
+RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
+    ln -s /backup/${IMAGE}/log /var/log/${IMAGE} && \
     cd /opt && \
     go get github.com/maklesoft/padlock-cloud && \
     /usr/local/bin/create_ssl_certificate_openssl.sh

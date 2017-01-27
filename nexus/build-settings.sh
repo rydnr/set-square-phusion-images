@@ -21,4 +21,3 @@ defineEnvVar SERVICE_GROUP "The service group" "nexus";
 defineEnvVar SERVICE_USER_HOME 'The home of the ${SERVICE_USER} user' '/opt/sonatype/sonatype-work/nexus3';
 defineEnvVar SERVICE_USER_SHELL 'The shell of the ${SERVICE_USER} user' '/bin/bash';
 overrideEnvVar ENABLE_LOGSTASH "true";
-
