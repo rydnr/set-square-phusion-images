@@ -5,29 +5,27 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 
 ENV DOBACKUP="true" \
-    PADLOCK_CLOUD_DOMAIN="${DOMAIN}" \
-    PADLOCK_VIRTUALHOST="cloud.${PADLOCK_CLOUD_DOMAIN}" \
-    GOPATH=/opt/go \
-    PATH="${PATH}:${GOPATH}/bin"
+    GOPATH="${SERVICE_USER_HOME}"
 
 @include("service_user")
 @include("create_ssl_certificate")
 @include("go")
+@include("git")
 @include("service")
 
 COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
 
 RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
     ln -s /backup/${IMAGE}/log /var/log/${IMAGE} && \
-    cd /opt && \
-    go get github.com/maklesoft/padlock-cloud && \
-    /usr/local/bin/create_ssl_certificate_openssl.sh
+    /usr/local/go/bin/go get github.com/maklesoft/padlock-cloud && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh && \
+    openssl rsa -in /etc/ssl/private/${IMAGE}.key -out /etc/ssl/private/${IMAGE}.nopass.key -passin pass:${SSL_KEY_PASSWORD} && \
+    mv /etc/ssl/private/${IMAGE}.nopass.key /etc/ssl/private/${IMAGE}.key && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud /backup/padlock-cloud /etc/ssl/private
 
-# chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud
+VOLUME /backup/${IMAGE}
 
-VOLUME [ "/backup/${IMAGE}/db" ]
-
-EXPOSE 80
+EXPOSE 8443
 
 @include("copy-metadata")
 @include("symlinks")

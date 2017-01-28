@@ -1,8 +1,9 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
+@include("gui")
 @include("service_user")
 @include("service")
 @include("pharo")

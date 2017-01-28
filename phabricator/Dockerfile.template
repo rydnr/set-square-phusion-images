@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -28,7 +28,7 @@ ENV SERVICE="apache" \
     DEFAULT_ENCODING="UTF-8"
 
 COPY apache-files/service /usr/local/bin/run-apache
-COPY php7.patch /usr/local/src/php7.patch
+#COPY php7.patch /usr/local/src/php7.patch
 
 RUN chmod +x /usr/local/bin/run-apache && \
     ${APTGET_INSTALL} -u libapache2-mod-php dpkg-dev \
