@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the base image" "201611";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the base image" "201701";
 defineEnvVar GRADLE_VERSION "The Gradle version" "3.2.1";
 overrideEnvVar TAG '${GRADLE_VERSION}';
 defineEnvVar WORKSPACE "The workspace folder" "/work";

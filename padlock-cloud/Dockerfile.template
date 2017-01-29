@@ -12,6 +12,7 @@ ENV DOBACKUP="true" \
 @include("go")
 @include("git")
 @include("service")
+@include("nginx")
 
 COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
 
@@ -21,11 +22,16 @@ RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     openssl rsa -in /etc/ssl/private/${IMAGE}.key -out /etc/ssl/private/${IMAGE}.nopass.key -passin pass:${SSL_KEY_PASSWORD} && \
     mv /etc/ssl/private/${IMAGE}.nopass.key /etc/ssl/private/${IMAGE}.key && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud /backup/padlock-cloud /etc/ssl/private
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud /backup/padlock-cloud /etc/ssl/private && \
+    echo '        location / {' > /tmp/nginx-ssl.cfg && \
+    echo '                proxy_pass https://localhost:8443;' >> /tmp/nginx-ssl.cfg && \
+    echo '        }' >> /tmp/nginx-ssl.cfg && \
+    sed '/^##REPLACEME##$/r /tmp/nginx-ssl.cfg' /etc/nginx/sites-available/default && \
+    rm -f /tmp/nginx-ssl.cfg
 
 VOLUME /backup/${IMAGE}
 
-EXPOSE 8443
+EXPOSE 443
 
 @include("copy-metadata")
 @include("symlinks")

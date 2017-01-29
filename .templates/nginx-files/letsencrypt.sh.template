@@ -1,0 +1,11 @@
+#!/bin/bash
+
+for s in ${NGINX_SERVER_NAMES}; do
+  export DOMAINS="${DOMAINS} -d ${s}";
+done
+if [ "${1}" == "renew" ]; then
+    letsencrypt certonly -n -m ${LETSENCRYPT_RECOVERY_CONTACT_EMAIL} --webroot -w /var/www/html --agree-tos ${DOMAINS}
+else
+  letsencrypt renew -n -m ${LETSENCRYPT_RECOVERY_CONTACT_EMAIL} --webroot -w /var/www/html --agree-tos ${DOMAINS}
+fi
+nginx -s reload

@@ -1,0 +1,1 @@
+30 03 01 */2 * root /usr/local/bin/letsencrypt.sh renew

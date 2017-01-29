@@ -2,6 +2,8 @@ defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201701";
 overrideEnvVar TAG "v1.0.0";
 defineEnvVar PADLOCK_CLOUD_DOMAIN "The padlock-cloud domain" '${DOMAIN}';
 defineEnvVar PADLOCK_CLOUD_VIRTUALHOST "The padlock-cloud virtual host" 'padlock.${PADLOCK_CLOUD_DOMAIN}';
+defineEnvVar NGINX_SERVER_NAME "The nginx server name" '${PADLOCK_CLOUD_VIRTUALHOST}';
+defineEnvVar LETSENCRYPT_RECOVERY_CONTACT_EMAIL "The email used for recovery or renewal purposes" 'letsencrypt@${DOMAIN}';
 defineEnvVar SERVICE_USER "The Padlock-Cloud service user" "padlock";
 defineEnvVar SERVICE_GROUP "The Padlock-Cloud service group" "padlock";
 defineEnvVar SERVICE_USER_SHELL "The Padlock-Cloud account shell" "/bin/bash";

@@ -59,6 +59,7 @@ getboo/setup.sql
 ghost/config.js
 .gradle
 gradle-daemon/service
+**/gradle-files
 gradle/gradle-files
 gradle/my_exec
 gradle-pharo/service
@@ -67,6 +68,7 @@ grails/my_exec
 grails/service
 grails/setup.sql
 graphite/local_settings.py
+**/gui-files
 */help
 **/install-files
 java/41_create_ssl_certificate_keytool.inc.sh
@@ -116,6 +118,7 @@ nexus/default
 nexus/INSTALL
 nexus/INSTALL.tmpl
 nexus/java-files
+**/nginx-files
 nodejs/my_exec
 observium/setup.sql
 */packetbeat-files
@@ -126,6 +129,7 @@ padlock-cloud/service
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
+**/phabricator-files
 phabricator/INSTALL
 phabricator/service
 pharo/service
@@ -177,6 +181,7 @@ sdkman/setup.sql
 .templates/go
 .templates/gosu
 .templates/gradle
+.templates/gui
 .templates/image_user
 .templates/install
 .templates/instructions
@@ -193,6 +198,9 @@ sdkman/setup.sql
 .templates/monit-files/enable-monit-ssl.sh
 .templates/monit-files/monit-http.conf
 .templates/monit-files/monit-mail.conf.tmpl
+.templates/nginx
+.templates/nginx-files/letsencrypt.sh
+.templates/nginx-files/nginx-default-ssl
 .templates/nodejs
 .templates/packetbeat
 .templates/phabricator
