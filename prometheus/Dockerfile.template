@@ -1,0 +1,29 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+@include("service_user")
+@include("go")
+@include("service")
+
+COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
+
+RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
+    ln -s /backup/${IMAGE}/log /var/log/${IMAGE} && \
+    cd /tmp && \
+    wget ${PROMETHEUS_DOWNLOAD_URL} && \
+    tar xvfz ${PROMETHEUS_ARTIFACT} && \
+    mv ${PROMETHEUS_FOLDER}/* ${SERVICE_USER_HOME} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}
+
+# chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud
+
+VOLUME [ "/backup/${IMAGE}/db" ]
+
+EXPOSE 80
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

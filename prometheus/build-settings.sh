@@ -1,0 +1,10 @@
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201701";
+defineEnvVar PROMETHEUS_VERSION "The version" '1.5.0';
+overrideEnvVar TAG '${PROMETHEUS_VERSION}';
+defineEnvVar PROMETHEUS_FOLDER "The artifact" 'prometheus-${PROMETHEUS_VERSION}';
+defineEnvVar PROMETHEUS_ARTIFACT "The artifact" '${PROMETHEUS_FOLDER}.linux-amd64.tar.gz';
+defineEnvVar PROMETHEUS_DOWNLOAD_URL "The download url" 'https://github.com/prometheus/prometheus/releases/download/v${PROMETHEUS_VERSION}/${PROMETHEUS_ARTIFACT}';
+defineEnvVar SERVICE_USER "The Prometheus service user" "prometheus";
+defineEnvVar SERVICE_GROUP "The Prometheus service group" "prometheus";
+defineEnvVar SERVICE_USER_SHELL "The Prometheus account shell" "/bin/bash";
+defineEnvVar SERVICE_USER_HOME "The Prometheus account home" "/opt/prometheus";
