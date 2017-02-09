@@ -8,8 +8,6 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("go")
 @include("service")
 
-COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
-
 RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
     ln -s /backup/${IMAGE}/log /var/log/${IMAGE} && \
     cd /tmp && \
@@ -18,11 +16,9 @@ RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
     mv ${PROMETHEUS_FOLDER}/* ${SERVICE_USER_HOME} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}
 
-# chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud
+VOLUME [ "/backup/${IMAGE}/db", "/backup/${IMAGE}/conf" ]
 
-VOLUME [ "/backup/${IMAGE}/db" ]
-
-EXPOSE 80
+EXPOSE 9090
 
 @include("copy-metadata")
 @include("symlinks")
