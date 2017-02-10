@@ -27,6 +27,7 @@ function defineReq() {
   checkReq grep;
   checkReq awk;
   checkReq ifconfig;
+  checkReq tr;
 }
 
 ## Defines the errors
@@ -37,6 +38,7 @@ function defineErrors() {
   addError "GREP_NOT_INSTALLED" "grep not installed";
   addError "AWK_NOT_INSTALLED" "awk not installed";
   addError "IFCONFIG_NOT_INSTALLED" "ifconfig not installed";
+  addError "TR_NOT_INSTALLED" "tr not installed";
   addError "CANNOT_RETRIEVE_INTERFACE_NAME" "Cannot retrieve the interface name";
   addError "CANNOT_RETRIEVE_SUBNET_16_FOR_IFACE" "Cannot retrieve the /16 subnet";
 }
@@ -103,13 +105,13 @@ function retrieve_iface() {
   local -i _rescode;
 
   logInfo -n "Finding out the name of the network interface";
-  _result="$(ifconfig -l | tr ' ' '\n' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun')";
+  _result="$(ifconfig | cut -d' ' -f1 | grep -v -e '^$' | tr ' ' '\n' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun')";
   _rescode=$?;
   if isTrue ${_rescode}; then
       logInfoResult SUCCESS "${_result}";
       export RESULT="${_result}";
   else
-    logInfoResult FAILED CANNOT_RETRIEVE_INTERFACE_NAME;
+    logInfoResult FAILED "failed";
     exitWithErrorCode CANNOT_RETRIEVE_INTERFACE_NAME;
   fi
 
@@ -185,6 +187,3 @@ EOF
       fi
   fi
 }
-
-
-
