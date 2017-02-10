@@ -105,7 +105,7 @@ function retrieve_iface() {
   local -i _rescode;
 
   logInfo -n "Finding out the name of the network interface";
-  _result="$(ifconfig | cut -d' ' -f1 | grep -v -e '^$' | tr ' ' '\n' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun')";
+  _result="$(ifconfig | cut -d' ' -f1 | grep -v -e '^$' | tr ' ' '\n' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun' | head -n 1)";
   _rescode=$?;
   if isTrue ${_rescode}; then
       logInfoResult SUCCESS "${_result}";
