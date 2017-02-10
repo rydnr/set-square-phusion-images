@@ -5,4 +5,4 @@ mkdir -p /etc/prometheus
 rsync -avz /backup/${IMAGE}/conf/ /etc/prometheus/
 rsync -avz /etc/prometheus/ /backup/${IMAGE}/conf/
 
-/usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /etc/prometheus /opt/prometheus/bin/prometheus -config.file=/etc/prometheus/prometheus.yml -storage.local.path=/backup/prometheus/db -web.console.libraries=/etc/prometheus/console_libraries -web.console.templates=/etc/prometheus/consoles
+/usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /etc/prometheus ${SERVICE_USER_HOME}/prometheus -config.file=/etc/prometheus/prometheus.yml -storage.local.path=/backup/${IMAGE}/db -web.console.libraries=${SERVICE_USER_HOME}/console_libraries -web.console.templates=${SERVICE_USER_HOME}/consoles

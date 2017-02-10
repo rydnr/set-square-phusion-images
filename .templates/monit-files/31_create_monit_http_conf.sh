@@ -37,7 +37,8 @@ function defineErrors() {
   addError "GREP_NOT_INSTALLED" "grep not installed";
   addError "AWK_NOT_INSTALLED" "awk not installed";
   addError "IFCONFIG_NOT_INSTALLED" "ifconfig not installed";
-  addError "CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0" "Cannot retrieve the /16 subnet for eth0";
+  addError "CANNOT_RETRIEVE_INTERFACE_NAME" "Cannot retrieve the interface name";
+  addError "CANNOT_RETRIEVE_SUBNET_16_FOR_IFACE" "Cannot retrieve the /16 subnet";
 }
 
 ## Validates the input.
@@ -91,20 +92,50 @@ function parseInput() {
   done
 }
 
+## Retrieves the first network interface.
+## <- RESULT: such interface name.
+## Usage:
+##   if retrieve_iface; then
+##     echo "Interface candidate: ${RESULT}";
+##   fi
+function retrieve_iface() {
+  local _result;
+  local -i _rescode;
+
+  logInfo -n "Finding out the name of the network interface";
+  _result="$(ifconfig -l | tr ' ' '\n' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun')";
+  _rescode=$?;
+  if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "${_result}";
+      export RESULT="${_result}";
+  else
+    logInfoResult FAILED CANNOT_RETRIEVE_INTERFACE_NAME;
+    exitWithErrorCode CANNOT_RETRIEVE_INTERFACE_NAME;
+  fi
+
+  return ${_rescode};
+}
+
 ## Retrieves the /16 subnet of the eth0 interface.
+## -> 1: The interface name.
+## <- 0/${TRUE} if the subnet information is available; 1/${FALSE} otherwise.
 ## <- RESULT: the device where the root filesystem is stored.
 ## Usage:
-##   retrieve_eth0_subnet_16;
-##   echo "The /16 subnet for eth0 is ${RESULT}"
-function retrieve_eth0_subnet_16() {
+##   if retrieve_subnet_16 "eth0"; then
+##     echo "The /16 subnet for eth0 is ${RESULT}"
+##   fi
+function retrieve_subnet_16() {
+  local _iface="${1}";
   local _result;
 
-  logInfo -n "Finding out the /16 subnet for eth0";
-  _result="$(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.0/24\n", $1, $2, $3);}')";
+  checkNotEmpty "iface" "${_iface}" 1;
+
+  logInfo -n "Finding out the /16 subnet for ${_iface}";
+  _result="$(ifconfig ${_iface} | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.0/24\n", $1, $2, $3);}')";
 
   if isEmpty ${_result}; then
       logInfoResult FAILED "failed";
-      exitWithErrorCode CANNOT_RETRIEVE_SUBNET_16_FOR_ETH0;
+      exitWithErrorCode CANNOT_RETRIEVE_SUBNET_16_FOR_IFACE "${_iface}";
   else
     logInfoResult SUCCESS "${_result}";
     export RESULT="${_result}";
@@ -114,6 +145,7 @@ function retrieve_eth0_subnet_16() {
 ## Main logic
 ## dry-wit hook
 function main() {
+  local _iface;
   local _subnet;
   local _key;
 
@@ -123,21 +155,23 @@ function main() {
       logDebugResult FAILURE "failed";
   fi
 
-  retrieve_eth0_subnet_16;
-  _subnet="${RESULT}";
+  if retrieve_iface; then
+      _iface="${RESULT}";
+      if retrieve_subnet_16 "${_iface}"; then
+          _subnet="${RESULT}";
 
-  logInfo -n "Creating Monit configuration for enabling web interface on port ${MONIT_HTTP_PORT}";
+          logInfo -n "Creating Monit configuration for enabling web interface on port ${MONIT_HTTP_PORT}";
   cat <<EOF > ${MONIT_CONF_FILE}
 set httpd port ${MONIT_HTTP_PORT} and
    use address 0.0.0.0
 EOF
-  if isNotEmpty "${_key}"; then
-      cat <<EOF >> ${MONIT_CONF_FILE}
+          if isNotEmpty "${_key}"; then
+              cat <<EOF >> ${MONIT_CONF_FILE}
    SSL ENABLE
    PEMFILE ${_key}
 EOF
-  fi
-  cat <<EOF >> ${MONIT_CONF_FILE}
+          fi
+          cat <<EOF >> ${MONIT_CONF_FILE}
    ALLOWSELFCERTIFICATION
    ALLOW ${_subnet}
    ALLOW ${MONIT_HTTP_USER}:"${MONIT_HTTP_PASSWORD}"
@@ -147,5 +181,10 @@ EOF
 #   if failed url http://${MONIT_HTTP_USER}:${MONIT_HTTP_PASSWORD}@0.0.0.0:${MONIT_HTTP_PORT}/
 #       then alert
 EOF
-  logInfoResult SUCCESS "done";
+          logInfoResult SUCCESS "done";
+      fi
+  fi
 }
+
+
+
