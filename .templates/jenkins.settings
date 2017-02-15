@@ -1,7 +1,7 @@
 defineEnvVar TOMCAT_HOME "The home directory of Tomcat" "/opt/tomcat";
 defineEnvVar JENKINS_HOME "The home directory of Jenkins" "/home/jenkins";
-defineEnvVar JENKINS_MEMORY_MIN "The default Xms setting" "-Xms512m";
-defineEnvVar JENKINS_MEMORY_MAX "The default Xmx setting" "-Xmx1024m";
+defineEnvVar JENKINS_MEMORY_MIN "The default Xms setting" "-Xms1024m";
+defineEnvVar JENKINS_MEMORY_MAX "The default Xmx setting" "-Xmx2048m";
 defineEnvVar JENKINS_DEFAULT_VIRTUAL_HOST "The default virtual host for Jenkins" 'jenkins.${DOMAIN}';
 defineEnvVar JENKINS_PHABRICATOR_URL "The Phabricator url should Jenkins uses it" 'http://phabricator.${DOMAIN}';
 _jm="";

@@ -6,6 +6,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("gui")
 @include("service_user")
 @include("service")
+@include("git")
 @include("pharo")
 @include("runme")
 
