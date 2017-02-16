@@ -4,5 +4,5 @@ if [ -e "/usr/local/bin/$1" ]; then
     $@
 else
   #  chpst -u ${SERVICE_USER} pharo $@
-  /usr/local/bin/run-as.sh -u ${SERVICE_USER} -g ${SERVICE_GROUP} /work pharo $@
+  /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} /work pharo $@
 fi

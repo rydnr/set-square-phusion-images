@@ -1,6 +1,9 @@
 # v go
-ENV GO_VERSION=${GO_VERSION}
+ENV GO_VERSION=${GO_VERSION} \
+    GOROOT=/usr/local/go \
+    PATH=${PATH}:${GOROOT}/bin
 
-RUN wget -O /usr/local/bin/go https://storage.googleapis.com/golang/go${GO_VERSION}.linux-$(dpkg --print-architecture).tar.gz" && \
-     chmod +x /usr/local/bin/go
+RUN wget -O /tmp/go.tar.gz https://storage.googleapis.com/golang/go${GO_VERSION}.linux-$(dpkg --print-architecture).tar.gz && \
+    tar xvfz /tmp/go.tar.gz -C /usr/local && \
+    rm -f /tmp/go.tar.gz
 # ^ go

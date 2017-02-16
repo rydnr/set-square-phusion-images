@@ -1,0 +1,9 @@
+= Prometheus
+
+This image runs Prometheus as a Docker container.
+
+= Usage
+
+- Run Prometheus with custom configuration
+
+  docker run -d --name prometheus -p 9090:9090 -v [data-dir]:/backup/${IMAGE}/db -e [conf-dir]:/backup/${IMAGE}/conf ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

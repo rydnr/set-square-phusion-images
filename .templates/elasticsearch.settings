@@ -1,8 +1,11 @@
-defineEnvVar ELASTICSEARCH_VERSION "The version of ElasticSearch" "5.1.1";
+defineEnvVar ELASTICSEARCH_VERSION "The version of ElasticSearch" "5.1.2";
 defineEnvVar ELASTICSEARCH_MAJOR_VERSION "The major version of ElasticSearch" "5";
 #defineEnvVar ELASTICSEARCH_HOME "The home folder of ElasticSearch" "/usr/share/elasticsearch";
 defineEnvVar ELASTICSEARCH_HOME "The home folder of ElasticSearch" "/opt/elasticsearch";
 defineEnvVar ELASTICSEARCH_FOLDER "The elasticsearch folder" 'elasticsearch-${ELASTICSEARCH_VERSION}';
 defineEnvVar ELASTICSEARCH_ARTIFACT "The elasticsearch artifact" '${ELASTICSEARCH_FOLDER}.tar.gz';
 defineEnvVar ELASTICSEARCH_DOWNLOAD_URL "The url to download elasticsearch" 'https://artifacts.elastic.co/downloads/elasticsearch/${ELASTICSEARCH_ARTIFACT}';
-
+defineEnvVar BOOTSTRAP_MEMORYLOCK "The bootstrap.memory_lock setting in /etc/elasticsearch/elasticsearch.yml" "false";
+defineEnvVar DISCOVERY_ZEN_MINIMUMMASTERNODES "The discovery.zen.minimum_master_nodes setting in /etc/elasticsearch/elasticsearch.yml" "1";
+overrideEnvVar JAVA_HEAP_MAX "1g";
+overrideEnvVar JAVA_HEAP_MIN "1g";

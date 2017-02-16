@@ -1,14 +1,17 @@
 ---
 server:
-  assets_path: assets
-  port: 443
+  assets_path: /opt/padlock-cloud/src/github.com/maklesoft/padlock-cloud/assets
+  port: 8443
   tls_cert: /etc/ssl/private/${IMAGE}.crt
   tls_key: /etc/ssl/private/${IMAGE}.key
-  base_url: https://${PADLOCK_CLOUD_DOMAIN}
+  base_url: https://${PADLOCK_CLOUD_VIRTUALHOST}
   cors: false
+email:
+  server: localhost
+  port: "25"
 leveldb:
   path: /backup/${IMAGE}/db
 log:
-  log_file: /var/log/${IMAGE}/${IMAGE}.log
-  err_file: /var/log/${IMAGE}/errors.log
+  log_file: /backup/${IMAGE}/log/${IMAGE}.log
+  err_file: /backup/${IMAGE}/log/errors.log
   notify_errors: ${ERRORS_EMAIL}

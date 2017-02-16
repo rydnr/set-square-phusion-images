@@ -1,5 +1,5 @@
 #!/bin/bash
 
-rsync -az --exclude '.sdkman/*' /backup/jenkins-home/ ${SERVICE_USER_HOME}
+rsync -az --exclude '.sdkman/*' /backup/jenkins-home/ ${SERVICE_USER_HOME}/
 rsync -az --exclude '.sdkman/*' ${SERVICE_USER_HOME}/ /backup/jenkins-home/
 chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}/ /backup/jenkins-home/

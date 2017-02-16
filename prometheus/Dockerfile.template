@@ -1,0 +1,25 @@
+@include("preamble")
+FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+@include("service_user")
+@include("go")
+@include("service")
+
+RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
+    ln -s /backup/${IMAGE}/log /var/log/${IMAGE} && \
+    cd /tmp && \
+    wget ${PROMETHEUS_DOWNLOAD_URL} && \
+    tar xvfz ${PROMETHEUS_ARTIFACT} && \
+    mv ${PROMETHEUS_FOLDER}/* ${SERVICE_USER_HOME} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}
+
+VOLUME [ "/backup/${IMAGE}/db", "/backup/${IMAGE}/conf" ]
+
+EXPOSE 9090
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

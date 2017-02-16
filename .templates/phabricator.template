@@ -2,15 +2,16 @@
 # - requires:
 #   - git
 #   - install
-COPY phabricator-files/php7.patch /usr/local/src/
+#COPY phabricator-files/php7.patch /usr/local/src/
+
+#    ${APTGET_INSTALL} -np patch && \
+#    patch -p0 < /usr/local/src/php7.patch && \
+#    ${APTGET_CLEANUP} && \
 
 RUN cd /opt && \
     git clone https://github.com/phacility/phabricator.git && \
     cd /opt/phabricator && \
     git checkout ${GITHUB_PHABRICATOR_HASH} && \
-    ${APTGET_INSTALL} -np patch && \
-    patch -p0 < /usr/local/src/php7.patch && \
-    ${APTGET_CLEANUP} && \
     cd /opt && \
     git clone https://github.com/phacility/libphutil.git && \
     cd /opt/libphutil && \

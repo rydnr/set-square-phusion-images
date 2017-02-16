@@ -59,6 +59,7 @@ getboo/setup.sql
 ghost/config.js
 .gradle
 gradle-daemon/service
+**/gradle-files
 gradle/gradle-files
 gradle/my_exec
 gradle-pharo/service
@@ -67,6 +68,7 @@ grails/my_exec
 grails/service
 grails/setup.sql
 graphite/local_settings.py
+**/gui-files
 */help
 **/install-files
 java/41_create_ssl_certificate_keytool.inc.sh
@@ -116,6 +118,7 @@ nexus/default
 nexus/INSTALL
 nexus/INSTALL.tmpl
 nexus/java-files
+**/nginx-files
 nodejs/my_exec
 observium/setup.sql
 */packetbeat-files
@@ -126,6 +129,7 @@ padlock-cloud/service
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
+**/phabricator-files
 phabricator/INSTALL
 phabricator/service
 pharo/service
@@ -144,12 +148,16 @@ postgresql/process-sqls.sh
 postgresql/service
 postgresql/setup.sh
 postgresql/setup.sql
+prometheus/service
 rabbitmq/create_bootstrap_cron_job.sh
+rabbitmq-perf-test/service
 rabbitmq/rc.local
 rabbitmq/service
 rabbitmq/skel.inc.sh
 rabbitmq/skel.sh
 */README
+redis/service
+riemann/service
 **/rsnapshot-files
 */rsyslog-files
 .rt-client.sh-push.lock
@@ -168,11 +176,14 @@ sdkman/setup.sql
 .templates/couchbase
 .templates/elasticsearch
 .templates/elk-common
+.templates/entrypoint
 .templates/exim-files/exim.00_local_macros
 .templates/filebeat
 .templates/go
 .templates/gosu
 .templates/gradle
+.templates/gui
+.templates/image_user
 .templates/install
 .templates/instructions
 .templates/java
@@ -188,6 +199,9 @@ sdkman/setup.sql
 .templates/monit-files/enable-monit-ssl.sh
 .templates/monit-files/monit-http.conf
 .templates/monit-files/monit-mail.conf.tmpl
+.templates/nginx
+.templates/nginx-files/letsencrypt.sh
+.templates/nginx-files/nginx-default-ssl
 .templates/nodejs
 .templates/packetbeat
 .templates/phabricator
@@ -195,6 +209,7 @@ sdkman/setup.sql
 .templates/plone5
 .templates/preamble
 .templates/rabbitmq
+.templates/redis
 .templates/sdkman
 .templates/service
 .templates/service_user

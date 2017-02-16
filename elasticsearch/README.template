@@ -7,5 +7,14 @@ It requires some tuning in the host system to work, tough:
   sudo sysctl -w vm.max_map_count=262144
 
 # Example:
+- Run Elasticsearch with default settings.
 
-docker run -d --name ${IMAGE} -p 9200:9200 ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+  docker run -d --name ${IMAGE} -p 9200:9200 ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Elasticsearch specifying a custom cluster and node name.
+
+  docker run -d --name ${IMAGE} -p 9200:9200 -e CLUSTER_NAME=mycluster -e NODE_NAME=mynode ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run ElasticSearch with custom heap settings.
+
+  docker run -d --name ${IMAGE} -p 9200:9200 -e HEAP_MIN=3g -e HEAP_MAX=4g ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

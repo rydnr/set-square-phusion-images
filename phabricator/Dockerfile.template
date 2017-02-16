@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -28,11 +28,11 @@ ENV SERVICE="apache" \
     DEFAULT_ENCODING="UTF-8"
 
 COPY apache-files/service /usr/local/bin/run-apache
-COPY php7.patch /usr/local/src/php7.patch
+#COPY php7.patch /usr/local/src/php7.patch
 
 RUN chmod +x /usr/local/bin/run-apache && \
     ${APTGET_INSTALL} -u libapache2-mod-php dpkg-dev \
-        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring && \
+        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php7.0-xml && \
     ${APTGET_INSTALL} --no-pin mysql-server=${MYSQL_VERSION} python-pip openjdk-8-jre-headless && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \

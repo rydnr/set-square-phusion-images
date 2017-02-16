@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/gradle:${PARENT_IMAGE_TAG}
+FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -9,6 +9,21 @@ FROM ${NAMESPACE}/gradle:${PARENT_IMAGE_TAG}
 @include("sdkman")
 @include("gradle")
 @include("pharo")
+
+COPY gradle-files/run-gradle /sbin/my_exec
+
+ENV WORKSPACE="${WORKSPACE}" \
+    GRADLE_USER_HOME="${WORKSPACE}/.gradle" \
+    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
+
+RUN chmod +x /sbin/my_exec && \
+    gpasswd -a ${SERVICE_USER} root && \
+    mkdir -p ${WORKSPACE} && \
+    chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE}
+
+RUN su - ${SERVICE_USER} -c \
+      'ln -s ${GRADLE_USER_HOME} /home/${SERVICE_USER}/.gradle && \
+       ln -s ${WORKSPACE} /home/${SERVICE_USER}/workspace';
 
 @include("copy-metadata")
 @include("symlinks")

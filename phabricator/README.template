@@ -60,7 +60,7 @@ for Liquibase (see ${NAMESPACE}/liquibase-[mariadb|postgresql]):
 
 # Backup
 
-The built-in backup mechanism copies regularly the contents of /backup/phabricator-* and /backup/rsnapshot to a remote server ${IMAGE}{BACKUP_HOST_SUFFIX},
+The built-in backup mechanism copies regularly the contents of /backup/phabricator-* and /backup/rsnapshot to a remote server ${IMAGE}${BACKUP_HOST_SUFFIX},
 which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT}.
 
 ## Preparation

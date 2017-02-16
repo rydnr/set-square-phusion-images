@@ -8,18 +8,25 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 RUN cd /tmp && \
     ${APTGET_INSTALL} -u bzip2 && \
+    ${APTGET_CLEANUP} && \
+    rm -rf ${SERVICE_USER_HOME} && \
     wget ${ANACONDA_DOWNLOAD_URL} && \
+    rm -rf ${SERVICE_USER_HOME} && \
     bash ${ANACONDA_ARTIFACT} -b -p ${SERVICE_USER_HOME} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} && \
-    ${APTGET_CLEANUP}
-#    rm -f ${ANACONDA_ARTIFACT} && \
+    rm -f ${ANACONDA_ARTIFACT} && \
+    su - ${SERVICE_USER} -c '${SERVICE_USER_HOME}/bin/conda update --all' && \
+    su - ${SERVICE_USER} -c '${SERVICE_USER_HOME}/bin/jupyter notebook --generate-config' && \
+    echo "c.NotebookApp.ip = '*'" >> ${SERVICE_USER_HOME}/.jupyter_notebook_config.py && \
+    echo "c.NotebookApp.open_browser = False'" >> ${SERVICE_USER_HOME}/.jupyter_notebook_config.py
+
+ENV PATH=${PATH}:${SERVICE_USER_HOME}/bin
 
 WORKDIR ${SERVICE_USER_HOME}
-
-USER ${SERVICE_USER}
-
-ENTRYPOINT /bin/bash
 
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+
+@include("entrypoint")
+@include("image_user")

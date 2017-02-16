@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${BASE_IMAGE}:${TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")

@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201611";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201701";
 defineEnvVar UBUNTU_VERSION "The version available in Ubuntu" "$(docker run --rm -it ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG} remote-ubuntu-version mysql-server | sed 's/[^0-9a-zA-Z\._-]//g')";
 overrideEnvVar TAG '${UBUNTU_VERSION}';
 defineEnvVar MYSQL_ROOT_PASSWORD "The password for the root user" "${RANDOM_PASSWORD}";

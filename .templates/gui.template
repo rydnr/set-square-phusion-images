@@ -1,0 +1,9 @@
+# v gui
+ENV DOBACKUP="false" \
+    DISPLAY=":0"
+
+RUN ${APTGET_INSTALL} -u x11-apps && \
+    ${APTGET_CLEANUP}
+
+COPY gui-files/prepare.sh /usr/local/bin/prepare.sh
+# ^ gui
