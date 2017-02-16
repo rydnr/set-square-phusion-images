@@ -1,14 +1,10 @@
 @include("preamble")
-FROM ${NAMESPACE}/gradle:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
-
 @include("addon-toggles")
+@include("redis")
 
-@include("service_user")
-@include("java")
-@include("sdkman")
-@include("gradle")
-@include("pharo")
+VOLUME /backup/${IMAGE}/data
 
 @include("copy-metadata")
 @include("symlinks")

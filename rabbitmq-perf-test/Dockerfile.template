@@ -1,0 +1,20 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+@include("service_user")
+@include("java")
+@include("service")
+
+RUN mkdir -p ${RABBITMQ_PERF_TEST_HOME} && \
+    wget -O /tmp/${RABBITMQ_PERF_TEST_ARTIFACT} ${RABBITMQ_PERF_TEST_DOWNLOAD_URL} && \
+    cd /tmp && /
+    tar xvfz ${RABBITMQ_PERF_TEST_ARTIFACT} && \
+    rm -f ${RABBITMQ_PERF_TEST_ARTIFACT} && \
+    mv rabbitmq-perf-test ${RABBITMQ_PERF_TEST_HOME}
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

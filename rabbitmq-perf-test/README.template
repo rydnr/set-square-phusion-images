@@ -1,0 +1,8 @@
+Runs RabbitMQ Perf Test tool as a Docker container.
+
+Examples:
+- Run RabbitMQ Perf Test with default settings:
+> docker run -d -p [port]:80 --name mqperftest --link [rabbitmq]:rabbitmq ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run RabbitMQ Perf Test with a benchmark specification:
+> docker run -d -p [port]:80 --name mqperftest --link [rabbitmq]:rabbitmq -v [path-to]/publish-consume-spec.js:/${RABBITMQ_PERF_TEST_HOME}/publish-consume-spec.js ${NAMESPACE}/${IMAGE}:${TAG}

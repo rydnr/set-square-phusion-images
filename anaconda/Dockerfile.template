@@ -1,0 +1,25 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+@include("service_user")
+
+RUN cd /tmp && \
+    ${APTGET_INSTALL} -u bzip2 && \
+    wget ${ANACONDA_DOWNLOAD_URL} && \
+    bash ${ANACONDA_ARTIFACT} -b -p ${SERVICE_USER_HOME} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} && \
+    ${APTGET_CLEANUP}
+#    rm -f ${ANACONDA_ARTIFACT} && \
+
+WORKDIR ${SERVICE_USER_HOME}
+
+USER ${SERVICE_USER}
+
+ENTRYPOINT /bin/bash
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
