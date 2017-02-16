@@ -1,0 +1,6 @@
+#!/bin/bash
+
+rsync -az /backup/mongodb2/db/ /var/lib/mongodb/
+rsync -az /var/lib/mongodb/ /backup/mongodb2/db/
+
+exec sudo -u mongodb /usr/bin/mongod --config /etc/mongod.conf --auth $@

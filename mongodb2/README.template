@@ -1,0 +1,8 @@
+This image runs MongoDB as a Docker container.
+
+Examples:
+- Run MongoDB with default settings:
+> docker run -d -p 27017:27017 --link [loghost]:logger --name mongodb ${NAMESPACE}/${IMAGE}
+
+- Run MongoDB redirecting logs to a loghost:
+> docker run -d -p [port]:27017 --link [loghost]:logger --name mongodb ${NAMESPACE}/${IMAGE}

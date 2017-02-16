@@ -195,6 +195,7 @@ sdkman/setup.sql
 .templates/maintainer
 .templates/metricbeat
 .templates/mongodb
+.templates/mongodb2
 .templates/monit-files/31_create_monit_http_conf.inc.sh
 .templates/monit-files/enable-monit-ssl.sh
 .templates/monit-files/monit-http.conf

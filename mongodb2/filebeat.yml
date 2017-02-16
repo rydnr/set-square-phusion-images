@@ -1,0 +1,29 @@
+output:
+  elasticsearch:
+    hosts: ["elasticsearch:9200"]
+    worker: 1
+
+    index: "mongodb"
+
+    template:
+     path: "filebeat.template.json"
+
+############################# Shipper #########################################
+
+shipper:
+# The name of the shipper that publishes the network data. It can be used to group
+# all the transactions sent by a single shipper in the web interface.
+# If this options is not defined, the hostname is used.
+  name: mongodb
+
+
+############################# Logging #########################################
+
+# There are three options for the log ouput: syslog, file, stderr.
+# Under Windos systems, the log files are per default sent to the file output,
+# under all other system per default to syslog.
+logging:
+  stderr: true
+#  files:
+
+#    rotateeverybytes: 10485760 # = 10MB
