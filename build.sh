@@ -375,15 +375,15 @@ function resolve_included_file() {
   local _repoFolder="${2}";
   local _templatesFolder="${3}";
   local _result;
-  local _rescode=1;
-  for d in "${_repoFolder}" "." "${_templatesFolder}"; do
+  local _rescode=${FALSE};
+  for d in "${_templatesFolder}"; do
     echo "Checking ${d}/${_file}" >> /tmp/log.txt;
-    if    [[ -e "${d}/${_file}" ]] \
-       || [[ -e "${d}/$(basename ${_file} .template).template" ]]; then
+    if    [[ -f "${d}/${_file}" ]] \
+       || [[ -f "${d}/$(basename ${_file} .template).template" ]]; then
       echo "${d}/${_file} found!" >> /tmp/log.txt;
       _result="${d}/${_file}";
       export RESULT="${_result}";
-      _rescode=0;
+      _rescode=${TRUE};
       break;
     fi
   done
@@ -729,7 +729,7 @@ function build_repo() {
   fi
   if overwrite_latest_enabled; then
     logInfo -n "Tagging ${NAMESPACE}/${_repo%%-stack}${_stack}:${_canonicalTag} as ${NAMESPACE}/${_repo%%-stack}${_stack}:latest"
-    docker tag -f "${NAMESPACE}/${_repo%%-stack}${_stack}:${_canonicalTag}" "${NAMESPACE}/${_repo%%-stack}${_stack}:latest"
+    docker tag "${NAMESPACE}/${_repo%%-stack}${_stack}:${_canonicalTag}" "${NAMESPACE}/${_repo%%-stack}${_stack}:latest"
     if [ $? -eq 0 ]; then
       logInfoResult SUCCESS "${NAMESPACE}/${_repo%%-stack}${_stack}:latest";
     else
@@ -755,7 +755,7 @@ function registry_push() {
   retrieve_stack_suffix "${_stack}";
   _stackSuffix="${RESULT}";
   logInfo -n "Tagging ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} for uploading to ${REGISTRY}";
-  docker tag -f "${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}" "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}";
+  docker tag "${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}" "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}";
   if [ $? -eq 0 ]; then
     logInfoResult SUCCESS "done"
   else

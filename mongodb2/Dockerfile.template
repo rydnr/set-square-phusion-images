@@ -1,0 +1,29 @@
+@include("preamble")
+FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="true" \
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
+
+@include("service_user")
+#@include("create_ssl_certificate")
+@include("mongodb2")
+@include("service")
+#@include("filebeat")
+
+#COPY create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
+
+#RUN chmod +x /etc/my_init.d/56_create_bootstrap_cron_job.sh && \
+RUN sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/${IMAGE}/db|g" /etc/mongod.conf && \
+    sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf && \
+    sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/${IMAGE}/db|g" /etc/mongod.conf && \
+    sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf
+#    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/${IMAGE}.pem|g" /etc/mongod.conf
+
+VOLUME /backup/${IMAGE}/db
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

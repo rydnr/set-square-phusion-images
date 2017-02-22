@@ -24,9 +24,9 @@ base/remote-rsyslogd.conf
 base/restart
 */.build*
 build*
-.build.inc.sh*
-.build-settings.sh
-*/.build-settings.sh
+\.build.inc.sh*
+*/\.build-settings.sh
+\.build-settings.sh
 .build.sh.*
 **/check-version-files
 */common-files
@@ -108,6 +108,7 @@ mariadb/upgrade.sh
 mariadb/watch-ddls
 */metricbeat-files
 metricbeat/service
+mongodb2/service
 mongodb/create_bootstrap_cron_job.sh
 mongodb/service
 mysql/admin.sh
@@ -195,6 +196,7 @@ sdkman/setup.sql
 .templates/maintainer
 .templates/metricbeat
 .templates/mongodb
+.templates/mongodb2
 .templates/monit-files/31_create_monit_http_conf.inc.sh
 .templates/monit-files/enable-monit-ssl.sh
 .templates/monit-files/monit-http.conf
