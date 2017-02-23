@@ -1,0 +1,1 @@
+defineEnvVar POSTGRESQL_VERSION "The version of PostgreSQL" '9.6';

@@ -1,0 +1,27 @@
+# v postgresql
+COPY postgresql-files/postgresql-cron.sh \
+     postgresql-files/bootstrap-db.sh \
+     postgresql-files/process-sqls.sh \
+     postgresql-files/process-sql.sh \
+     postgresql-files/process-sql.inc.sh \
+     /usr/local/bin/
+COPY postgresql-files/postgresql-sqls.cron /etc/cron.d/postgresql-sqls
+COPY postgresql-files/backup.sh /usr/local/bin/backup-postgresql.sh
+
+# From http://docs.docker.com/examples/postgresql_service
+# Add the PostgreSQL PGP key to verify their Debian packages.
+# It should be the same key as https://www.postgresql.org/media/keys/ACCC4CF8.asc
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys B97B0AFCAA1A47F044F244A07FCC7D46ACCC4CF8 && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ precise-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    ${APTGET_INSTALL} python-software-properties software-properties-common postgresql-${POSTGRESQL_VERSION} postgresql-client-${POSTGRESQL_VERSION} postgresql-contrib-${POSTGRESQL_VERSION} daemontools && \
+    ${APTGET_CLEANUP} && \
+    update-rc.d postgresql disable && \
+    gpasswd -a ${SERVICE_USER} crontab && \
+    gpasswd -a ${SERVICE_USER} ssl-cert && \
+    rm -f /etc/init.d/postgres && \
+    mkdir -p /var/lib/postgresql-sql && \
+    chmod +x /usr/local/bin/bootstrap-db.sh && \
+    chmod +x /usr/local/bin/process-sqls.sh && \
+    chmod +x /usr/local/bin/${IMAGE}-cron.sh && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} /var/lib/postgresql-sql
+# ^ postgresql

@@ -209,6 +209,7 @@ sdkman/setup.sql
 .templates/phabricator
 .templates/pharo
 .templates/plone5
+.templates/postgresql
 .templates/preamble
 .templates/rabbitmq
 .templates/redis
