@@ -1,5 +1,6 @@
 defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201702";
-defineEnvVar MONGODB_VERSION "The MongoDB version" "3.2";
+defineEnvVar MONGODB_MAJOR_VERSION "The MongoDB version" "3.4";
+defineEnvVar MONGODB_VERSION "The MongoDB version" "3.4.2";
 overrideEnvVar TAG '${MONGODB_VERSION}';
 defineEnvVar SERVICE_USER "The service user" "mongodb";
 defineEnvVar SERVICE_GROUP "The service group" "mongodb";

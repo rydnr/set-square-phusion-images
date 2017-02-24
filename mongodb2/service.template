@@ -12,7 +12,7 @@ if [ ! -e /backup/${IMAGE}/db/.bootstrapped ]; then
     ps -ef | grep mongodb | grep -v grep | grep -v bootstrap | grep -v service > /dev/null
     _alive=$?;
     while [ ${_alive} -eq 0 ] && [ ! -e /backup/${IMAGE}/db/.bootstrapped ]; do
-      /usr/local/bin/${SQ_IMAGE}-bootstrap.sh -v
+      /usr/local/bin/${SQ_IMAGE}-bootstrap.sh
       echo "We'll try to bootstrap Mongo again in 1s";
       sleep 1s;
       ps -ef | grep mongodb | grep -v grep | grep -v bootstrap | grep -v service > /dev/null

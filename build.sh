@@ -112,9 +112,9 @@ function parseInput() {
          ;;
       -t | --tag)
          shift;
-	       export TAG="${1}";
+         export TAG="${1}";
          shift;
-	       ;;
+         ;;
       -p | --registry)
          shift;
 	       export REGISTRY_PUSH=TRUE;
