@@ -813,7 +813,7 @@ function build_repo() {
   if overwrite_latest_enabled; then
     logInfo -n "Tagging ${NAMESPACE}/${_repo%%-stack}${_stack}:${_canonicalTag} as ${NAMESPACE}/${_repo%%-stack}${_stack}:latest"
     docker tag "${NAMESPACE}/${_repo%%-stack}${_stack}:${_canonicalTag}" "${NAMESPACE}/${_repo%%-stack}${_stack}:latest"
-    if [ $? -eq 0 ]; then
+    if isTrue $?; then
       logInfoResult SUCCESS "${NAMESPACE}/${_repo%%-stack}${_stack}:latest";
     else
       logInfoResult FAILURE "failed"
@@ -839,7 +839,7 @@ function registry_push() {
   _stackSuffix="${RESULT}";
   logInfo -n "Tagging ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} for uploading to ${REGISTRY}";
   docker tag "${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}" "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}";
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
     logInfoResult SUCCESS "done"
   else
     logInfoResult FAILURE "failed"
@@ -848,8 +848,7 @@ function registry_push() {
   logInfo "Pushing ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} to ${REGISTRY}";
   docker push "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}"
   _pushResult=$?;
-  logInfo "Pushing ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} to ${REGISTRY}";
-  if [ ${_pushResult} -eq 0 ]; then
+  if isTrue ${_pushResult}; then
     logInfoResult SUCCESS "done"
   else
     logInfoResult FAILURE "failed"
@@ -874,14 +873,14 @@ function is_32bit() {
 function find_parent_repo() {
   local _repo="${1}"
   local _result=$(grep -e '^FROM ' ${_repo}/Dockerfile.template 2> /dev/null | head -n 1 | awk '{print $2;}' | awk -F':' '{print $1;}')
-  if [[ -n ${_result} ]] && [[ "${_result#\$\{NAMESPACE\}/}" != "${_result}" ]]; then
+  if isNotEmpty ${_result} && [[ "${_result#\$\{NAMESPACE\}/}" != "${_result}" ]]; then
     # parent under our namespace
     _result="${_result#\$\{NAMESPACE\}/}"
   fi
-  if [[ -n ${_result} ]] && [[ ! -n ${_result#\$\{BASE_IMAGE\}} ]]; then
+  if isNotEmpty "${_result}" && isEmpty "${_result#\$\{BASE_IMAGE\}}"; then
     _result=$(echo ${BASE_IMAGE} | awk -F'/' '{print $2;}')
   fi
-  if [[ -n ${_result} ]] && [[ ! -n ${_result#\$\{ROOT_IMAGE\}} ]]; then
+  if isNotEmpty "${_result}" && isEmpty "${_result#\$\{ROOT_IMAGE\}}"; then
     _result=${ROOT_IMAGE}
   fi
    export RESULT="${_result}"
@@ -900,7 +899,7 @@ function find_parents() {
   declare -a _result;
   find_parent_repo "${_repo}"
   local _parent="${RESULT}"
-  while [[ -n ${_parent} ]] && [[ "${_parent#.*/}" == "${_parent}" ]]; do
+  while isEmpty "${_parent}" && [[ "${_parent#.*/}" == "${_parent}" ]]; do
     _result[${#_result[@]}]="${_parent}"
     find_parent_repo "${_parent}"
     _parent="${RESULT}"

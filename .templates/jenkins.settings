@@ -34,3 +34,8 @@ defineEnvVar SLACK_BUILD_SERVER_URL "The Slack build server url" 'http://slack.$
 defineEnvVar SWARM_CLIENT_VERSION "The version of the Swarm client" "2.2";
 defineEnvVar SWARM_CLIENT_ARTIFACT "The Swarm client artifact" 'swarm-client-${SWARM_CLIENT_VERSION}-jar-with-dependencies.jar';
 defineEnvVar SWARM_CLIENT_DOWNLOAD_URL "The url to download the Swarm agent" 'https://repo.jenkins-ci.org/releases/org/jenkins-ci/plugins/swarm-client/${SWARM_CLIENT_VERSION}/${SWARM_CLIENT_ARTIFACT}';
+defineEnvVar GROOVY_VERSIONS "The groovy versions to install" "2.4.8";
+defineEnvVar GRADLE_VERSIONS "The gradle versions to install" "3.4 3.2.1";
+defineEnvVar GRAILS_VERSIONS "The grails versions to install" "3.2.6 2.5.5";
+defineEnvVar MAVEN_VERSIONS "The maven versions to install" "3.3.9";
+defineEnvVar ANT_VERSIONS "The ant versions to install" "1.10.0";
