@@ -1,17 +1,17 @@
 #!/bin/bash
 
+_bootstrapFile="/backup/${IMAGE}/db/.bootstrapped";
+
 mkdir -p /backup/${IMAGE}/db
 rsync -az /backup/${IMAGE}/db/ /var/lib/mongodb/
 rsync -az /var/lib/mongodb/ /backup/${IMAGE}/db/
 chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lib/mongodb /var/log/mongodb
 
-_alive=1;
-
-if [ ! -e /backup/${IMAGE}/db/.bootstrapped ]; then
+if [ ! -e ${_bootstrapFile} ]; then
     /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/${IMAGE}/db /usr/bin/mongod --config /etc/mongod.conf $@ &
     ps -ef | grep mongodb | grep -v grep | grep -v bootstrap | grep -v service > /dev/null
     _alive=$?;
-    while [ ${_alive} -eq 0 ] && [ ! -e /backup/${IMAGE}/db/.bootstrapped ]; do
+    while [ ${_alive} -eq 0 ] && [ ! -e ${_bootstrapFile} ]; do
       /usr/local/bin/${SQ_IMAGE}-bootstrap.sh
       echo "We'll try to bootstrap Mongo again in 1s";
       sleep 1s;
@@ -20,17 +20,9 @@ if [ ! -e /backup/${IMAGE}/db/.bootstrapped ]; then
     done
 fi
 
-if [ ${_alive} -ne 0 ]; then
-    echo "Could not bootstrap MongoDB"
-    exit 1
+if [ -e ${_bootstrapFile} ]; then
+    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/${IMAGE}/db /usr/bin/mongod --config /etc/mongod.conf --auth $@
 else
-  exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/${IMAGE}/db /usr/bin/mongod --config /etc/mongod.conf --auth $@
+  echo "Could not bootstrap MongoDB"
+  exit 1
 fi
-
-
-#!/bin/bash
-
-rsync -az /backup/${IMAGE}/db/ /var/lib/mongodb/
-rsync -az /var/lib/mongodb/ /backup/${IMAGE}/db/
-
-exec sudo -u ${SERVICE_USER} /usr/bin/mongod --config /etc/mongod.conf --auth $@

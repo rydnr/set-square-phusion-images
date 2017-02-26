@@ -39,7 +39,6 @@ ENV SERVICE_USER="jenkins" \
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY tomcat-files/service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
-COPY tomcat-files/logstash.conf /etc/logstash/conf.d/jenkins.conf
 
 ADD init.groovy.d/ /home/jenkins/init.groovy.d/
 

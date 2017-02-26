@@ -1,0 +1,11 @@
+- requires:
+  - java
+  - service_user
+  - tomcat
+  - git
+  - phabricator
+  - gradle
+  - groovy
+  - maven
+  - ant
+  - nodejs

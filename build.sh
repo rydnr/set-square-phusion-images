@@ -146,22 +146,22 @@ function parseInput() {
         ;;
     esac
   done
- 
-  if [[ ! -n ${TAG} ]]; then
+
+  if isEmpty "${TAG}"; then
     TAG="${DATE}";
   fi
 
   # Parameters
-  if [[ -z ${REPOS} ]]; then
+  if isEmpty "${REPOS}"; then
     REPOS="$@";
     shift;
   fi
 
-  if [[ -z ${REPOS} ]]; then
+  if isEmpty "${REPOS}"; then
     REPOS="$(find . -maxdepth 1 -type d | grep -v '^\.$' | sed 's \./  g' | grep -v '^\.')";
   fi
 
-  if [[ -n ${REPOS} ]]; then
+  if ! isEmpty "${REPOS}"; then
       loadRepoEnvironmentVariables "${REPOS}";
       evalEnvVars;
   fi
@@ -174,6 +174,7 @@ function checkInput() {
   local _flags=$(extractFlags $@);
   local _flagCount;
   local _currentCount;
+
   logDebug -n "Checking input";
 
   # Flags
@@ -189,8 +190,8 @@ function checkInput() {
          ;;
     esac
   done
- 
-  if [[ -z ${REPOS} ]]; then
+
+  if isEmpty "${REPOS}"; then
     logDebugResult FAILURE "fail";
     exitWithErrorCode NO_REPOSITORIES_FOUND;
   else
@@ -203,7 +204,7 @@ function checkInput() {
       done
     fi
     logDebugResult SUCCESS "valid";
-  fi 
+  fi
 }
 
 ## Checks whether the repository is part of a stack.
@@ -213,9 +214,9 @@ function is_stacked_repo() {
   local _repo="${1}";
   local _result;
   if [ "x${_repo%%-stack}" == "x${_repo}" ]; then
-      _result=1;
+      _result=${FALSE};
   else
-      _result=0;
+      _result=${TRUE};
   fi
   return ${_result};
 }
@@ -235,13 +236,17 @@ function repo_exists() {
   retrieve_stack_suffix "${_stack}";
   _stackSuffix="${RESULT}";
 
+  checkNotEmpty "repository" "${_repo}" 1;
+  checkNotEmpty "tag" "${_tag}" 2;
+
   local _images=$(${DOCKER} images "${NAMESPACE}/${_repo%%-stack}${_stackSuffix}")
   local _matches=$(echo "${_images}" | grep "${_tag}")
-  local _rescode;
-  if [ -z "${_matches}" ]; then
-    _rescode=1
+  local -i _rescode;
+
+  if isEmpty "${_matches}"; then
+      _rescode=${FALSE};
   else
-    _rescode=0
+    _rescode=${TRUE};
   fi
 
   return ${_rescode};
@@ -257,11 +262,13 @@ function repo_exists() {
 function retrieve_stack_suffix() {
   local _stack="${1}";
   local _result;
-  if [[ -n ${_stack} ]]; then
-    _result="-${_stack}"
+
+  if isEmpty "${_stack}"; then
+      _result="";
   else
-    _result=""
+    _result="-${_stack}";
   fi
+
   export RESULT="${_result}";
 }
 
@@ -275,7 +282,7 @@ function build_repo_if_defined_locally() {
   local _repo="${1}";
   local _tag="${2}";
   local _stack="${3}";
-  if [[ -n ${_repo} ]] && \
+  if ! isEmpty "${_repo}" && \
      [[ -d ${_repo} ]] && \
      ! repo_exists "${_repo#${NAMESPACE}/}" "${_tag}" "${_stack}" ; then
     build_repo "${_repo}" "${_tag}" "${_stack}"
@@ -284,10 +291,10 @@ function build_repo_if_defined_locally() {
 
 ## Squashes the image with docker-squash [1]
 ## [1] https://github.com/jwilder/docker-squash
-## -> 1: the current tag
-## -> 2: the new tag for the squashed image
-## -> 3: the namespace
-## -> 4: the repo name
+## -> 1: the namespace.
+## -> 2: the repo name.
+## -> 3: the current tag.
+## -> 4: the new tag for the squashed image.
 ## Example:
 ##   reduce_image_size "namespace" "myimage" "201508-raw" "201508"
 function reduce_image_size() {
@@ -296,9 +303,15 @@ function reduce_image_size() {
   local _currentTag="${3}";
   local _tag="${4}";
   checkReq docker-squash DOCKER_SQUASH_NOT_INSTALLED;
+
+  checkNotEmpty "namespace" "${_namespace}" 1;
+  checkNotEmpty "repository" "${_repo}" 2;
+  checkNotEmpty "currentTag" "${_currentTag}" 3;
+  checkNotEmpty "tag" "${_tag}" 4;
+
   logInfo -n "Squashing ${_image} as ${_namespace}/${_repo}:${_tag}"
   ${DOCKER} save "${_namespace}/${_repo}:${_currentTag}" | sudo docker-squash -t "${_namespace}/${_repo}:${_tag}" | ${DOCKER} load
-  if [ $? -eq 0 ]; then
+  if isTrue $?; then
     logInfoResult SUCCESS "done"
   else
     logInfoResult FAILURE "failed"
@@ -333,31 +346,54 @@ function process_file() {
   local _tag="${8}";
   local _stackSuffix="${9}";
   local _backupHostSshPort="${10:-22}";
-  local _rescode=1;
-  createTempFile;
-  local _temp1="${RESULT}";
-  createTempFile;
-  local _temp2="${RESULT}";
+  local _rescode=${FALSE};
 
-  if resolve_includes "${_file}" "${_temp1}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
-    logTrace -n "Resolving @include_env in ${_file}";
-    if resolve_include_env "${_temp1}" "${_temp2}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
-      logTraceResult SUCCESS "done";
-      logTrace -n "Resolving placeholders in ${_file}";
-      if process_placeholders "${_temp2}" "${_output}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
-        _rescode=0;
-        logTraceResult SUCCESS "done"
+  local _temp1;
+  local _temp2;
+
+  checkNotEmpty "file" "${_file}" 1;
+  checkNotEmpty "output" "${_output}" 2;
+  checkNotEmpty "repoFolder" "${_repoFolder}" 3;
+  checkNotEmpty "templateFolder" "${_templateFolder}" 4;
+  checkNotEmpty "repository" "${_repo}" 5;
+  checkNotEmpty "rootImage" "${_rootImage}" 6;
+  checkNotEmpty "namespace" "${_namespace}" 7;
+  checkNotEmpty "tag" "${_tag}" 8;
+
+  local _settingsFile="$(dirname ${_file})/$(basename ${_file} .template).settings";
+
+  if createTempFile; then
+      _temp1="${RESULT}";
+  fi
+
+  if createTempFile; then
+      _temp2="${RESULT}";
+  fi
+
+  if isNotEmpty "${_temp1}" && isNotEmpty "${_temp2}" && \
+        resolve_includes "${_file}" "${_temp1}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
+      logTrace -n "Resolving @include_env in ${_file}";
+      if resolve_include_env "${_temp1}" "${_temp2}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix=}" "${_backupHostSshPort}"; then
+          logTraceResult SUCCESS "done";
+          if [ -e "${_settingsFile}" ]; then
+              process_settings_file "${_settingsFile}";
+          fi
+          logTrace -n "Resolving placeholders in ${_file}";
+          if process_placeholders "${_temp2}" "${_output}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
+              _rescode=${TRUE};
+              logTraceResult SUCCESS "done"
+          else
+            _rescode=${FALSE};
+            logTraceResult FAILURE "failed";
+          fi
       else
-        _rescode=1;
+        _rescode=${FALSE};
         logTraceResult FAILURE "failed";
       fi
-    else
-      _rescode=1;
-      logTraceResult FAILURE "failed";
-    fi
   else
-    _rescode=1;
+    _rescode=${FALSE};
   fi
+
   return ${_rescode};
 }
 
@@ -376,17 +412,23 @@ function resolve_included_file() {
   local _templatesFolder="${3}";
   local _result;
   local _rescode=${FALSE};
+
+  checkNotEmpty "file" "${_file}" 1;
+  checkNotEmpty "repoFolder" "${_repoFolder}" 2;
+  checkNotEmpty "templatesFolder" "${_templatesFolder}" 3;
+
   for d in "${_templatesFolder}"; do
-    echo "Checking ${d}/${_file}" >> /tmp/log.txt;
+    _debugEcho "Checking ${d}/${_file}";
     if    [[ -f "${d}/${_file}" ]] \
        || [[ -f "${d}/$(basename ${_file} .template).template" ]]; then
-      echo "${d}/${_file} found!" >> /tmp/log.txt;
+      _debugEcho "${d}/${_file} found!";
       _result="${d}/${_file}";
       export RESULT="${_result}";
       _rescode=${TRUE};
       break;
     fi
   done
+
   if isFalse ${_rescode}; then
     eval "echo ${_file}" > /dev/null 2>&1;
     if isTrue $?; then
@@ -394,7 +436,9 @@ function resolve_included_file() {
       _rescode=$?;
     fi
   fi
-  echo "${_file} resolved -> ${_rescode}" >> /tmp/log.txt;
+
+  _debugEcho "${_file} resolved -> ${_rescode}";
+
   return ${_rescode};
 }
 
@@ -428,55 +472,85 @@ function resolve_includes() {
   local _includedFile;
   local line;
 
+  checkNotEmpty "input" "${_input}" 1;
+  checkNotEmpty "output" "${_output}" 2;
+  checkNotEmpty "repoFolder" "${_repoFolder}" 3;
+  checkNotEmpty "templateFolder" "${_templateFolder}" 4;
+  checkNotEmpty "repository" "${_repo}" 5;
+  checkNotEmpty "rootImage" "${_rootImage}" 6;
+  checkNotEmpty "namespace" "${_namespace}" 7;
+  checkNotEmpty "tag" "${_tag}" 8;
+
   logTrace -n "Resolving @include()s in ${_input}";
 
   echo -n '' > "${_output}";
 
   while IFS='' read -r line; do
-    _match=1;
+    _match=${FALSE};
     _includedFile="";
     if    [[ "${line#@include(\"}" != "$line" ]] \
        && [[ "${line%\")}" != "$line" ]]; then
       _ref="$(echo "$line" | sed 's/@include(\"\(.*\)\")/\1/g')";
       if resolve_included_file "${_ref}" "${_repoFolder}" "${_templateFolder}"; then
-        _includedFile="${RESULT}";
-        if [ -e "${_includedFile}.template" ]; then
-          if process_file "${_includedFile}.template" "${_includedFile}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
-            _match=0;
+          _includedFile="${RESULT}";
+          if [ -e "${_includedFile}.template" ]; then
+              if process_file "${_includedFile}.template" "${_includedFile}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
+                  _match=${TRUE};
+              else
+                _match=${FALSE};
+                logTraceResult FAILURE "failed";
+                exitWithErrorCode CANNOT_PROCESS_TEMPLATE "${_includedFile}";
+              fi
           else
-            _match=1;
-            logTraceResult FAILURE "failed";
-            exitWithErrorCode CANNOT_PROCESS_TEMPLATE "${_includedFile}";
+            _match=${TRUE};
           fi
-        else
-          _match=0;
-        fi
       else
-        _match=1;
+        _match=${FALSE};
         _errorRef="${_ref}";
         eval "echo ${_ref}" > /dev/null 2>&1;
-        if [ $? -eq 0 ]; then
+        if isTrue $?; then
           _errorRef="${_input} contains ${_ref} with evaluates to $(eval "echo ${_ref}" 2> /dev/null), and it's not found in any of the expected paths: ${_repoFolder}, ${_templateFolder}";
         fi
       fi
     fi
-    if [[ ${_match} -eq 0 ]]; then
-      cat "${_includedFile}" >> "${_output}";
+    if isTrue ${_match}; then
+        cat "${_includedFile}" >> "${_output}";
     else
       echo "$line" >> "${_output}";
     fi
   done < "${_input}";
   _rescode=$?;
-  if [ "${_errorRef}" != "" ]; then
-    logTraceResult FAILURE "failed";
-    exitWithErrorCode INCLUDED_FILE_NOT_FOUND "${_errorRef}";
-  else
-    if [ ${_rescode} -eq 0 ]; then
+  if isEmpty "${_errorRef}" && isTrue ${_rescode}; then
       logTraceResult SUCCESS "done";
-    else
-      logTraceResult FAILURE "failed";
-    fi
+  else
+    logTraceResult FAILURE "failed";
   fi
+
+  return ${_rescode};
+}
+
+## Processes a settings file for a template.
+## -> 1: The settings file.
+## <- 0/${TRUE} if the settings file was processed successfully; 1/${FALSE} otherwise.
+## Example:
+##   if process_settings_file "my.settings"; then
+##     echo "my.settings processed successfully";
+##   fi
+function process_settings_file() {
+  local _file="${1}";
+  local -i _rescode=${FALSE};
+
+  checkNotEmpty "file" "${_file}" 1;
+
+  logTrace -n "Reading ${_file}";
+  source "${_file}";
+  _rescode=$?;
+  if isTrue ${_rescode}; then
+      logTraceResult SUCCESS "done";
+  else
+    logTraceResult FAILURE "failed";
+  fi
+
   return ${_rescode};
 }
 
@@ -504,15 +578,24 @@ function process_placeholders() {
   local _stackSuffix="${7}";
   local _backupHostSshPort="${8:-22}";
   local _rescode;
+
+  checkNotEmpty "file" "${_file}" 1;
+  checkNotEmpty "output" "${_output}" 2;
+  checkNotEmpty "repository" "${_repo}" 3;
+  checkNotEmpty "rootImage" "${_rootImage}" 4;
+  checkNotEmpty "namespace" "${_namespace}" 5;
+  checkNotEmpty "tag" "${_tag}" 6;
+
   local _env="$( \
     for ((i = 0; i < ${#ENV_VARIABLES[*]}; i++)); do \
       echo ${ENV_VARIABLES[$i]} | awk -v dollar="$" -v quote="\"" '{printf("echo  %s=\\\"%s%s{%s}%s\\\"", $0, quote, dollar, $0, quote);}' | sh; \
     done;) TAG=\"${_tag}\" DATE=\"${DATE}\" TIME=\"${TIME}\" MAINTAINER=\"${AUTHOR} <${AUTHOR_EMAIL}>\" STACK=\"${STACK}\" REPO=\"${_repo}\" IMAGE=\"${_repo}\" ROOT_IMAGE=\"${_rootImage}\" BASE_IMAGE=\"${BASE_IMAGE}\" STACK_SUFFIX=\"${_stackSuffix}\" NAMESPACE=\"${_namespace}\" BACKUP_HOST_SSH_PORT=\"${_backupHostSshPort}\" DOLLAR='$' ";
 
-  local _envsubstDecl=$(echo -n "'"; echo -n "$"; echo -n "{TAG} $"; echo -n "{DATE} $"; echo -n "{MAINTAINER} $"; echo -n "{STACK} $"; echo -n "{REPO} $"; echo -n "{IMAGE} $"; echo -n "{ROOT_IMAGE} $"; echo -n "{BASE_IMAGE} $"; echo -n "{STACK_SUFFIX} $"; echo -n "{NAMESPACE} $"; echo -n "{BACKUP_HOST_SSH_PORT} $"; echo -n "{DOLLAR}"; echo ${ENV_VARIABLES[*]} | tr ' ' '\n' | awk '{printf("${%s} ", $0);}'; echo -n "'";);
+  local _envsubstDecl=$(echo -n "'"; echo -n "$"; echo -n "{_tag} $"; echo -n "{DATE} $"; echo -n "{MAINTAINER} $"; echo -n "{STACK} $"; echo -n "{_repo} $"; echo -n "{IMAGE} $"; echo -n "{_rootImage} $"; echo -n "{BASE_IMAGE} $"; echo -n "{_stackSuffix} $"; echo -n "{_namespace} $"; echo -n "{_backupHostSshPort} $"; echo -n "{DOLLAR}"; echo ${ENV_VARIABLES[*]} | tr ' ' '\n' | awk '{printf("${%s} ", $0);}'; echo -n "'";);
 
   echo "${_env} envsubst ${_envsubstDecl} < ${_file}" | sh > "${_output}";
   _rescode=$?;
+
   return ${_rescode};
 }
 
@@ -531,12 +614,12 @@ function process_placeholders() {
 function resolve_include_env() {
   local _input="${1}";
   local _output="${2}";
-  export IMAGE="${3}";
-  export ROOT_IMAGE="${4}";
-  export NAMESPACE="${5}";
-  export TAG="${6}";
-  export STACK_SUFFIX="${7}";
-  export BACKUP_HOST_SSH_PORT="${8:-22}";
+  local _image="${3}";
+  local _rootImage="${4}";
+  local _namespace="${5}";
+  local _tag="${6}";
+  local _stackSuffix="${7}";
+  local _backupHostSshPort="${8:-22}";
   local _includedFile;
   local _rescode;
   local _envVar;
@@ -850,13 +933,15 @@ function resolve_base_image() {
 function loadRepoEnvironmentVariables() {
   local _repos="${1}";
 
+  checkNotEmpty "repositories" "${_repos}" 1;
+
   for _repo in ${_repos}; do
     for f in "${DRY_WIT_SCRIPT_FOLDER}/${_repo}/build-settings.sh" \
              "./${_repo}/build-settings.sh" \
              "${DRY_WIT_SCRIPT_FOLDER}/${_repo}/.build-settings.sh" \
              "./${_repo}/.build-settings.sh"; do
       if [ -e "${f}" ]; then
-        source "${f}";
+          source "${f}";
       fi
     done
   done
@@ -988,3 +1073,5 @@ function main() {
   cleanup_containers;
   cleanup_images;
 }
+
+
