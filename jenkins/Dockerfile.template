@@ -35,6 +35,7 @@ ENV SERVICE_USER="jenkins" \
 @include("phabricator")
 @include("pharo")
 @include("jenkins")
+@include("nodejs")
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY tomcat-files/service /etc/service/${IMAGE}/run
