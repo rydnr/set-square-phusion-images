@@ -1,47 +1,62 @@
 #!/bin/bash
 
+## Checks whether MongoDB is running.
+## <- 0 if it's running; 1 otherwise.
+## Example:
+##   if ! is_running; then
+##     echo "RabbitMQ is not running";
+##   fi
+function is_mongodb_running() {
+  local -i _rescode;
+
+  exec 6<>/dev/tcp/127.0.0.1/27017 2>&1 > /dev/null;
+  _rescode=$?;
+  exec 6>&- # close output connection
+  exec 6<&- # close input connection
+
+  return ${_rescode};
+}
+
 _bootstrapFile="/backup/mongodb/db/.bootstrapped";
 
 mkdir -p /backup/mongodb/db
-rsync -az /backup/mongodb/db/ /var/lib/mongodb/
-rsync -az /var/lib/mongodb/ /backup/mongodb/db/
 chown -R mongodb:mongodb /var/lib/mongodb /var/log/mongodb
 
 if [ ! -e ${_bootstrapFile} ]; then
     jobs &>/dev/null
-    /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@ > /dev/null 2>&1 &
+    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@ > /dev/null 2>&1 &
     mongoStarted="$(jobs -n)"
     if [ -n "${mongoStarted}" ];then
       mongoPid=$!;
+      sleep 2;
     else
       echo "Could not launch MongoDB for bootstrap"
       exit 1;
     fi
-    ps -ef | grep mongodb | grep -v grep | grep -v bootstrap | grep -v service > /dev/null
-    _alive=$?;
-    while [ ${_alive} -eq 0 ] && [ ! -e ${_bootstrapFile} ]; do
-      /usr/local/bin/${SQ_IMAGE}-bootstrap.sh
-      echo "We'll try to bootstrap Mongo again in 1s";
-      sleep 1s;
-      ps -ef | grep mongodb | grep -v grep | grep -v bootstrap | grep -v service > /dev/null
-      _alive=$?;
+    while ! is_mongodb_running && [ ! -e ${_bootstrapFile} ]; do
+      /usr/local/bin/${SQ_IMAGE}-bootstrap.sh -vv
+      if ! is_mongodb_running; then
+        echo "We'll try to bootstrap Mongo again in 1s";
+        sleep 1;
+      fi
     done
-    echo -n "Waiting MongoDB to shut down ";
+    echo -n "Waiting MongoDB (${mongoPid}) to shut down ";
     kill ${mongoPid}
-    ps -ef | grep mongodb | grep -v grep | grep -v bootstrap | grep -v service > /dev/null
-    _alive=$?;
-    while [ ${_alive} -eq 0 ]; do
-      echo ".";
-      sleep 1s;
-      ps -f -p ${mongoPid} > /dev/null
-      _alive=$?;
-    done
+    while is_mongodb_running ; do
+      echo -n ".";
+      sleep 1;
+      parentPid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $3;}')";
+      kill ${parentPid};
+      pid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $2;}')";
+      kill ${pid};
+     done
     rm -f /backup/mongodb/db/mongod.lock
     echo "";
- fi
+fi
 
 if [ -e ${_bootstrapFile} ]; then
     echo "Launching MongoDB"
+    tailf /var/log/mongodb/mongod.log &
     exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth $@
 else
   echo "Could not bootstrap MongoDB"
