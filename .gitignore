@@ -25,7 +25,6 @@ base/restart
 */.build*
 build*
 \.build.inc.sh*
-*/\.build-settings.sh
 \.build-settings.sh
 .build.sh.*
 **/check-version-files

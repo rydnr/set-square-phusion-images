@@ -1,6 +1,4 @@
 # v tomcat
-# - requires:
-#   - java
 RUN mkdir -p /opt && \
     wget -O /opt/${TOMCAT_FILE} ${TOMCAT_DOWNLOAD_URL} && \
     tar xvfz /opt/${TOMCAT_FILE} -C /opt && \
