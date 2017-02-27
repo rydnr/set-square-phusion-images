@@ -845,7 +845,7 @@ function registry_push() {
     logInfoResult FAILURE "failed"
     exitWithErrorCode ERROR_TAGGING_IMAGE "${_repo}";
   fi
-  logInfo "Pushing ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} to ${REGISTRY}";
+  logInfo -n "Pushing ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} to ${REGISTRY}";
   docker push "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}"
   _pushResult=$?;
   if isTrue ${_pushResult}; then
