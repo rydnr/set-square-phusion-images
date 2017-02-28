@@ -1,0 +1,11 @@
+= ${IMAGE} Docker image
+
+Base image to run a Java application.
+
+This image should be extended as follows:
+
+FROM ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+ENV APP=my-app.jar
+
+COPY my-app.jar ${APP_HOME}/

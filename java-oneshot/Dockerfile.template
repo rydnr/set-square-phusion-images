@@ -1,0 +1,22 @@
+@include("preamble")
+FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="false" \
+    DEFAULT_LOCALE=${JAVA_DEFAULT_LOCALE} \
+    DEFAULT_ENCODING=${JAVA_DEFAULT_ENCODING} \
+    DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS}" \
+    APP_HOME=${APP_HOME}
+
+@include("service_user")
+@include("java")
+
+COPY start.sh /etc/my_init.d/99_java_oneshot.sh
+COPY start.inc.sh  /etc/my_init.d/99_java_oneshot.inc.sh
+RUN chmod +x /etc/my_init.d/99_java_oneshot.sh
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
