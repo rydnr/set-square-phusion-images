@@ -1,11 +1,12 @@
 @include("preamble")
-FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
 @include("service_user")
 @include("java")
+@include("git")
 @include("sdkman")
 @include("gradle")
 @include("pharo")
@@ -19,11 +20,14 @@ ENV WORKSPACE="${WORKSPACE}" \
 RUN chmod +x /sbin/my_exec && \
     gpasswd -a ${SERVICE_USER} root && \
     mkdir -p ${WORKSPACE} && \
-    chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE}
-
-RUN su - ${SERVICE_USER} -c \
+    chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE} && \
+    su - ${SERVICE_USER} -c \
       'ln -s ${GRADLE_USER_HOME} /home/${SERVICE_USER}/.gradle && \
        ln -s ${WORKSPACE} /home/${SERVICE_USER}/workspace';
+
+USER ${SERVICE_USER}
+WORKDIR ${WORKSPACE}
+ENTRYPOINT /bin/bash
 
 @include("copy-metadata")
 @include("symlinks")

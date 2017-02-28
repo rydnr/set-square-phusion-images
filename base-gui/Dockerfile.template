@@ -12,7 +12,7 @@ ENV DOBACKUP="false" \
 RUN ${APTGET_INSTALL} -u x11-apps && \
     ${APTGET_CLEANUP}
 
-COPY prepare.sh /usr/local/bin/prepare.sh
+# COPY prepare.sh /usr/local/bin/prepare.sh
 
 @include("copy-metadata")
 @include("symlinks")
