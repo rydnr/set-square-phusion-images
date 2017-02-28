@@ -1,0 +1,10 @@
+defineEnvVar ANACONDA_PYTHON_VERSION "The Python version used in Anaconda" "3";
+defineEnvVar ANACONDA_VERSION "The Anaconda version" '4.2.0';
+overrideEnvVar TAG '${ANACONDA_PYTHON_VERSION}-${ANACONDA_VERSION}';
+defineEnvVar ANACONDA_ARTIFACT "The Anaconda artifact" 'Anaconda${TAG}-Linux-x86_64.sh';
+defineEnvVar ANACONDA_DOWNLOAD_URL "The url to download the Anaconda artifact" 'https://repo.continuum.io/archive/${ANACONDA_ARTIFACT}';
+defineEnvVar PARENT_IMAGE_TAG "The parent image tag" "201701";
+defineEnvVar SERVICE_USER "The Anaconda user" "anaconda";
+defineEnvVar SERVICE_GROUP "The Anaconda group" "anaconda";
+defineEnvVar SERVICE_USER_HOME "The home of Anaconda user" "/work/anaconda";
+defineEnvVar SERVICE_USER_SHELL "The shell of Anaconda user" "/bin/bash";
