@@ -23,9 +23,7 @@ base/monit-mail.conf.template
 base/remote-rsyslogd.conf
 base/restart
 */.build*
-build*
 \.build.inc.sh*
-\.build-settings.sh
 .build.sh.*
 **/check-version-files
 */common-files
