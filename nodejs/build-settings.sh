@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The base tag" "201611";
+defineEnvVar PARENT_IMAGE_TAG "The base tag" "201702";
 defineEnvVar NODEJS_MAJOR_VERSION "The major version of NodeJS" "6";
 overrideEnvVar TAG '${NODEJS_MAJOR_VERSION}';
 defineEnvVar SERVICE_USER "The name of the user" '${NAMESPACE}';
