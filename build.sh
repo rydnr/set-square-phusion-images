@@ -4,7 +4,7 @@
 
 function usage() {
 cat <<EOF
-$SCRIPT_NAME [-t|--tag tagName] [-f|--force] [-o|--overwrite-latest] [-p|--registry] [-r|--reduce-image] [-ci|--cleanup-images] [-cc|--cleanup-containers] [repo]+
+$SCRIPT_NAME [-t|--tag tagName] [-f|--force] [-o|--overwrite-latest] [-p|--registry] [-r|--reduce-image] [-ci|--cleanup-images] [-cc|--cleanup-containers] [-rt|--registry-tag] [repo]+
 $SCRIPT_NAME [-h|--help]
 (c) 2014-today Automated Computing Machinery S.L.
     Distributed under the terms of the GNU General Public License v3
@@ -20,6 +20,7 @@ Where:
   * reduce-image: whether to reduce the size of the resulting image.
   * cleanup-images: Whether to try to cleanup images.
   * cleanup-containers: Whether to try to cleanup containers.
+  * registry-tag: Whether to tag also for pushing to a registry later (implicit if -p is enabled).
 Common flags:
     * -h | --help: Display this message.
     * -X:e | --X:eval-defaults: whether to eval all default values, which potentially slows down the script unnecessarily.
@@ -117,6 +118,7 @@ function parseInput() {
          ;;
       -p | --registry)
          shift;
+         export REGISTRY_TAG=TRUE;
 	       export REGISTRY_PUSH=TRUE;
 	       ;;
       -f | --force)
@@ -143,6 +145,10 @@ function parseInput() {
       -cc | --cleanup-containers)
         shift;
         export CLEAUP_CONTAINERS=TRUE;
+        ;;
+      -rt | --registry-tag)
+        shift;
+        export REGISTRY_TAG=TRUE;
         ;;
     esac
   done
@@ -185,6 +191,8 @@ function checkInput() {
         ;;
       -t | --tag | -p | --registry | -f | --force | -r | --reduce-image | -s | --stack)
 	      ;;
+      -rt | --registry-tag)
+        ;;
       *) logDebugResult FAILURE "fail";
          exitWithErrorCode INVALID_OPTION ${_flag};
          ;;
@@ -822,6 +830,31 @@ function build_repo() {
   fi
 }
 
+## Tags the image anticipating it will be pushed to a Docker registry later.
+## -> 1: the repository.
+## -> 2: the tag.
+## -> 3: the stack (optional).
+## Example:
+##   registry_tag "myImage" "latest"
+function registry_tag() {
+  local _repo="${1}";
+  local _tag="${2}";
+  local _stack="${3}";
+  local _stackSuffix;
+  local _pushResult;
+  update_log_category "${_repo}";
+  retrieve_stack_suffix "${_stack}";
+  _stackSuffix="${RESULT}";
+  logInfo -n "Tagging ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} for uploading to ${REGISTRY}";
+  docker tag ${DOCKER_TAG_OPTIONS} "${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}" "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}";
+  if isTrue $?; then
+    logInfoResult SUCCESS "done"
+  else
+    logInfoResult FAILURE "failed"
+    exitWithErrorCode ERROR_TAGGING_IMAGE "${_repo}";
+  fi
+}
+
 ## Pushes the image to a Docker registry.
 ## -> 1: the repository.
 ## -> 2: the tag.
@@ -837,14 +870,6 @@ function registry_push() {
   update_log_category "${_repo}";
   retrieve_stack_suffix "${_stack}";
   _stackSuffix="${RESULT}";
-  logInfo -n "Tagging ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} for uploading to ${REGISTRY}";
-  docker tag "${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}" "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}";
-  if isTrue $?; then
-    logInfoResult SUCCESS "done"
-  else
-    logInfoResult FAILURE "failed"
-    exitWithErrorCode ERROR_TAGGING_IMAGE "${_repo}";
-  fi
   logInfo -n "Pushing ${NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag} to ${REGISTRY}";
   docker push "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo%%-stack}${_stackSuffix}:${_tag}"
   _pushResult=$?;
@@ -967,6 +992,13 @@ function registry_push_enabled() {
   _flagEnabled REGISTRY_PUSH;
 }
 
+## Checks whether the -rt flag is enabled
+## Example:
+##   if registry_tag_enabled; then [..]; fi
+function registry_tag_enabled() {
+  _flagEnabled REGISTRY_TAG;
+}
+
 ## Checks whether the -r flag is enabled
 ## Example:
 ##   if reduce_image_enabled; then [..]; fi
@@ -1061,6 +1093,12 @@ function main() {
       done
 
       build_repo "${_repo}" "${TAG}" "${_stack}"
+    fi
+    if registry_tag_enabled; then
+        registry_tag "${_repo}" "${TAG}" "${_stack}";
+        if overwrite_latest_enabled; then
+            registry_tag "${_repo}" "latest" "${_stack}"
+        fi
     fi
     if registry_push_enabled; then
       registry_push "${_repo}" "${TAG}" "${_stack}"

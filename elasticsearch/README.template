@@ -15,6 +15,6 @@ It requires some tuning in the host system to work, tough:
 
   docker run -d --name ${IMAGE} -p 9200:9200 -e CLUSTER_NAME=mycluster -e NODE_NAME=mynode ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
 
-- Run ElasticSearch with custom heap settings.
+- Run ElasticSearch with custom heap settings. Keep in mind HEAP_MIN and HEAP_MAX must be equal to pass ElasticSearch bootstrap checks.
 
-  docker run -d --name ${IMAGE} -p 9200:9200 -e HEAP_MIN=3g -e HEAP_MAX=4g ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+  docker run -d --name ${IMAGE} -p 9200:9200 -e HEAP_MIN=4g -e HEAP_MAX=4g ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
