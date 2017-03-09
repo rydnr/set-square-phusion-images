@@ -1,0 +1,15 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="false"
+
+@include("service_user")
+@include("nodejs")
+@include("create_ssl_certificate")
+@include("letsencrypt")
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

@@ -1,0 +1,8 @@
+Base image for NodeJS applications.
+
+This image is meant to be inherited to provide the script to run the NodeJS app.
+
+Examples:
+
+- Run this image to take a look at how to use it:
+> docker run -it --rm --entrypoint=/bin/bash ${NAMESPACE}/${IMAGE}:${TAG}

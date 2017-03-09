@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# Splitting executable from arguments
+_cmd="${1}";
+shift
+_cmd="${_cmd} ${@}";
+
+_folder="/work";
+
+_projectFolder="${_folder}"
+
+if [ -n "${PROJECT_NAME}" ]; then
+  _projectFolder="${_folder}/${PROJECT_NAME}"
+fi
+
+mkdir -p "${_projectFolder}";
+
+/usr/local/bin/run-as.sh -- ${_projectFolder} ${_cmd};
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
