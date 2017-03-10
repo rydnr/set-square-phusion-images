@@ -1,8 +1,8 @@
 # v pharo
-ENV PATH=${PATH}:/opt/pharo
+ENV PATH=${PATH}:/opt/pharo/bin
 
 RUN dpkg --add-architecture i386 && \
-    ${APTGET_INSTALL} -u  libx11-6:i386 libgl1-mesa-glx:i386 libfontconfig1:i386 libssl1.0.0:i386 && \
+    ${APTGET_INSTALL} -u libx11-6:i386 libgl1-mesa-glx:i386 libfontconfig1:i386 libssl1.0.0:i386 && \
     ${APTGET_INSTALL} -np unzip && \
     ${APTGET_CLEANUP} && \
     ([ -d /opt ] || mkdir /opt) && \
@@ -10,5 +10,7 @@ RUN dpkg --add-architecture i386 && \
     wget ${PHARO_DOWNLOAD_URL} && \
     unzip ${PHARO_ARTIFACT} && \
     ln -s ${PHARO_FOLDER} pharo && \
-    rm -f ${PHARO_ARTIFACT}
+    rm -f ${PHARO_ARTIFACT} && \
+    cd /opt/pharo/bin && \
+    ln -s pharo pharo-ui
 # ^ pharo

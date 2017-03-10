@@ -9,7 +9,7 @@
 function is_mongodb_running() {
   local -i _rescode;
 
-  exec 6<>/dev/tcp/127.0.0.1/27017 2>&1 > /dev/null;
+  exec 6<>/dev/tcp/127.0.0.1/27017 > /dev/null 2>&1 3>&1;
   _rescode=$?;
   exec 6>&- # close output connection
   exec 6<&- # close input connection
@@ -20,7 +20,7 @@ function is_mongodb_running() {
 _bootstrapFile="/backup/mongodb/db/.bootstrapped";
 
 mkdir -p /backup/mongodb/db
-chown -R mongodb:mongodb /var/lib/mongodb /var/log/mongodb
+chown -R mongodb:mongodb /var/lib/mongodb /var/log/mongodb /backup/mongodb
 
 if [ ! -e ${_bootstrapFile} ]; then
     jobs &>/dev/null
