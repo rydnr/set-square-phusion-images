@@ -1,0 +1,17 @@
+* Bash image
+
+This image runs bash.
+
+** Examples
+
+- Launch this image to run only terminal applications:
+>  docker run -it --rm --name bash -v ${PWD}:${WORKSPACE} ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Launch this image to run X applications:
+
+to build your application's image:
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> xhost +
+> docker run -it --name bash -v ${PWD}:${WORKSPACE} -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

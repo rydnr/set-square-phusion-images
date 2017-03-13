@@ -1,0 +1,19 @@
+@include("preamble")
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+@include("maintainer")
+@include("addon-toggles")
+@include("service_user")
+
+ENV WORKSPACE="${WORKSPACE}" \
+    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
+
+RUN gpasswd -a ${SERVICE_USER} root
+
+VOLUME ${WORKSPACE}
+USER ${SERVICE_USER}
+WORKDIR ${WORKSPACE}
+ENTRYPOINT /bin/bash
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
