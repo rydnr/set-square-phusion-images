@@ -10,10 +10,11 @@ ENV WORKSPACE="${WORKSPACE}" \
 RUN gpasswd -a ${SERVICE_USER} root
 
 VOLUME ${WORKSPACE}
-USER ${SERVICE_USER}
 WORKDIR ${WORKSPACE}
 ENTRYPOINT /bin/bash
 
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+
+USER ${SERVICE_USER}
