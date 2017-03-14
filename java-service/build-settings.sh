@@ -1,0 +1,12 @@
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201611";
+defineEnvVar APP_HOME "The Grails application directory" "/opt/java-app";
+defineEnvVar SERVICE_USER "The service user" '${NAMESPACE}';
+defineEnvVar SERVICE_GROUP "The service group" '${SERVICE_USER}';
+defineEnvVar SERVICE_USER_HOME "The service user home" '${APP_HOME}';
+defineEnvVar SERVICE_USER_SHELL "The service user shell" "/bin/bash";
+defineEnvVar JAVA_DEFAULT_LOCALE "The default locale for grails" "es_ES";
+defineEnvVar JAVA_DEFAULT_ENCODING "The default enconding for grails" "UTF-8";
+defineEnvVar DEFAULT_JAVA_OPTS "The default java options" "-Djava.security.egd=file:/dev/./urandom";
+defineEnvVar JAVA_OPTS "The default Java options" '${DEFAULT_JAVA_OPTS}';
+overrideEnvVar ENABLE_LOCAL_SMTP "false";
+overrideEnvVar ENABLE_RSNAPSHOT "false";
