@@ -379,7 +379,7 @@ function process_file() {
   fi
 
   if isNotEmpty "${_temp1}" && isNotEmpty "${_temp2}" && \
-        resolve_includes "${_file}" "${_temp1}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
+     resolve_includes "${_file}" "${_temp1}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
       logTrace -n "Resolving @include_env in ${_file}";
       if resolve_include_env "${_temp1}" "${_temp2}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix=}" "${_backupHostSshPort}"; then
           logTraceResult SUCCESS "done";
@@ -501,6 +501,15 @@ function resolve_includes() {
       _ref="$(echo "$line" | sed 's/@include(\"\(.*\)\")/\1/g')";
       if resolve_included_file "${_ref}" "${_repoFolder}" "${_templateFolder}"; then
           _includedFile="${RESULT}";
+          if [ -d "${_templateFolder}/$(basename ${_includedFile})-files" ]; then
+              mkdir "${_repoFolder}/$(basename ${_includedFile})-files" 2> /dev/null;
+              find "${PWD}/${_templateFolder#\./}/$(basename ${_includedFile})-files/" -exec cp {} "${_repoFolder}/$(basename ${_includedFile})-files/" \; ;
+              echo "Processing ${_repoFolder}/$(basename ${_includedFile})-files"
+              for p in ${_repoFolder}/$(basename ${_includedFile})-files/*.template; do
+                echo "Processing ${p}";
+                process_file "${p}" "$(basename ${p} .template)" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}";
+              done
+          fi
           if [ -e "${_includedFile}.template" ]; then
               if process_file "${_includedFile}.template" "${_includedFile}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_stackSuffix}" "${_backupHostSshPort}"; then
                   _match=${TRUE};
@@ -709,7 +718,7 @@ function copy_license_file() {
   if [ -e "${_folder}/${LICENSE_FILE}" ]; then
     logDebug -n "Using ${LICENSE_FILE} for ${_repo} image";
     cp "${_folder}/${LICENSE_FILE}" "${_repo}";
-    if [ $? -eq 0 ]; then
+    if isTrue $?; then
       logDebugResult SUCCESS "done";
     else
       logDebugResult FAILURE "failed";
