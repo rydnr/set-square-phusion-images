@@ -1,0 +1,11 @@
+* Let's Encrypt certificate generator
+
+This image can generate Let's Encrypt certificates for you.
+
+* Example:
+
+- Generate a certificate for domain pre.example.com, using 'me@gmail.com' as domain contact, to be generated in /tmp/my-certs
+
+  docker run -it -v /tmp/my-certs:/etc/ssl/certs ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} pre.example.com me@gmail.com
+
+Then, follow the instructions, add the required DNS record as requested, and wait a reasonable period of time (depending on your DNS TTL) before pressing "Enter".

@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the base image" "201612";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the base image" "201702";
 defineEnvVar UBUNTU_VERSION "The version available in Ubuntu" "$(docker run --rm -it ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG} remote-ubuntu-version rabbitmq-server | sed 's/[^0-9a-zA-Z\._-]//g')";
 overrideEnvVar TAG '${UBUNTU_VERSION}';
 defineEnvVar RABBITMQ_USER "The RabbitMQ user" "rabbitmq";

@@ -1,2 +1,2 @@
 defineEnvVar RABBITMQ_ULIMIT_N "The ulimit -n value to use when launching RabbitMQ" "1024";
-defineEnvVar RABBITMQ_PLUGINS "The list of plugins to install" "stomp shovel rabbitmq_shovel rabbitmq_shovel_management federation federation_management mqtt";
+defineEnvVar RABBITMQ_PLUGINS "The list of plugins to install" "stomp shovel shovel_management federation federation_management mqtt";

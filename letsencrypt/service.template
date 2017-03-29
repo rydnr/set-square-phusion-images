@@ -1,0 +1,131 @@
+#!/bin/bash dry-wit
+# Copyright 2017-today OSOCO S.L.
+# Distributed under the terms of the GNU General Public License v3
+
+function usage() {
+cat <<EOF
+docker run -it --rm -v [folder]:/etc/ssl/certs ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} domain contact-email
+docker run -it --rm ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} [-h|--help]
+(c) 2017-today OSOCO S.L.
+    Distributed under the terms of the GNU General Public License v3
+
+Generates a Let's Encrypt certificate for a given domain.
+
+Where:
+  - domain: The name of the domain to generate a certificate for.
+  - contact-email: The contact email to include in the certificate.
+
+Common flags:
+    * -h | --help: Display this message.
+    * -v: Increase the verbosity.
+    * -vv: Increase the verbosity further.
+    * -q | --quiet: Be silent.
+EOF
+}
+
+# Requirements
+function defineRequirements() {
+  checkReq certbot CERTBOT_NOT_INSTALLED;
+}
+
+# Error messages
+function defineErrors() {
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "CERTBOT_NOT_INSTALLED" "certbot is not installed";
+  addError "DOMAIN_IS_MANDATORY" "domain argument is mandatory";
+  addError "CONTACT_EMAIL_IS_MANDATORY" "contact email is mandatory";
+}
+
+## Parses the input
+## dry-wit hook
+function parseInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q)
+         shift;
+         ;;
+      --)
+        shift;
+        break;
+        ;;
+    esac
+  done
+
+  if isEmpty "${LETSENCRYPT_DOMAIN}"; then
+      LETSENCRYPT_DOMAIN="${1}";
+      shift;
+  fi
+  if isEmpty "${LETSENCRYPT_CONTACT_EMAIL}"; then
+      LETSENCRYPT_CONTACT_EMAIL="${1}";
+      shift;
+  fi
+}
+
+## Checking input
+## dry-wit hook
+function checkInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+  logDebug -n "Checking input";
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q)
+        shift;
+        ;;
+      --)
+        shift;
+	      ;;
+      *) logDebugResult FAILURE "fail";
+         exitWithErrorCode INVALID_OPTION ${_flag};
+         ;;
+    esac
+  done
+
+  if isEmpty "${LETSENCRYPT_DOMAIN}"; then
+      logDebugResult FAILURE "fail";
+      exitWithErrorCode DOMAIN_IS_MANDATORY;
+  fi
+
+  if isEmpty "${LETSENCRYPT_CONTACT_EMAIL}"; then
+      logDebugResult FAILURE "fail";
+      exitWithErrorCode CONTACT_EMAIL_IS_MANDATORY;
+  else
+    logDebugResult SUCCESS "valid";
+  fi
+}
+
+function main() {
+  local _aux="${LETSENCRYPT_DOMAIN%\.*}";
+  _aux="${_aux%\.*}";
+  local _domain="${LETSENCRYPT_DOMAIN#${_aux}.}";
+
+  logInfo "Calling Let's Encrypt's tool to generate the certificate for ${LETSENCRYPT_DOMAIN} using ${LETSENCRYPT_CONTACT_EMAIL}.";
+  logInfo "You need to create a TXT record in your DNS for ${_domain}, with the name specified in the 'txt_domain', and whose value matches the 'validation' field.";
+  logInfo "New DNS record in ${_domain}";
+  logInfo -n "Name";
+  logInfoResult SUCCESS "_acme-challenge.${LETSENCRYPT_DOMAIN}";
+  logInfo -n "Value";
+  logInfoResult SUCCESS "[validation string]";
+  logInfo " ";
+  logInfo "Once you've added the DNS record, wait some time (according to the TTL defined in ${_domain} DNS)";
+  logInfo "and press 'Enter' to start the validation process";
+  logInfo " ";
+  logInfo "Should the validation succeeds, your certificate files will be available in /etc/ssl/certs";
+  logInfo " ";
+  certbot --text --agree-tos --email ${LETSENCRYPT_CONTACT_EMAIL} --expand --renew-by-default --configurator certbot-external-auth:out --certbot-external-auth:out-public-ip-logging-ok -d ${LETSENCRYPT_DOMAIN} certonly && \
+  mv /etc/letsencrypt/archive/${LETSENCRYPT_DOMAIN}/* /etc/ssl/certs/
+}
+
+
