@@ -13,12 +13,10 @@ ENV GRAILS_ENV=production \
 
 @include("service_user")
 @include("java")
+@include("service")
 
-COPY start-grails-app.sh start-grails-app.inc.sh ${APP_HOME}/
-RUN chmod +x ${APP_HOME}/start-grails-app.sh
+COPY service.inc.sh /etc/service/${IMAGE}/run.inc.sh
 COPY restore_default_envvars.sh /etc/my_init.d/99_restore_default_envvars.sh
-
-ENTRYPOINT ["${APP_HOME}/start-grails-app.sh"]
 
 EXPOSE 8080
 
