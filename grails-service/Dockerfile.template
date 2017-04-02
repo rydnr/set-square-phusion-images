@@ -1,0 +1,35 @@
+@include("preamble")
+FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV GRAILS_ENV=production \
+    GRAILS_OPTS="" \
+    DEFAULT_LOCALE=${DEFAULT_LOCALE} \
+    DEFAULT_ENCODING=${DEFAULT_ENCODING} \
+    DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS}" \
+    APP_HOME=${APP_HOME}
+
+@include("service_user")
+@include("java")
+
+COPY start-grails-app.sh start-grails-app.inc.sh ${APP_HOME}/
+RUN chmod +x ${APP_HOME}/start-grails-app.sh
+COPY restore_default_envvars.sh /etc/my_init.d/99_restore_default_envvars.sh
+
+ENTRYPOINT ["${APP_HOME}/start-grails-app.sh"]
+
+EXPOSE 8080
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
+
+# Descendant images should add the jar file to ${APP_HOME}
+# And define their configuration in
+# /usr/local/share/app-config.yml.tmpl and
+# /usr/local/share/app-config.yml-settings.sh
+# with
+# COPY app-config.yml.tmpl /usr/local/share/app-config.yml.tmpl
+# COPY app-config.yml-settings.sh /usr/local/share/app-config.yml-settings.sh

@@ -1,0 +1,228 @@
+#!/bin/bash dry-wit
+# Copyright 2015-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+
+function usage() {
+  cat <<EOF
+$SCRIPT_NAME locale encoding
+$SCRIPT_NAME [-h|--help]
+(c) 2016-today OSOCO Software Company.
+    Distributed under the terms of the GNU General Public License v3
+
+Runs a Grails app.
+
+Common flags:
+    * -h | --help: Display this message.
+    * -v: Increase the verbosity.
+    * -vv: Increase the verbosity further.
+    * -q | --quiet: Be silent.
+EOF
+}
+
+# Requirements
+function defineRequirements() {
+  checkReq java "JAVA_IS_NOT_INSTALLED";
+}
+
+## Defines the errors
+## dry-wit hook
+function defineErrors() {
+  addError "INVALID_OPTION" "Unrecognized option";
+  addError "JAVA_IS_NOT_INSTALLED" "java is not installed";
+  addError CANNOT_GENERATE_THE_APPLICATION_CONFIGURATION_FROM_THE_TEMPLATE "Cannot generate the application configuration from the template";
+  addError CANNOT_APPEND_SETTINGS_TO_THE_TEMPORARY_PROCESSFILE_INC_FILE "Cannot append settings to the temporary processfile-inc file";
+  addError CANNOT_COPY_PROCESSFILE_INC_TO_A_TEMPORARY_FILE "Cannot copy processfile-inc file to a temporary file.";
+}
+
+## Validates the input.
+## dry-wit hook
+function checkInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+  logDebug -n "Checking input";
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q)
+        shift;
+        ;;
+      --)
+        shift;
+        break;
+        ;;
+      *) logDebugResult FAILURE "failed";
+         exitWithErrorCode INVALID_OPTION;
+         ;;
+    esac
+  done
+
+  logDebugResult SUCCESS "valid";
+}
+
+## Parses the input
+## dry-wit hook
+function parseInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q)
+        shift;
+        ;;
+      --)
+        shift;
+        break;
+        ;;
+    esac
+  done
+
+  if isEmpty "${LOCALE}"; then
+      export LOCALE="${DEFAULT_LOCALE}";
+  fi
+
+  if isEmpty "${ENCODING}"; then
+      export ENCODING="${DEFAULT_ENCODING}";
+  fi
+}
+
+## Retrieves the war file of the Grails application.
+## -> 1: The application folder.
+## <- 0/${TRUE} if the file is found; 1/${FALSE} otherwise.
+## <- RESULT: The path of the Grails war file.
+## Example:
+##   if retrieve_grails_war /opt/grails; then
+##     echo "war file is ${RESULT}";
+##   fi
+function retrieve_grails_war() {
+  local _appFolder="${1}";
+  local _result;
+  local -i _rescode;
+
+    checkNotEmpty "appFolder" "${_appFolder}" 1;
+
+  if isEmpty "${GRAILS_WAR_FILE}"; then
+      _result="$(find ${_appFolder}/ -maxdepth 1 -name '*.war' | head -n 1)";
+      _rescode=$?;
+  else
+    _result="${GRAILS_WAR_FILE}";
+    _rescode=${TRUE};
+  fi
+
+  if isTrue ${_rescode}; then
+      export RESULT="${_result}";
+  fi
+}
+
+## Generates the application's app-config.yml.
+## -> 1: The app-config.yml.tmpl file.
+## -> 2: The output file.
+## -> 3: The source settings.
+## <- 0/${TRUE} if the file gets generated correctly; 1/${FALSE} otherwise.
+## Example:
+##   if generate_appconfig_yml "/usr/local/share/app-config.yml.tmpl" "/opt/grails/app-config.yml" "/usr/local/share/app-config.yml-settings.sh"; then
+##     echo "/opt/grails/app-config.yml generated successfully";
+##   fi
+function generate_appconfig_yml() {
+  local _tmplFile="${1}";
+  local _output="${2}";
+  local _settings="${3}";
+  local -i _rescode;
+  local _processFileTemp;
+
+  createTempFile;
+  _processFileTemp="${RESULT}";
+
+  logTrace -n "Copying /usr/local/bin/process-file.sh to ${_processFileTemp}";
+  cp "/usr/local/bin/process-file.sh" "${_processFileTemp}.sh";
+  _rescode=$?;
+  if isTrue ${_rescode}; then
+    logTraceResult SUCCESS "done";
+    if [ -e "$(basename /usr/local/bin/process-file.sh .sh).inc.sh)" ]; then
+      cp "$(basename /usr/local/bin/process-file.sh .sh).inc.sh" "${_processFileTemp}.inc.sh";
+      _rescode=$?;
+      if isFalse ${_rescode}; then
+        logTraceResult FAILURE "failed";
+        exitWithErrorCode CANNOT_COPY_PROCESSFILE_INC_TO_A_TEMPORARY_FILE;
+      fi
+    fi
+    if isTrue ${_rescode}; then
+      logTrace -n "Appending ${_settings} to ${_processFileTemp}.inc.sh"
+      cat "${_settings}" >> "${_processFileTemp}.inc.sh";
+      _rescode=$?;
+      if isTrue ${_rescode}; then
+          logDebug -n "Processing ${_tmplFile} to generate ${_output}";
+        ${_processFileTemp}.sh -q -o "${_output}" "${_tmplFile}";
+        _rescode=$?;
+        if isTrue ${_rescode}; then
+          logDebugResult SUCCESS "done";
+        else
+          logDebugResult FAILURE "failed";
+          exitWithErrorCode CANNOT_GENERATE_THE_APPLICATION_CONFIGURATION_FROM_THE_TEMPLATE;
+        fi
+      else
+        logTraceResult FAILURE "failed";
+        exitWithErrorCode CANNOT_APPEND_SETTINGS_TO_THE_TEMPORARY_PROCESSFILE_INC_FILE;
+      fi
+    fi
+  else
+    logTraceResult FAILURE "failed";
+    exitWithErrorCode CANNOT_COPY_PROCESSFILE_TO_A_TEMPORARY_FILE;
+  fi
+}
+
+## Main logic
+## dry-wit hook
+function main() {
+  local _grailsWarFile;
+  local _extraEnvVars;
+
+  if isEmpty "${JAVA_OPTS}"; then
+    JAVA_OPTS="${DEFAULT_JAVA_OPTS}";
+  fi
+
+  if ! isEmpty "${JAVA_HEAP_MIN}"; then
+      JAVA_OPTS="-Xms${JAVA_HEAP_MIN} ${JAVA_OPTS}";
+  fi
+
+  if ! isEmpty "${JAVA_HEAP_MAX}"; then
+      JAVA_OPTS="-Xmx${JAVA_HEAP_MAX} ${JAVA_OPTS}";
+  fi
+
+  if isEmpty "${GRAILS_ENV}"; then
+      GRAILS_ENV="${DEFAULT_GRAILS_ENV}";
+  fi
+  JAVA_OPTS="${JAVA_OPTS} -Dgrails.env=${GRAILS_ENV}";
+
+  if ! isEmpty "${LOCALE}"; then
+      JAVA_OPTS="${JAVA_OPTS} -Duser.language=${LOCALE%_*} -Duser.country=${LOCALE#*_}";
+  fi
+
+  if ! isEmpty "${ENCODING}"; then
+      JAVA_OPTS="${JAVA_OPTS} -Dfile.encoding=${ENCODING}";
+  fi
+
+  if isEmpty "${GRAILS_OPTS}"; then
+    GRAILS_OPTS="${DEFAULT_GRAILS_OPTS}";
+  fi
+
+  if retrieve_grails_war "/opt/grails"; then
+      _grailsWarFile="${RESULT}";
+  fi
+
+  if isEmpty "${_grailsWarFile}"; then
+      _grailsWarFile=$(echo -n "/opt/grails"; echo '*.war');
+  fi
+
+  generate_appconfig_yml "/usr/local/share/app-config.yml.tmpl" "/opt/grails/app-config.yml" "/usr/local/share/app-config.yml-settings.sh";
+
+  $(which java) ${JAVA_OPTS} -Dlocal.config.location=/opt/grails/app-config.yml ${GRAILS_OPTS} -jar ${_grailsWarFile}
+}

@@ -1,0 +1,22 @@
+# Grails service Docker image
+
+Runs a Grails application.
+
+Examples:
+
+- Run the application
+
+> docker run -d -p [HOST_PORT]:8080 --name [APP-NAME] ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run the application using settings defined for test environments:
+
+> docker run -d -p [HOST_PORT]:8080 --name [APP-NAME] -e GRAILS_ENV=test ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run the application overriding certain settings from the production environment:
+
+> docker run -d -p [HOST_PORT]:8080 --name [APP-NAME] -e [setting]=[value] ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+Supported settings:
+
+- GRAILS_ENV: The Grails environment.
+- GRAILS_OPTS: Additional Grails command-line options.
