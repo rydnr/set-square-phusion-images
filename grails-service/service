@@ -179,11 +179,22 @@ function generate_appconfig_yml() {
   fi
 }
 
+## Checks whether the external configuration is enabled.
+## <- 0/${TRUE} if the external configuration is enabled; 1/${FALSE} otherwise.
+## Example:
+##   if externalConfigEnabled; then
+##     echo "External config enabled"
+##   fi
+function externalConfigEnabled() {
+  [ "${EXTERNAL_CONFIG_ENABLED}" == "true" ]
+}
+
 ## Main logic
 ## dry-wit hook
 function main() {
   local _grailsWarFile;
   local _extraEnvVars;
+  local _extConfig="";
 
   if isEmpty "${JAVA_OPTS}"; then
     JAVA_OPTS="${DEFAULT_JAVA_OPTS}";
@@ -222,7 +233,10 @@ function main() {
       _grailsWarFile=$(echo -n "/opt/grails"; echo '*.war');
   fi
 
-  generate_appconfig_yml "/usr/local/share/app-config.yml.tmpl" "/opt/grails/app-config.yml" "/usr/local/share/app-config.yml-settings.sh";
+  if externalConfigEnabled; then
+    generate_appconfig_yml "/usr/local/share/app-config.yml.tmpl" "/opt/grails/app-config.yml" "/usr/local/share/app-config.yml-settings.sh";
+    _extConfig="-Dlocal.config.location=/opt/grails/app-config.yml";
+  fi
 
-  $(which java) ${JAVA_OPTS} -Dlocal.config.location=/opt/grails/app-config.yml ${GRAILS_OPTS} -jar ${_grailsWarFile}
+  $(which java) ${JAVA_OPTS} ${GRAILS_OPTS} ${_extConfig} -jar ${_grailsWarFile}
 }
