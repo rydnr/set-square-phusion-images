@@ -3,6 +3,9 @@ FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
 @include("maintainer")
 @include("addon-toggles")
 @include("service_user")
+@include("python")
+@include("pip")
+@include("aws")
 
 ENV WORKSPACE="${WORKSPACE}" \
     DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"

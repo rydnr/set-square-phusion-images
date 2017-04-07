@@ -7,6 +7,9 @@ This image runs bash.
 - Launch this image to run only terminal applications:
 >  docker run -it --rm --name bash -v ${PWD}:${WORKSPACE} ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
 
+- Launch this image to run AWS CLI:
+>  docker run -it --rm --name bash -v ${PWD}:${WORKSPACE} -v ${HOME}/.aws:${SERVICE_USER_HOME}/.aws ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
 - Launch this image to run X applications:
 
 to build your application's image:
