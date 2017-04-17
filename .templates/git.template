@@ -1,0 +1,6 @@
+# v git
+COPY git-files/gitconfig ${SERVICE_USER_HOME}/.gitconfig
+RUN ${APTGET_INSTALL} git && ${APTGET_CLEANUP} && \
+    su - ${SERVICE_USER} -c 'git config --global user.email "${GIT_USER_EMAIL}"' && \
+    su - ${SERVICE_USER} -c 'git config --global user.name "${GIT_USER_NAME}"'
+# ^ git

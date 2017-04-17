@@ -30,7 +30,11 @@ ENV SERVICE_USER="jenkins" \
 @include("tomcat")
 @include("apr")
 @include("git")
+
 @include("sdkman")
+RUN mkdir -p /home/jenkins && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/jenkins && \
+    ln -s /backup/jenkins-home/.sdkman /home/jenkins/.sdkman
 @include("gradle")
 @include("phabricator")
 @include("pharo")

@@ -1,6 +1,7 @@
 # v jenkins:
 COPY jenkins-files/update-jenkins.sh jenkins-files/update-jenkins.inc.sh \
      jenkins-files/generate-jenkins-plugin-configs.sh jenkins-files/generate-jenkins-plugin-configs.inc.sh \
+     jenkins-files/backup-jenkins-configs.sh jenkins-files/backup-jenkins-configs.inc.sh \
      /usr/local/bin/
 
 RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/service/update-jenkins && \
@@ -43,6 +44,8 @@ su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradl
     su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh nodejs" && \
     echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> ${TOMCAT_HOME}/bin/setenv.sh  && \
     ${APTGET_CLEANUP}
+#    ln -s /usr/local/bin/backup-jenkins-configs.sh /etc/cron.hourly/backup-jenkins-configs.sh && \
+#    ln -s /usr/local/bin/backup-jenkins-configs.inc.sh /etc/cron.hourly/backup-jenkins-configs.inc.sh
 
 COPY jenkins-files/context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
 COPY jenkins-files/config /etc/default/tomcat
@@ -51,3 +54,4 @@ COPY jenkins-files/known_hosts ${JENKINS_HOME}/.ssh/known_hosts
 COPY jenkins-files/jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
 COPY jenkins-files/hudson.tasks.Mailer.xml jenkins-files/config.xml ${SERVICE_USER_HOME}/
 # ^ jenkins
+

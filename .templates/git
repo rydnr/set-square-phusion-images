@@ -1,5 +1,0 @@
-# v git
-# - requires:
-#   - install
-RUN ${APTGET_INSTALL} git && ${APTGET_CLEANUP}
-# ^ git

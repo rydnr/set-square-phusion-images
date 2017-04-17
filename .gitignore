@@ -177,6 +177,7 @@ sdkman/setup.sql
 .templates/entrypoint
 .templates/exim-files/exim.00_local_macros
 .templates/filebeat
+.templates/git
 .templates/go
 .templates/gosu
 .templates/gradle
@@ -188,6 +189,7 @@ sdkman/setup.sql
 .templates/jce
 .templates/jenkins
 .templates/kibana
+.templates/letsencrypt
 .templates/locale
 .templates/logstash
 .templates/maintainer
@@ -225,4 +227,3 @@ tt-rss/create-ttrss-database.sql
 tt-rss/create-ttrss-user.sql
 tt-rss/setup.sql
 */volumes-files/*
-.templates/letsencrypt

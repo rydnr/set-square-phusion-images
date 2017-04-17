@@ -5,7 +5,8 @@ defineEnvVar NAMESPACE "The docker registry's namespace" "example";
 defineEnvVar DATE "The date format used to tag images" "$(date '+%Y%m')";
 defineEnvVar TIME "A timestamp" "$(date)";
 defineEnvVar ROOT_IMAGE_VERSION "The root image version" "0.9.19";
-defineEnvVar ROOT_IMAGE_64BIT "The default root image for 64 bits" "phusion/baseimage"
+defineEnvVar ROOT_IMAGE "The default root image" "phusion/baseimage"
+defineEnvVar ROOT_IMAGE_64BIT "The default root image for 64 bits" '${ROOT_IMAGE}';
 defineEnvVar RANDOM_PASSWORD \
              "A random password" \
              "secret" \
