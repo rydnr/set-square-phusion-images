@@ -449,14 +449,14 @@ function resolve_includes() {
           _includedFile="${RESULT}";
           if [ -d "${_templateFolder}/$(basename ${_includedFile})-files" ]; then
               mkdir "${_repoFolder}/$(basename ${_includedFile})-files" 2> /dev/null;
-              find "${PWD}/${_templateFolder#\./}/$(basename ${_includedFile})-files/" -exec cp {} "${_repoFolder}/$(basename ${_includedFile})-files/" \; ;
-#              echo "Processing ${_repoFolder}/$(basename ${_includedFile})-files"
+              rsync -az "${PWD}/${_templateFolder#\./}/$(basename ${_includedFile})-files/" "${_repoFolder}/$(basename ${_includedFile})-files/"
+              _debugEcho "Processing ${_repoFolder}/$(basename ${_includedFile})-files"
               shopt -s nullglob dotglob;
               _files=(${_repoFolder}/$(basename ${_includedFile})-files/*.template);
               shopt -u nullglob dotglob;
               if [ ${#_files[@]} -gt 0 ]; then
                 for p in ${_repoFolder}/$(basename ${_includedFile})-files/*.template; do
-#                  echo "Processing ${p}";
+                  _debugEcho "Processing ${p}";
                   process_file "${p}" "$(basename ${p} .template)" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_backupHostSshPort}";
                 done
               fi
@@ -1019,7 +1019,6 @@ function main() {
       find_parents "${_repo}"
       _parents="${RESULT}"
       for _parent in ${_parents}; do
-        echo "parent ${_parent}"
         build_repo_if_defined_locally "${_parent}";
       done
 
