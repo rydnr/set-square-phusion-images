@@ -1,0 +1,8 @@
+# v discord
+RUN ${APTGET_INSTALL} -u libasound2 libgconf-2-4 libnotify4 libnss3 libxss1 libxtst6 libappindicator1 && \
+    apt-get install -f && \
+    cd /opt && \
+    wget -O- ${DISCORD_DOWNLOAD_URL} && \
+    dpkg -i ${DISCORD_ARTIFACT} && \
+    ${APTGET_CLEANUP}
+# ^ discord
