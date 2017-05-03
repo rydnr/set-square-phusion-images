@@ -1,6 +1,9 @@
 #!/bin/bash
 
-/usr/local/bin/letsencrypt.sh
+# /usr/local/bin/letsencrypt.sh
+
+/usr/local/bin/process-file.sh -o /etc/nginx/sites-available/default /usr/local/src/nginx-default
+/usr/local/bin/process-file.sh -o /etc/nginx/sites-available/default-ssl /usr/local/src/nginx-default-ssl
 
 exec 2>&1
 exec /usr/sbin/nginx -c /etc/nginx/nginx.conf  -g "daemon off;"

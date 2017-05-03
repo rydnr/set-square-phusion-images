@@ -1,5 +1,5 @@
 # v nginx
-COPY nginx-files/nginx-default /usr/local/src/
+COPY nginx-files/nginx-default nginx-files/nginx-default-ssl /usr/local/src/
 COPY nginx-files/letsencrypt.sh /usr/local/bin/
 COPY nginx-files/letsencrypt-renew.cron /etc/cron.d/letsencrypt
 COPY nginx-files/service /etc/service/nginx/run
@@ -7,7 +7,6 @@ COPY nginx-files/service /etc/service/nginx/run
 RUN ${APTGET_INSTALL} nginx letsencrypt && \
     ${APTGET_CLEANUP} && \
     chmod +x /usr/local/bin/letsencrypt.sh && \
-    cp /usr/local/src/nginx-default /etc/nginx/sites-available/default && \
     cp -r /etc/service/.template/* /etc/service/nginx/ && \
     chmod +x /etc/service/nginx/run
 

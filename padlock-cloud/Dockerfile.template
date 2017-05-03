@@ -11,7 +11,6 @@ ENV DOBACKUP="true" \
 @include("go")
 @include("git")
 @include("service")
-@include("nginx")
 
 COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
 ADD ssl/ /etc/ssl/private/
@@ -19,16 +18,11 @@ ADD ssl/ /etc/ssl/private/
 RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
     ln -s /backup/${IMAGE}/log /var/log/${IMAGE} && \
     /usr/local/go/bin/go get github.com/maklesoft/padlock-cloud && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud /backup/padlock-cloud /etc/ssl/private && \
-    echo '        location / {' > /tmp/nginx-ssl.cfg && \
-    echo '                proxy_pass https://localhost:8443;' >> /tmp/nginx-ssl.cfg && \
-    echo '        }' >> /tmp/nginx-ssl.cfg && \
-    sed '/^##REPLACEME##$/r /tmp/nginx-ssl.cfg' /etc/nginx/sites-available/default && \
-    rm -f /tmp/nginx-ssl.cfg
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud /backup/padlock-cloud /etc/ssl/private
 
 VOLUME /backup/${IMAGE}
 
-EXPOSE 443
+EXPOSE 8443
 
 @include("copy-metadata")
 @include("symlinks")
