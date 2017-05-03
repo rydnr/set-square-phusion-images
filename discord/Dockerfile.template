@@ -1,0 +1,15 @@
+@include("preamble")
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+@include("service_user")
+@include("discord")
+
+USER ${SERVICE_USER}
+ENTRYPOINT /usr/bin/discord
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
