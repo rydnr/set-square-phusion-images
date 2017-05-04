@@ -1,11 +1,33 @@
 # v rabbitmq
-RUN wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
-    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
-    ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
+RUN wget -O /tmp/${RABBITMQ_DEB_ARTIFACT} ${RABBITMQ_DEB_DOWNLOAD_URL} && \
+    ${APTGET_INSTALL} -u erlang-nox socat && \
+    dpkg -i /tmp/${RABBITMQ_DEB_ARTIFACT} && \
+    rm -f /tmp/${RABBITMQ_DEB_ARTIFACT} && \
     rabbitmq-plugins enable --offline rabbitmq_management && \
     for p in ${RABBITMQ_PLUGINS}; do \
       rabbitmq-plugins enable rabbitmq_${p} --offline; \
-    done
+    done && \
+    mkdir -p /backup/rabbitmq/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/rabbitmq/data/mnesia && \
+    mv /var/lib/rabbitmq/mnesia /backup/rabbitmq/data && \
+    ln -s /backup/rabbitmq/data/mnesia /var/lib/rabbitmq/mnesia && \
+    ln -s /backup/rabbitmq/data/mnesia /data/mnesia && \
+    mv /var/log/rabbitmq /data/log && \
+    ln -s /data/log /var/log/rabbitmq && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data && \
+    echo '[{rabbit, [{' >> /etc/rabbitmq/rabbitmq.config && \
+    echo '    loopback_users, []' >> /etc/rabbitmq/rabbitmq.config && \
+    echo '  }]}].' >> /etc/rabbitmq/rabbitmq.config
+
+
+#RUN wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && \
+#    sudo dpkg -i erlang-solutions_1.0_all.deb && \
+#    ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
+
+# Define mount points.
+VOLUME ["/backup/rabbitmq/data/mnesia"]
+
+EXPOSE 5672 15672
+
 
 # Expose ports.
 EXPOSE 5672 15672 5671 5672 5671 4369 25672 1883 8883 61613 61614
