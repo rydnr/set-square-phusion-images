@@ -4,6 +4,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
+@include("service_user")
 @include("apache")
 @include("git")
 @include("phabricator")

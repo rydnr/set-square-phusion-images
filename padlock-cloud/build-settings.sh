@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201704";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.21";
 overrideEnvVar TAG "v1.0.0";
 defineEnvVar DEFAULT_PADLOCK_CLOUD_DOMAIN "The padlock-cloud domain" '${DOMAIN}';
 defineEnvVar DEFAULT_PADLOCK_CLOUD_VIRTUALHOST "The padlock-cloud virtual host" 'padlock.${DEFAULT_PADLOCK_CLOUD_DOMAIN}';

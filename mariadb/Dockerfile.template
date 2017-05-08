@@ -19,10 +19,11 @@ COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh 
      /usr/local/bin/
 
 @include("create_ssl_certificate")
-@include("java")
-@include("logstash")
+#@include("java")
+#@include("logstash")
 
-COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+#COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
 #ADD conf.d /etc/mysql/conf.d
 
 #RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db

@@ -5,7 +5,7 @@ server:
   tls_cert: /etc/ssl/private/${PADLOCK_CLOUD_VIRTUALHOST}.cert.pem
   tls_key: /etc/ssl/private/${PADLOCK_CLOUD_VIRTUALHOST}.privkey.pem
   base_url: https://${PADLOCK_CLOUD_VIRTUALHOST}
-  cors: false
+  cors: true
 email:
   server: localhost
   port: "25"

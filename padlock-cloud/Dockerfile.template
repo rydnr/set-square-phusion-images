@@ -15,12 +15,12 @@ ENV DOBACKUP="true" \
 COPY config.tmpl /usr/local/src/${IMAGE}-config.tmpl
 ADD ssl/ /etc/ssl/private/
 
-RUN mkdir -p /backup/${IMAGE}/log /etc/${IMAGE} && \
+RUN mkdir -p /etc/${IMAGE} && \
     ln -s /backup/${IMAGE}/log /var/log/${IMAGE} && \
     /usr/local/go/bin/go get github.com/maklesoft/padlock-cloud && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud /backup/padlock-cloud /etc/ssl/private
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/padlock-cloud /etc/ssl/private
 
-VOLUME /backup/${IMAGE}
+VOLUME [ /backup/${IMAGE}/db, /backup/${IMAGE}/log ]
 
 EXPOSE 8443
 

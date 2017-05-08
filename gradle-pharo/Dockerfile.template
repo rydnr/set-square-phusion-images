@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+FROM osoco/base-gui:0.9.21
 @include("maintainer")
 
 @include("addon-toggles")

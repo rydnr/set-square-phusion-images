@@ -9,6 +9,7 @@
 #    ${APTGET_CLEANUP} && \
 
 RUN cd /opt && \
+    [ -d /opt/phabricator ] && rm -rf /opt/phabricator && \
     git clone https://github.com/phacility/phabricator.git && \
     cd /opt/phabricator && \
     git checkout ${GITHUB_PHABRICATOR_HASH} && \

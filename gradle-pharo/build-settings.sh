@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201704";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.21";
 defineEnvVar GRADLE_VERSION "The Gradle version" '3.5';
 defineEnvVar PHARO_VERSION "The Pharo version" "6.0";
 defineEnvVar TAG "The tag" '${GRADLE_VERSION}-${PHARO_VERSION}';

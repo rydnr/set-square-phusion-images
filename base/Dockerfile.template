@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${ROOT_IMAGE}
+FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")

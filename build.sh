@@ -45,54 +45,28 @@ function checkRequirements() {
 
 # Error messages
 function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export DOCKER_NOT_INSTALLED="docker is not installed";
-  export DATE_NOT_INSTALLED="date is not installed";
-  export REALPATH_NOT_INSTALLED="realpath is not installed";
-  export ENVSUBST_NOT_INSTALLED="envsubst is not installed";
-  export HEAD_NOT_INSTALLED="head is not installed";
-  export GREP_NOT_INSTALLED="grep is not installed";
-  export AWK_NOT_INSTALLED="awk is not installed";
-  export DOCKER_SQUASH_NOT_INSTALLED="docker-squash is not installed. Check out https://github.com/jwilder/docker-squash for details";
-  export NO_REPOSITORIES_FOUND="no repositories found";
-  export INVALID_URL="Invalid command";
-  export CANNOT_PROCESS_TEMPLATE="Cannot process template";
-  export INCLUDED_FILE_NOT_FOUND="The included file is missing";
-  export ERROR_BUILDING_REPO="Error building repository";
-  export ERROR_TAGGING_IMAGE="Error tagging image";
-  export ERROR_PUSHING_IMAGE="Error pushing image to ${REGISTRY}";
-  export ERROR_REDUCING_IMAGE="Error reducing the image size";
-  export CANNOT_COPY_LICENSE_FILE="Cannot copy the license file ${LICENSE_FILE}";
-  export LICENSE_FILE_DOES_NOT_EXIST="The specified license ${LICENSE_FILE} does not exist";
-  export CANNOT_COPY_COPYRIGHT_PREAMBLE_FILE="Cannot copy the license file ${COPYRIGHT_PREAMBLE_FILE}";
-  export COPYRIGHT_PREAMBLE_FILE_DOES_NOT_EXIST="The specified copyright-preamble file ${COPYRIGHT_PREAMBLE_FILE} does not exist";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    DOCKER_NOT_INSTALLED \
-    DATE_NOT_INSTALLED \
-    REALPATH_NOT_INSTALLED \
-    ENVSUBST_NOT_INSTALLED \
-    HEAD_NOT_INSTALLED \
-    GREP_NOT_INSTALLED \
-    AWK_NOT_INSTALLED \
-    DOCKER_SQUASH_NOT_INSTALLED \
-    NO_REPOSITORIES_FOUND \
-    REPO_IS_NOT_STACKED \
-    INVALID_URL \
-    CANNOT_PROCESS_TEMPLATE \
-    INCLUDED_FILE_NOT_FOUND \
-    ERROR_BUILDING_REPO \
-    ERROR_TAGGING_IMAGE \
-    ERROR_PUSHING_IMAGE \
-    ERROR_REDUCING_IMAGE \
-    CANNOT_COPY_LICENSE_FILE \
-    LICENSE_FILE_DOES_NOT_EXIST \
-    CANNOT_COPY_COPYRIGHT_PREAMBLE_FILE \
-    COPYRIGHT_PREAMBLE_FILE_DOES_NOT_EXIST \
-  );
-
-  export ERROR_MESSAGES;
+  addError INVALID_OPTION "Unrecognized option";
+  addError DOCKER_NOT_INSTALLED "docker is not installed";
+  addError DATE_NOT_INSTALLED "date is not installed";
+  addError REALPATH_NOT_INSTALLED "realpath is not installed";
+  addError ENVSUBST_NOT_INSTALLED "envsubst is not installed";
+  addError HEAD_NOT_INSTALLED "head is not installed";
+  addError GREP_NOT_INSTALLED "grep is not installed";
+  addError AWK_NOT_INSTALLED "awk is not installed";
+  addError DOCKER_SQUASH_NOT_INSTALLED "docker-squash is not installed. Check out https://github.com/jwilder/docker-squash for details";
+  addError NO_REPOSITORIES_FOUND "no repositories found";
+  addError INVALID_URL "Invalid url";
+  addError CANNOT_PROCESS_TEMPLATE "Cannot process template";
+  addError INCLUDED_FILE_NOT_FOUND "The included file is missing";
+  addError ERROR_BUILDING_REPO "Error building repository";
+  addError ERROR_TAGGING_IMAGE "Error tagging image";
+  addError ERROR_PUSHING_IMAGE "Error pushing image to ${REGISTRY}";
+  addError ERROR_REDUCING_IMAGE "Error reducing the image size";
+  addError CANNOT_COPY_LICENSE_FILE "Cannot copy the license file ${LICENSE_FILE}";
+  addError LICENSE_FILE_DOES_NOT_EXIST "The specified license ${LICENSE_FILE} does not exist";
+  addError CANNOT_COPY_COPYRIGHT_PREAMBLE_FILE "Cannot copy the license file ${COPYRIGHT_PREAMBLE_FILE}";
+  addError COPYRIGHT_PREAMBLE_FILE_DOES_NOT_EXIST "The specified copyright-preamble file ${COPYRIGHT_PREAMBLE_FILE} does not exist";
+  addError PARENT_REPO_NOT_AVAILABLE "The parent repository is not available";
 }
 
 ## Parses the input
@@ -217,7 +191,7 @@ function repo_exists() {
   if _evalEnvVar "${_tag}"; then
       _tag="${RESULT}";
   fi
-  
+
   local _images=$(${DOCKER} images "${NAMESPACE}/${_repo}")
   local _matches=$(echo "${_images}" | grep "${_tag}")
   local -i _rescode;
@@ -243,7 +217,7 @@ function build_repo_if_defined_locally() {
   if ! isEmpty "${_name}" && \
      [[ -d ${_name} ]] && \
      ! repo_exists "${_name#${NAMESPACE}/}" "${_tag}"; then
-    build_repo "${_name}" "${_tag}"
+      build_repo "${_name}" "${_tag}"
   fi
 }
 
@@ -557,7 +531,7 @@ function process_placeholders() {
       echo ${ENV_VARIABLES[$i]} | awk -v dollar="$" -v quote="\"" '{printf("echo  %s=\\\"%s%s{%s}%s\\\"", $0, quote, dollar, $0, quote);}' | sh; \
     done;) TAG=\"${_tag}\" DATE=\"${DATE}\" TIME=\"${TIME}\" MAINTAINER=\"${AUTHOR} <${AUTHOR_EMAIL}>\" STACK=\"${STACK}\" REPO=\"${_repo}\" IMAGE=\"${_repo}\" ROOT_IMAGE=\"${_rootImage}\" BASE_IMAGE=\"${BASE_IMAGE}\" NAMESPACE=\"${_namespace}\" BACKUP_HOST_SSH_PORT=\"${_backupHostSshPort}\" DOLLAR='$' ";
 
-  local _envsubstDecl=$(echo -n "'"; echo -n "$"; echo -n "{_tag} $"; echo -n "{DATE} $"; echo -n "{MAINTAINER} $"; echo -n "{STACK} $"; echo -n "{_repo} $"; echo -n "{IMAGE} $"; echo -n "{_rootImage} $"; echo -n "{BASE_IMAGE} $"; echo -n "{_namespace} $"; echo -n "{_backupHostSshPort} $"; echo -n "{DOLLAR}"; echo ${ENV_VARIABLES[*]} | tr ' ' '\n' | awk '{printf("${%s} ", $0);}'; echo -n "'";);
+  local _envsubstDecl=$(echo -n "'"; echo -n "$"; echo -n "{_tag} $"; echo -n "{DATE} $"; echo -n "{TIME} $"; echo -n "{MAINTAINER} $"; echo -n "{STACK} $"; echo -n "{REPO} $"; echo -n "{IMAGE} $"; echo -n "{ROOT_IMAGE} $"; echo -n "{BASE_IMAGE} $"; echo -n "{NAMESPACE} $"; echo -n "{BACKUP_HOST_SSH_PORT} $"; echo -n "{DOLLAR}"; echo ${ENV_VARIABLES[*]} | tr ' ' '\n' | awk '{printf("${%s} ", $0);}'; echo -n "'";);
 
   echo "${_env} envsubst ${_envsubstDecl} < ${_file}" | sh > "${_output}";
   _rescode=$?;
@@ -710,11 +684,17 @@ function retrieve_backup_host_ssh_port() {
   local _repo="${1}";
   local _result;
   if [ -e "${SSHPORTS_FILE}" ]; then
-    _result="$(echo -n ''; (grep -e ${_repo} ${SSHPORTS_FILE} || echo ${_repo} 22) | awk '{print $2;}')";
+      logDebug -n "Retrieving the ssh port of the backup host for ${_repo}";
+      _result="$(echo -n ''; (grep -e ${_repo} ${SSHPORTS_FILE} || echo ${_repo} 22) | awk '{print $2;}' | head -n 1)";
+      if isTrue $?; then
+          logDebugResult SUCCESS "${_result}";
+          export RESULT="${_result}";
+      else
+        logDebugResult FAILURE "not-found";
+      fi
   else
     _result="";
   fi
-  export RESULT="${_result}";
 }
 
 ## PUBLIC
@@ -897,16 +877,35 @@ function resolve_base_image() {
 ##   echo "MY_VAR is ${MY_VAR}"
 function loadRepoEnvironmentVariables() {
   local _repos="${1}";
+  local _repoSettings;
+  local _privateSettings;
 
   checkNotEmpty "repositories" "${_repos}" 1;
 
   for _repo in ${_repos}; do
     for f in "${DRY_WIT_SCRIPT_FOLDER}/${_repo}/build-settings.sh" \
-             "./${_repo}/build-settings.sh" \
-             "${DRY_WIT_SCRIPT_FOLDER}/${_repo}/.build-settings.sh" \
-             "./${_repo}/.build-settings.sh"; do
+                 "./${_repo}/build-settings.sh"; do
       if [ -e "${f}" ]; then
+          _repoSettings="${f}";
+      fi
+    done
+
+    for f in "${DRY_WIT_SCRIPT_FOLDER}/${_repo}/.build-settings.sh" \
+                 "./${_repo}/.build-settings.sh"; do
+      if [ -e "${f}" ]; then
+          _privateSettings="${f}";
+      fi
+    done
+
+    for f in "${_repoSettings}" "${_privateSettings}"; do
+      if [ -e "${f}" ]; then
+          logTrace -n "Sourcing ${f}";
           source "${f}";
+          if isTrue $?; then
+              logTraceResult SUCCESS "done";
+          else
+            logTraceResult FAILURE "failed";
+          fi
       fi
     done
   done

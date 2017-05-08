@@ -1,5 +1,5 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201704";
-defineEnvVar NEXUS_VERSION "The version of Sonatype Nexus" "3.2.0-01";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.21";
+defineEnvVar NEXUS_VERSION "The version of Sonatype Nexus" "3.3.1-01";
 defineEnvVar TAG "The image tag" '${NEXUS_VERSION}';
 defineEnvVar NEXUS_ARTIFACT \
              "The Nexus artifact" \
