@@ -26,8 +26,9 @@ RUN wget -O /tmp/${RABBITMQ_DEB_ARTIFACT} ${RABBITMQ_DEB_DOWNLOAD_URL} && \
 # Define mount points.
 VOLUME ["/backup/rabbitmq/data/mnesia"]
 
-EXPOSE 5672 15672
-
+# wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
+#    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
+#    ${APTGET_INSTALL} --update --force-yes rabbitmq-server && \
 
 # Expose ports.
 EXPOSE 5672 15672 5671 5672 5671 4369 25672 1883 8883 61613 61614

@@ -13,17 +13,18 @@ ENV DOBACKUP="true" \
     RABBITMQ_NODENAME=${IMAGE}
 
 @include("service_user")
-@include("service")
 @include("filebeat")
 
-COPY filebeat.yml /etc/filebeat/filebeat.yml
+COPY service /sbin/my_exec
+#COPY filebeat.yml /etc/filebeat/filebeat.yml
 COPY skel.sh /usr/local/bin/skel.sh
 COPY skel.inc.sh /usr/local/bin/skel.inc.sh
 COPY create_bootstrap_cron_job.sh /etc/my_init.d/55_create_bootstrap_cron_job.sh
 
 @include("rabbitmq")
 
-RUN mkdir -p /backup/${IMAGE}/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/${IMAGE}/data/mnesia && \
+RUN chmod +x /sbin/my_exec && \
+    mkdir -p /backup/${IMAGE}/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/${IMAGE}/data/mnesia && \
     mv /var/lib/rabbitmq/mnesia /backup/${IMAGE}/data && \
     ln -s /backup/${IMAGE}/data/mnesia /var/lib/rabbitmq/mnesia && \
     ln -s /backup/${IMAGE}/data/mnesia /data/mnesia && \
