@@ -1,0 +1,3 @@
+defineEnvVar DBEAVER_VERSION "The DBeaver version" "4.0.6";
+defineEnvVar DBEAVER_ARTIFACT "The DBeaver artifact" 'dbeaver-ce_${DBEAVER_VERSION}_amd64.deb';
+defineEnvVar DBEAVER_DOWNLOAD_URL "The DBeaver download url" 'http://dbeaver.jkiss.org/files/${DBEAVER_VERSION}/${DBEAVER_ARTIFACT}';

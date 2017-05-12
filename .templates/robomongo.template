@@ -1,0 +1,9 @@
+# v robomongo
+RUN cd /opt && \
+    wget -O ${ROBOMONGO_ARTIFACT} ${ROBOMONGO_DOWNLOAD_URL} && \
+    tar xvfz ${ROBOMONGO_ARTIFACT} && \
+    ln -s ${ROBOMONGO_FOLDER} robomongo && \
+    rm -f ${ROBOMONGO_ARTIFACT} && \
+    ${APTGET_INSTALL} -u libgl1-mesa-glx xcb qt5-default && \
+    ${APTGET_CLEANUP}
+# ^ robomongo

@@ -1,0 +1,3 @@
+#!/bin/bash
+
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} /opt/robomongo/bin/robomongo

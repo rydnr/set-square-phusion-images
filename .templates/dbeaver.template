@@ -1,0 +1,5 @@
+# v dbeaver
+RUN cd /opt && wget -O ${DBEAVER_ARTIFACT} ${DBEAVER_DOWNLOAD_URL} && \
+    dpkg -i ${DBEAVER_ARTIFACT} && \
+    rm -f ${DBEAVER_ARTIFACT}
+# ^ dbeaver

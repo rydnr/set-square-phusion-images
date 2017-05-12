@@ -1,0 +1,17 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+@include("gui")
+@include("service_user")
+@include("service")
+@include("java")
+@include("dbeaver")
+@include("runme")
+
+RUN rm -f /sbin/my_exec && ln -s /etc/service/dbeaver/run /sbin/my_exec
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
