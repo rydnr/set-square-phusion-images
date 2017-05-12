@@ -1,0 +1,3 @@
+# v mtools
+RUN su - ${SERVICE_USER} 'git clone https://github.com/rueckstiess/mtools.git && cd mtools && git checkout ${MTOOLS_VERSION} && python2 setup.py'
+# ^ mtools
