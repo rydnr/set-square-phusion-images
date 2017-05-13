@@ -1,5 +1,5 @@
 defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.21";
-defineEnvVar TAG "The phabricator tag" 'b0df33e';
+overrideEnvVar TAG '${GITHUB_PHABRICATOR_HASH}';
 defineEnvVar PHABRICATOR_VIRTUAL_HOST "The virtual host of the Phabricator installation" "phabricator.${DOMAIN}";
 defineEnvVar SERVICE_USER "The service user" "phabricator";
 defineEnvVar SERVICE_GROUP "The service group" "phabricator";
