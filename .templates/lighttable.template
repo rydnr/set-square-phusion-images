@@ -1,0 +1,9 @@
+# v lighttable
+RUN ${APTGET_INSTALL} -u libgtk2.0-0 libgconf-2-4 libnss3-dev libasound2 && \
+    ${APTGET_CLEANUP} && \
+    cd /opt && \
+    wget ${LIGHTTABLE_DOWNLOAD_URL} && \
+    tar xvfz ${LIGHTTABLE_ARTIFACT} && \
+    ln -s ${LIGHTTABLE_FOLDER} lighttable && \
+    rm -f ${LIGHTTABLE_ARTIFACT}
+# ^ lighttable

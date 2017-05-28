@@ -1,0 +1,15 @@
+* LightTable
+
+This Docker image runs LightTable [1].
+
+[1] http://lighttable.com/
+
+** Examples
+
+- Run LightTable to edit files under current folder, visible to LightTable under /work:
+
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> xhost +
+> docker run -it -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -v ${PWD}:/work ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
