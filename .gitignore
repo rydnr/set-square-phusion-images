@@ -24,6 +24,7 @@ base/remote-rsyslogd.conf
 base/restart
 */.build*
 \.build.inc.sh*
+.build-settings.sh
 .build.sh.*
 **/check-version-files
 */common-files
@@ -74,6 +75,7 @@ java/my_exec
 java/remote-syslogd.conf
 jenkins/50-rsync-jenkins-home.sh
 jenkins/config.xml
+jenkins/git-files
 jenkins/gradle-files
 jenkins/hudson.tasks.Mailer.xml
 jenkins/jenkins-files
@@ -82,6 +84,7 @@ jenkins/phabricator-files
 jenkins/prepare-release.sh
 jenkins/settings.xml
 kibana/service
+letsencrypt/service
 */LICENSE.*
 **/LICENSE
 LICENSE.*
@@ -111,6 +114,7 @@ mongodb/service
 mysql/admin.sh
 mysql/backup-mysql.sh
 mysql/conf.d
+mysql/my.cnf
 nexus/50_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL
@@ -123,11 +127,13 @@ observium/setup.sql
 packetbeat/service
 padlock/apache-files
 padlock-cloud/config.tmpl
+padlock-cloud/git-files
 padlock-cloud/service
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
 **/phabricator-files
+phabricator/git-files
 phabricator/INSTALL
 phabricator/service
 pharo/service
@@ -172,6 +178,7 @@ sdkman/setup.sql
 .templates/backup
 .templates/copy-metadata
 .templates/couchbase
+.templates/discord
 .templates/elasticsearch
 .templates/elk-common
 .templates/entrypoint
@@ -181,6 +188,7 @@ sdkman/setup.sql
 .templates/go
 .templates/gosu
 .templates/gradle
+.templates/grails
 .templates/gui
 .templates/image_user
 .templates/install
@@ -190,6 +198,7 @@ sdkman/setup.sql
 .templates/jenkins
 .templates/kibana
 .templates/letsencrypt
+.templates/lighttable
 .templates/locale
 .templates/logstash
 .templates/maintainer
@@ -204,9 +213,11 @@ sdkman/setup.sql
 .templates/nginx-files/letsencrypt.sh
 .templates/nginx-files/nginx-default-ssl
 .templates/nodejs
+.templates/npm
 .templates/packetbeat
 .templates/phabricator
 .templates/pharo
+.templates/pharo6
 .templates/plone5
 .templates/postgresql
 .templates/preamble
@@ -217,6 +228,7 @@ sdkman/setup.sql
 .templates/service_user
 .templates/tini
 .templates/tomcat
+.templates/yarn
 tern/my_exec
 tomcat/entrypoint.sh
 */tomcat-files

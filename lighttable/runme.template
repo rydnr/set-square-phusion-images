@@ -1,0 +1,3 @@
+#!/bin/bash
+
+exec /usr/local/bin/run-as.sh -- /work /opt/lighttable/light

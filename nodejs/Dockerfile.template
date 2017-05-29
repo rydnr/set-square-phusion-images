@@ -4,20 +4,18 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-COPY my_exec /sbin/my_exec
-
 ENV DOBACKUP="false"
-
-RUN chmod +x /sbin/my_exec
 
 @include("service_user")
 @include("nodejs")
+@include("npm")
+@include("yarn")
 @include("python")
 @include("pip")
 @include("aws")
 
 RUN mkdir -p /work && \
-    for d in .npm .local .aws; do \
+    for d in .npm .local .aws .config; do \
       ln -s /work/${d} ${SERVICE_USER_HOME}/${d}; \
     done && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /work

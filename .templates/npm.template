@@ -1,0 +1,7 @@
+# v npm
+RUN AUX="${NPM_MODULES}" && if [ -n "${AUX}" ]; then \
+      for p in ${AUX}; do \
+        npm install -g ${p}; \
+      done; \
+    fi
+# ^ npm

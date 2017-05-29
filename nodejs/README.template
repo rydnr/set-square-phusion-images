@@ -1,14 +1,19 @@
+* nodejs
+
 Base image for NodeJS applications.
 
 Parameters:
-  - userId: Optional. Changes the user id running NodeJS within the container.
-  - groupId: Optional. It changes the group id running NodeJS within the container.
-  - command: The command to run. Typically, npm and its arguments.
+  - command: The command to run. Typically, npm or yarn with arguments.
 
-Examples:
+* Usage
 
-- Run this image to run npm using the very same user id and group id:
-> docker run -it --rm -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" -v ${PWD}:/work -v ~/.npmrc:~/.npmrc -v ~/.npm:~/.npm -p 9876:9876 ${NAMESPACE}/${IMAGE}:${TAG} $(id -u) $(id -g) npm ...
+- Run this image to run npm once and be able to run on any port:
+> docker run -it --rm --name nodejs -v ${PWD}:/work -v ${HOME}:/work --net=host ${NAMESPACE}/${IMAGE}:${TAG} npm ...
 
-- Run this image to run npm:
-> docker run -it --rm -e TERM="${TERM}" -e TERMCAP="${TERMCAP}" -v ${PWD}:/work -v ~/.npmrc:~/.npmrc -v ~/.npm:~/.npm -p 9876:9876 ${NAMESPACE}/${IMAGE}:${TAG} npm ...
+- Run this image in background to be able to run NodeJS tools easily:
+> docker run -d --rm --name nodejs --net=host -v ${HOME}:${SERVICE_USER_HOME} ${NAMESPACE}/${IMAGE}:${TAG}
+> alias npm='docker exec -it nodejs npm'
+> alias yarn='docker exec -it nodejs yarn'
+> alias express='docker exec -it nodejs express'
+> alias babel='docker exec -it nodejs babel'
+> alias mb='docker exec -it nodejs mb'
