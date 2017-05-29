@@ -1,9 +1,11 @@
 # v lighttable
-RUN ${APTGET_INSTALL} -u libgtk2.0-0 libgconf-2-4 libnss3-dev libasound2 && \
+RUN ${APTGET_INSTALL} -u libgtk2.0-0 libgconf-2-4 libnss3-dev libasound2 libxtst6 && \
     ${APTGET_CLEANUP} && \
     cd /opt && \
     wget ${LIGHTTABLE_DOWNLOAD_URL} && \
     tar xvfz ${LIGHTTABLE_ARTIFACT} && \
     ln -s ${LIGHTTABLE_FOLDER} lighttable && \
-    rm -f ${LIGHTTABLE_ARTIFACT}
+    rm -f ${LIGHTTABLE_ARTIFACT} && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/lighttable /opt/${LIGHTTABLE_FOLDER} && \
+    sed -i -e 's|^LD_LIBRARY_PATH="$HERE:$LD_LIBRARY_PATH" $HERE/$BIN "$@" &|LD_LIBRARY_PATH="$HERE:$LD_LIBRARY_PATH" $HERE/$BIN "$@"|g' /opt/lighttable/light
 # ^ lighttable
