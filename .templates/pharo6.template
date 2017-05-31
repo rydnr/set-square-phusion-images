@@ -8,14 +8,7 @@ RUN dpkg --add-architecture i386 && \
     ([ -d /opt ] || mkdir /opt) && \
     mkdir /opt/pharo6 && \
     cd /opt/pharo6 && \
-    curl get.pharo.org/60+vm | bash && \
+    curl get.pharo.org/vmT60 | bash && \
     cd /opt && \
-    ln -s pharo6 pharo && \
-    mkdir pharo/bin && \
-    cd pharo/bin && \
-    echo '#!/bin/bash' >> pharo && \
-    echo '/opt/pharo/pharo-vm/pharo --nodisplay "$@"' >> pharo && \
-    echo '#!/bin/bash' >> pharo-ui && \
-    echo '/opt/pharo/pharo-vm/pharo "$@"' >> pharo-ui && \
-    chmod +x pharo pharo-ui
+    ln -s pharo6 pharo
 # ^ pharo6
