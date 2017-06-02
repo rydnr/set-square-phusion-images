@@ -1,9 +1,10 @@
 @include("preamble")
-FROM osoco/base-gui:0.9.21
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
+@include("gui")
 @include("service_user")
 @include("java")
 @include("git")

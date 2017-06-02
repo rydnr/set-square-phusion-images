@@ -1,7 +1,5 @@
 # v apr
-# - requires:
-#   - java
-RUN ${APTGET_INSTALL} -np make gcc openssl libssl-dev libapr1-dev && \
+RUN ${APTGET_INSTALL} -u -np make gcc openssl libssl-dev libapr1-dev && \
     cd /usr/local/src && wget -O ${APR_FILE} ${APR_DOWNLOAD_URL} && \
     tar xvfz ${APR_FILE} && cd ${APR_FOLDER} && \
     ./configure && make && make install && \
