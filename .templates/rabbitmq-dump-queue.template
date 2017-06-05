@@ -1,0 +1,11 @@
+# v rabbitmq-dump-queue
+RUN ${APTGET_INSTALL} -y golang && ${APTGET_CLEANUP} && \
+    (mkdir /opt || echo -n) && \
+    cd /opt && \
+    wget ${RABBITMQ_DUMP_QUEUE_DOWNLOAD_URL} && \
+    tar xvfz ${RABBITMQ_DUMP_QUEUE_ARTIFACT} && \
+    rm -f ${RABBITMQ_DUMP_QUEUE_ARTIFACT} && \
+    ln -s ${RABBITMQ_DUMP_QUEUE_FOLDER} rabbitmq-dump-queue
+
+ENV PATH=${PATH}:/opt/rabbitmq-dump-queue
+# ^ rabbitmq-dump-queue

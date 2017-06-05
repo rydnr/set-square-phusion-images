@@ -222,6 +222,7 @@ sdkman/setup.sql
 .templates/postgresql
 .templates/preamble
 .templates/rabbitmq
+.templates/rabbitmq-dump-queue
 .templates/redis
 .templates/sdkman
 .templates/service

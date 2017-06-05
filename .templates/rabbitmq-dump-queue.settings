@@ -1,0 +1,4 @@
+defineEnvVar RABBITMQ_DUMP_QUEUE_VERSION 'The rabbitmq-dump-queue version' '0.3';
+defineEnvVar RABBITMQ_DUMP_QUEUE_FOLDER 'The rabbitmq-dump-queue folder once extracted' 'rabbitmq-dump-queue-v${RABBITMQ_DUMP_QUEUE_VERSION}-linux-amd64';
+defineEnvVar RABBITMQ_DUMP_QUEUE_ARTIFACT 'The rabbitmq-dump-queue artifact' '${RABBITMQ_DUMP_QUEUE_FOLDER}.tgz';
+defineEnvVar RABBITMQ_DUMP_QUEUE_DOWNLOAD_URL "The url to download RabbitMQ-dump-queue tool" 'https://github.com/dubek/rabbitmq-dump-queue/releases/download/v${RABBITMQ_DUMP_QUEUE_VERSION}/${RABBITMQ_DUMP_QUEUE_ARTIFACT}';
