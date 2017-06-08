@@ -303,17 +303,21 @@ function process_file() {
   if isNotEmpty "${_temp1}" && isNotEmpty "${_temp2}" && \
      resolve_includes "${_file}" "${_temp1}" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_backupHostSshPort}"; then
       logTrace -n "Resolving @include_env in ${_file}";
+      _debugEcho "Resolving @include_env in ${_file}";
       if resolve_include_env "${_temp1}" "${_temp2}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_backupHostSshPort}"; then
           logTraceResult SUCCESS "done";
           if [ -e "${_settingsFile}" ]; then
               process_settings_file "${_settingsFile}";
           fi
           logTrace -n "Resolving placeholders in ${_file}";
+          _debugEcho "Resolving placeholders in ${_temp2}";
           if process_placeholders "${_temp2}" "${_output}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_backupHostSshPort}"; then
               _rescode=${TRUE};
+              _debugEcho "Resolving placeholders in ${_file} succeeded -> ${_output}";
               logTraceResult SUCCESS "done"
           else
             _rescode=${FALSE};
+            _debugEcho "Resolving placeholders in ${_file} failed";
             logTraceResult FAILURE "failed";
           fi
       else
@@ -431,7 +435,7 @@ function resolve_includes() {
               if [ ${#_files[@]} -gt 0 ]; then
                 for p in ${_repoFolder}/$(basename ${_includedFile})-files/*.template; do
                   _debugEcho "Processing ${p}";
-                  process_file "${p}" "$(basename ${p} .template)" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_backupHostSshPort}";
+                  process_file "${p}" "$(dirname ${p})/$(basename ${p} .template)" "${_repoFolder}" "${_templateFolder}" "${_repo}" "${_rootImage}" "${_namespace}" "${_tag}" "${_backupHostSshPort}";
                 done
               fi
           fi
@@ -607,7 +611,7 @@ function resolve_include_env() {
     fi
   done < "${_input}";
   _rescode=$?;
-  if [ ${_rescode} -eq 0 ]; then
+  if isTrue ${_rescode}; then
     logTraceResult SUCCESS "done";
   else
     logTraceResult FAILURE "failed";

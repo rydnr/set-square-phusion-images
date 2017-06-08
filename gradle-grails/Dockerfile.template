@@ -1,0 +1,33 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+@include("service_user")
+@include("java")
+@include("git")
+@include("sdkman")
+@include("gradle")
+@include("grails")
+
+ENV WORKSPACE="${WORKSPACE}" \
+    GRADLE_USER_HOME="${WORKSPACE}/.gradle" \
+    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
+
+RUN chmod +x /sbin/my_exec && \
+    gpasswd -a ${SERVICE_USER} root && \
+    mkdir -p ${WORKSPACE} && \
+    chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE} && \
+    su - ${SERVICE_USER} -c \
+      'ln -s ${GRADLE_USER_HOME} /home/${SERVICE_USER}/.gradle && \
+       ln -s ${WORKSPACE} /home/${SERVICE_USER}/workspace';
+
+WORKDIR ${WORKSPACE}
+ENTRYPOINT /bin/bash
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
+
+USER ${SERVICE_USER}

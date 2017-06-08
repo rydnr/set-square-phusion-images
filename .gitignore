@@ -55,6 +55,7 @@ getboo/dml.sql
 getboo/rc.local
 getboo/setup.sql
 ghost/config.js
+*/git-files
 .gradle
 gradle-daemon/service
 **/gradle-files
@@ -120,6 +121,7 @@ nexus/default
 nexus/INSTALL
 nexus/INSTALL.tmpl
 nexus/java-files
+nexus/ssl
 **/nginx-files
 nodejs/my_exec
 observium/setup.sql
@@ -129,6 +131,7 @@ padlock/apache-files
 padlock-cloud/config.tmpl
 padlock-cloud/git-files
 padlock-cloud/service
+padlock-cloud/ssl
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap

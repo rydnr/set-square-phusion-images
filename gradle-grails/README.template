@@ -1,0 +1,8 @@
+* Gradle - Grails
+
+Docker image that includes gradle and grails.
+
+* Usage
+
+- Run a shell to run a grails app on port 8080:
+  docker run -it --rm -v ${PWD}:${WORKSPACE} -p 8080:8080 ${REGISTRY}/${IMAGE}:${TAG}
