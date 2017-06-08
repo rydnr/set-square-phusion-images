@@ -7,10 +7,14 @@ RUN dpkg --add-architecture i386 && \
     ${APTGET_CLEANUP} && \
     ([ -d /opt ] || mkdir /opt) && \
     cd /opt && \
-    wget ${PHARO_DOWNLOAD_URL} && \
-    unzip ${PHARO_ARTIFACT} && \
+    mkdir ${PHARO_FOLDER} && \
+    cd ${PHARO_FOLDER} && \
+    curl ${PHARO_DOWNLOAD_URL} | bash && \
+    mkdir bin && \
+    cd bin && \
+    ln -s ../pharo . && \
+    ln -s ../pharo-ui . && \
+    cd /opt && \
     ln -s ${PHARO_FOLDER} pharo && \
-    rm -f ${PHARO_ARTIFACT} && \
-    cd /opt/pharo/bin && \
-    ln -s pharo pharo-ui
+    source /opt/${PHARO_FOLDER}/CONFIG
 # ^ pharo
