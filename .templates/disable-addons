@@ -1,0 +1,12 @@
+# v disable-addons
+ENV ENABLE_CRON=false \
+    ENABLE_MONIT=false \
+    ENABLE_RSNAPSHOT=false \
+    ENABLE_SSH=false \
+    ENABLE_SYSLOG=false \
+    ENABLE_LOCAL_SMTP=false \
+    ENABLE_LOGSTASH=false 
+
+RUN mkdir -p /etc/service/sshd; touch /etc/service/sshd/down
+# ^ disable-addons
+
