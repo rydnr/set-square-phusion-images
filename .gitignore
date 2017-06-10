@@ -223,10 +223,12 @@ sdkman/setup.sql
 .templates/pharo6
 .templates/plone5
 .templates/postgresql
+.templates/postman
 .templates/preamble
 .templates/rabbitmq
 .templates/rabbitmq-dump-queue
 .templates/redis
+.templates/robomongo
 .templates/sdkman
 .templates/service
 .templates/service_user
