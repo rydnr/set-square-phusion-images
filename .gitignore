@@ -111,6 +111,7 @@ mariadb/watch-ddls
 metricbeat/service
 mongodb2/service
 mongodb/create_bootstrap_cron_job.sh
+*/mongodb-files
 mongodb/service
 mysql/admin.sh
 mysql/backup-mysql.sh
