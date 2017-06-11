@@ -62,13 +62,14 @@ if [ ! -e ${_bootstrapFile} ]; then
 fi
 
 if [ -e ${_bootstrapFile} ]; then
-    tailf /var/log/mongodb/mongod.log &
     if [ "{_auth}" == "true" ]; then
         echo "Launching MongoDB with ${_authMechanism} authentication mechanism"
         exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth --authenticationMechanism=${_authMechanism} $@
     elif [ "mongoPid" == "" ]; then
         echo "Launching MongoDB with no authentication"
         exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@
+    else
+      fg
     fi
 else
   echo "Could not bootstrap MongoDB"
