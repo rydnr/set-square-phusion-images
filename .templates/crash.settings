@@ -1,0 +1,2 @@
+defineEnvVar CRASH_VERSION "The CRaSH version" '1.3.0';
+defineEnvVar AVAILABLE_CRASH_VERSIONS "The available CRaSH versions" "1.3.0";

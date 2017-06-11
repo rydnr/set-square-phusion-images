@@ -18,6 +18,11 @@ function is_mongodb_running() {
 }
 
 _bootstrapFile="/backup/mongodb/db/.bootstrapped";
+_authMechanism="${AUTHENTICATION_MECHANISM:-SCRAM-SHA-1}";
+_auth="true";
+if [ "${_authMechanism}" == "none" ]; then
+    _auth="false";
+fi
 
 mkdir -p /backup/mongodb/db
 chown -R mongodb:mongodb /var/lib/mongodb /var/log/mongodb /backup/mongodb
@@ -40,24 +45,31 @@ if [ ! -e ${_bootstrapFile} ]; then
         sleep 1;
       fi
     done
-    echo -n "Waiting MongoDB (${mongoPid}) to shut down ";
-    kill ${mongoPid}
-    while is_mongodb_running ; do
-      echo -n ".";
-      sleep 1;
-      parentPid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $3;}')";
-      kill ${parentPid};
-      pid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $2;}')";
-      kill ${pid};
-     done
-    rm -f /backup/mongodb/db/mongod.lock
-    echo "";
+    if [ "${_auth}" == "true" ]; then
+      echo -n "Waiting MongoDB (${mongoPid}) to shut down ";
+      kill ${mongoPid}
+      while is_mongodb_running ; do
+        echo -n ".";
+        sleep 1;
+        parentPid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $3;}')";
+        kill ${parentPid};
+        pid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $2;}')";
+        kill ${pid};
+      done
+      rm -f /backup/mongodb/db/mongod.lock
+      echo "";
+    fi
 fi
 
 if [ -e ${_bootstrapFile} ]; then
-    echo "Launching MongoDB"
     tailf /var/log/mongodb/mongod.log &
-    exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth $@
+    if [ "{_auth}" == "true" ]; then
+        echo "Launching MongoDB with ${_authMechanism} authentication mechanism"
+        exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth --authenticationMechanism=${_authMechanism} $@
+    elif [ "mongoPid" == "" ]; then
+        echo "Launching MongoDB with no authentication"
+        exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@
+    fi
 else
   echo "Could not bootstrap MongoDB"
   exit 1

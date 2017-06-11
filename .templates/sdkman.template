@@ -1,7 +1,4 @@
 # v sdkman
-# - requires:
-#   - java
-#   - user_service
 RUN ${APTGET_INSTALL} zip unzip && \
     ${APTGET_CLEANUP} && \
     touch /tmp/.drywit.log && chmod a+w /tmp/.drywit.log && \
