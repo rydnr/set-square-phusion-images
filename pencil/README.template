@@ -1,0 +1,11 @@
+= Pencil
+
+This image runs Pencil (http://pencil.evolus.vn) within a Docker container.
+
+= Usage
+
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> xhost +
+> docker run -it --rm -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -v ${PWD}:${SERVICE_USER_HOME} ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

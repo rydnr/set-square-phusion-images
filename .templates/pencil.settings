@@ -1,0 +1,4 @@
+defineEnvVar PENCIL_VERSION "The Pencil version" '3.0.3';
+defineEnvVar PENCIL_ARTIFACT "The Pencil artifact" 'Pencil_${PENCIL_VERSION}_amd64.deb';
+defineEnvVar PENCIL_DOWNLOAD_URL "The url to download Pencil" 'http://pencil.evolus.vn/dl/V${PENCIL_VERSION}/${PENCIL_ARTIFACT}';
+
