@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201704";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.21";
 defineEnvVar JENKINS_VERSION "The Jenkins version" "2.46.2";
 defineEnvVar TAG "The image tag" '${JENKINS_VERSION}';
 defineEnvVar SERVICE_USER "The service user" "jenkins";
