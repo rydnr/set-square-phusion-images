@@ -1,77 +1,25 @@
 #!/bin/bash
 
-## Checks whether MongoDB is running.
-## <- 0 if it's running; 1 otherwise.
-## Example:
-##   if ! is_running; then
-##     echo "RabbitMQ is not running";
-##   fi
-function is_mongodb_running() {
-  local -i _rescode;
-
-  exec 6<>/dev/tcp/127.0.0.1/27017 > /dev/null 2>&1 3>&1;
-  _rescode=$?;
-  exec 6>&- # close output connection
-  exec 6<&- # close input connection
-
-  return ${_rescode};
-}
-
 _bootstrapFile="/backup/mongodb/db/.bootstrapped";
+
+mkdir -p /backup/mongodb/db
+chown -R ${SERVICE_USER}:${SERVICE_GORUP} /var/lib/mongodb /var/log/mongodb /backup/mongodb
+
 _authMechanism="${AUTHENTICATION_MECHANISM:-SCRAM-SHA-1}";
 _auth="true";
 if [ "${_authMechanism}" == "none" ]; then
-    _auth="false";
-fi
-
-mkdir -p /backup/mongodb/db
-chown -R mongodb:mongodb /var/lib/mongodb /var/log/mongodb /backup/mongodb
-
-if [ ! -e ${_bootstrapFile} ]; then
-    jobs &>/dev/null
-    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@ > /dev/null 2>&1 &
-    mongoStarted="$(jobs -n)"
-    if [ -n "${mongoStarted}" ];then
-      mongoPid=$!;
-      sleep 2;
-    else
-      echo "Could not launch MongoDB for bootstrap"
-      exit 1;
-    fi
-    while ! is_mongodb_running && [ ! -e ${_bootstrapFile} ]; do
-      /usr/local/bin/${SQ_IMAGE}-bootstrap.sh -vv
-      if ! is_mongodb_running; then
-        echo "We'll try to bootstrap Mongo again in 1s";
-        sleep 1;
-      fi
-    done
-    if [ "${_auth}" == "true" ]; then
-      echo -n "Waiting MongoDB (${mongoPid}) to shut down ";
-      kill ${mongoPid}
-      while is_mongodb_running ; do
-        echo -n ".";
-        sleep 1;
-        parentPid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $3;}')";
-        kill ${parentPid};
-        pid="$(ps -ef | grep '/usr/bin/mongod --config /etc/mongod.conf' | grep -v grep | grep -v auth | awk '{print $2;}')";
-        kill ${pid};
-      done
-      rm -f /backup/mongodb/db/mongod.lock
-      echo "";
-    fi
+  _auth="false";
 fi
 
 if [ -e ${_bootstrapFile} ]; then
-    if [ "{_auth}" == "true" ]; then
-        echo "Launching MongoDB with ${_authMechanism} authentication mechanism"
-        exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth --authenticationMechanism=${_authMechanism} $@
-    elif [ "mongoPid" == "" ]; then
-        echo "Launching MongoDB with no authentication"
-        exec /usr/local/bin/run-as.sh -U mongodb -G mongodb -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@
-    else
-      fg
-    fi
+  if [ "${_auth}" == "true" ]; then
+    echo "Launching MongoDB with ${_authMechanism} authentication mechanism"
+    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth --setParameter authenticationMechanisms=${_authMechanism} $@
+  else
+    echo "Launching MongoDB with no authentication"
+    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@
+  fi
 else
-  echo "Could not bootstrap MongoDB"
-  exit 1
+  echo "Launching MongoDB to accept bootstrapping via cron"
+  exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@
 fi
