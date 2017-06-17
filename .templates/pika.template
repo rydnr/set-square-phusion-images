@@ -1,0 +1,3 @@
+# v pika
+RUN pip install pika
+# ^ pika

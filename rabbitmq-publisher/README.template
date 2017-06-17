@@ -1,0 +1,31 @@
+* RabbitMQ Publisher
+
+This image runs a Python script to publish to a RabbitMQ server the contents of all JSON files under a certain folder.
+
+* Usage
+
+docker run -it --rm -v [json-folder]:/work \
+  -e RABBITMQ_HOST=[host] \
+  -e RABBITMQ_PORT=[port] \
+  -e RABBITMQ_USER=[user] \
+  -e RABBITMQ_PASSWORD=[password] \
+  -e RABBITMQ_VIRTUALHOST=[vhost] \
+  -e EXCHANGE=[exchange] \
+  -e ROUTINGKEY=[routingKey] \
+  -e FILENAME_EXTENSION=[fileExt] \
+  -e CONTENT_TYPE=[contentType] \
+  -e DELIVERY_MODE=[deliveryMode] \
+  ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
+
+Where:
+  - json-folder: A folder with the JSON files to publish.
+  - host: The RabbitMQ host (if the container is not able to connect, consider passing --net=host option).
+  - port: The RabbitMQ port. Optional. Defaults to 5672.
+  - user: The RabbitMQ username to log in.
+  - password: The RabbitMQ password to log in.
+  - vhost: The virtual host. Optional. Defaults to /.
+  - exchange: The RabbitMQ exchange where the messages will be published.
+  - routingKey: The routing key.
+  - fileExt: The extension of the files to process. Optional. Defaults to .json.
+  - contentType: The content type. Optional. Defaults to application/json.
+  - deliveryMode: The delivery mode. Optional. Defaults to 2.

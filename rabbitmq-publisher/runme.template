@@ -1,0 +1,3 @@
+#!/bin/bash
+
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} python3 /usr/local/src/rabbitmq-publisher.py

@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+import pika
+import os
+import sys
+
+def process_folder(folder, host, port, user, password, vhost, exchange, routingKey, fileExt, contentType, deliveryMode):
+    directory = os.fsencode(folder)
+
+    userPass = ""
+    if user != None:
+        userPass = user + ':' + password + '@'
+
+    url = 'amqp://' + userPass + host + ':' + str(port) + vhost
+    connection = pika.BlockingConnection(pika.connection.URLParameters(url))
+    channel = connection.channel()
+
+    for file in os.listdir(directory):
+        filename = os.fsdecode(file)
+        if filename.endswith(fileExt):
+            publish_file(folder, filename, channel, exchange, routingKey, contentType, deliveryMode)
+
+    connection.close()
+
+def publish_file(folder, filename, channel, exchange, routingKey, contentType, deliveryMode):
+    with open (os.path.join(folder, filename)) as f:
+        contents = f.read()
+        channel.basic_publish(exchange=exchange, routing_key=routingKey, body=contents, properties=pika.BasicProperties(content_type=contentType, delivery_mode=deliveryMode), mandatory=True)
+        print(contents)
+
+def usage():
+    print("docker run -it --rm -v ${PWD}:/work -e RABBITMQ_HOST=[host] -e RABBITMQ_PORT=[port] -e RABBITMQ_USER=[user] -e RABBITMQ_PASSWORD=[password] -e RABBITMQ_VIRTUALHOST=[vhost] -e EXCHANGE=[exchange] -e ROUTINGKEY=[routingKey] -e FILENAME_EXTENSION=[file-ext] -e CONTENT_TYPE=[content-type] -e DELIVERY_MODE=[delivery-mode] ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}")
+    print("Publishes one message per file in a given folder, with a routing key")
+    print("")
+
+def main():
+    host = os.getenv("RABBITMQ_HOST")
+    if host == None:
+        print("RABBITMQ_HOST is mandatory")
+        usage()
+        sys.exit(2)
+    exchange = os.getenv("EXCHANGE")
+    if exchange == None:
+        print("EXCHANGE is mandatory")
+        usage()
+        sys.exit(2)
+    routingKey = os.getenv("ROUTINGKEY")
+    if routingKey == None:
+        print("ROUTINGKEY is mandatory")
+        usage()
+        sys.exit(2)
+    rabbitmqUser = os.getenv('RABBITMQ_USER')
+    rabbitmqPassword = os.getenv('RABBITMQ_PASSWORD')
+    rabbitmqPort = os.getenv('RABBITMQ_PORT', 5672)
+    virtualHost = os.getenv('RABBITMQ_VIRTUALHOST', "/")
+    fileExt = os.getenv('FILENAME_EXTENSION', '.json')
+    contentType = os.getenv('CONTENT_TYPE', 'application/json')
+    deliveryMode = os.getenv('DELIVERY_MODE', 2)
+    process_folder("/work", host, int(rabbitmqPort), rabbitmqUser, rabbitmqPassword, virtualHost, exchange, routingKey, fileExt, contentType, int(deliveryMode))
+
+if __name__ == "__main__":
+    main()

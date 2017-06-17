@@ -159,6 +159,7 @@ postgresql/setup.sql
 prometheus/service
 rabbitmq/create_bootstrap_cron_job.sh
 rabbitmq-perf-test/service
+rabbitmq-publisher/rabbitmq-publisher.py
 rabbitmq/rc.local
 rabbitmq/service
 rabbitmq/skel.inc.sh
@@ -219,9 +220,13 @@ sdkman/setup.sql
 .templates/nodejs
 .templates/npm
 .templates/packetbeat
+.templates/pencil
 .templates/phabricator
 .templates/pharo
 .templates/pharo6
+.templates/pika
+.templates/pip
+.templates/pip
 .templates/plone5
 .templates/postgresql
 .templates/postman
