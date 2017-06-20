@@ -1,6 +1,6 @@
 defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.21";
-defineEnvVar ROBOMONGO_VERSION "The Robomongo version" '1.0.0';
-defineEnvVar ROBOMONGO_HASH "The Robomongo hash" '89f24ea';
+defineEnvVar ROBOMONGO_VERSION "The Robomongo version" '1.1.1';
+defineEnvVar ROBOMONGO_HASH "The Robomongo hash" 'c93c6b0';
 defineEnvVar TAG "The image tag" '${ROBOMONGO_VERSION}-${ROBOMONGO_HASH}';
 defineEnvVar SERVICE_USER "The service user" 'robomongo';
 defineEnvVar SERVICE_GROUP "The service group" 'robomongo';
