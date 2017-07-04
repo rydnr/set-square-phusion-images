@@ -18,6 +18,7 @@ defineEnvVar REGISTRY "The registry to push Docker images to" "tutum.co";
 defineEnvVar REGISTRY_NAMESPACE \
              "The namespace under the registry where the image is to be uploaded" \
              '${NAMESPACE}';
+defineEnvVar PUSH_TO_DOCKERHUB "Whether to push to Docker HUB" 'false';
 defineEnvVar JAVA_VERSION "The Java version" "8";
 defineEnvVar APTGET_INSTALL \
              "Installs a program via apt-get" \
@@ -65,10 +66,10 @@ defineEnvVar INCLUDES_FOLDER \
              "./.templates";
 defineEnvVar COPYRIGHT_PREAMBLE_FILE \
              "The file with the copyright preamble" \
-             'copyright-preamble.txt';
+             'copyright-preamble.gpl3';
 defineEnvVar LICENSE_FILE \
              "The file with the license details" \
-             'LICENSE';
+             'LICENSE.gpl3';
 defineEnvVar ENABLE_SSH "Whether to enable SSH by default" "false";
 defineEnvVar ENABLE_MONIT "Whether to enable Monit" "true";
 defineEnvVar ENABLE_SYSLOG "Whether to enable syslog" "true";
@@ -79,12 +80,15 @@ defineEnvVar ENABLE_LOGSTASH \
              "Whether to enable logstash, if available for the specific image" \
              "true";
 defineEnvVar BUILDER "The builder of the image" '${AUTHOR}';
+defineEnvVar SSL_KEY_ENCRYPTION "The encryption of the key" "des3";
 defineEnvVar SSL_KEY_ALGORITHM "The algorithm of the SSL key" "rsa";
 defineEnvVar SSL_KEY_LENGTH "The length of the SSL key" "2048";
 defineEnvVar SSL_KEY_FOLDER "The folder storing the SSL key pairs" "/etc/ssl/private";
 defineEnvVar SSL_KEY_PASSWORD "The key password" 'K8emqG04hZKlOUY3rET1ZBChtqFuERxyWAtyVtnVrP1MYMXhA8SPhdBJ';
 defineEnvVar SSL_CERTIFICATE_ORGANIZATIONAL_UNIT "The organizational unit for the SSL certificate" "IT";
 defineEnvVar SSL_CERTIFICATE_ORGANIZATION "The organization behind the SSL certificate" '${DOMAIN}';
+defineEnvVar SSL_CERTIFICATE_ALIAS "The certificate alias" '${IMAGE}';
+defineEnvVar SSL_CERTIFICATE_SUBJECT "The certificate subject" '/cn=${DOMAIN}';
 defineEnvVar SSL_CERTIFICATE_LOCALITY "The locality information in the SSL certificate" "Madrid";
 defineEnvVar SSL_CERTIFICATE_STATE "The state information in the SSL certificate" "Madrid";
 defineEnvVar SSL_CERTIFICATE_COUNTRY "The country information in the SSL certificate" "ES";

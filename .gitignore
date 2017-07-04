@@ -4,6 +4,7 @@
 abc/*
 android-studio/my_exec
 android-studio/studio.vmoptions
+**/apache-files
 artifactory/entrypoint.sh
 backup/
 **/backup-files
@@ -183,6 +184,7 @@ sdkman/setup.sql
 .templates/backup
 .templates/copy-metadata
 .templates/couchbase
+.templates/dbeaver
 .templates/discord
 .templates/elasticsearch
 .templates/elk-common

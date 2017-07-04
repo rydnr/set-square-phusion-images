@@ -773,10 +773,18 @@ function build_repo() {
 function registry_tag() {
   local _repo="${1}";
   local _tag="${2}";
-  local _pushResult;
+
+  checkNotEmpty "repository" "${_repo}" 1;
+  checkNotEmpty "tag" "${_tag}" 2;
+
+  local _remoteTag="${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo}:${_tag}";
+  if isTrue ${PUSH_TO_DOCKERHUB}; then
+    _remoteTag="${REGISTRY}/${_repo}:${_tag}";
+  fi
+
   update_log_category "${_repo}";
-  logInfo -n "Tagging ${NAMESPACE}/${_repo}:${_tag} for uploading to ${REGISTRY}";
-  docker tag ${DOCKER_TAG_OPTIONS} "${NAMESPACE}/${_repo}:${_tag}" "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo}:${_tag}";
+  logInfo -n "Tagging ${NAMESPACE}/${_repo}:${_tag} as ${_remoteTag}";
+  docker tag ${DOCKER_TAG_OPTIONS} "${NAMESPACE}/${_repo}:${_tag}" "${_remoteTag}";
   if isTrue $?; then
     logInfoResult SUCCESS "done"
   else
@@ -793,16 +801,26 @@ function registry_tag() {
 function registry_push() {
   local _repo="${1}";
   local _tag="${2}";
-  local _pushResult;
+
+  checkNotEmpty "repository" "${_repo}" 1;
+  checkNotEmpty "tag" "${_tag}" 2;
+
+  local _remoteTag="${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo}:${_tag}";
+  if isTrue ${PUSH_TO_DOCKERHUB}; then
+    _remoteTag="${REGISTRY}/${_repo}:${_tag}";
+  fi
+
+  local -i _pushResult;
   update_log_category "${_repo}";
-  logInfo -n "Pushing ${NAMESPACE}/${_repo}:${_tag} to ${REGISTRY}";
-  docker push "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo}:${_tag}"
+
+  logInfo -n "Pushing ${_remoteTag}";
+  docker push "${_remoteTag}"
   _pushResult=$?;
   if isTrue ${_pushResult}; then
     logInfoResult SUCCESS "done"
   else
     logInfoResult FAILURE "failed"
-    exitWithErrorCode ERROR_PUSHING_IMAGE "${REGISTRY}/${REGISTRY_NAMESPACE}/${_repo}:${_tag}"
+    exitWithErrorCode ERROR_PUSHING_IMAGE "${_remoteTag}"
   fi
 }
 
@@ -1043,5 +1061,3 @@ function main() {
   cleanup_containers;
   cleanup_images;
 }
-
-
