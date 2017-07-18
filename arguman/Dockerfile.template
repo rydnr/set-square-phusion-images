@@ -7,7 +7,7 @@ ENV SERVICE="apache-files/service"
 @include("addon-toggles")
 @include("service_user")
 @include("apache")
-@include("service")
+#@include("service")
 
 COPY requirements.txt /opt/requirements.txt
 
