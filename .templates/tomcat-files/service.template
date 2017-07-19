@@ -2,6 +2,7 @@
 
 set -a
 JAVA_HOME="/usr/lib/jvm/java"
+TOMCAT_HOME="${TOMCAT_HOME}"
 source "/etc/default/tomcat"
 CATALINA_HOME="${TOMCAT_HOME}"
 CATALINA_BASE="${TOMCAT_HOME}"

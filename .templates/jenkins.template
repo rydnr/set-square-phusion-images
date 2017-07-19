@@ -6,7 +6,7 @@ COPY jenkins-files/update-jenkins.sh jenkins-files/update-jenkins.inc.sh \
 
 RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/service/update-jenkins && \
     mkdir -p ${JENKINS_HOME} && \
-    echo "${SERVICE_USER}:${JENKINS_PASSWORD}" | chpasswd  && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lock/tomcat /var/run/tomcat /var/log/tomcat ${TOMCAT_HOME} /opt/${TOMCAT_FOLDER} && \
     mkdir -p ${SERVICE_USER_HOME}/.m2 /usr/share/jenkins/ref  && \
     wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL}  && \
     mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome  && \

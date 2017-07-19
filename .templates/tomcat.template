@@ -2,13 +2,14 @@
 RUN mkdir -p /opt && \
     wget -O /opt/${TOMCAT_FILE} ${TOMCAT_DOWNLOAD_URL} && \
     tar xvfz /opt/${TOMCAT_FILE} -C /opt && \
-    ln -s /opt/${TOMCAT_FOLDER} /opt/tomcat && \
-    mkdir /var/lock/tomcat /var/run/tomcat /opt/tomcat/contexts && \
-    cd /var/log && ln -s /opt/tomcat/logs tomcat && \
+    ln -s /opt/${TOMCAT_FOLDER} ${TOMCAT_HOME} && \
+    mkdir /var/lock/tomcat /var/run/tomcat ${TOMCAT_HOME}/contexts && \
+    cd /var/log && ln -s ${TOMCAT_HOME}/logs tomcat && \
     chmod 755 /var/run/tomcat && \
-    chown -R jenkins:jenkins /var/lock/tomcat /var/run/tomcat /var/log/tomcat /opt/tomcat /opt/${TOMCAT_FOLDER} && \
     rm -f /opt/${TOMCAT_FILE} && \
-    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' /opt/tomcat/conf/context.xml
+    sed -i 's|</Context>|  <Resources cachingAllowed="true" cacheMaxSize="${TOMCAT_CACHE_MAX_SIZE}" />\n</Context>|g' ${TOMCAT_HOME}/conf/context.xml
 
-COPY tomcat-files/setenv.sh /opt/tomcat/bin/setenv.sh
+COPY tomcat-files/setenv.sh ${TOMCAT_HOME}/bin/setenv.sh
+
+ENV TOMCAT_HOME ${TOMCAT_HOME}
 # ^ tomcat
