@@ -1,4 +1,4 @@
-defineEnvVar SSL_CERTIFICATE_ALIAS "The alias of the SSL certificate" "${SSL_CERTIFICATE_ALIAS}";
+defineEnvVar SSL_CERTIFICATE_ALIAS "The alias of the SSL certificate" "";
 defineEnvVar SSL_KEY_ALGORITHM "The algorithm of the SSL key pairs" "rsa";
 defineEnvVar SSL_KEY_FOLDER "The folder storing the SSL key pairs" "/etc/ssl/private";
 defineEnvVar SSL_KEYSTORE_NAME "The keystore name" "${SSL_KEYSTORE_NAME}";
