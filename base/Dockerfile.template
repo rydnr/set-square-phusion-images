@@ -2,10 +2,12 @@
 FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
+# Basic stuff. Sets sh to bash, required by addon-toggles
+@include("common")
+
 @include("addon-toggles")
 
 # Housekeeping
-@include("common")
 @include("install")
 @include("syslog")
 @include("rsyslog")

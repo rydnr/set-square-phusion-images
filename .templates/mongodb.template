@@ -1,4 +1,7 @@
 # v mongodb
+
+COPY mongodb-files/mongodb-dump.sh mongodb-files/mongodb-dump.inc.sh /etc/cron.hourly/
+
 # From http://docs.docker.com/examples/mongodb/
 # From http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
 # Installation:
@@ -12,7 +15,9 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
     echo "mongodb-org-shell hold" | sudo dpkg --set-selections && \
     echo "mongodb-org-mongos hold" | sudo dpkg --set-selections && \
     echo "mongodb-org-tools hold" | sudo dpkg --set-selections && \
-    ${APTGET_CLEANUP}
+    ${APTGET_CLEANUP} && \
+    chmod +x /etc/cron.hourly/mongodb-dump.sh && \
+    chmod -x /etc/cron.hourly/mongodb-dump.inc.sh
 
 EXPOSE 27017 27018 27019 28017 28018 28019
 # ^ mongodb
