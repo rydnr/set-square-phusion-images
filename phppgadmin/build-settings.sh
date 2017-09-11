@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201611";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.21";
 defineEnvVar PHPPGADMIN_VIRTUAL_HOST "The virtual host of phpPgAdmin application" 'phppgadmin.${DOMAIN}';
 #defineEnvVar PHPPGADMIN_VERSION "The PhpPgAdmin version" "5.1";
 #defineEnvVar PHPPGADMIN_ARTIFACT "The PhpPgAdmin artifact" 'phpPgAdmin-${PHPPGADMIN_VERSION}.tar.bz2';

@@ -21,7 +21,8 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     chmod 700 ${TOMCAT_HOME}/.ssh  && \
     chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh  && \
     mkdir -p ${SERVICE_USER_HOME}/plugins ${SERVICE_USER_HOME}/updates  && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 ${JENKINS_HOME} && \
+    cd /var && ln -s ${SERVICE_USER_HOME} /var/jenkins_home && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 ${JENKINS_HOME} /var/jenkins_home && \
     cd ${SERVICE_USER_HOME}/plugins/ && \
     for m in ${JENKINS_MODULES}; do \
       echo "Downloading ${m} plugin"; \
