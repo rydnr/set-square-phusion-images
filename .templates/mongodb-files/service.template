@@ -11,15 +11,18 @@ if [ "${_authMechanism}" == "none" ]; then
   _auth="false";
 fi
 
+cp /etc/mongod.conf.template /etc/mongod.conf
+[ -e /etc/mongod.conf.replication ] && cat /etc/mongod.conf.replication >> /etc/mongod.conf
+
 if [ -e ${_bootstrapFile} ]; then
   if [ "${_auth}" == "true" ]; then
     echo "Launching MongoDB with ${_authMechanism} authentication mechanism"
-    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth --setParameter authenticationMechanisms=${_authMechanism} $@
+    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --auth --setParameter authenticationMechanisms=${_authMechanism} --master $@
   else
     echo "Launching MongoDB with no authentication"
-    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@
+    exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --master $@
   fi
 else
   echo "Launching MongoDB to accept bootstrapping via cron"
-  exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf $@
+  exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --master $@
 fi

@@ -12,17 +12,9 @@ ENV DOBACKUP="true" \
 @include("mongodb")
 #@include("filebeat")
 
-COPY mongodb-files/service.template /etc/service/mongodb/run
+COPY mongodb-files/service /etc/service/mongodb/run
 
-#COPY create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
-
-#RUN chmod +x /etc/my_init.d/56_create_bootstrap_cron_job.sh && \
-RUN chmod +x /etc/service/mongodb/run && \
-    sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf && \
-    sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf && \
-    sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf && \
-    sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf
-#    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
+RUN chmod +x /etc/service/mongodb/run
 
 VOLUME /backup/${IMAGE}/db
 

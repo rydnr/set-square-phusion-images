@@ -1,2 +1,3 @@
 defineEnvVar MONGODB_MAJOR_VERSION "The mongodb major version" "3.4";
 defineEnvVar MONGODB_VERSION "The mongodb version" '${MONGODB_MAJOR_VERSION}.8';
+defineEnvVar REPLICA_SET_NAME "The name of the replica set" '${NAMESPACE}';

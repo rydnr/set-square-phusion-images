@@ -4,6 +4,7 @@ COPY mongodb-files/mongodb-dump.sh mongodb-files/mongodb-dump.inc.sh \
      /etc/cron.hourly/
 COPY mongodb-files/mongodb-discard-old-dumps.sh mongodb-files/mongodb-discard-old-dumps.inc.sh \
      /etc/cron.daily/
+#COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
 
 # From http://docs.docker.com/examples/mongodb/
 # From http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
@@ -19,10 +20,18 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
     echo "mongodb-org-mongos hold" | sudo dpkg --set-selections && \
     echo "mongodb-org-tools hold" | sudo dpkg --set-selections && \
     ${APTGET_CLEANUP} && \
+    cp /etc/mongod.conf /etc/mongod.conf.distrib && \
+    mv /etc/mongod.conf /etc/mongod.conf.template && \
+    sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf.template && \
+    sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf.template && \
+    sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf.template && \
+    sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf.template && \
     chmod +x /etc/cron.hourly/mongodb-dump.sh && \
     chmod -x /etc/cron.hourly/mongodb-dump.inc.sh && \
     chmod +x /etc/cron.daily/mongodb-discard-old-dumps.sh && \
     chmod -x /etc/cron.daily/mongodb-discard-old-dumps.inc.sh
+
+#    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
 
 EXPOSE 27017 27018 27019 28017 28018 28019
 # ^ mongodb
