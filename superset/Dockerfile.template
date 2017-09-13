@@ -1,0 +1,24 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="true" \
+    DEFAULT_LOCALE="en_US" \
+    DEFAULT_ENCODING="UTF-8"
+
+@include("service_user")
+@include("python")
+@include("pip")
+@include("superset")
+
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+COPY superset-files/service /etc/service/${IMAGE}/run
+RUN chmod +x /etc/service/${IMAGE}/run
+
+VOLUME [ "/backup/${IMAGE}" ]
+
+@include("copy-metadata")
+@include("instructions")
+@include("symlinks")

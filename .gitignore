@@ -240,6 +240,7 @@ sdkman/setup.sql
 .templates/sdkman
 .templates/service
 .templates/service_user
+.templates/superset
 .templates/tini
 .templates/tomcat
 .templates/yarn
