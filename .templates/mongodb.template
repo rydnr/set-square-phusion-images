@@ -1,8 +1,8 @@
 # v mongodb
 
-COPY mongodb-files/mongodb-dump.sh mongodb-files/mongodb-dump.inc.sh \
+COPY mongodb-files/mongodb-dump mongodb-files/mongodb-dump.inc \
      /etc/cron.hourly/
-COPY mongodb-files/mongodb-discard-old-dumps.sh mongodb-files/mongodb-discard-old-dumps.inc.sh \
+COPY mongodb-files/mongodb-discard-old-dumps mongodb-files/mongodb-discard-old-dumps.inc \
      /etc/cron.daily/
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
 

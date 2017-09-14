@@ -1,5 +1,11 @@
 defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.22";
 defineEnvVar SUPERSET_DEFAULT_VIRTUAL_HOST "The default virtual host" 'superset.${DOMAIN}';
+defineEnvVar SUPERSET_ADMIN_USER "The admin user" "admin";
+defineEnvVar SUPERSET_ADMIN_PASSWORD "The password of the admin user" '${RANDOM_PASSWORD}';
+defineEnvVar SUPERSET_ADMIN_FIRSTNAME "The firstname of the admin user" '${AUTHOR_FIRSTNAME}';
+defineEnvVar SUPERSET_ADMIN_LASTNAME "The lastname of the admin user"  '${AUTHOR_LASTNAME}';
+defineEnvVar SUPERSET_ADMIN_EMAIL "The email of the admin user" '${AUTHOR_EMAIL}';
+defineEnvVar SUPERSET_LOAD_EXAMPLES "Whether to load examples into Superset database or not" "false";
 defineEnvVar SERVICE_USER "The service user" "superset";
 defineEnvVar SERVICE_GROUP "The group of the service user" "superset";
 defineEnvVar SERVICE_USER_SHELL "The shell of the service user" "/bin/bash";

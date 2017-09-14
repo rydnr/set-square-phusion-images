@@ -1,4 +1,6 @@
-defineEnvVar AUTHOR "The author of the image(s) to build" "me";
+defineEnvVar AUTHOR_FIRSTNAME "The firstname of the author" "John";
+defineEnvVar AUTHOR_LASTNAME "The lastname of the author" "Smith";
+defineEnvVar AUTHOR "The author of the image(s) to build" '${AUTHOR_FIRSTNAME} ${AUTHOR_LASTNAME}';
 defineEnvVar DOMAIN "The domain" "example.com";
 defineEnvVar AUTHOR_EMAIL "The author's email" 'me@${DOMAIN}';
 defineEnvVar NAMESPACE "The docker registry's namespace" "example";

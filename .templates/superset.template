@@ -2,7 +2,7 @@
 ENV VIRTUAL_HOST="${SUPERSET_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8088
 
-RUN ${APTGET_INSTALL} -u build-essential libssl-dev libffi-dev python-dev python-pip libsasl2-dev libldap2-dev && \
+RUN ${APTGET_INSTALL} -u build-essential libssl-dev libffi-dev python-dev python-pip libsasl2-dev libldap2-dev python3-dev && \
     ${APTGET_CLEANUP} && \
     pip install virtualenv && \
     mkdir -p ${SERVICE_USER_HOME} && \
@@ -11,9 +11,9 @@ RUN ${APTGET_INSTALL} -u build-essential libssl-dev libffi-dev python-dev python
     . ./venv/bin/activate && \
     pip install --upgrade setuptools pip && \
     pip install superset && \
-    fabmanager create-admin --app superset && \
+    fabmanager create-admin --app superset --username ${SUPERSET_ADMIN_USER} --password ${SUPERSET_ADMIN_PASSWORD} --firstname "${SUPERSET_ADMIN_FIRSTNAME}" --lastname "${SUPERSET_ADMIN_LASTNAME}" --email "${SPPERSET_ADMIN_EMAIL}" && \
     superset db upgrade && \
-    superset load_examples && \
+    ([ "${SUPERSET_LOAD_EXAMPLES}" == "true" ] && superset load_examples) && \
     superset init
 
 EXPOSE 8088
