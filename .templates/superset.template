@@ -11,7 +11,7 @@ RUN ${APTGET_INSTALL} -u build-essential libssl-dev libffi-dev python-dev python
     . ./venv/bin/activate && \
     pip install --upgrade setuptools pip && \
     pip install superset && \
-    fabmanager create-admin --app superset --username ${SUPERSET_ADMIN_USER} --password ${SUPERSET_ADMIN_PASSWORD} --firstname "${SUPERSET_ADMIN_FIRSTNAME}" --lastname "${SUPERSET_ADMIN_LASTNAME}" --email "${SPPERSET_ADMIN_EMAIL}" && \
+    fabmanager create-admin --app superset --username ${SUPERSET_ADMIN_USER} --password ${SUPERSET_ADMIN_PASSWORD} --firstname "${SUPERSET_ADMIN_FIRSTNAME}" --lastname "${SUPERSET_ADMIN_LASTNAME}" --email "${SUPERSET_ADMIN_EMAIL}" && \
     superset db upgrade && \
     ([ "${SUPERSET_LOAD_EXAMPLES}" == "true" ] && superset load_examples) && \
     superset init
