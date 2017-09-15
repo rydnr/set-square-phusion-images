@@ -8,9 +8,9 @@ COPY rsnapshot-files/20_create_rsnapshot_conf.sh rsnapshot-files/20_create_rsnap
      /etc/my_init.d/
 COPY rsnapshot-files/my_exec.d /etc/my_exec.d/rsnapshot
 
-COPY rsnapshot-files/rsnapshot.daily /etc/cron.daily/rsnapshot.daily
-COPY rsnapshot-files/rsnapshot.weekly /etc/cron.weekly/rsnapshot.weekly
-COPY rsnapshot-files/rsnapshot.monthly /etc/cron.monthly/rsnapshot.monthly
+COPY rsnapshot-files/rsnapshot.daily /etc/cron.daily/rsnapshot
+COPY rsnapshot-files/rsnapshot.weekly /etc/cron.weekly/rsnapshot
+COPY rsnapshot-files/rsnapshot.monthly /etc/cron.monthly/rsnapshot
 
 RUN ${APTGET_INSTALL} --update rsnapshot && \
     ${APTGET_CLEANUP} && \
