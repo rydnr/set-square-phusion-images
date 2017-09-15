@@ -1,9 +1,8 @@
 # v mongodb
 
-COPY mongodb-files/mongodb-dump mongodb-files/mongodb-dump.inc \
-     /etc/cron.hourly/
-COPY mongodb-files/mongodb-discard-old-dumps mongodb-files/mongodb-discard-old-dumps.inc \
-     /etc/cron.daily/
+COPY mongodb-files/mongodb-dump.sh mongodb-files/mongodb-dump.inc.sh \
+     mongodb-files/mongodb-discard-old-dumps.sh mongodb-files/mongodb-discard-old-dumps.inc.sh \
+     /usr/local/bin/
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
 
 # From http://docs.docker.com/examples/mongodb/
@@ -26,10 +25,8 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
     sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf.template && \
     sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf.template && \
     sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf.template && \
-    chmod +x /etc/cron.hourly/mongodb-dump && \
-    chmod -x /etc/cron.hourly/mongodb-dump.inc && \
-    chmod +x /etc/cron.daily/mongodb-discard-old-dumps && \
-    chmod -x /etc/cron.daily/mongodb-discard-old-dumps.inc
+    ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump && \
+    ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps
 
 #    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
 
