@@ -26,10 +26,10 @@ RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 7F0CEB10 && \
     sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf.template && \
     sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf.template && \
     sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf.template && \
-    chmod +x /etc/cron.hourly/mongodb-dump.sh && \
-    chmod -x /etc/cron.hourly/mongodb-dump.inc.sh && \
-    chmod +x /etc/cron.daily/mongodb-discard-old-dumps.sh && \
-    chmod -x /etc/cron.daily/mongodb-discard-old-dumps.inc.sh
+    chmod +x /etc/cron.hourly/mongodb-dump && \
+    chmod -x /etc/cron.hourly/mongodb-dump.inc && \
+    chmod +x /etc/cron.daily/mongodb-discard-old-dumps && \
+    chmod -x /etc/cron.daily/mongodb-discard-old-dumps.inc
 
 #    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
 

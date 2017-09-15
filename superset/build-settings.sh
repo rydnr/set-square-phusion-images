@@ -1,4 +1,6 @@
 defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.22";
+defineEnvVar SUPERSET_VERSION "The version of Superset" "0.19.1";
+overrideEnvVar TAG '${SUPERSET_VERSION}';
 defineEnvVar SUPERSET_DEFAULT_VIRTUAL_HOST "The default virtual host" 'superset.${DOMAIN}';
 defineEnvVar SUPERSET_ADMIN_USER "The admin user" "admin";
 defineEnvVar SUPERSET_ADMIN_PASSWORD "The password of the admin user" '${RANDOM_PASSWORD}';
