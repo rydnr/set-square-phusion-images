@@ -1,0 +1,6 @@
+# v druid
+RUN cd ${SERVICE_USER_HOME} && \
+    wget -O ${SERVICE_USER_HOME}/${DRUID_ARTIFACT} ${DRUID_DOWNLOAD_URL}
+
+EXPOSE 8088
+# ^ druid
