@@ -16,7 +16,7 @@ COPY mongodb-files/service /etc/service/mongodb/run
 
 RUN chmod +x /etc/service/mongodb/run
 
-VOLUME /backup/${IMAGE}/db
+VOLUME [ "/backup/${IMAGE}/db", "/backup/${IMAGE}/dumps" ]
 
 @include("copy-metadata")
 @include("symlinks")
