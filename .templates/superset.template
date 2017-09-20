@@ -7,15 +7,13 @@ RUN ${APTGET_INSTALL} -u build-essential libssl-dev libffi-dev python-dev python
     ${APTGET_CLEANUP} && \
     cd ${SERVICE_USER_HOME} && \
     pip install --upgrade setuptools pip && \
-    pip install superset && \
+    pip install superset psycopg2 && \
     fabmanager create-admin --app superset --username ${SUPERSET_ADMIN_USER} --password ${SUPERSET_ADMIN_PASSWORD} --firstname "${SUPERSET_ADMIN_FIRSTNAME}" --lastname "${SUPERSET_ADMIN_LASTNAME}" --email "${SUPERSET_ADMIN_EMAIL}" && \
     superset db upgrade && \
-    superset load_examples && \
+    ([[ "${SUPERSET_LOAD_EXAMPLES}" == "true" ]] && superset load_examples || echo -n) && \
     superset init && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}/ && \
     chmod g+w ${SERVICE_USER_HOME}/
-#    mv /root/.superset/* ${SERVICE_USER_HOME}/ && \
-#    ([ "${SUPERSET_LOAD_EXAMPLES}" == "true" ] && superset load_examples) && \
 
 EXPOSE 8088
 # ^ superset
