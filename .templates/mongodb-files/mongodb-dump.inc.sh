@@ -1,3 +1,4 @@
+defineEnvVar MONGODB_DUMP_FOLDER "The folder where the dumps are stored" "/backup/mongodb/dumps";
 defineEnvVar MONGODB_HOST "The MongoDB host" "localhost";
 defineEnvVar MONGODB_USER "The MongoDB user" "";
 defineEnvVar MONGODB_PASSWORD 'The MongoDB password for ${MONGODB_USER}' "";

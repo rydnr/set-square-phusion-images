@@ -87,6 +87,8 @@ function checkInput() {
 function main() {
   local _outputFolder="${MONGODB_DUMPS_FOLDER}";
 
+  mkdir "${_outputFolder}";
+
   logInfo -n "Deleting MongoDB dumps older than ${MONGODB_DUMP_RETAIN_DAYS} days in ${_outputFolder}";
   find "${_outputFolder}" -daystart -mtime +${MONGODB_DUMP_RETAIN_DAYS} -exec rm -f {} \;
   if isTrue $?; then

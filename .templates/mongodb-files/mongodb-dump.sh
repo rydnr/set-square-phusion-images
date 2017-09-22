@@ -120,7 +120,7 @@ function mongo_dump() {
 ## Main logic
 ## dry-wit hook
 function main() {
-  local _outputFolder="${MONGODB_DUMPS_FOLDER}";
+  local _outputFolder="${MONGODB_DUMP_FOLDER}";
   local _dumpFile="${_outputFolder}/dump-$(date '+%Y%m%d.%H%M').gz";
 
   mkdir -p "${_outputFolder}" > /dev/null;
