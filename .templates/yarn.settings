@@ -1,1 +1,1 @@
-defineEnvVar YARN_MODULES "Additional yarn modules" "express";
+defineButDoNotOverrideEnvVar YARN_MODULES "Additional yarn modules" "express";echo -n ''

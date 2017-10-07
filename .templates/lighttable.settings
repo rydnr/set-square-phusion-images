@@ -1,4 +1,5 @@
-defineEnvVar LIGHTTABLE_VERSION "The LightTable version" '0.8.1';
-defineEnvVar LIGHTTABLE_FOLDER "The LightTable folder once extracted" 'lighttable-${LIGHTTABLE_VERSION}-linux';
-defineEnvVar LIGHTTABLE_ARTIFACT "The LightTable artifact" '${LIGHTTABLE_FOLDER}.tar.gz';
-defineEnvVar LIGHTTABLE_DOWNLOAD_URL "The url to download LightTable" 'https://github.com/LightTable/LightTable/releases/download/${LIGHTTABLE_VERSION}/${LIGHTTABLE_ARTIFACT}';
+defineButDoNotOverrideEnvVar LIGHTTABLE_VERSION "The LightTable version" '0.8.1';
+defineButDoNotOverrideEnvVar LIGHTTABLE_FOLDER "The LightTable folder once extracted" 'lighttable-${LIGHTTABLE_VERSION}-linux';
+defineButDoNotOverrideEnvVar LIGHTTABLE_ARTIFACT "The LightTable artifact" '${LIGHTTABLE_FOLDER}.tar.gz';
+defineButDoNotOverrideEnvVar LIGHTTABLE_DOWNLOAD_URL "The url to download LightTable" 'https://github.com/LightTable/LightTable/releases/download/${LIGHTTABLE_VERSION}/${LIGHTTABLE_ARTIFACT}';
+echo -n ''

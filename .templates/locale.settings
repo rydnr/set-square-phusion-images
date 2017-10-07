@@ -1,12 +1,13 @@
-defineEnvVar DEFAULT_LOCALE "The default locale" "en_US";
-defineEnvVar LOCALES "The supported locales" '${DEFAULT_LOCALE} es_ES es_ES@euro';
-defineEnvVar DEFAULT_ENCODING "The default encoding" "UTF-8";
-defineEnvVar ENCODINGS "The supported encodings" '${DEFAULT_ENCODING} ISO-8859-1 ISO-8859-15';
-defineEnvVar TIMEZONE "The timezone" "Etc/UTC";
+defineButDoNotOverrideEnvVar DEFAULT_LOCALE "The default locale" "en_US";
+defineButDoNotOverrideEnvVar LOCALES "The supported locales" '${DEFAULT_LOCALE} es_ES es_ES@euro';
+defineButDoNotOverrideEnvVar DEFAULT_ENCODING "The default encoding" "UTF-8";
+defineButDoNotOverrideEnvVar ENCODINGS "The supported encodings" '${DEFAULT_ENCODING} ISO-8859-1 ISO-8859-15';
+defineButDoNotOverrideEnvVar TIMEZONE "The timezone" "Etc/UTC";
 if isEmpty "${APTGET_INSTALL}"; then
-  defineEnvVar APTGET_INSTALL "Installs a program via apt-get" '/usr/local/bin/aptget-install.sh -vv ';
+  defineButDoNotOverrideEnvVar APTGET_INSTALL "Installs a program via apt-get" '/usr/local/bin/aptget-install.sh -vv ';
 fi
 if isEmpty "${APTGET_CLEANUP}"; then
-  defineEnvVar APTGET_CLEANUP "The cleanup commands after an apt-get so that the resulting image size is optimal" '/usr/local/bin/aptget-cleanup.sh -v ';
+  defineButDoNotOverrideEnvVar APTGET_CLEANUP "The cleanup commands after an apt-get so that the resulting image size is optimal" '/usr/local/bin/aptget-cleanup.sh -v ';
 fi
 
+echo -n ''

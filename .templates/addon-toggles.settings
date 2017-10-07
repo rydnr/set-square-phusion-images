@@ -1,10 +1,11 @@
-defineEnvVar ENABLE_SSH "Whether to enable SSH by default" "false";
-defineEnvVar ENABLE_MONIT "Whether to enable Monit" "true";
-defineEnvVar ENABLE_SYSLOG "Whether to enable syslog" "true";
-defineEnvVar ENABLE_CRON "Whether to enable cron" "true";
-defineEnvVar ENABLE_RSNAPSHOT "Whether to enable rsnapshot" "true";
-defineEnvVar ENABLE_LOCAL_SMTP "Whether to run a local SMTP server" "true";
-defineEnvVar ENABLE_LOGSTASH \
+defineButDoNotOverrideEnvVar ENABLE_SSH "Whether to enable SSH by default" "false";
+defineButDoNotOverrideEnvVar ENABLE_MONIT "Whether to enable Monit" "true";
+defineButDoNotOverrideEnvVar ENABLE_SYSLOG "Whether to enable syslog" "true";
+defineButDoNotOverrideEnvVar ENABLE_CRON "Whether to enable cron" "true";
+defineButDoNotOverrideEnvVar ENABLE_RSNAPSHOT "Whether to enable rsnapshot" "true";
+defineButDoNotOverrideEnvVar ENABLE_LOCAL_SMTP "Whether to run a local SMTP server" "true";
+defineButDoNotOverrideEnvVar ENABLE_LOGSTASH \
              "Whether to enable logstash, if available for the specific image" \
              "false";
 
+echo -n ''

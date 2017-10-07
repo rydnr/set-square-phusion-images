@@ -1,17 +1,18 @@
-defineEnvVar MONIT_HTTP_PORT \
+defineButDoNotOverrideEnvVar MONIT_HTTP_PORT \
              "The port used by Monit's webapp" \
              "2812";
-defineEnvVar MONIT_HTTP_USER \
+defineButDoNotOverrideEnvVar MONIT_HTTP_USER \
              "The user to login in monit's webapp" \
              "monit";
-defineEnvVar MONIT_HTTP_PASSWORD \
+defineButDoNotOverrideEnvVar MONIT_HTTP_PASSWORD \
              "The password to login in monit's webapp" \
              '${RANDOM_PASSWORD}' \
              "head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1";
-defineEnvVar MONIT_HTTP_TIMEOUT \
+defineButDoNotOverrideEnvVar MONIT_HTTP_TIMEOUT \
              "The timeout before alerting that monit's own http interface is down" \
              "15 seconds";
-defineEnvVar MONIT_ALERT_EMAIL \
+defineButDoNotOverrideEnvVar MONIT_ALERT_EMAIL \
              "The email address to send alerts to" \
              '${AUTHOR_EMAIL}';
 
+echo -n ''

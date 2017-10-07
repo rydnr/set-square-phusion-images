@@ -1,3 +1,4 @@
-defineEnvVar DOCKER_USER "The Docker group" "docker";
-defineEnvVar DOCKER_GROUP "The Docker group" "docker";
+defineButDoNotOverrideEnvVar DOCKER_USER "The Docker group" "docker";
+defineButDoNotOverrideEnvVar DOCKER_GROUP "The Docker group" "docker";
 
+echo -n ''

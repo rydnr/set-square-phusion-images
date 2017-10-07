@@ -1,16 +1,17 @@
-defineEnvVar PLONE5_RELEASE_VERSION "The Plone release version" "5";
-defineEnvVar PLONE5_MAJOR_VERSION "The Plone major version" "0";
-defineEnvVar PLONE5_MINOR_VERSION "The Plone minor version" "6";
-defineEnvVar PLONE5_VERSION "The Plone version" '${PLONE5_RELEASE_VERSION}.${PLONE5_MAJOR_VERSION}.${PLONE5_MINOR_VERSION}';
-defineEnvVar PLONE5_ARTIFACT \
+defineButDoNotOverrideEnvVar PLONE5_RELEASE_VERSION "The Plone release version" "5";
+defineButDoNotOverrideEnvVar PLONE5_MAJOR_VERSION "The Plone major version" "0";
+defineButDoNotOverrideEnvVar PLONE5_MINOR_VERSION "The Plone minor version" "6";
+defineButDoNotOverrideEnvVar PLONE5_VERSION "The Plone version" '${PLONE5_RELEASE_VERSION}.${PLONE5_MAJOR_VERSION}.${PLONE5_MINOR_VERSION}';
+defineButDoNotOverrideEnvVar PLONE5_ARTIFACT \
              "The Plone artifact" \
              'Plone-${PLONE5_VERSION}-UnifiedInstaller';
-defineEnvVar PLONE5_FILE \
+defineButDoNotOverrideEnvVar PLONE5_FILE \
              "The Plone file" \
              '${PLONE5_ARTIFACT}.tgz';
-defineEnvVar PLONE5_DOWNLOAD_URL \
+defineButDoNotOverrideEnvVar PLONE5_DOWNLOAD_URL \
              "The url to download Plone3" \
              'https://launchpad.net/plone/${PLONE5_RELEASE_VERSION}.${PLONE5_MAJOR_VERSION}/${PLONE5_VERSION}/+download/${PLONE5_FILE}';
-defineEnvVar PLONE5_HOME \
+defineButDoNotOverrideEnvVar PLONE5_HOME \
              "The home directory of the Plone installation" \
              '/opt/plone';
+echo -n ''

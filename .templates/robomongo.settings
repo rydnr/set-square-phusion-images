@@ -1,5 +1,5 @@
-defineEnvVar ROBOMONGO_VERSION "The Robomongo version" '1.1.1';
-defineEnvVar ROBOMONGO_HASH "The Robomongo hash" 'c93c6b0';
-defineEnvVar ROBOMONGO_FOLDER "The Robomongo folder" 'robo3t-${ROBOMONGO_VERSION}-linux-x86_64-${ROBOMONGO_HASH}';
-defineEnvVar ROBOMONGO_ARTIFACT "The Robomongo artifact" '${ROBOMONGO_FOLDER}.tar.gz';
-defineEnvVar ROBOMONGO_DOWNLOAD_URL "The url to download Robomongo" 'https://download.robomongo.org/${ROBOMONGO_VERSION}/linux/${ROBOMONGO_ARTIFACT}';
+defineButDoNotOverrideEnvVar ROBOMONGO_VERSION "The Robomongo version" '1.1.1';
+defineButDoNotOverrideEnvVar ROBOMONGO_HASH "The Robomongo hash" 'c93c6b0';
+defineButDoNotOverrideEnvVar ROBOMONGO_FOLDER "The Robomongo folder" 'robo3t-${ROBOMONGO_VERSION}-linux-x86_64-${ROBOMONGO_HASH}';
+defineButDoNotOverrideEnvVar ROBOMONGO_ARTIFACT "The Robomongo artifact" '${ROBOMONGO_FOLDER}.tar.gz';
+defineButDoNotOverrideEnvVar ROBOMONGO_DOWNLOAD_URL "The url to download Robomongo" 'https://download.robomongo.org/${ROBOMONGO_VERSION}/linux/${ROBOMONGO_ARTIFACT}';echo -n ''

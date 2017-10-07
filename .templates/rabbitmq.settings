@@ -1,5 +1,6 @@
-defineEnvVar RABBITMQ_ULIMIT_N "The ulimit -n value to use when launching RabbitMQ" "50000";
-defineEnvVar RABBITMQ_PLUGINS "The list of plugins to install" "stomp shovel shovel_management federation federation_management mqtt";
-defineEnvVar RABBITMQ_VERSION "The rabbitmq version" "3.6.6";
-defineEnvVar RABBITMQ_DEB_ARTIFACT "The rabbitmq deb file" 'rabbitmq-server_${RABBITMQ_VERSION}-1_all.deb';
-defineEnvVar RABBITMQ_DEB_DOWNLOAD_URL "The rabbitmq deb file" 'https://www.rabbitmq.com/releases/rabbitmq-server/v${RABBITMQ_VERSION}/${RABBITMQ_DEB_ARTIFACT}';
+defineButDoNotOverrideEnvVar RABBITMQ_ULIMIT_N "The ulimit -n value to use when launching RabbitMQ" "50000";
+defineButDoNotOverrideEnvVar RABBITMQ_PLUGINS "The list of plugins to install" "stomp shovel shovel_management federation federation_management mqtt";
+defineButDoNotOverrideEnvVar RABBITMQ_VERSION "The rabbitmq version" "3.6.6";
+defineButDoNotOverrideEnvVar RABBITMQ_DEB_ARTIFACT "The rabbitmq deb file" 'rabbitmq-server_${RABBITMQ_VERSION}-1_all.deb';
+defineButDoNotOverrideEnvVar RABBITMQ_DEB_DOWNLOAD_URL "The rabbitmq deb file" 'https://www.rabbitmq.com/releases/rabbitmq-server/v${RABBITMQ_VERSION}/${RABBITMQ_DEB_ARTIFACT}';
+echo -n ''

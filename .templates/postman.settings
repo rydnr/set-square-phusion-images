@@ -1,4 +1,5 @@
-defineEnvVar POSTMAN_VERSION "The Postman version" '5.0.0';
-defineEnvVar POSTMAN_FOLDER "The Postman folder" 'Postman';
-defineEnvVar POSTMAN_ARTIFACT "The Postman artifact" '${POSTMAN_FOLDER}-linux-x64-${POSTMAN_VERSION}.tar.gz';
-defineEnvVar POSTMAN_DOWNLOAD_URL "The url to download Postman" 'https://dl.pstmn.io/download/latest/linux64';
+defineButDoNotOverrideEnvVar POSTMAN_VERSION "The Postman version" '5.0.0';
+defineButDoNotOverrideEnvVar POSTMAN_FOLDER "The Postman folder" 'Postman';
+defineButDoNotOverrideEnvVar POSTMAN_ARTIFACT "The Postman artifact" '${POSTMAN_FOLDER}-linux-x64-${POSTMAN_VERSION}.tar.gz';
+defineButDoNotOverrideEnvVar POSTMAN_DOWNLOAD_URL "The url to download Postman" 'https://dl.pstmn.io/download/latest/linux64';
+echo -n ''

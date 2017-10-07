@@ -1,6 +1,7 @@
-defineEnvVar SUPERSET_ADMIN_USER "The admin user" "admin";
-defineEnvVar SUPERSET_ADMIN_PASSWORD "The password of the admin user" '${RANDOM_PASSWORD}';
-defineEnvVar SUPERSET_ADMIN_FIRSTNAME "The firstname of the admin user" '${AUTHOR_FIRSTNAME}';
-defineEnvVar SUPERSET_ADMIN_LASTNAME "The lastname of the admin user"  '${AUTHOR_LASTNAME}';
-defineEnvVar SUPERSET_ADMIN_EMAIL "The email of the admin user" '${AUTHOR_EMAIL}';
-defineEnvVar SUPERSET_LOAD_EXAMPLES "Whether to load examples into Superset database or not" "true";
+defineButDoNotOverrideEnvVar SUPERSET_ADMIN_USER "The admin user" "admin";
+defineButDoNotOverrideEnvVar SUPERSET_ADMIN_PASSWORD "The password of the admin user" '${RANDOM_PASSWORD}';
+defineButDoNotOverrideEnvVar SUPERSET_ADMIN_FIRSTNAME "The firstname of the admin user" '${AUTHOR_FIRSTNAME}';
+defineButDoNotOverrideEnvVar SUPERSET_ADMIN_LASTNAME "The lastname of the admin user"  '${AUTHOR_LASTNAME}';
+defineButDoNotOverrideEnvVar SUPERSET_ADMIN_EMAIL "The email of the admin user" '${AUTHOR_EMAIL}';
+defineButDoNotOverrideEnvVar SUPERSET_LOAD_EXAMPLES "Whether to load examples into Superset database or not" "true";
+echo -n ''

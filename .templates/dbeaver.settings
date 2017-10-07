@@ -1,3 +1,4 @@
-defineEnvVar DBEAVER_VERSION "The DBeaver version" "4.0.6";
-defineEnvVar DBEAVER_ARTIFACT "The DBeaver artifact" 'dbeaver-ce_${DBEAVER_VERSION}_amd64.deb';
-defineEnvVar DBEAVER_DOWNLOAD_URL "The DBeaver download url" 'http://dbeaver.jkiss.org/files/${DBEAVER_VERSION}/${DBEAVER_ARTIFACT}';
+defineButDoNotOverrideEnvVar DBEAVER_VERSION "The DBeaver version" "4.0.6";
+defineButDoNotOverrideEnvVar DBEAVER_ARTIFACT "The DBeaver artifact" 'dbeaver-ce_${DBEAVER_VERSION}_amd64.deb';
+defineButDoNotOverrideEnvVar DBEAVER_DOWNLOAD_URL "The DBeaver download url" 'http://dbeaver.jkiss.org/files/${DBEAVER_VERSION}/${DBEAVER_ARTIFACT}';
+echo -n ''

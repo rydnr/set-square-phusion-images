@@ -1,1 +1,2 @@
-defineEnvVar MONGODB_VERSION "The mongodb version" "2.6.12";
+defineButDoNotOverrideEnvVar MONGODB_VERSION "The mongodb version" "2.6.12";
+echo -n ''echo -n ''

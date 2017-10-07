@@ -1,2 +1,3 @@
-defineEnvVar NGINX_SERVER_NAME "The nginx server name" 'nginx.${DOMAIN}';
-defineEnvVar NGINX_SERVER_NAMES "The nginx server names (for SSL purposes)" '${NGINX_SERVER_NAME} ${DOMAIN}';
+defineButDoNotOverrideEnvVar NGINX_SERVER_NAME "The nginx server name" 'nginx.${DOMAIN}';
+defineButDoNotOverrideEnvVar NGINX_SERVER_NAMES "The nginx server names (for SSL purposes)" '${NGINX_SERVER_NAME} ${DOMAIN}';
+echo -n ''

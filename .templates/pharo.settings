@@ -1,4 +1,5 @@
-defineEnvVar PHARO_VERSION "The version of Pharo" "6.0";
-defineEnvVar PHARO_FOLDER "The Pharo folder" 'pharo${PHARO_VERSION}';
-defineEnvVar PHARO_ARTIFACT "The Pharo artifact" 'Pharo${PHARO_VERSION}-linux.zip';
-defineEnvVar PHARO_DOWNLOAD_URL "The URL to download Pharo" 'http://get.pharo.org/vmT60';
+defineButDoNotOverrideEnvVar PHARO_VERSION "The version of Pharo" "6.0";
+defineButDoNotOverrideEnvVar PHARO_FOLDER "The Pharo folder" 'pharo${PHARO_VERSION}';
+defineButDoNotOverrideEnvVar PHARO_ARTIFACT "The Pharo artifact" 'Pharo${PHARO_VERSION}-linux.zip';
+defineButDoNotOverrideEnvVar PHARO_DOWNLOAD_URL "The URL to download Pharo" 'http://get.pharo.org/vmT60';
+echo -n ''

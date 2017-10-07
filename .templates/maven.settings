@@ -1,2 +1,3 @@
-defineEnvVar MAVEN_VERSION "The Maven version" "3.3.9";
-defineEnvVar MAVEN_VERSIONS "The versions of Maven to include" '${MAVEN_VERSION}';
+defineButDoNotOverrideEnvVar MAVEN_VERSION "The Maven version" "3.3.9";
+defineButDoNotOverrideEnvVar MAVEN_VERSIONS "The versions of Maven to include" '${MAVEN_VERSION}';
+echo -n ''

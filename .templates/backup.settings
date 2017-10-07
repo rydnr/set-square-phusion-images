@@ -1,11 +1,12 @@
-defineEnvVar BACKUP_HOST_SUFFIX \
+defineButDoNotOverrideEnvVar BACKUP_HOST_SUFFIX \
              "The prefix of the backup host to send the backup files" \
              '-backup.${DOMAIN}';
-defineEnvVar BACKUP_USER "The backup user" "backup";
-defineEnvVar CUSTOM_BACKUP_SCRIPTS_FOLDER \
+defineButDoNotOverrideEnvVar BACKUP_USER "The backup user" "backup";
+defineButDoNotOverrideEnvVar CUSTOM_BACKUP_SCRIPTS_FOLDER \
              "The folder with the custom backup scripts" \
              "/usr/local/bin";
-defineEnvVar CUSTOM_BACKUP_SCRIPTS_PREFIX "The prefix of all custom backup scripts" "backup-";
-defineEnvVar BACKUP_USER "The backup user" "backup";
-defineEnvVar BACKUP_GROUP "The backup group" '${BACKUP_USER}';
+defineButDoNotOverrideEnvVar CUSTOM_BACKUP_SCRIPTS_PREFIX "The prefix of all custom backup scripts" "backup-";
+defineButDoNotOverrideEnvVar BACKUP_USER "The backup user" "backup";
+defineButDoNotOverrideEnvVar BACKUP_GROUP "The backup group" '${BACKUP_USER}';
 
+echo -n ''

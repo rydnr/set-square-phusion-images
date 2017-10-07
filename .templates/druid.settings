@@ -1,4 +1,5 @@
-defineEnvVar DRUID_VERSION "The Druid version" '0.10.1';
-defineEnvVar DRUID_FOLDER "The Druid artifact" 'druid-${DRUID_VERSION}';
-defineEnvVar DRUID_ARTIFACT "The Druid artifact" '${DRUID_FOLDER}-bin.tar.gz';
-defineEnvVar DRUID_DOWNLOAD_URL "The url to download Druid" 'http://static.druid.io/artifacts/releases/${DRUID_ARTIFACT}';
+defineButDoNotOverrideEnvVar DRUID_VERSION "The Druid version" '0.10.1';
+defineButDoNotOverrideEnvVar DRUID_FOLDER "The Druid artifact" 'druid-${DRUID_VERSION}';
+defineButDoNotOverrideEnvVar DRUID_ARTIFACT "The Druid artifact" '${DRUID_FOLDER}-bin.tar.gz';
+defineButDoNotOverrideEnvVar DRUID_DOWNLOAD_URL "The url to download Druid" 'http://static.druid.io/artifacts/releases/${DRUID_ARTIFACT}';
+echo -n ''

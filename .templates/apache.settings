@@ -1,4 +1,5 @@
-defineEnvVar APACHE_SERVICE_PACKAGE "The Apache2 service package" "apache2";
-defineEnvVar APACHE_SERVICE_USER "The Apache2 user" "www-data";
-defineEnvVar APACHE_SERVICE_GROUP "The Apache2 group" "www-data";
+defineButDoNotOverrideEnvVar APACHE_SERVICE_PACKAGE "The Apache2 service package" "apache2";
+defineButDoNotOverrideEnvVar APACHE_SERVICE_USER "The Apache2 user" "www-data";
+defineButDoNotOverrideEnvVar APACHE_SERVICE_GROUP "The Apache2 group" "www-data";
 
+echo -n ''

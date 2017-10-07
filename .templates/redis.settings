@@ -1,2 +1,3 @@
-defineEnvVar REDIS_VERSION "The version of Redis" "3.0.6-1";
-defineEnvVar UBUNTU_REDIS_VERSION "The version of Redis" '2:${REDIS_VERSION}';
+defineButDoNotOverrideEnvVar REDIS_VERSION "The version of Redis" "3.0.6-1";
+defineButDoNotOverrideEnvVar UBUNTU_REDIS_VERSION "The version of Redis" '2:${REDIS_VERSION}';
+echo -n ''

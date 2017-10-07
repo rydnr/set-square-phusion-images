@@ -447,6 +447,14 @@ function resolve_includes() {
                 logTraceResult FAILURE "failed";
                 exitWithErrorCode CANNOT_PROCESS_TEMPLATE "${_includedFile}";
               fi
+          elif [ -e "${_includedFile}.settings" ]; then
+              if process_settings_file "${_includedFile}.settings"; then
+                  _match=${TRUE};
+              else
+                _match=${FALSE};
+                logTraceResult FAILURE "failed";
+                exitWithErrorCode CANNOT_PROCESS_TEMPLATE "${_includedFile}.settings";
+              fi
           else
             _match=${TRUE};
           fi
@@ -488,13 +496,13 @@ function process_settings_file() {
 
   checkNotEmpty "file" "${_file}" 1;
 
-  logTrace -n "Reading ${_file}";
+  logInfo -n "Reading ${_file}";
   source "${_file}";
   _rescode=$?;
   if isTrue ${_rescode}; then
-      logTraceResult SUCCESS "done";
+      logInfoResult SUCCESS "done";
   else
-    logTraceResult FAILURE "failed";
+    logInfoResult FAILURE "failed";
   fi
 
   return ${_rescode};
@@ -727,6 +735,8 @@ function build_repo() {
   fi
   update_log_category "${_repo}";
 
+  defineEnvVar IMAGE "The image to build" "${_repo}";
+  
   copy_license_file "${_repo}" "${PWD}";
   copy_copyright_preamble_file "${_repo}" "${PWD}";
 
