@@ -1,5 +1,5 @@
 # v addon-toggles
-## Default values, can be overriden with -e ENABLE_[CRON|MONIT|RSNAPSHOT|SSH|SYSLOG|LOGSTASH|LOCAL_SMTP]=[true|false]
+## Default values, can be overridden with -e ENABLE_[CRON|MONIT|RSNAPSHOT|SSH|SYSLOG|LOGSTASH|LOCAL_SMTP]=[true|false]
 # when launching the container
 ENV ENABLE_CRON=${ENABLE_CRON} \
     ENABLE_MONIT=${ENABLE_MONIT} \
