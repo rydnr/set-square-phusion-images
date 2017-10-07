@@ -103,8 +103,9 @@ function parseInput() {
 function retrieve_ip() {
   local -i _rescode;
   local _result;
+  local _iface="$(ifconfig | grep ' Link'  | grep -v docker | grep -v lo | grep -v tun | grep -v veth | awk '{print $1}')";
 
-  _result="$(ifconfig | grep 'inet addr:' | grep -v '127.0.0.1' | cut -d ':' -f 2 | cut -d' ' -f 1)";
+  _result="$(ifconfig ${_iface} | grep 'inet addr:' | grep -v '127.0.0.1' | cut -d ':' -f 2 | cut -d' ' -f 1)";
   _rescode=$?;
 
   if isTrue ${_rescode}; then
