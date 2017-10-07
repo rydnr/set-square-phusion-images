@@ -1,5 +1,5 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.21";
-defineEnvVar NEXUS_VERSION "The version of Sonatype Nexus" "3.6";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.22";
+defineEnvVar NEXUS_VERSION "The version of Sonatype Nexus" "3.6.0-02";
 defineEnvVar TAG "The image tag" '${NEXUS_VERSION}';
 defineEnvVar NEXUS_ARTIFACT \
              "The Nexus artifact" \
@@ -18,6 +18,6 @@ defineEnvVar NEXUS_DOCKER_GROUP_PORT "The HTTPS port for the Dcoker group (proxy
 defineEnvVar NEXUS_WORK_FOLDER "The work folder used in Nexus" "/opt/sonatype/sonatype-work/nexus3";
 defineEnvVar SERVICE_USER "The service user" "nexus";
 defineEnvVar SERVICE_GROUP "The service group" "nexus";
-defineEnvVar SERVICE_USER_HOME 'The home of the ${SERVICE_USER} user' '/opt/sonatype/sonatype-work/nexus3';
+defineEnvVar SERVICE_USER_HOME 'The home of the ${SERVICE_USER} user' '${NEXUS_WORK_FOLDER}';
 defineEnvVar SERVICE_USER_SHELL 'The shell of the ${SERVICE_USER} user' '/bin/bash';
 overrideEnvVar ENABLE_LOGSTASH "true";

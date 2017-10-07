@@ -1,12 +1,12 @@
 #!/bin/bash
 
 set -a
-NEXUS_HOME=${SERVICE_USER_HOME}
+NEXUS_HOME=/opt/sonatype/sonatype-work/nexus3
 SONATYPE_WORK=/sonatype-work
 KARAF_DATA=${SONATYPE_WORK}
-SONATYPE_USER="${SERVICE_USER}"
+SONATYPE_USER="nexus"
 
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SONATYPE_WORK}
+chown -R nexus:nexus ${SONATYPE_WORK}
 
 sed -i "s/^-Xms(.*)$/-Xms${NEXUS_MIN_MEMORY:-${SQ_NEXUS_MIN_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
 sed -i "s/^-Xmx(.*)$/-Xms${NEXUS_MAX_MEMORY:-${SQ_NEXUS_MAX_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
@@ -19,12 +19,12 @@ cat << EOF > /tmp/runme
 #!/bin/bash
 
 ${_exports}
-declare -x HOME="/home/${SERVICE_USER}"
+declare -x HOME="/home/nexus"
 cd ${_folder}
 bin/nexus run
 EOF
 chmod +x /tmp/runme
 
-chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
+chpst -u nexus:nexus -U nexus:nexus /tmp/runme
 
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet
