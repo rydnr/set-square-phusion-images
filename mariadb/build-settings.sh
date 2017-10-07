@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.21";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.22";
 defineEnvVar UBUNTU_VERSION "The version available in Ubuntu" "$(docker run --rm -it ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG} remote-ubuntu-version mariadb-server | sed 's/[^0-9a-zA-Z\._-]//g')";
 overrideEnvVar TAG '${UBUNTU_VERSION}';
 defineEnvVar MARIADB_ROOT_PASSWORD "The password for the root user" "${RANDOM_PASSWORD}";
