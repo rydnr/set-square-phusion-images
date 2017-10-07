@@ -5,8 +5,6 @@ FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 
 ENV SERVICE_PACKAGE="mysql-server" \
-    SERVICE_USER="mysql" \
-    SERVICE_GROUP="mysql" \
     DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
     INNODB_POOL_SIZE_FACTOR="0.4"
@@ -18,14 +16,16 @@ COPY backup-${IMAGE}.sh \
      apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh admin.sh \
      /usr/local/bin/
 
+@include("service_user")
 @include("create_ssl_certificate")
 @include("java")
+@include("elk-common")
 @include("logstash")
 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 #ADD conf.d /etc/mysql/
 
-RUN ([ ! -d /backup ] && rm -f /backup) && \
+RUN ([ ! -d /backup ] && rm -f /backup || echo -n '') && \
     export CONFIG_FILE=/etc/mysql/${IMAGE}.conf.d/mysqld.cnf && \
     mkdir -p /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump && \
     ${APTGET_INSTALL} --update ${IMAGE}-server=${TAG} bc && \

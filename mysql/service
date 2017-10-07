@@ -15,7 +15,7 @@ if [[ ! -e ${_datadir}/.bootstrapped ]]; then
 fi
 
 chmod 755 ${_datadir}
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${_datadir}
+chown -R mysql:mysql ${_datadir}
 
 _poolSize=$(cat /proc/meminfo | grep MemTotal | awk -v f=${INNODB_POOL_SIZE_FACTOR:-0.4} '{printf("%s*%s*1024\n", $2, f);}' | bc -l | cut -d'.' -f 1)
 [[ -d /usr/local/etc/mysql ]] && rsync -az /etc/mysql/conf.d/* /usr/local/etc/mysql && cp /usr/local/etc/mysql/*.cnf /etc/mysql/conf.d/
@@ -31,13 +31,13 @@ rsync -az /etc/mysql/conf.d/ /var/local/mysql/conf.d/
 rsync -az /var/local/mysql/conf.d/ /etc/mysql/conf.d/
 
 mkdir /var/run/mysql
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/run/mysql
+chown -R mysql:mysql /var/run/mysql
 
 exec 2>&1
 if [ "true" == "true" ]; then
-    exec /usr/bin/mysqld_safe --console --user=${SERVICE_USER} | logstash agent -f /etc/logstash/conf.d/mysql.conf
+    exec /usr/bin/mysqld_safe --console --user=mysql | logstash agent -f /etc/logstash/conf.d/mysql.conf
 else
-  exec /usr/bin/mysqld_safe --console --user=${SERVICE_USER} \
+  exec /usr/bin/mysqld_safe --console --user=mysql \
       || mysqladmin -u root --password="${SQ_MYSQL_ROOT_PASSWORD}" -h127.0.0.1 --protocol=tcp shutdown
 fi
 
