@@ -62,7 +62,6 @@ RUN chmod +x /usr/local/bin/run-apache && \
     bin/config set metamta.default-address ${PHABRICATOR_FROM_ADDRESS} && \
     bin/config set metamta.domain ${DOMAIN} && \
     bin/config set phabricator.timezone ${DEFAULT_TIMEZONE} && \
-    bin/config set config.ignore-issues '{ "security.security.alternate-file-domain": true }' && \
     bin/config set environment.append-paths '["/usr/lib/git-core"]' && \
     bin/config set phd.user daemon-user && \
     bin/config set diffusion.ssh-user git && \
@@ -128,6 +127,8 @@ RUN chmod +x /usr/local/bin/run-apache && \
     done && \
     rm -f /usr/local/bin/help.sh && \
     ln -s /usr/local/bin/help.phabricator.sh /usr/local/bin/help.sh
+
+#    bin/config set config.ignore-issues '{ "security.security.alternate-file-domain": true }' && \
 
 # Phabricator HTTP UI
 EXPOSE 8000
