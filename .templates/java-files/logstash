@@ -5,4 +5,4 @@ conf="/etc/logstash/conf.d/${service}.conf";
 if [[ ! -e ${conf} ]]; then
   conf="/etc/logstash/conf.d/default.conf";
 fi
-exec /usr/share/logstash/bin/logstash agent -f ${conf}
+exec /usr/share/logstash/bin/logstash -f ${conf}
