@@ -1,12 +1,12 @@
 #!/bin/bash dry-wit
-# Copyright 2016-today Automated Computing Machinery S.L.
+# Copyright 2017-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
 function usage() {
   cat <<EOF
 $SCRIPT_NAME [[locale]? [encoding]?]?
 $SCRIPT_NAME [-h|--help]
-(c) 2016-today OSOCO Software Company.
+(c) 2017-today OSOCO Software Company.
     Distributed under the terms of the GNU General Public License v3
 
 Runs the ${APP_HOME}/${APP} Java application.

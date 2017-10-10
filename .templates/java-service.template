@@ -1,0 +1,12 @@
+# v java-service
+ENV DOBACKUP="false" \
+    DEFAULT_LOCALE=${JAVA_DEFAULT_LOCALE} \
+    DEFAULT_ENCODING=${JAVA_DEFAULT_ENCODING} \
+    DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS}" \
+    APP_HOME=${APP_HOME}
+
+COPY java-service-files/start.sh java-service-files/start.inc.sh ${APP_HOME}/
+RUN chmod +x ${APP_HOME}/start.sh
+
+ENTRYPOINT ["${APP_HOME}/start.sh"]
+# ^ java-service

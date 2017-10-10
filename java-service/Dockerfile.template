@@ -4,20 +4,9 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-ENV DOBACKUP="false" \
-    DEFAULT_LOCALE=${JAVA_DEFAULT_LOCALE} \
-    DEFAULT_ENCODING=${JAVA_DEFAULT_ENCODING} \
-    DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS}" \
-    APP_HOME=${APP_HOME}
-
 @include("service_user")
 @include("java")
-
-COPY service /etc/service/${IMAGE}/run
-COPY start.sh start.inc.sh ${APP_HOME}/
-RUN chmod +x ${APP_HOME}/start.sh
-
-ENTRYPOINT ["${APP_HOME}/start.sh"]
+@include("java-service")
 
 @include("copy-metadata")
 @include("symlinks")

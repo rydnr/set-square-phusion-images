@@ -1,0 +1,1 @@
+defineButDoNotOverrideEnvVar APP_HOME "The app folder" '/opt/${IMAGE}';
