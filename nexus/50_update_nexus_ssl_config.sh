@@ -109,6 +109,8 @@ function obfuscatePassword() {
 
   if isTrue ${_rescode}; then
       export RESULT="${_result}";
+  else
+    export RESULT="";
   fi
 
   return ${_rescode};

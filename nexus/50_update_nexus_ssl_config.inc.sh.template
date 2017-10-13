@@ -1,8 +1,8 @@
 defineEnvVar PASSWORD_CLASS "The Password class" "org.eclipse.jetty.util.security.Password";
 defineEnvVar PASSWORD_JAR_FILE 'The location of the Jetty jar with the ${PASSWORD_CLASS} class' '/opt/sonatype/nexus/system/org/eclipse/jetty/jetty-util/*/jetty-util-*.jar';
-defineEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" '${SQ_SSL_KEYSTORE_PASSWORD}';
-defineEnvVar SSL_KEY_PASSWORD "The key password" '${SQ_SSL_KEY_PASSWORD}';
-defineEnvVar SSL_KEYSTORE_PATH "The keystore path" '${SQ_SSL_KEY_FOLDER}/${SQ_SSL_KEYSTORE_NAME}.jks';
+defineEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" "${SQ_SSL_KEYSTORE_PASSWORD}";
+defineEnvVar SSL_KEY_PASSWORD "The key password" "${SQ_SSL_KEY_PASSWORD}";
+defineEnvVar SSL_KEYSTORE_PATH "The keystore path" "${SQ_SSL_KEY_FOLDER}/${SQ_SSL_KEYSTORE_NAME}.jks";
 #defineEnvVar NEXUS_CONFIG_FILE "The Nexus config file" "/opt/sonatype/nexus/etc/org.sonatype.nexus.cfg";
 defineEnvVar NEXUS_CONFIG_FILE "The Nexus config file" "/opt/sonatype/sonatype-work/nexus3/etc/nexus.properties";
 defineEnvVar NEXUS_DEFAULT_CONFIG_FILE "The Nexus config file" "/opt/sonatype/nexus/etc/nexus-default.properties";

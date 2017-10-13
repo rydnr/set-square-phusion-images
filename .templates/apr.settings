@@ -1,4 +1,4 @@
-defineButDoNotOverrideEnvVar APR_VERSION "The version of Apache Portable Runtime" "1.5.2";
+defineButDoNotOverrideEnvVar APR_VERSION "The version of Apache Portable Runtime" "1.6.2";
 defineButDoNotOverrideEnvVar APR_FOLDER "The APR folder" 'apr-${APR_VERSION}';
 defineButDoNotOverrideEnvVar APR_FILE "The APR file" '${APR_FOLDER}.tar.gz';
 defineButDoNotOverrideEnvVar APR_DOWNLOAD_URL "The url to download APR" 'http://www.us.apache.org/dist//apr/${APR_FILE}';

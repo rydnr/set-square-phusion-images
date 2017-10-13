@@ -30,7 +30,8 @@ ENV SERVICE_USER="jenkins" \
 @include("tomcat")
 @include("apr")
 @include("git")
-
+@include("elk-common")
+@include("logstash")
 @include("sdkman")
 RUN mkdir -p /home/jenkins && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/jenkins && \

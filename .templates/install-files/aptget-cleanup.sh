@@ -133,7 +133,7 @@ function delete_caches() {
   local -i _rescode;
 
   logInfo -n "Deleting caches";
-  ${APTGET_CLEAN} > /dev/null
+  rm -rf /var/lib/apt/lists/* > /dev/null
   _rescode=$?;
 
   if isTrue ${_rescode}; then

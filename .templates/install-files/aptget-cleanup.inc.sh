@@ -9,7 +9,7 @@ defineEnvVar APTGET_CLEAN \
              "apt-get clean";
 defineEnvVar APTGET_AUTOREMOVE \
              "The 'apt-get autoremove' call" \
-             "apt-get autoremove -y";
+             "apt-get autoremove --purge -y";
 defineEnvVar INSTALLED_PACKAGES_FILE \
              "The file to annotate the explicitly-installed packages" \
              "/var/local/docker-installed-packages.txt";
