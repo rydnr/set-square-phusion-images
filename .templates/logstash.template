@@ -11,9 +11,8 @@ RUN  mkdir -p /usr/local/lib && \
      ${APTGET_INSTALL} -u logstash=${LOGSTASH_VERSION} && \
      ${APTGET_CLEANUP} && \
      sed -ri "s;^(\#\s*)?(path\.data:).*;\2 /backup/${IMAGE}/data;" ${LS_SETTINGS_DIR}/logstash.yml && \
-     grep -q "^path\.data: /backup/${IMAGE}/data\$" ${LS_SETTINGS_DIR}/logstash.yml
-
-RUN  if [ -n "${LOGSTASH_CODEC_PLUGINS}" ]; then \
+     grep -q "^path\.data: /backup/${IMAGE}/data\$" ${LS_SETTINGS_DIR}/logstash.yml && \
+     if [ -n "${LOGSTASH_CODEC_PLUGINS}" ]; then \
        echo "Installing Logstash codec plugins" && \
        for p in ${LOGSTASH_CODEC_PLUGINS}; do \
          ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
