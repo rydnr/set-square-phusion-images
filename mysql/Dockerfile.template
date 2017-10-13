@@ -7,7 +7,7 @@ FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 ENV SERVICE_PACKAGE="mysql-server" \
     DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
-    INNODB_POOL_SIZE_FACTOR="0.4"
+    INNODB_POOL_SIZE_FACTOR="${INNODB_DEFAULT_POOL_SIZE_FACTOR}"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
@@ -37,7 +37,7 @@ RUN ([ ! -d /backup ] && rm -f /backup || echo -n '') && \
     sed -i -e"s|# ssl-key\s*.*|# ssl-key=/etc/ssl/private/${IMAGE}.key|" ${CONFIG_FILE} && \
     echo 'explicit_defaults_for_timestamp=1' >> ${CONFIG_FILE} && \
     ${APTGET_CLEANUP} && \
-    /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
+    /usr/local/bin/create_ssl_certificate_openssl.sh -v && \
     rm -rf /var/lib/mysql && \
     ln -s /backup/${IMAGE}-db /var/lib/mysql && \
     update-rc.d mysql disable && \
