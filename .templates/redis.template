@@ -1,4 +1,6 @@
 # v redis
 RUN ${APTGET_INSTALL} -u redis-server=${UBUNTU_REDIS_VERSION} && \
     ${APTGET_CLEANUP}
+
+EXPOSE 6379
 # ^ redis
