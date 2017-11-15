@@ -21,7 +21,7 @@ defineEnvVar MARIADB_JDBC_DRIVER_VERSION "The version of the JDBC driver for Mar
 defineEnvVar MARIADB_JDBC_DRIVER_ARTIFACT "The name of the MariaDB JDBC driver artifact" 'mariadb-java-client-${MARIADB_JDBC_DRIVER_VERSION}.jar';
 defineEnvVar MARIADB_JDBC_DRIVER_URL "The url of the MariaDB JDBC driver artifact" 'http://central.maven.org/maven2/org/mariadb/jdbc/mariadb-java-client/${MARIADB_JDBC_DRIVER_VERSION}/${MARIADB_JDBC_DRIVER_ARTIFACT}';
 defineEnvVar MARIADB_JDBC_DRIVER "The class name of the JDBC driver for MariaDB" "org.mariadb.jdbc.Driver";
-defineEnvVar MYSQL_VERSION "The MySQL version" "5.7.19-0ubuntu0.16.04.1";
+defineEnvVar MYSQL_VERSION "The MySQL version" "$(docker run --rm -it ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG} remote-ubuntu-version mysql-version | sed 's/[^0-9a-zA-Z\._-]//g')";
 defineEnvVar MYSQL_JDBC_DRIVER_VERSION "The version of the JDBC driver for MySQL" "6.0.6";
 defineEnvVar MYSQL_JDBC_DRIVER_ARTIFACT "The name of the MySQL JDBC driver artifact" 'mysql-connector-java-${MYSQL_JDBC_DRIVER_VERSION}.jar';
 defineEnvVar MYSQL_JDBC_DRIVER_URL "The url of the MySQL JDBC driver artifact" 'http://central.maven.org/maven2/mysql/mysql-connector-java/${MYSQL_JDBC_DRIVER_VERSION}/${MYSQL_JDBC_DRIVER_ARTIFACT}';
