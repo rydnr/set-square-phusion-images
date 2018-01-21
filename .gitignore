@@ -191,6 +191,7 @@ sdkman/setup.sql
 .templates/entrypoint
 .templates/exim-files/exim.00_local_macros
 .templates/filebeat
+.templates/ganache
 .templates/git
 .templates/go
 .templates/gosu
@@ -244,6 +245,7 @@ sdkman/setup.sql
 .templates/superset
 .templates/tini
 .templates/tomcat
+.templates/truffle
 .templates/yarn
 tern/my_exec
 tomcat/entrypoint.sh

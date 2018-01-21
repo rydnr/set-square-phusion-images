@@ -1,0 +1,3 @@
+# v ganache
+RUN npm -g install ganache-cli
+# ^ ganache

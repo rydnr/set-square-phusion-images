@@ -1,0 +1,3 @@
+# v trufflen
+RUN npm -g install truffle
+# ^ truffle
