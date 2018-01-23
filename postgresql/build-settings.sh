@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "${TAG}";
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.9.22";
 defineEnvVar POSTGRESQL_VERSION "The PostgreSQL version" "9.6";
 defineEnvVar TAG '${POSTGRESQL_VERSION}';
 defineEnvVar POSTGRESQL_ROOT_USER "The name of the admin user in PostgreSQL" "root";
