@@ -1,0 +1,5 @@
+defineButDoNotOverrideEnvVar ROBO3T_VERSION "The Robo3T version" '1.2.1';
+defineButDoNotOverrideEnvVar ROBO3T_HASH "The Robo3T hash" '3e50a65';
+defineButDoNotOverrideEnvVar ROBO3T_FOLDER "The Robo3T folder" 'robo3t-${ROBO3T_VERSION}-linux-x86_64-${ROBO3T_HASH}';
+defineButDoNotOverrideEnvVar ROBO3T_ARTIFACT "The Robo3T artifact" '${ROBO3T_FOLDER}.tar.gz';
+defineButDoNotOverrideEnvVar ROBO3T_DOWNLOAD_URL "The url to download Robo3T" 'https://download.robomongo.org/${ROBO3T_VERSION}/linux/${ROBO3T_ARTIFACT}';

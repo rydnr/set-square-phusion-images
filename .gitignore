@@ -238,10 +238,12 @@ sdkman/setup.sql
 .templates/rabbitmq
 .templates/rabbitmq-dump-queue
 .templates/redis
+.templates/robo3t
 .templates/robomongo
 .templates/sdkman
 .templates/service
 .templates/service_user
+.templates/studio3t
 .templates/superset
 .templates/tini
 .templates/tomcat

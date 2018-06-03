@@ -1,0 +1,9 @@
+# v studio3t
+RUN cd /opt && \
+    wget -O ${STUDIO3T_ARTIFACT} ${STUDIO3T_DOWNLOAD_URL} && \
+    tar xvfz ${STUDIO3T_ARTIFACT} && \
+    chmod +x ./studio-3t-linux-x64.sh && \
+    ./studio-3t-linux-x64.sh && \
+    ${APTGET_INSTALL} -u libgl1-mesa-glx xcb qt5-default && \
+    ${APTGET_CLEANUP}
+# ^ studio3t

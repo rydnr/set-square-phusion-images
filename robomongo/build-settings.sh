@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.21";
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.9.22";
 defineEnvVar ROBOMONGO_VERSION "The Robomongo version" '1.1.1';
 defineEnvVar ROBOMONGO_HASH "The Robomongo hash" 'c93c6b0';
 defineEnvVar TAG "The image tag" '${ROBOMONGO_VERSION}-${ROBOMONGO_HASH}';

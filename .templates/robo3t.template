@@ -1,0 +1,9 @@
+# v robo3t
+RUN cd /opt && \
+    wget -O ${ROBO3T_ARTIFACT} ${ROBO3T_DOWNLOAD_URL} && \
+    tar xvfz ${ROBO3T_ARTIFACT} && \
+    ln -s ${ROBO3T_FOLDER} robo3t && \
+    rm -f ${ROBO3T_ARTIFACT} && \
+    ${APTGET_INSTALL} -u libgl1-mesa-glx xcb qt5-default && \
+    ${APTGET_CLEANUP}
+# ^ robo3t
