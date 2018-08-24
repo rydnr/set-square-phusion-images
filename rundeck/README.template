@@ -1,5 +1,14 @@
 Runs Rundeck as a Docker container.
 
 Examples:
-- Run Rundeck with default settings.
-> docker run -d -p [port]:8080 -e VIRTUAL_HOST=[r-vhost] ${NAMESPACE}/${IMAGE}:${TAG}
+- Run Rundeck with the admin password.
+> docker run -d -p [port]:8080 -p [adminPort]:4440 -e VIRTUAL_HOST=[vhost] -e ADMIN_PASSWORD=[...] ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Run Rundeck with all settings.
+> docker run -d \
+    -p [port]:8080 \
+    -p [adminPort]:4440 \
+    -e VIRTUAL_HOST=[vhost] \
+    -e ADMIN_USER=[...] \
+    -e ADMIN_PASSWORD=[...] \
+    ${NAMESPACE}/${IMAGE}:${TAG}

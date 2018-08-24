@@ -105,7 +105,7 @@ function retrieve_iface() {
   local -i _rescode;
 
   logInfo -n "Finding out the name of the network interface";
-  _result="$(ifconfig | cut -d' ' -f1 | grep -v -e '^$' | tr ' ' '\n' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun' | head -n 1)";
+  _result="$(ifconfig | cut -d' ' -f1 | grep -v -e '^$' | tr ' ' '\n' | tr -d ':' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun' | head -n 1)";
   _rescode=$?;
   if isTrue ${_rescode}; then
       logInfoResult SUCCESS "${_result}";
@@ -118,7 +118,7 @@ function retrieve_iface() {
   return ${_rescode};
 }
 
-## Retrieves the /16 subnet of the eth0 interface.
+## Retrieves the /16 subnet of given network interface.
 ## -> 1: The interface name.
 ## <- 0/${TRUE} if the subnet information is available; 1/${FALSE} otherwise.
 ## <- RESULT: the device where the root filesystem is stored.
@@ -133,7 +133,7 @@ function retrieve_subnet_16() {
   checkNotEmpty "iface" "${_iface}" 1;
 
   logInfo -n "Finding out the /16 subnet for ${_iface}";
-  _result="$(ifconfig ${_iface} | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.0/24\n", $1, $2, $3);}')";
+  _result="$(ifconfig ${_iface} | grep 'inet ' | cut -d':' -f 2 | awk '{print $3;}' | awk -F'.' '{printf("%d.%d.%d.0/24\n", $1, $2, $3);}')";
 
   if isEmpty ${_result}; then
       logInfoResult FAILED "failed";

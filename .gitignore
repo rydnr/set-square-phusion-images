@@ -152,6 +152,7 @@ postgresql/backup.sh
 postgresql/bootstrap-db
 postgresql/bootstrap-db.sh
 postgresql-bootstrap/my_exec
+postgresql/postgresql-files
 postgresql/process-sql.inc.sh
 postgresql/process-sqls.sh
 postgresql/service
@@ -172,6 +173,8 @@ riemann/service
 */rsyslog-files
 .rt-client.sh-push.lock
 .rt-projects
+rundeck/check_input.sh
+rundeck/service
 */runme
 sdkman/setup.sql
 **/ssh-files

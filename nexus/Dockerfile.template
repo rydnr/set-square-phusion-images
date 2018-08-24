@@ -15,7 +15,7 @@ ENV DOBACKUP="true" \
 @include("java")
 @include("elk-common")
 @include("logstash")
-#@include("filebeat")
+@include("filebeat")
 @include("service")
 
 COPY INSTALL.tmpl /usr/local/share/INSTALL.tmpl

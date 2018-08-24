@@ -1,0 +1,101 @@
+#!/bin/bash dry-wit
+# Copyright 2018-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+
+# Prints how to use this script.
+## dry-wit hook
+function usage() {
+  cat <<EOF
+$SCRIPT_NAME [-v[v]|-q]
+$SCRIPT_NAME [-h|--help]
+(c) 2018-today Automated Computing Machinery, S.L.
+    Distributed under the terms of the GNU General Public License v3
+
+Checks the container is launched with the required runtime parameters.
+
+Common flags:
+    * -h | --help: Display this message.
+    * -v: Increase the verbosity.
+    * -vv: Increase the verbosity further.
+    * -q | --quiet: Be silent.
+EOF
+}
+
+# Error messages
+function defineErrors() {
+  addError INVALID_OPTION "Unknown option";
+  addError ADMIN_PASSWORD_ENV_VAR_IS_MANDATORY "ADMIN_PASSWORD environment variable is mandatory";
+  addError MONITORING_PASSWORD_ENV_VAR_IS_MANDATORY "MONITORING_PASSWORD environment variable is mandatory";
+  addError CORE_PASSWORD_ENV_VAR_IS_MANDATORY "CORE_PASSWORD environment variable is mandatory";
+  addError WEB_PASSWORD_ENV_VAR_IS_MANDATORY "WEB_PASSWORD environment variable is mandatory";
+  addError GIT_PASSWORD_ENV_VAR_IS_MANDATORY "GIT_PASSWORD environment variable is mandatory";
+}
+
+## Parses the input
+## dry-wit hook
+function parseInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount=0;
+  local _currentCount;
+  local _help=${FALSE};
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help)
+        _help=${TRUE};
+        shift;
+        ;;
+      -v | -vv | -q | --quiet)
+        shift;
+        ;;
+      --)
+        shift;
+        break;
+        ;;
+    esac
+  done
+}
+
+## Checking input
+## dry-wit hook
+function checkInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+  local _oldIfs;
+
+  logDebug -n "Checking input";
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q | --quiet)
+      ;;
+      --)
+        break;
+        ;;
+      *) logDebugResult FAILURE "fail";
+         exitWithErrorCode INVALID_OPTION ${_flag};
+         ;;
+    esac
+  done
+
+  if isEmpty "${ADMIN_PASSWORD}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode ADMIN_PASSWORD_ENV_VAR_IS_MANDATORY;
+  fi
+
+  logDebugResult SUCCESS "valid";
+}
+
+## Main logic
+## dry-wit hook
+function main() {
+
+  echo -n "";
+}
