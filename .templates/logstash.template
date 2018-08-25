@@ -6,42 +6,45 @@ ENV LS_SETTINGS_DIR=/etc/logstash \
 
 COPY logstash-files/50_generate_logstash_forwarder_crt.sh logstash-files/50_generate_logstash_forwarder_crt.inc.sh /etc/my_init.d/
 
-RUN  mkdir -p /usr/local/lib && \
-	   ln -s /usr/lib/*/libzmq.so.3 /usr/local/lib/libzmq.so && \
-     ${APTGET_INSTALL} -u logstash=${LOGSTASH_VERSION} && \
-     ${APTGET_CLEANUP} && \
-     sed -ri "s;^(\#\s*)?(path\.data:).*;\2 /backup/${IMAGE}/data;" ${LS_SETTINGS_DIR}/logstash.yml && \
-     grep -q "^path\.data: /backup/${IMAGE}/data\$" ${LS_SETTINGS_DIR}/logstash.yml && \
-     if [ -n "${LOGSTASH_CODEC_PLUGINS}" ]; then \
-       echo "Installing Logstash codec plugins" && \
-       for p in ${LOGSTASH_CODEC_PLUGINS}; do \
-         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
-       done; \
-     fi; \
-     if [ -n "${LOGSTASH_FILTER_PLUGINS}" ]; then \
-       echo "Installing Logstash filter plugins" && \
-       for p in ${LOGSTASH_FILTER_PLUGINS}; do \
-         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
-       done; \
-     fi; \
-     if [ -n "${LOGSTASH_INPUT_PLUGINS}" ]; then \
-       echo "Installing Logstash input plugins" && \
-       for p in ${LOGSTASH_INPUT_PLUGINS}; do \
-         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
-       done; \
-     fi; \
-     if [ -n "${LOGSTASH_OUTPUT_PLUGINS}" ]; then \
-       echo "Installing Logstash output plugins" && \
-       for p in ${LOGSTASH_OUTPUT_PLUGINS}; do \
-         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
-       done; \
-     fi; \
-     if [ -n "${LOGSTASH_PATTERNS_PLUGINS}" ]; then \
-       echo "Installing Logstash patterns plugins" && \
-       for p in ${LOGSTASH_PATTERNS_PLUGINS}; do \
-         ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
-       done; \
-     fi
+RUN wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
+    ${APTGET_INSTALL} apt-transport-https && \
+    echo "deb https://artifacts.elastic.co/packages/6.x/apt stable main" | sudo tee -a /etc/apt/sources.list.d/elastic-6.x.list && \
+    mkdir -p /usr/local/lib && \
+    ln -s /usr/lib/*/libzmq.so.3 /usr/local/lib/libzmq.so && \
+    ${APTGET_INSTALL} -u logstash=${LOGSTASH_VERSION} && \
+    ${APTGET_CLEANUP} && \
+    sed -ri "s;^(\#\s*)?(path\.data:).*;\2 /backup/${IMAGE}/data;" ${LS_SETTINGS_DIR}/logstash.yml && \
+    grep -q "^path\.data: /backup/${IMAGE}/data\$" ${LS_SETTINGS_DIR}/logstash.yml && \
+    if [ -n "${LOGSTASH_CODEC_PLUGINS}" ]; then \
+      echo "Installing Logstash codec plugins" && \
+      for p in ${LOGSTASH_CODEC_PLUGINS}; do \
+        ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+      done; \
+    fi; \
+    if [ -n "${LOGSTASH_FILTER_PLUGINS}" ]; then \
+      echo "Installing Logstash filter plugins" && \
+      for p in ${LOGSTASH_FILTER_PLUGINS}; do \
+        ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+      done; \
+    fi; \
+    if [ -n "${LOGSTASH_INPUT_PLUGINS}" ]; then \
+      echo "Installing Logstash input plugins" && \
+      for p in ${LOGSTASH_INPUT_PLUGINS}; do \
+        ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+      done; \
+    fi; \
+    if [ -n "${LOGSTASH_OUTPUT_PLUGINS}" ]; then \
+      echo "Installing Logstash output plugins" && \
+      for p in ${LOGSTASH_OUTPUT_PLUGINS}; do \
+        ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+      done; \
+    fi; \
+    if [ -n "${LOGSTASH_PATTERNS_PLUGINS}" ]; then \
+      echo "Installing Logstash patterns plugins" && \
+      for p in ${LOGSTASH_PATTERNS_PLUGINS}; do \
+        ${LS_HOME}/bin/logstash-plugin install ${p} || exit 1; \
+      done; \
+    fi
 
 COPY logstash-files/02-beats-input.conf \
      logstash-files/10-syslog-filter.conf \
