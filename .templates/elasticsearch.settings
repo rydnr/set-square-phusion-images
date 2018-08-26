@@ -1,5 +1,5 @@
-defineButDoNotOverrideEnvVar ELASTICSEARCH_VERSION "The version of ElasticSearch" "5.1.2";
-defineButDoNotOverrideEnvVar ELASTICSEARCH_MAJOR_VERSION "The major version of ElasticSearch" "5";
+defineButDoNotOverrideEnvVar ELASTICSEARCH_VERSION "The version of ElasticSearch" "6.4.0";
+defineButDoNotOverrideEnvVar ELASTICSEARCH_MAJOR_VERSION "The major version of ElasticSearch" "6";
 #defineButDoNotOverrideEnvVar ELASTICSEARCH_HOME "The home folder of ElasticSearch" "/usr/share/elasticsearch";
 defineButDoNotOverrideEnvVar ELASTICSEARCH_HOME "The home folder of ElasticSearch" "/opt/elasticsearch";
 defineButDoNotOverrideEnvVar ELASTICSEARCH_FOLDER "The elasticsearch folder" 'elasticsearch-${ELASTICSEARCH_VERSION}';
@@ -9,4 +9,4 @@ defineButDoNotOverrideEnvVar BOOTSTRAP_MEMORYLOCK "The bootstrap.memory_lock set
 defineButDoNotOverrideEnvVar DISCOVERY_ZEN_MINIMUMMASTERNODES "The discovery.zen.minimum_master_nodes setting in /etc/elasticsearch/elasticsearch.yml" "1";
 overrideEnvVar JAVA_HEAP_MAX "1g";
 overrideEnvVar JAVA_HEAP_MIN "1g";
-echo -n ''
+#
