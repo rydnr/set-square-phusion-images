@@ -40,7 +40,7 @@ function defineErrors() {
   addError "IFCONFIG_NOT_INSTALLED" "ifconfig not installed";
   addError "TR_NOT_INSTALLED" "tr not installed";
   addError "CANNOT_RETRIEVE_INTERFACE_NAME" "Cannot retrieve the interface name";
-  addError "CANNOT_RETRIEVE_SUBNET_16_FOR_IFACE" "Cannot retrieve the /16 subnet";
+  addError "CANNOT_RETRIEVE_SUBNET_24_FOR_IFACE" "Cannot retrieve the /24 subnet";
 }
 
 ## Validates the input.
@@ -94,56 +94,6 @@ function parseInput() {
   done
 }
 
-## Retrieves the first network interface.
-## <- RESULT: such interface name.
-## Usage:
-##   if retrieve_iface; then
-##     echo "Interface candidate: ${RESULT}";
-##   fi
-function retrieve_iface() {
-  local _result;
-  local -i _rescode;
-
-  logInfo -n "Finding out the name of the network interface";
-  _result="$(ifconfig | cut -d' ' -f1 | grep -v -e '^$' | tr ' ' '\n' | tr -d ':' | grep -v -e '^docker' | grep -v -e '^lo$' | grep -v -e '^tun' | head -n 1)";
-  _rescode=$?;
-  if isTrue ${_rescode}; then
-      logInfoResult SUCCESS "${_result}";
-      export RESULT="${_result}";
-  else
-    logInfoResult FAILED "failed";
-    exitWithErrorCode CANNOT_RETRIEVE_INTERFACE_NAME;
-  fi
-
-  return ${_rescode};
-}
-
-## Retrieves the /16 subnet of given network interface.
-## -> 1: The interface name.
-## <- 0/${TRUE} if the subnet information is available; 1/${FALSE} otherwise.
-## <- RESULT: the device where the root filesystem is stored.
-## Usage:
-##   if retrieve_subnet_16 "eth0"; then
-##     echo "The /16 subnet for eth0 is ${RESULT}"
-##   fi
-function retrieve_subnet_16() {
-  local _iface="${1}";
-  local _result;
-
-  checkNotEmpty "iface" "${_iface}" 1;
-
-  logInfo -n "Finding out the /16 subnet for ${_iface}";
-  _result="$(ifconfig ${_iface} | grep 'inet ' | cut -d':' -f 2 | awk '{print $3;}' | awk -F'.' '{printf("%d.%d.%d.0/24\n", $1, $2, $3);}')";
-
-  if isEmpty ${_result}; then
-      logInfoResult FAILED "failed";
-      exitWithErrorCode CANNOT_RETRIEVE_SUBNET_16_FOR_IFACE "${_iface}";
-  else
-    logInfoResult SUCCESS "${_result}";
-    export RESULT="${_result}";
-  fi
-}
-
 ## Main logic
 ## dry-wit hook
 function main() {
@@ -157,9 +107,9 @@ function main() {
       logDebugResult FAILURE "failed";
   fi
 
-  if retrieve_iface; then
+  if retrieveIface; then
       _iface="${RESULT}";
-      if retrieve_subnet_16 "${_iface}"; then
+      if retrieveSubnet24 "${_iface}"; then
           _subnet="${RESULT}";
 
           logInfo -n "Creating Monit configuration for enabling web interface on port ${MONIT_HTTP_PORT}";
@@ -184,6 +134,17 @@ EOF
 #       then alert
 EOF
           logInfoResult SUCCESS "done";
+      else
+        exitWithErrorCode CANNOT_RETRIEVE_SUBNET_24_FOR_IFACE "${_iface}";
       fi
+  else
+    exitWithErrorCode CANNOT_RETRIEVE_INTERFACE_NAME;
   fi
 }
+
+
+
+
+
+
+

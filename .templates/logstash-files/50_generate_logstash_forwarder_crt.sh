@@ -36,7 +36,8 @@ function defineErrors() {
   addError "IFCONFIG_NOT_AVAILABLE" "ifconfig is not installed";
   addError "GREP_NOT_AVAILABLE" "grep is not available";
   addError "CUT_NOT_AVAILABLE" "cut is not available";
-  addError "CANNOT_RETRIEVE_OWN_IP" "Cannot retrieve my own IP";
+  addError "CANNOT_FIND_OUT_INTERFACE_NAME" "Cannot find out the network interface name";
+  addError "CANNOT_FIND_OUT_MY_OWN_IP" "Cannot find out my own IP";
   addError "CANNOT_UPDATE_OPENSSL_CNF" "Cannot update openssl.cnf";
   addError "CANNOT_GENERATE_LOGSTASH_FORWARDER_CRT_FILE" "Cannot generate logstash-forwarder.crt";
 }
@@ -91,28 +92,6 @@ function parseInput() {
         ;;
     esac
   done
-}
-
-## Retrieves the IP.
-## <- 0/${TRUE} if the IP is up; 1/${FALSE} otherwise.
-## <- RESULT: The IP.
-## Example:
-##   if retrieve_ip; then
-##     echo "IP: ${RESULT}";
-##   fi
-function retrieve_ip() {
-  local -i _rescode;
-  local _result;
-  local _iface="$(ifconfig | grep ' Link'  | grep -v docker | grep -v lo | grep -v tun | grep -v veth | awk '{print $1}')";
-
-  _result="$(ifconfig ${_iface} | grep 'inet addr:' | grep -v '127.0.0.1' | cut -d ':' -f 2 | cut -d' ' -f 1)";
-  _rescode=$?;
-
-  if isTrue ${_rescode}; then
-      export RESULT=${_result};
-  fi
-
-  return ${_rescode};
 }
 
 ## Adds the IP to the openssl.cnf file.
@@ -177,37 +156,46 @@ function generate_logstash_forwarder_crt_file() {
 ## Main logic
 ## dry-wit hook
 function main() {
+  local _iface;
   local _ip;
 
-  logInfo -n "Retrieving IP";
-  if retrieve_ip; then
-      _ip="${RESULT}";
-      logInfoResult SUCCESS "${_ip}";
+  logInfo -n "Retrieving interface name";
+  if retrieveIface; then
+      _iface="${RESULT}";
+      logInfoResult SUCCESS "done";
+      logInfo -n "Retrieving IP";
+      if retrieveIp "${_iface}"; then
+          _ip="${RESULT}";
+          logInfoResult SUCCESS "${_ip}";
 
-      logInfo -n "Updating ${OPENSSL_CNF_FILE}";
-      if add_ip_to_openssl_cnf "${OPENSSL_CNF_FILE}" "${_ip}"; then
-          logInfoResult SUCCESS "done";
-
-          logInfo -n "Generating ${LOGSTASH_FORWARDER_CRT_FILE}";
-          if generate_logstash_forwarder_crt_file \
-                 "${OPENSSL_CNF_FILE}" \
-                 "${LOGSTASH_FORWARDER_CRT_FILE}" \
-                 "${LOGSTASH_FORWARDER_PRIVATE_KEY}" \
-                 "${LOGSTASH_FORWARDER_VALIDITY_DAYS}" \
-                 "${LOGSTASH_FORWARDER_KEY_ALGORITHM}" \
-                 "${LOGSTASH_FORWARDER_KEY_LENGTH}"; then
+          logInfo -n "Updating ${OPENSSL_CNF_FILE}";
+          if add_ip_to_openssl_cnf "${OPENSSL_CNF_FILE}" "${_ip}"; then
               logInfoResult SUCCESS "done";
+
+              logInfo -n "Generating ${LOGSTASH_FORWARDER_CRT_FILE}";
+              if generate_logstash_forwarder_crt_file \
+                     "${OPENSSL_CNF_FILE}" \
+                     "${LOGSTASH_FORWARDER_CRT_FILE}" \
+                     "${LOGSTASH_FORWARDER_PRIVATE_KEY}" \
+                     "${LOGSTASH_FORWARDER_VALIDITY_DAYS}" \
+                     "${LOGSTASH_FORWARDER_KEY_ALGORITHM}" \
+                     "${LOGSTASH_FORWARDER_KEY_LENGTH}"; then
+                  logInfoResult SUCCESS "done";
+              else
+                logInfoResult FAILURE "failed";
+                exitWithErrorCode CANNOT_GENERATE_LOGSTASH_FORWARDER_CRT_FILE;
+              fi
           else
             logInfoResult FAILURE "failed";
-            exitWithErrorCode CANNOT_GENERATE_LOGSTASH_FORWARDER_CRT_FILE;
+            exitWithErrorCode CANNOT_UPDATE_OPENSSL_CNF "${OPENSSL_CNF_FILE}";
           fi
       else
         logInfoResult FAILURE "failed";
-        exitWithErrorCode CANNOT_UPDATE_OPENSSL_CNF "${OPENSSL_CNF_FILE}";
+        exitWithErrorCode CANNOT_FIND_OUT_MY_OWN_IP;
       fi
   else
     logInfoResult FAILURE "failed";
-    exitWithErrorCode CANNOT_RETRIEVE_OWN_IP;
+    exitWithErrorCode CANNOT_FIND_OUT_INTERFACE_NAME;
   fi
 }
 
