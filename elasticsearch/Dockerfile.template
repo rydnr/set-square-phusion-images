@@ -7,6 +7,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("elk-common")
 @include("elasticsearch")
 @include("service")
+@include("logstash")
 
 COPY elasticsearch-files/check-host.sh /etc/my_init.d/00_check_host.sh
 

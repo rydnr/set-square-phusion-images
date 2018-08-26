@@ -15,7 +15,7 @@ defineEnvVar SERVICE_USER_SHELL "The shell of the service user" "/bin/bash";
 defineEnvVar DEFAULT_LOCALE "The default locale" "en_US";
 defineEnvVar DEFAULT_ENCODING "The default encoding" "UTF-8";
 defineEnvVar DEFAULT_JAVA_OPTS "The default JAVA_OPTS" "";
-defineEnvVar LOGSTASH_INPUT_PLUGINS "The space-separated list of Logstash input plugins" "logstash-input-log4j logstash-input-stdin";
-defineEnvVar LOGSTASH_FILTER_PLUGINS "The space-separated list of Logstash filter plugins" "logstash-filter-date logstash-filter-json";
+defineEnvVar LOGSTASH_INPUT_PLUGINS "The space-separated list of Logstash input plugins" "logstash-input-stdin";
+defineEnvVar LOGSTASH_FILTER_PLUGINS "The space-separated list of Logstash filter plugins" "logstash-filter-grok logstash-filter-date logstash-filter-json";
 defineEnvVar LOGSTASH_OUTPUT_PLUGINS "The space-separated list of Logstash output plugins" "logstash-output-stdout";
 #
