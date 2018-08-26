@@ -1,0 +1,388 @@
+#!/bin/bash dry-wit
+# Copyright 2018-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+
+# Prints how to use this script.
+## dry-wit hook
+function usage() {
+  cat <<EOF
+$SCRIPT_NAME [-v[v]|-q]
+$SCRIPT_NAME [-h|--help]
+(c) 2018-today Automated Computing Machinery, S.L.
+    Distributed under the terms of the GNU General Public License v3
+
+Checks the container is launched with the required runtime parameters.
+
+Common flags:
+    * -h | --help: Display this message.
+    * -v: Increase the verbosity.
+    * -vv: Increase the verbosity further.
+    * -q | --quiet: Be silent.
+EOF
+}
+
+# Error messages
+function defineErrors() {
+  addError INVALID_OPTION "Unknown option";
+  addError DEFAULT_VIRTUAL_HOST_ENV_VAR_IS_MANDATORY "DEFAULT_VIRTUAL_HOST environment variable is mandatory";
+  addError DEFAULT_VIRTUAL_PORT_ENV_VAR_IS_MANDATORY "DEFAULT_VIRTUAL_PORT environment variable is mandatory";
+  addError DEFAULT_ADMIN_USERNAME_ENV_VAR_IS_MANDATORY "DEFAULT_ADMIN_USERNAME environment variable is mandatory";
+  addError ADMIN_PASSWORD_ENV_VAR_IS_MANDATORY "ADMIN_PASSWORD environment variable is mandatory";
+  addError VIRTUAL_HOST_IS_MANDATORY "Either VIRTUAL_HOST or DEFAULT_VIRTUAL_HOST are mandatory";
+  addError VIRTUAL_PORT_IS_MANDATORY "Either VIRTUAL_PORT or DEFAULT_VIRTUAL_PORT are mandatory";
+  addError RUNDECK_CONFIG_FILE_IS_MANDATORY "RUNDECK_CONFIG_FILE is mandatory";
+  addError RUNDECK_CONFIG_FILE_DOES_NOT_EXIST "RUNDECK_CONFIG_FILE does not exist";
+  addError CANNOT_READ_RUNDECK_CONFIG_FILE "No permissions to read RUNDECK_CONFIG_FILE";
+  addError CANNOT_WRITE_RUNDECK_CONFIG_FILE "No permissions to write RUNDECK_CONFIG_FILE";
+  addError REALM_PROPERTIES_FILE_IS_MANDATORY "REALM_PROPERTIES_FILE is mandatory";
+  addError REALM_PROPERTIES_FILE_DOES_NOT_EXIST "REALM_PROPERTIES_FILE does not exist";
+  addError CANNOT_READ_REALM_PROPERTIES_FILE "No permissions to read REALM_PROPERTIES_FILE";
+  addError CANNOT_WRITE_REALM_PROPERTIES_FILE "No permissions to write REALM_PROPERTIES_FILE";
+  addError PROFILE_FILE_IS_MANDATORY "PROFILE_FILE is mandatory";
+  addError PROFILE_FILE_DOES_NOT_EXIST "PROFILE_FILE does not exist";
+  addError CANNOT_READ_PROFILE_FILE "No permissions to read PROFILE_FILE";
+  addError ERROR_CHANGING_ADMIN_USERNAME_AND_PASSWORD_IN_REALM_PROPERTIES "Error changing admin username and password ir realm.properties file";
+  addError ERROR_CHANGING_GRAILSSERVERURL_DOMAIN_IN_CONFIG_FILE "Error changing grails.serverURL in rundeck-config.properties file";
+}
+
+## Parses the input
+## dry-wit hook
+function parseInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount=0;
+  local _currentCount;
+  local _help=${FALSE};
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help)
+        _help=${TRUE};
+        shift;
+        ;;
+      -v | -vv | -q | --quiet)
+        shift;
+        ;;
+      --)
+        shift;
+        break;
+        ;;
+    esac
+  done
+}
+
+## Checking input
+## dry-wit hook
+function checkInput() {
+
+  local _flags=$(extractFlags $@);
+  local _flagCount;
+  local _currentCount;
+  local _oldIfs;
+
+  logDebug -n "Checking input";
+
+  # Flags
+  for _flag in ${_flags}; do
+    _flagCount=$((_flagCount+1));
+    case ${_flag} in
+      -h | --help | -v | -vv | -q | --quiet)
+      ;;
+      --)
+        break;
+        ;;
+      *) logDebugResult FAILURE "fail";
+         exitWithErrorCode INVALID_OPTION ${_flag};
+         ;;
+    esac
+  done
+
+  if isEmpty "${VIRTUAL_HOST}"; then
+      if isEmpty "${DEFAULT_VIRTUAL_HOST}"; then
+          logDebugResult FAILURE "failed";
+          exitWithErrorCode DEFAULT_VIRTUAL_HOST_ENV_VAR_IS_MANDATORY;
+      fi
+  fi
+
+  if isEmpty "${VIRTUAL_PORT}"; then
+      if isEmpty "${DEFAULT_VIRTUAL_PORT}"; then
+          logDebugResult FAILURE "failed";
+          exitWithErrorCode DEFAULT_VIRTUAL_PORT_ENV_VAR_IS_MANDATORY;
+      fi
+  fi
+
+  if isEmpty "${ADMIN_USERNAME}"; then
+      if isEmpty "${DEFAULT_ADMIN_USERNAME}"; then
+          logDebugResult FAILURE "failed";
+          exitWithErrorCode DEFAULT_ADMIN_USERNAME_ENV_VAR_IS_MANDATORY;
+      fi
+  fi
+
+  if isEmpty "${ADMIN_PASSWORD}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode ADMIN_PASSWORD_ENV_VAR_IS_MANDATORY;
+  fi
+
+  if isEmpty "${RUNDECK_CONFIG_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode RUNDECK_CONFIG_FILE_IS_MANDATORY;
+  fi
+
+  if ! fileExists "${RUNDECK_CONFIG_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode RUNDECK_CONFIG_FILE_DOES_NOT_EXIST "${RUNDECK_CONFIG_FILE}";
+  fi
+
+  if ! fileIsReadable "${RUNDECK_CONFIG_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode CANNOT_READ_RUNDECK_CONFIG_FILE "${RUNDECK_CONFIG_FILE}";
+  fi
+
+  if ! fileIsWritable "${RUNDECK_CONFIG_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode CANNOT_WRITE_RUNDECK_CONFIG_FILE "${RUNDECK_CONFIG_FILE}";
+  fi
+
+  if isEmpty "${REALM_PROPERTIES_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode REALM_PROPERTIES_FILE_IS_MANDATORY;
+  fi
+
+  if ! fileExists "${REALM_PROPERTIES_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode REALM_PROPERTIES_FILE_DOES_NOT_EXIST "${REALM_PROPERTIES_FILE}";
+  fi
+
+  if ! fileIsReadable "${REALM_PROPERTIES_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode CANNOT_READ_REALM_PROPERTIES_FILE "${REALM_PROPERTIES_FILE}";
+  fi
+
+  if ! fileIsWritable "${REALM_PROPERTIES_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode CANNOT_WRITE_REALM_PROPERTIES_FILE "${REALM_PROPERTIES_FILE}";
+  fi
+
+  if isEmpty "${PROFILE_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode PROFILE_FILE_IS_MANDATORY;
+  fi
+
+  if ! fileExists "${PROFILE_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode PROFILE_FILE_DOES_NOT_EXIST "${PROFILE_FILE}";
+  fi
+
+  if ! fileIsReadable "${PROFILE_FILE}"; then
+      logDebugResult FAILURE "failed";
+      exitWithErrorCode CANNOT_READ_PROFILE_FILE "${PROFILE_FILE}";
+  fi
+
+  logDebugResult SUCCESS "valid";
+}
+
+## Retrieves the virtual host setting from environment variables.
+## <- RESULT: the virtual host.
+## <- 0/${TRUE} if the virtual host can be retrieved; 1/${FALSE} otherwise.
+## Example:
+##   if retrieve_virtual_host; then
+##     echo "VIRTUAL_HOST: ${RESULT}";
+##   fi
+function retrieve_virtual_host() {
+  local result="${VIRTUAL_HOST}";
+  local -i rescode=${FALSE};
+
+  if [ -z "${result}" ]; then
+      result="${DEFAULT_VIRTUAL_HOST}";
+  fi
+
+  if [ -n "${result}" ]; then
+      export RESULT="${result}";
+      rescode=${TRUE};
+  fi
+
+   return ${rescode};
+}
+
+## Retrieves the virtual port setting from environment variables.
+## <- RESULT: the virtual port.
+## <- 0/${TRUE} if the virtual port can be retrieved; 1/${FALSE} otherwise.
+## Example:
+##   if retrieve_virtual_port; then
+##     echo "VIRTUAL_PORT: ${RESULT}";
+##   fi
+function retrieve_virtual_port() {
+  local result="${VIRTUAL_PORT}";
+  local -i rescode=${FALSE};
+
+  if isEmpty "${result}"; then
+      result="${DEFAULT_VIRTUAL_PORT}";
+  fi
+
+  if isNotEmpty "${result}"; then
+      export RESULT="${result}";
+      rescode=${TRUE};
+  fi
+
+  return ${rescode};
+}
+
+## Retrieves the admin username setting from environment variables.
+## <- RESULT: the admin username.
+## <- 0/${TRUE} if the admin user can be retrieved; 1/${FALSE} otherwise.
+## Example:
+##   if retrieve_admin_username; then
+##     echo "ADMIN_USERNAME: ${RESULT}";
+##   fi
+function retrieve_admin_username() {
+  local result="${ADMIN_USERNAME}";
+  local -i rescode=${FALSE};
+
+  if isEmpty "${result}"; then
+      result="${DEFAULT_ADMIN_USERNAME}";
+  fi
+
+  if isNotEmpty "${result}"; then
+      export RESULT="${result}";
+      rescode=${TRUE};
+  fi
+
+  return ${rescode};
+}
+
+## Retrieves the admin password setting from environment variables.
+## <- RESULT: the admin password.
+## <- 0/${TRUE} if the admin password can be retrieved; 1/${FALSE} otherwise.
+## Example:
+##   if retrieve_admin_password; then
+##     echo "ADMIN_PASSWORD: ${RESULT}";
+##   fi
+function retrieve_admin_password() {
+  local result="${ADMIN_PASSWORD}";
+  local -i rescode=${FALSE};
+
+  if isEmpty "${result}"; then
+      result="${DEFAULT_ADMIN_PASSWORD}";
+  fi
+
+  if isNotEmpty "${result}"; then
+      export RESULT="${result}";
+      rescode=${TRUE};
+  fi
+
+  return ${rescode};
+}
+
+## Updates the grails.serverURL setting in given file, changing its domain but keeping any context path.
+## -> 1: the virtual host.
+## -> 2: the virtual port.
+## -> 3: the file to update.
+## <- 0/${TRUE} if the file gets updated successfully; 1/${FALSE} otherwise.
+## Example:
+##   if change_grailsServerURL_domain_in_properties_file "example.com" "8888" /etc/rundeck/rundeck-config.properties; then
+##     echo "rundeck-config.properties updated successfully";
+##   fi
+function change_grailsServerURL_domain_in_properties_file() {
+  local virtualHost="${1}";
+  local virtualPort="${2}";
+  local file="${3}";
+  local -i rescode;
+
+  checkNotEmpty "virtualHost" "${virtualHost}" 1;
+  checkNotEmpty "virtualPort" "${virtualPort}" 2;
+  checkNotEmpty "file" "${file}" 3;
+
+  sed -i "s ^grails.serverURL=http://\([^:]*\)\(:[^/]*\)\?\(/.*\)\? grails.serverURL=http://${virtualHost}:${virtualPort}\3 g" "${file}";
+  rescode=$?;
+
+  return ${rescode};
+}
+
+## Updates the admin username and password in given realm-properties file.
+## -> 1: the admin username.
+## -> 2: the admin password.
+## -> 3: the file to update.
+## <- 0/${TRUE} if the file gets updated successfully; 1/${FALSE} otherwise.
+## Example:
+##   if change_admin_username_and_password_in_realm_properties_file "root" "s3cr3t" /etc/rundeck/realm.properties; then
+##     echo "realm.properties updated successfully";
+##   fi
+function change_admin_username_and_password_in_realm_properties_file() {
+  local adminUser="${1}";
+  local adminPassword="${2}";
+  local file="${3}";
+  local -i rescode;
+
+  checkNotEmpty "adminUser" "${adminUser}" 1;
+  checkNotEmpty "adminPassword" "${adminPassword}" 2;
+  checkNotEmpty "file" "${file}" 3;
+
+  sed -i "s admin:admin,\(.*\)$ ${adminUser}:${adminPassword},\1 g" "${file}"
+  rescode=$?
+
+  return ${rescode};
+}
+
+## Main logic
+## dry-wit hook
+function main() {
+  local virtualHost;
+  local virtualPort;
+  local adminUser;
+  local adminPassword;
+
+  if retrieve_virtual_host; then
+      virtualHost="${RESULT}";
+  else
+    exitWithErrorCode VIRTUAL_HOST_IS_MANDATORY;
+  fi
+
+  if retrieve_virtual_port; then
+      virtualPort="${RESULT}";
+  else
+    exitWithErrorCode VIRTUAL_PORT_IS_MANDATORY;
+  fi
+
+  if retrieve_admin_username; then
+      adminUser="${RESULT}";
+  else
+    exitWithErrorCode ADMIN_USERNAME_IS_MANDATORY;
+  fi
+
+  if retrieve_admin_password; then
+      adminPassword="${RESULT}";
+  else
+    exitWithErrorCode ADMIN_PASSWORD_IS_MANDATORY;
+  fi
+
+  source "${PROFILE_FILE}";
+
+  logDebug -n "Updating ${RUNDECK_CONFIG_FILE}";
+  if change_grailsServerURL_domain_in_properties_file "${virtualHost}" "${virtualPort}" "${RUNDECK_CONFIG_FILE}"; then
+      logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode ERROR_CHANGING_GRAILSSERVERURL_DOMAIN_IN_CONFIG_FILE;
+  fi
+
+  logDebug -n "Updating ${REALM_PROPERTIES_FILE}";
+  if change_admin_username_and_password_in_realm_properties_file "${adminUser}" "${adminPassword}" "${REALM_PROPERTIES_FILE}"; then
+      logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+    exitWithErrorCode ERROR_CHANGING_ADMIN_USERNAME_AND_PASSWORD_IN_REALM_PROPERTIES;
+  fi
+
+  logDebug -n "Changing ownership of ${SERVICE_USER_HOME} to ${SERVICE_USER}:${SERVICE_GROUP}";
+  if chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}; then
+      logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  logInfo "Running ${rundeckd}"
+  runCommandAsUserAndGroup ${SERVICE_USER} ${SERVICE_GROUP} ${SERVICE_USER_HOME} ${rundeckd};
+}
+#

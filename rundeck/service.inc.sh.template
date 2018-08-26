@@ -1,0 +1,8 @@
+defineEnvVar DEFAULT_VIRTUAL_HOST "The default Rundeck virtual host" '${DEFAULT_VIRTUAL_HOST}';
+defineEnvVar DEFAULT_VIRTUAL_PORT "The default Rundeck virtual port" '${DEFAULT_VIRTUAL_PORT}';
+defineEnvVar DEFAULT_ADMIN_USERNAME "The default Rundeck admin username" '${DEFAULT_ADMIN_USERNAME}';
+defineEnvVar DEFAULT_ADMIN_PASSWORD "The default Rundeck admin password" '${DEFAULT_ADMIN_PASSWORD}';
+defineEnvVar RUNDECK_CONFIG_FILE "The location of the rundeck-config.properties file" "/etc/rundeck/rundeck-config.properties";
+defineEnvVar REALM_PROPERTIES_FILE "The location of the realm.properties file" "/etc/rundeck/realm.properties";
+defineEnvVar PROFILE_FILE "The location of the profile file" "/etc/rundeck/profile";
+#

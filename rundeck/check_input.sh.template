@@ -25,10 +25,6 @@ EOF
 function defineErrors() {
   addError INVALID_OPTION "Unknown option";
   addError ADMIN_PASSWORD_ENV_VAR_IS_MANDATORY "ADMIN_PASSWORD environment variable is mandatory";
-  addError MONITORING_PASSWORD_ENV_VAR_IS_MANDATORY "MONITORING_PASSWORD environment variable is mandatory";
-  addError CORE_PASSWORD_ENV_VAR_IS_MANDATORY "CORE_PASSWORD environment variable is mandatory";
-  addError WEB_PASSWORD_ENV_VAR_IS_MANDATORY "WEB_PASSWORD environment variable is mandatory";
-  addError GIT_PASSWORD_ENV_VAR_IS_MANDATORY "GIT_PASSWORD environment variable is mandatory";
 }
 
 ## Parses the input

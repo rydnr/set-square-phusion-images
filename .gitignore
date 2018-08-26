@@ -174,7 +174,7 @@ riemann/service
 .rt-client.sh-push.lock
 .rt-projects
 rundeck/check_input.sh
-rundeck/service
+rundeck/service.inc.sh
 */runme
 sdkman/setup.sql
 **/ssh-files
