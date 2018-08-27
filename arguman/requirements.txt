@@ -6,7 +6,7 @@ oauth2==1.5.211
 python-openid==2.2.5
 wsgiref==0.1.2
 django-gravatar2==1.1.4
-markdown2==2.3.0
+markdown2==2.3.5
 pymongo==2.6.3
 django-markitup==2.2.2
 Markdown==2.3.5
