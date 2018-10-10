@@ -1,6 +1,6 @@
-defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "201701";
-defineEnvVar LOGSTASH_VERSION "The logstash version" "1:5.1.2-1";
-overrideEnvVar TAG '5.1.2';
+defineEnvVar PARENT_IMAGE_TAG "The version of the parent image" "0.11";
+defineEnvVar LOGSTASH_VERSION "The logstash version" "1:6.4.0-1";
+overrideEnvVar TAG '6.4.0';
 overrideEnvVar ENABLE_LOGSTASH "false";
 overrideEnvVar ENABLE_LOCAL_SMTP "false";
 overrideEnvVar ENABLE_CRON "false";

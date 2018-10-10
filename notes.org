@@ -1,3 +1,9 @@
+* Pending tasks
+
+** Monit
+
+- [ ] Aug 26 19:06:33 3264a7863fa4 base: The SSL server PEM file '/etc/ssl/private/monit-base-0.11.key' must be owned by you.
+- [ ] Check it's working and could be useful.
 * Misc
 
 
@@ -12,3 +18,7 @@ curl https://archive.apache.org/dist/httpd/ \
     | awk '{printf("%s\n", $1);}' \
     | sort --version-sort \
     | tail -n 1
+
+
+
+

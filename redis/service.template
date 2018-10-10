@@ -3,4 +3,6 @@
 rsync -avz /backup/${IMAGE}/data/ ${SERVICE_HOME}/
 rsync -avz ${SERVICE_HOME} /backup/${IMAGE}/data/
 
+chsh -s /bin/bash ${SERVICE_USER}
+
 /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/${IMAGE}/data /usr/bin/redis-server /etc/redis/redis.conf

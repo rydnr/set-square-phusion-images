@@ -503,6 +503,7 @@ function process_settings_file() {
       logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
+    exit 1;
   fi
 
   return ${_rescode};
@@ -736,14 +737,18 @@ function build_repo() {
   update_log_category "${_repo}";
 
   defineEnvVar IMAGE "The image to build" "${_repo}";
-  
+
   copy_license_file "${_repo}" "${PWD}";
   copy_copyright_preamble_file "${_repo}" "${PWD}";
 
   if [ $(ls ${_repo} | grep -e '\.template$' | wc -l) -gt 0 ]; then
-    for f in ${_repo}/*.template; do
-      if ! process_file "${f}" "${_repo}/$(basename ${f} .template)" "${_repo}" "${INCLUDES_FOLDER}" "${_repo}" "${_rootImage}" "${NAMESPACE}" "${_tag}" "${_backupHostSshPort}"; then
-        exitWithErrorCode CANNOT_PROCESS_TEMPLATE "${f}";
+      for f in ${_repo}/*.template; do
+        logDebug -n "Processing ${f}";
+        if process_file "${f}" "${_repo}/$(basename ${f} .template)" "${_repo}" "${INCLUDES_FOLDER}" "${_repo}" "${_rootImage}" "${NAMESPACE}" "${_tag}" "${_backupHostSshPort}"; then
+            logDebugResult SUCCESS "done";
+        else
+          logDebugResult FAILURE "failed";
+          exitWithErrorCode CANNOT_PROCESS_TEMPLATE "${f}";
       fi
     done
   fi
@@ -947,42 +952,42 @@ function loadRepoEnvironmentVariables() {
 ## Example:
 ##   if force_mode_enabled; then [..]; fi
 function force_mode_enabled() {
-  _flagEnabled FORCE_MODE;
+  flagEnabled FORCE_MODE;
 }
 
 ## Checks whether the -o flag is enabled
 ## Example:
 ##   if overwrite_latest_enabled; then [..]; fi
 function overwrite_latest_enabled() {
-  _flagEnabled OVERWRITE_LATEST;
+  flagEnabled OVERWRITE_LATEST;
 }
 
 ## Checks whether the -p flag is enabled
 ## Example:
 ##   if registry_push_enabled; then [..]; fi
 function registry_push_enabled() {
-  _flagEnabled REGISTRY_PUSH;
+  flagEnabled REGISTRY_PUSH;
 }
 
 ## Checks whether the -rt flag is enabled
 ## Example:
 ##   if registry_tag_enabled; then [..]; fi
 function registry_tag_enabled() {
-  _flagEnabled REGISTRY_TAG;
+  flagEnabled REGISTRY_TAG;
 }
 
 ## Checks whether the -r flag is enabled
 ## Example:
 ##   if reduce_image_enabled; then [..]; fi
 function reduce_image_enabled() {
-  _flagEnabled REDUCE_IMAGE;
+  flagEnabled REDUCE_IMAGE;
 }
 
 ## Checks whether the -cc flag is enabled.
 ## Example:
 ##   if cleanup_containers_enabled; then [..]; fi
 function cleanup_containers_enabled() {
-  _flagEnabled CLEANUP_CONTAINERS;
+  flagEnabled CLEANUP_CONTAINERS;
 }
 
 ## Cleans up the docker containers
@@ -1009,7 +1014,7 @@ function cleanup_containers() {
 ## Example:
 ##   if cleanup_images_enabled; then [..]; fi
 function cleanup_images_enabled() {
-  _flagEnabled CLEANUP_IMAGES;
+  flagEnabled CLEANUP_IMAGES;
 }
 
 ## Cleans up unused docker images.

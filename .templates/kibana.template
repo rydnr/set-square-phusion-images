@@ -10,8 +10,8 @@ RUN ${APTGET_INSTALL} -u kibana=${KIBANA_VERSION} && \
      grep -q "^server\.host: '0.0.0.0'\$" /etc/kibana/kibana.yml && \
      sed -ri 's;^(\#\s*)?(elasticsearch\.url:).*;\2 "http://elasticsearch:9200";' /etc/kibana/kibana.yml && \
      grep -q '^elasticsearch\.url: "http://elasticsearch:9200"$' /etc/kibana/kibana.yml && \
-     sed -ri "s;^(\#\s*)?(server\.ssl\.cert:).*;#\2 /etc/ssl/private/${IMAGE}.crt;" /etc/kibana/kibana.yml && \
-     grep -q "^#server\.ssl\.cert: /etc/ssl/private/${IMAGE}.crt$" /etc/kibana/kibana.yml && \
+     sed -ri "s;^(\#\s*)?(server\.ssl\.certificate:).*;#\2 /etc/ssl/private/${IMAGE}.crt;" /etc/kibana/kibana.yml && \
+     grep -q "^#server\.ssl\.certificate: /etc/ssl/private/${IMAGE}.crt$" /etc/kibana/kibana.yml && \
      sed -ri "s;^(\#\s*)?(server\.ssl\.key:).*;#\2 /etc/ssl/private/${IMAGE}.key;" /etc/kibana/kibana.yml && \
      grep -q "^#server\.ssl\.key: /etc/ssl/private/${IMAGE}.key$" /etc/kibana/kibana.yml && \
      sed -ri "s;^(\#\s*)?(logging\.dest:).*;\2 stdout;" /etc/kibana/kibana.yml && \

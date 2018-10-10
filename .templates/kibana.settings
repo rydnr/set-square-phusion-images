@@ -1,3 +1,3 @@
-defineButDoNotOverrideEnvVar KIBANA_MAJOR "The Kibana major version" "5.1";
-defineButDoNotOverrideEnvVar KIBANA_VERSION "The Kibana version" '${KIBANA_MAJOR}.1';
-echo -n ''
+defineButDoNotOverrideEnvVar KIBANA_MAJOR "The Kibana major version" "6.4";
+defineButDoNotOverrideEnvVar KIBANA_VERSION "The Kibana version" '${KIBANA_MAJOR}.0';
+#

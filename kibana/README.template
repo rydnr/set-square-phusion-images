@@ -29,7 +29,7 @@ This image can be customized via environment variables. See https://github.com/e
 
 To communicate with ElasticSearch using SSL, you'll need to provide ElasticSearch's server certificate and PEM files:
 
-- ELASTICSEARCH_SSL_CERT: path to a volume-mounted certificate file.
+- ELASTICSEARCH_SSL_CERTIFICATE: path to a volume-mounted certificate file.
 - ELASTICSEARCH_SSL_KEY: path to a volume-mounted key file.
 - ELASTICSEARCH_SSL_CA: path to a volume-mounted CA file.
 
@@ -42,7 +42,7 @@ To communicate with ElasticSearch using SSL, you'll need to provide ElasticSearc
   docker run -d --name ${IMAGE} -p 5601:5601 --link [elasticsearch-container]:elasticsearch -e SERVER_NAME=kibana.example.com ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
 
   docker run -d --name ${IMAGE} -p 5601:5601 --link [elasticsearch-container]:elasticsearch \
-    -e ELASTICSEARCH_SSL_CERT=/etc/ssl/private/client.crt -v /path/to/elasticsearch/client.crt:/etc/ssl/private/client.crt:ro \
+    -e ELASTICSEARCH_SSL_CERTIFICATE=/etc/ssl/private/client.crt -v /path/to/elasticsearch/client.crt:/etc/ssl/private/client.crt:ro \
     -e ELASTICSEARCH_SSL_KEY=/etc/ssl/private/client.key -v /path/to/elasticsearch/client.key:/etc/ssl/private/client.key:ro \
     -e ELASTICSEARCH_SSL_CA=/etc/ssl/private/ca.pem -v /path/to/elasticsearch/ca.pem:/etc/ssl/private/ca.pem:ro \
     ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

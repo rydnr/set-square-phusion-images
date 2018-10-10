@@ -1,7 +1,11 @@
-# Redis
+= Redis
 
 This image runs Redis inside a Docker container.
 
-# Examples:
+= Examples:
+
 - Run Redis with default settings:
+
   docker run -d --name redis -p 6379:6379 ${REGISTRY}/${IMAGE}:${TAG}
+
+#

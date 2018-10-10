@@ -1,6 +1,6 @@
-defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "201701";
-defineEnvVar KIBANA_MAJOR "The Kibana major version" "5.1";
-defineEnvVar KIBANA_VERSION "The Kibana version" '${KIBANA_MAJOR}.2';
+defineEnvVar PARENT_IMAGE_TAG "The tag of the parent image" "0.11";
+defineEnvVar KIBANA_MAJOR "The Kibana major version" "6.4";
+defineEnvVar KIBANA_VERSION "The Kibana version" '${KIBANA_MAJOR}.0';
 defineEnvVar TAG "The image tag" '${KIBANA_VERSION}';
 defineEnvVar SERVER_NAME "The Kibana's server name" 'kibana.${DOMAIN}';
 defineEnvVar SERVICE_USER "The service user" "kibana";
