@@ -56,7 +56,7 @@ function checkInput() {
   for _flag in ${_flags}; do
     _flagCount=$((_flagCount+1));
     case ${_flag} in
-      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
+      -h | --help | -v | -vv | -q | --quiet | -X:e | --X:eval-defaults)
          shift;
          ;;
       --) shift;
@@ -104,26 +104,28 @@ function main() {
   logDebug -n "Checking SSL certificate for monit";
   _key=$(find /etc/ssl/private/ -name 'monit-*.key');
   if isEmpty "${_key}"; then
-      logDebugResult FAILURE "failed";
+    logDebugResult FAILURE "failed";
+  else
+    logDebugResult SUCCESS "${_key}";
   fi
 
   if retrieveIface; then
-      _iface="${RESULT}";
-      if retrieveSubnet24 "${_iface}"; then
-          _subnet="${RESULT}";
+    _iface="${RESULT}";
+    if retrieveSubnet24 "${_iface}"; then
+      _subnet="${RESULT}";
 
-          logInfo -n "Creating Monit configuration for enabling web interface on port ${MONIT_HTTP_PORT}";
-  cat <<EOF > ${MONIT_CONF_FILE}
+      logInfo -n "Creating Monit configuration for enabling web interface on port ${MONIT_HTTP_PORT}";
+      cat <<EOF > ${MONIT_CONF_FILE}
 set httpd port ${MONIT_HTTP_PORT} and
    use address 0.0.0.0
 EOF
-          if isNotEmpty "${_key}"; then
-              cat <<EOF >> ${MONIT_CONF_FILE}
+      if isNotEmpty "${_key}"; then
+        cat <<EOF >> ${MONIT_CONF_FILE}
    SSL ENABLE
    PEMFILE ${_key}
 EOF
-          fi
-          cat <<EOF >> ${MONIT_CONF_FILE}
+      fi
+      cat <<EOF >> ${MONIT_CONF_FILE}
    ALLOWSELFCERTIFICATION
    ALLOW ${_subnet}
    ALLOW ${MONIT_HTTP_USER}:"${MONIT_HTTP_PASSWORD}"
@@ -133,10 +135,10 @@ EOF
 #   if failed url http://${MONIT_HTTP_USER}:${MONIT_HTTP_PASSWORD}@0.0.0.0:${MONIT_HTTP_PORT}/
 #       then alert
 EOF
-          logInfoResult SUCCESS "done";
-      else
-        exitWithErrorCode CANNOT_RETRIEVE_SUBNET_24_FOR_IFACE "${_iface}";
-      fi
+      logInfoResult SUCCESS "done";
+    else
+      exitWithErrorCode CANNOT_RETRIEVE_SUBNET_24_FOR_IFACE "${_iface}";
+    fi
   else
     exitWithErrorCode CANNOT_RETRIEVE_INTERFACE_NAME;
   fi
