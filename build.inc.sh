@@ -1,4 +1,4 @@
-defineEnvVar ROOT_IMAGE_VERSION "The root image version" "0.9.22";
+defineEnvVar ROOT_IMAGE_VERSION "The root image version" "0.11";
 defineEnvVar ROOT_IMAGE "The default root image" "phusion/baseimage"
 defineEnvVar ROOT_IMAGE_64BIT "The default root image for 64 bits" '${ROOT_IMAGE}';
 defineEnvVar ROOT_IMAGE_32BIT "The default root image for 32 bits" "${ROOT_IMAGE_64BIT_DEFAULT}32";
