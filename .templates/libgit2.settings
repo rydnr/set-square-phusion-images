@@ -1,0 +1,4 @@
+defineEnvVar LIBGIT2_VERSION MANDATORY "The libgit2 version" "0.25.0";
+defineEnvVar LIBGIT2_ARTIFACT MANDATORY "The libgit2 artifact" 'v${LIBGIT2_VERSION}.tar.gz';
+defineEnvVar LIBGIT2_DOWNLOAD_URL MANDATORY "The libgit2 download url" 'https://github.com/libgit2/libgit2/archive/${LIBGIT2_ARTIFACT}';
+#

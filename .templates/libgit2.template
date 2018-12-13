@@ -1,0 +1,22 @@
+# v libgit2
+RUN cd /tmp && \
+    ${APTGET_INSTALL} -np libssl-dev \
+    libssh2-1-dev \
+    libffi-dev \
+    zlib1g-dev \
+    build-essential \
+    cmake \
+    gcc \
+    pkg-config \
+    git \
+    libhttp-parser-dev \
+    make && \
+    wget ${LIBGIT2_DOWNLOAD_URL} && \
+    tar xzf ${LIBGIT2_ARTIFACT} && \
+    cd libgit2-${LIBGIT2_VERSION}/ && \
+    cmake . && \
+    make && \
+    make install && \
+    ldconfig && \
+    ${APTGET_CLEANUP}
+# ^ libgit2

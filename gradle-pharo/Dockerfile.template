@@ -10,7 +10,8 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("git")
 @include("sdkman")
 @include("gradle")
-@include("pharo6")
+@include("libgit2")
+@include("pharo")
 
 ENV WORKSPACE="${WORKSPACE}" \
     GRADLE_USER_HOME="${WORKSPACE}/.gradle" \

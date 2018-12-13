@@ -1,20 +1,17 @@
 # v pharo
-ENV PATH=${PATH}:/opt/pharo/pharo-vm
-
 RUN dpkg --add-architecture i386 && \
     ${APTGET_INSTALL} -u libx11-6:i386 libgl1-mesa-glx:i386 libfontconfig1:i386 libssl1.0.0:i386 libcairo2:i386 && \
     ${APTGET_INSTALL} -np unzip && \
     ${APTGET_CLEANUP} && \
     ([ -d /opt ] || mkdir /opt) && \
+    mkdir /opt/pharo${PHARO_MAJOR_VERSION} && \
+    cd /opt/pharo${PHARO_MAJOR_VERSION} && \
+    curl get.pharo.org/vmT${PHARO_VERSION_ZEROCONF} | bash && \
     cd /opt && \
-    mkdir ${PHARO_FOLDER} && \
-    cd ${PHARO_FOLDER} && \
-    curl ${PHARO_DOWNLOAD_URL} | bash && \
-    mkdir bin && \
-    cd bin && \
-    ln -s ../pharo . && \
-    ln -s ../pharo-ui . && \
-    cd /opt && \
-    ln -s ${PHARO_FOLDER} pharo && \
-    source /opt/${PHARO_FOLDER}/CONFIG
+    ln -s pharo${PHARO_MAJOR_VERSION} pharo && \
+    echo '*      hard    rtprio  2' >  /etc/security/limits.d/pharo.conf && \
+    echo '*      soft    rtprio  2' >> /etc/security/limits.d/pharo.conf && \
+    echo 'export PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.sh && \
+    echo 'setenv PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.csh && \
+    chmod +x /etc/profile.d/pharo.sh /etc/profile.d/pharo.csh
 # ^ pharo
