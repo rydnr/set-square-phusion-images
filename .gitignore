@@ -127,6 +127,7 @@ nexus/ssl
 **/nginx-files
 nodejs/my_exec
 observium/setup.sql
+**/openjdk-files
 */packetbeat-files
 packetbeat/service
 padlock/apache-files
@@ -141,6 +142,7 @@ phabricator/bootstrap
 phabricator/git-files
 phabricator/INSTALL
 phabricator/service
+pharo-launcher/service
 pharo/service
 phppgadmin/apache-files
 phppgadmin/apache-vhost.conf
@@ -204,9 +206,6 @@ sdkman/setup.sql
 .templates/image_user
 .templates/install
 .templates/instructions
-.templates/java
-.templates/java-service
-.templates/jce
 .templates/jenkins
 .templates/kibana
 .templates/letsencrypt
@@ -227,11 +226,16 @@ sdkman/setup.sql
 .templates/nginx-files/nginx-default-ssl
 .templates/nodejs
 .templates/npm
+.templates/openjdk
+.templates/openjdk-jre
+.templates/oracle-jdk
+.templates/oracle-jre
 .templates/packetbeat
 .templates/pencil
 .templates/phabricator
 .templates/pharo
 .templates/pharo6
+.templates/pharo-launcher
 .templates/pika
 .templates/pip
 .templates/pip

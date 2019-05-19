@@ -6,12 +6,9 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("gui")
 @include("service_user")
-@include("openjdk")
-@include("git")
-@include("sdkman")
-@include("gradle")
+@include("service")
 @include("libgit2")
-@include("pharo")
+@include("pharo-launcher")
 
 ENV WORKSPACE="${WORKSPACE}" \
     GRADLE_USER_HOME="${WORKSPACE}/.gradle" \
@@ -21,8 +18,6 @@ RUN chmod +x /sbin/my_exec && \
     gpasswd -a ${SERVICE_USER} root && \
     mkdir -p ${WORKSPACE} && \
     chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE} && \
-    echo 'export SDKMAN_DIR="${SERVICE_USER_HOME}/.sdkman"' >> /root/.bashrc && \
-    echo '[[ -s "${SERVICE_USER_HAME}/.sdkman/bin/sdkman-init.sh" ]] && source "${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh"' >> /root/.bashrc && \
     su - ${SERVICE_USER} -c 'ln -s ${WORKSPACE} ${SERVICE_USER_HOME}/workspace';
 
 @include("copy-metadata")

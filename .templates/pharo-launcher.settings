@@ -1,0 +1,3 @@
+defineEnvVar PHARO_LAUNCHER_DOWNLOAD_URL MANDATORY 'https://files.pharo.org/pharo-launcher/linux32';
+defineEnvVar PHARO_LAUNCHER_ARTIFACT MANDATORY 'pharo-launcher.zip';
+#

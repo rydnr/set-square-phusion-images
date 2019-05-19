@@ -1,0 +1,30 @@
+# v oracle-java
+COPY java-files/logstash /etc/service/.template/log/run
+COPY java-files/logstash-cron.sh /etc/service/cron/log/run
+COPY java-files/logstash-cron.sh /etc/service/cron/log/
+COPY java-files/create_ssl_certificate_keytool.sh /usr/local/bin/create_ssl_certificate_keytool.sh
+
+ENV JAVA_HEAP_MIN="${JAVA_HEAP_MIN}" \
+    JAVA_HEAP_MAX="${JAVA_HEAP_MAX}" \
+    JAVA_OPTS="${JAVA_OPTS}"
+
+# From http://www.webupd8.org/2012/09/install-oracle-java-8-in-ubuntu-via-ppa.html
+# From https://www.digitalocean.com/community/tutorials/how-to-install-java-on-ubuntu-with-apt-get
+RUN yes | add-apt-repository ppa:webupd8team/java && \
+    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | /usr/bin/debconf-set-selections && \
+    ${APTGET_INSTALL} --update software-properties-common && \
+   (${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer oracle-java8-set-default || \
+    ${APTGET_INSTALL} oracle-java${JAVA_VERSION}-installer oracle-java8-set-default ) && \
+    chmod +x /etc/service/.template/log/run && \
+    chmod +x /etc/service/cron/log/run && \
+    ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_keytool.inc.sh && \
+    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh && \
+    ${APTGET_INSTALL} oracle-java8-set-default && \
+    ${APTGET_CLEANUP}
+
+COPY java-files/my_exec.logstash /etc/my_exec.d/logstash
+COPY java-files/logstash-cron.conf /etc/logstash/conf.d/cron.conf
+COPY java-files/logstash-default.conf /etc/logstash/conf.d/default.conf
+
+@include("jce")
+# ^ oracle-java

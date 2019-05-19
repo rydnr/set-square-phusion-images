@@ -1,0 +1,27 @@
+This image runs "pharo-launcher".
+
+Since pharo-launcher is a GUI, you'll need to provide some environment variables,
+
+- XAUTHORITY
+
+and to share some Unix sockets:
+
+- XSOCK
+- XAUTH
+
+Examples:
+
+- Run the image to familiarize yourself with how
+to build your application's image:
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> docker run -it -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} /bin/bash
+
+Examples:
+- For an isolated Gradle+Pharo project, you can run me with: 
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> xhost +
+> docker run -it -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -v [my-gradle-project-folder]:/work --hostname [my-project-name] -p [host-port]:[app-port] ${NAMESPACE}/${IMAGE}:${TAG}

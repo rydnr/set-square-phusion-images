@@ -10,7 +10,7 @@ COPY locale-files/install-locale.sh \
      locale-files/install-locale.inc.sh \
      /usr/local/bin/
 
-RUN ${APTGET_INSTALL} --update localepurge apt-utils && \
+RUN cd /usr/local/bin && ${PKG_INSTALL} localepurge apt-utils && \
     chmod +x /usr/local/bin/install-locale.sh /etc/my_init.d/02_change_default_locale.sh && \
     echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
     if [ -n "${LOCALES}" ]; then \
@@ -22,7 +22,7 @@ RUN ${APTGET_INSTALL} --update localepurge apt-utils && \
       done; \
     fi && \
     /etc/my_init.d/02_change_default_locale.sh ${DEFAULT_LOCALE} ${DEFAULT_ENCODING} && \
-    ${APTGET_CLEANUP} && \
+    ${SYSTEM_CLEANUP} && \
     rm -f /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 # ^ locale

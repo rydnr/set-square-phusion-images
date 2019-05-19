@@ -1,0 +1,5 @@
+#!/bin/bash
+
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /opt/pharo-launcher/pharo-launcher
+
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

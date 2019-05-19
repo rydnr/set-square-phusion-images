@@ -5,14 +5,18 @@ defineEnvVar ROOT_IMAGE_32BIT MANDATORY "The default root image for 32 bits" "${
 defineEnvVar BASE_IMAGE_64BIT MANDATORY "The base image for 64 bits" '${NAMESPACE}/base';
 defineEnvVar BASE_IMAGE_32BIT MANDATORY "The base image for 32 bits" '${BASE_IMAGE_64BIT_DEFAULT%%64}32';
 defineEnvVar JAVA_VERSION MANDATORY "The Java version" "8";
-defineEnvVar APTGET_INSTALL \
+defineEnvVar PKG_INSTALL \
              MANDATORY \
              "Installs a program via apt-get" \
-             '/usr/local/bin/aptget-install.sh -vv ';
-defineEnvVar APTGET_CLEANUP \
+             '/usr/local/bin/pkg-install.sh -vv ';
+defineEnvVar PKG_CLEANUP \
              MANDATORY \
              "The cleanup commands after an apt-get so that the resulting image size is optimal" \
-             '/usr/local/bin/aptget-cleanup.sh -v ';
+             '/usr/local/bin/pkg-cleanup.sh -v ';
+defineEnvVar SYSTEM_CLEANUP \
+             MANDATORY \
+             "The cleanup commands after an apt-get so that the resulting image size is optimal" \
+             '/usr/local/bin/system-cleanup.sh -v ';
 defineEnvVar SMTP_HOST \
              MANDATORY \
              "The SMTP host to send emails, including monit's" \
