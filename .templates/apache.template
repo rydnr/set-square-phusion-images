@@ -2,7 +2,7 @@
 ENV SERVICE_PACKAGE="${APACHE_SERVICE_PACKAGE}"
 
 RUN ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} --update ${SERVICE_PACKAGE} && \
+    ${PKG_INSTALL} ${SERVICE_PACKAGE} && \
     ${SYSTEM_CLEANUP} && \
     mkdir -p /var/run/apache2 /var/lock/apache2 && \
     chown ${APACHE_SERVICE_USER}:${APACHE_SERVICE_GROUP} /var/run/apache2 /var/lock/apache2 && \
