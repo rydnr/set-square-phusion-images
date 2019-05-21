@@ -4,13 +4,6 @@
 
 DW.import command;
 
-## Declares the requirements.
-## dry-wit hook
-function checkRequirements() {
-  checkReq apt-get;
-  checkReq apt-mark;
-}
-
 ## Checks the ${INSTALLED_PACKAGES_FILE} is writable.
 ## Example:
 ##   check_packages_file_writable
@@ -136,7 +129,9 @@ function dw_parse_packages_cli_parameter() {
 
 addError "INVALID_OPTION" "Unrecognized option";
 addError "APTGET_NOT_INSTALLED" "apt-get not found";
+checkReq apt-get APTGET_NOT_INSTALLED;
 addError "APTMARK_NOT_INSTALLED" "apt-mark not found";
+checkReq apt-mark APTMARK_NOT_INSTALLED;
 addError "NO_PACKAGES_SPECIFIED" "No packages specified";
 addError "CANNOT_WRITE_TO_INSTALLED_PACKAGES_FILE" 'Cannot write to ';
 addError "ERROR_INSTALLING_PACKAGE" "Error installing ";

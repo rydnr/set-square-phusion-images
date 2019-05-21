@@ -4,6 +4,7 @@ RUN cd /opt && \
     tar xvfz ${STUDIO3T_ARTIFACT} && \
     chmod +x ./studio-3t-linux-x64.sh && \
     ./studio-3t-linux-x64.sh && \
-    ${APTGET_INSTALL} -u libgl1-mesa-glx xcb qt5-default && \
-    ${APTGET_CLEANUP}
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} libgl1-mesa-glx xcb qt5-default && \
+    ${SYSTEM_CLEANUP}
 # ^ studio3t

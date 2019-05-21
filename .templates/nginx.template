@@ -4,8 +4,9 @@ COPY nginx-files/letsencrypt.sh /usr/local/bin/
 COPY nginx-files/letsencrypt-renew.cron /etc/cron.d/letsencrypt
 COPY nginx-files/service /etc/service/nginx/run
 
-RUN ${APTGET_INSTALL} nginx letsencrypt && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} nginx letsencrypt && \
+    ${SYSTEM_CLEANUP} && \
     chmod +x /usr/local/bin/letsencrypt.sh && \
     cp -r /etc/service/.template/* /etc/service/nginx/ && \
     chmod +x /etc/service/nginx/run

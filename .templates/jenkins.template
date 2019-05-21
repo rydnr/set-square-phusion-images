@@ -32,7 +32,9 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     done; \
     wget -o /dev/null ${SWARM_CLIENT_DOWNLOAD_URL} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}  && \
-    ${APTGET_INSTALL} git graphviz php php-curl php-cli unzip nodejs build-essential && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} git graphviz php php-curl php-cli unzip nodejs build-essential && \
+    ${SYSTEM_CLEANUP} && \
     su - ${SERVICE_USER} -c '/opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL}'  && \
     mkdir -p ${SERVICE_USER_HOME}/init.groovy.d  && \
     chmod +x /usr/local/bin/generate-jenkins-plugin-configs.sh  && \
@@ -43,8 +45,7 @@ su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh gradl
     su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS}"  && \
     su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS}" && \
     su - ${SERVICE_USER} -c "/usr/local/bin/generate-jenkins-plugin-configs.sh nodejs" && \
-    echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> ${TOMCAT_HOME}/bin/setenv.sh  && \
-    ${APTGET_CLEANUP}
+    echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> ${TOMCAT_HOME}/bin/setenv.sh
 #    ln -s /usr/local/bin/backup-jenkins-configs.sh /etc/cron.hourly/backup-jenkins-configs.sh && \
 #    ln -s /usr/local/bin/backup-jenkins-configs.inc.sh /etc/cron.hourly/backup-jenkins-configs.inc.sh
 

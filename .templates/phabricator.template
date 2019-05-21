@@ -4,9 +4,10 @@
 #   - install
 #COPY phabricator-files/php7.patch /usr/local/src/
 
-#    ${APTGET_INSTALL} -np patch && \
+#    ${SYSTEM_UPDATE} && \
+#    ${PKG_INSTALL} -np patch && \
 #    patch -p0 < /usr/local/src/php7.patch && \
-#    ${APTGET_CLEANUP} && \
+#    ${SYSTEM_CLEANUP} && \
 
 RUN cd /opt && \
     ([ -d /opt/phabricator ] && rm -rf /opt/phabricator || echo "") && \

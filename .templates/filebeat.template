@@ -6,8 +6,9 @@ COPY filebeat-files/service /etc/service/filebeat/run
 
 RUN wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add - && \
     echo "deb https://packages.elastic.co/beats/apt stable main" |  sudo tee -a /etc/apt/sources.list.d/beats.list && \
-    ${APTGET_INSTALL} --update filebeat && \
-    ${APTGET_CLEANUP} && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} filebeat && \
+    ${SYSTEM_CLEANUP} && \
     (/usr/sbin/groupadd filebeat || echo -n "") && \
     /usr/sbin/useradd -g filebeat -G filebeat -c "filebeat user" filebeat && \
     chmod +x /etc/service/filebeat/run # /etc/my_init.d/55_filebeat_checks.sh

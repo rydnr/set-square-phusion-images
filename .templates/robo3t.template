@@ -4,6 +4,7 @@ RUN cd /opt && \
     tar xvfz ${ROBO3T_ARTIFACT} && \
     ln -s ${ROBO3T_FOLDER} robo3t && \
     rm -f ${ROBO3T_ARTIFACT} && \
-    ${APTGET_INSTALL} -u libgl1-mesa-glx xcb qt5-default && \
-    ${APTGET_CLEANUP}
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} libgl1-mesa-glx xcb qt5-default && \
+    ${SYSTEM_CLEANUP}
 # ^ robo3t

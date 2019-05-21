@@ -1,8 +1,7 @@
 # v exim
-# - requires:
-#   - create_ssl_certificate
-RUN ${APTGET_INSTALL} --update mailutils exim4 sasl2-bin opendkim opendkim-tools apt-utils net-tools spf-tools-perl && \
-    ${APTGET_CLEANUP}
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} mailutils exim4 sasl2-bin opendkim opendkim-tools apt-utils net-tools spf-tools-perl && \
+    ${SYSTEM_CLEANUP}
 
 RUN mkdir -p /etc/service/exim4/log; \
     SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=exim-${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \

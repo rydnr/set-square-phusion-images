@@ -2,104 +2,6 @@
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME locale encoding
-$SCRIPT_NAME [-h|--help]
-(c) 2016-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Installs given locale.
-
-Where:
-  - locale: The locale to install (en_US.UTF-8, es_ES.ISO-8859-1, ...).
-  - encoding: The encoding (UTF-8, ISO-8859-1, ...)
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-# Requirements
-function defineRequirements() {
-  checkReq locale-gen "LOCALEGEN_IS_NOT_INSTALLED";
-  checkReq apt-get "APTGET_IS_NOT_INSTALLED";
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-  addError "LOCALEGEN_IS_NOT_INSTALLED" "locale-gen is not installed";
-  addError "APTGET_IS_NOT_INSTALLED" "apt-get is not installed";
-  addError "TARGET_LOCALE_IS_MANDATORY" "The locale parameter is mandatory";
-  addError "TARGET_ENCODING_IS_MANDATORY" "The encoding parameter is mandatory";
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  if isEmpty "${TARGET_LOCALE}"; then
-    logDebugResult FAILURE "failed";
-    exitWithErrorCode TARGET_LOCALE_IS_MANDATORY;
-  elif isEmpty "${TARGET_ENCODING}"; then
-      logDebugResult FAILURE "failed";
-      exitWithErrorCode TARGET_ENCODING_IS_MANDATORY;
-  else
-    logDebugResult SUCCESS "valid";
-  fi
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-    esac
-  done
-
-  if isEmpty "${TARGET_LOCALE}"; then
-      TARGET_LOCALE="${1}";
-      shift;
-  fi
-
-  if isEmpty "${TARGET_ENCODING}"; then
-      TARGET_ENCODING="${1}";
-  fi
-}
-
 ## Checks if given locale identifier is supported.
 ## -> *: The locale identifier.
 ## <- 0/${TRUE} if the locale is supported; 1/${FALSE} otherwise.
@@ -264,3 +166,26 @@ function install_locale() {
 function main() {
   install_locale "${TARGET_LOCALE}" "${TARGET_ENCODING}";
 }
+
+## Script metadata and CLI settings.
+
+setScriptDescription "Installs a locale (for an encoding).";
+
+addCommandLineFlag "locale" "l" "The locale to install (en_US, es_ES, ...)" MANDATORY EXPECTS_ARGUMENT;
+addCommandLineFlag "encoding" "e" "The encoding (UTF-8, ISO-8859-1, ...)" MANDATORY EXPECTS_ARGUMENT;
+
+function dw_parse_locale_cli_flag() {
+  TARGET_LOCALE="${1}";
+}
+
+function dw_parse_encoding_cli_flag() {
+  TARGET_ENCODING="${1}";
+}
+
+addError "LOCALEGEN_IS_NOT_INSTALLED" "locale-gen is not installed";
+checkReq locale-gen LOCALEGEN_IS_NOT_INSTALLED;
+addError "APTGET_IS_NOT_INSTALLED" "apt-get is not installed";
+checkReq aptget APTGET_IS_NOT_INSTALLED;
+addError "TARGET_LOCALE_IS_MANDATORY" "The locale parameter is mandatory";
+addError "TARGET_ENCODING_IS_MANDATORY" "The encoding parameter is mandatory";
+#

@@ -2,107 +2,6 @@
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME locale encoding
-$SCRIPT_NAME [-h|--help]
-(c) 2016-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Changes the locale and encoding (available after re-login).
-
-Where:
-  - locale: The locale to use.
-  - encoding: The encoding to use.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-# Requirements
-function defineRequirements() {
-  checkReq locale-gen;
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-  addError "LOCALE_IS_MANDATORY" "The locale parameter is mandatory";
-  addError "ENCODING_IS_MANDATORY" "The encoding parameter is mandatory";
-  addError "LOCALE_ENCODING_PAIR_IS_NOT_SUPPORTED" "The provided locale-encoding pair is not supported";
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  if isEmpty "${LOCALE}" && isEmpty ${DEFAULT_LOCALE}; then
-    logDebugResult FAILURE "failed";
-    exitWithErrorCode LOCALE_IS_MANDATORY;
-  elif isEmpty "${ENCODING}" && isEmpty ${DEFAULT_ENCODING}; then
-      logDebugResult FAILURE "failed";
-      exitWithErrorCode ENCODING_IS_MANDATORY;
-  else
-    logDebugResult SUCCESS "valid";
-  fi
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-    esac
-  done
-
-  if isEmpty "${LOCALE}"; then
-      LOCALE="${1}";
-      shift;
-  fi
-  if isEmpty "${LOCALE}"; then
-      LOCALE="${DEFAULT_LOCALE}";
-  fi
-  if isEmpty "${ENCODING}"; then
-      ENCODING="${1}";
-  fi
-  if isEmpty "${ENCODING}"; then
-      ENCODING="${DEFAULT_ENCODING}";
-  fi
-}
-
 ## Checks if given locale identifier is supported.
 ## -> *: The locale identifier.
 ## <- 0/${TRUE} if the locale is supported; 1/${FALSE} otherwise.
@@ -249,3 +148,21 @@ function main() {
   change_default_locale "${LOCALE}" "${ENCODING}";
 }
 
+## Script metadata and CLI settings.
+
+setScriptDescription "Changes the locale and encoding (available after re-login).";
+addCommandLineFlag "locale" "l" "The locale to use (en_US, es_ES, ...)" OPTIONAL EXPECTS_ARGUMENT "${DEFAULT_LOCALE}";
+addCommandLineFlag "encoding" "e" "The encoding (UTF-8, ISO-8859-1, ...)" OPTIONAL EXPECTS_ARGUMENT "${DEFAULT_ENCODING}";
+
+function dw_parse_locale_cli_flag() {
+  LOCALE="${1}";
+}
+
+function dw_parse_encoding_cli_flag() {
+  ENCODING="${1}";
+}
+
+addError "LOCALE_IS_MANDATORY" "The locale parameter is mandatory";
+addError "ENCODING_IS_MANDATORY" "The encoding parameter is mandatory";
+addError "LOCALE_ENCODING_PAIR_IS_NOT_SUPPORTED" "The provided locale-encoding pair is not supported";
+#

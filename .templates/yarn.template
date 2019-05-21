@@ -1,7 +1,8 @@
 # v yarn
 RUN curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add - && \
     echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list && \
-    ${APTGET_INSTALL} -u yarn && \
-    ${APTGET_CLEANUP} && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} yarn && \
+    ${SYSTEM_CLEANUP} && \
     for m in ${YARN_MODULES}; do yarn add ${m}; done
 # ^ yarn

@@ -1,5 +1,5 @@
 # v unzip
-# - Requires:
-#   - install
-RUN ${APTGET_INSTALL} -u unzip && ${APTGET_CLEANUP}
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} unzip && \
+    ${SYSTEM_CLEANUP}
 # ^ unzip

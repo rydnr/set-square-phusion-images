@@ -2,12 +2,6 @@
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-## Declares the requirements.
-## dry-wit hook
-function checkRequirements() {
-  checkReq "apt-get" "APTGET_NOT_INSTALLED";
-}
-
 ## Removes unused packages from the system.
 ## Example:
 ##   autoremove_packages
@@ -124,12 +118,12 @@ function main() {
   wipe_temporary_folder;
 }
 
-
 ## Script metadata and CLI settings.
 
 setScriptDescription "Cleans up the system by removing unused packages.";
 
 addError "INVALID_OPTION" "Unrecognized option";
 addError "APTGET_NOT_INSTALLED" "apt-get not found";
+checkReq apt-get APTGET_NOT_INSTALLED;
 addError "ERROR_REMOVING_UNUSED_PACKAGES" "Error removing unused packages";
 #

@@ -1,6 +1,7 @@
 # v libgit2
 RUN cd /tmp && \
-    ${APTGET_INSTALL} -np libssl-dev \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -np libssl-dev \
     libssh2-1-dev \
     libffi-dev \
     zlib1g-dev \
@@ -11,12 +12,13 @@ RUN cd /tmp && \
     git \
     libhttp-parser-dev \
     make && \
+    ${SYSTEM_CLEANUP} && \
     wget ${LIBGIT2_DOWNLOAD_URL} && \
     tar xzf ${LIBGIT2_ARTIFACT} && \
     cd libgit2-${LIBGIT2_VERSION}/ && \
     cmake . && \
     make && \
     make install && \
-    ldconfig && \
-    ${APTGET_CLEANUP}
+    ldconfig
 # ^ libgit2
+

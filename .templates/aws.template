@@ -4,5 +4,7 @@
 #   - python
 #   - pip
 RUN pip install awscli && \
-    ${APTGET_INSTALL} -u groff && ${APTGET_CLEANUP}
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} groff && \
+    ${SYSTEM_CLEANUP}
 # ^ aws

@@ -1,7 +1,8 @@
 # v plone5
 # ENV VIRTUAL_HOST="${PLONE_VIRTUAL_HOST}"
 
-#RUN ${APTGET_INSTALL} -u build-essential python-dev libjpeg-dev libxslt1-dev poppler-utils zlib1g-dev wv libjpeg-dev libxml2-dev libreadline6-dev libssl-dev python-pip && \
+#RUN ${SYSTEM_UPDATE} && \
+#    ${PKG_INSTALL} build-essential python-dev libjpeg-dev libxslt1-dev poppler-utils zlib1g-dev wv libjpeg-dev libxml2-dev libreadline6-dev libssl-dev python-pip && \
 #    pip install --upgrade pip && \
 #    for i in setuptools accesscontrol App documenttemplate docutils initgroups interface mechanize missing multimapping nt_svcutils OFS signals structuredtext tempstorage ThreadLock zlog zodbcode zope2 zserver zc.buildout Pillow; do \
 #      pip install ${i}; \
@@ -9,7 +10,8 @@
 
 RUN mkdir -p ${PLONE5_HOME}/.buildout && \
     for d in eggs downloads extends; do mkdir -p ${PLONE5_HOME}/.buildout-cache/${d}; done && \
-    ${APTGET_INSTALL} -u python-pip build-essential python-dev python-virtualenv libssl-dev libxml2-dev libxslt1-dev libbz2-dev python-tk python-gdbm libxslt1-dev \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} python-pip build-essential python-dev python-virtualenv libssl-dev libxml2-dev libxslt1-dev libbz2-dev python-tk python-gdbm libxslt1-dev \
       python-setuptools libjpeg62-dev \
       libreadline-dev wv poppler-utils && \
     mkdir -p /opt && \
@@ -32,7 +34,7 @@ RUN mkdir -p ${PLONE5_HOME}/.buildout && \
     grep 'Username: ' ${PLONE5_HOME}/install.log > /username && \
     grep 'Password: ' ${PLONE5_HOME}/install.log > /password && \
     rm -rf /opt/${PLONE5_FILE} /opt/${PLONE5_ARTIFACT} && \
-    ${APTGET_CLEANUP} && \
+    ${SYSTEM_CLEANUP} && \
     chown -R plone_daemon:plone_daemon ${PLONE5_HOME}
 
 COPY plone5-files/default.cfg ${PLONE5_HOME}/.buildout/default.cfg

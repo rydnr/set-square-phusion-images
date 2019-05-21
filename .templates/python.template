@@ -1,3 +1,5 @@
 # v python
-RUN ${APTGET_INSTALL} -u python2.7 && ${APTGET_CLEANUP}
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} python2.7 && \
+    ${SYSTEM_CLEANUP}
 # ^ python

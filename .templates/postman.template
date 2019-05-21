@@ -5,6 +5,7 @@ RUN cd /opt && \
     ln -s ${POSTMAN_FOLDER} postman && \
     rm -f ${POSTMAN_ARTIFACT} && \
     cd /opt/postman && ln -s Postman postman && \
-    ${APTGET_INSTALL} -u libgtk2.0-0 libxtst6 libxss1 libgconf-2-4 libnss3 libasound2 && \
-    ${APTGET_CLEANUP}
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} libgtk2.0-0 libxtst6 libxss1 libgconf-2-4 libnss3 libasound2 && \
+    ${SYSTEM_CLEANUP}
 # ^ postman

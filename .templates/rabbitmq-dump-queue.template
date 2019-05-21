@@ -1,5 +1,7 @@
 # v rabbitmq-dump-queue
-RUN ${APTGET_INSTALL} -y golang && ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -y golang && \
+    ${SYSTEM_CLEANUP} && \
     (mkdir /opt || echo -n) && \
     cd /opt && \
     wget ${RABBITMQ_DUMP_QUEUE_DOWNLOAD_URL} && \

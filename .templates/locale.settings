@@ -3,11 +3,10 @@ defineButDoNotOverrideEnvVar LOCALES "The supported locales" '${DEFAULT_LOCALE} 
 defineButDoNotOverrideEnvVar DEFAULT_ENCODING "The default encoding" "UTF-8";
 defineButDoNotOverrideEnvVar ENCODINGS "The supported encodings" '${DEFAULT_ENCODING} ISO-8859-1 ISO-8859-15';
 defineButDoNotOverrideEnvVar TIMEZONE "The timezone" "Etc/UTC";
-if isEmpty "${APTGET_INSTALL}"; then
-  defineButDoNotOverrideEnvVar APTGET_INSTALL "Installs a program via apt-get" '/usr/local/bin/aptget-install.sh -vv ';
+if isEmpty "${PKG_INSTALL}"; then
+  defineButDoNotOverrideEnvVar PKG_INSTALL "Installs a program via apt-get" '/usr/local/bin/pkg-install.sh -vv ';
 fi
-if isEmpty "${APTGET_CLEANUP}"; then
-  defineButDoNotOverrideEnvVar APTGET_CLEANUP "The cleanup commands after an apt-get so that the resulting image size is optimal" '/usr/local/bin/aptget-cleanup.sh -v ';
+if isEmpty "${SYSTEM_CLEANUP}"; then
+  defineButDoNotOverrideEnvVar SYSTEM_CLEANUP "The cleanup commands after an apt-get so that the resulting image size is optimal" '/usr/local/bin/system-cleanup.sh -v ';
 fi
-
-echo -n ''
+#

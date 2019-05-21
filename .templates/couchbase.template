@@ -1,8 +1,9 @@
 # v couchbase
 COPY couchbase-files/dummy.sh /usr/local/bin/
 
-RUN ${APTGET_INSTALL} python-httplib2 chrpath lsof lshw sysstat net-tools numactl && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} python-httplib2 chrpath lsof lshw sysstat net-tools numactl && \
+    ${SYSTEM_CLEANUP} && \
     wget -N ${COUCHBASE_DOWNLOAD_URL} && \
     echo "${COUCHBASE_DIGEST}  ${COUCHBASE_ARTIFACT}" | sha256sum -c - && \
     dpkg -i ./${COUCHBASE_ARTIFACT} && rm -f ./${COUCHBASE_ARTIFACT} && \

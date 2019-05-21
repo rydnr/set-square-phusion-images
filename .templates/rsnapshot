@@ -12,8 +12,9 @@ COPY rsnapshot-files/rsnapshot.daily /etc/cron.daily/rsnapshot
 COPY rsnapshot-files/rsnapshot.weekly /etc/cron.weekly/rsnapshot
 COPY rsnapshot-files/rsnapshot.monthly /etc/cron.monthly/rsnapshot
 
-RUN ${APTGET_INSTALL} --update rsnapshot && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} rsnapshot && \
+    ${SYSTEM_CLEANUP} && \
     ln -s -- /backup/rsnapshot /var/cache/rsnapshot && \
     sed -i 's/^#logfile/logfile/g' /etc/rsnapshot.conf && \
     sed -i 's/^#cmd_ssh/cmd_ssh/g' /etc/rsnapshot.conf && \

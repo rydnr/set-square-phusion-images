@@ -1,6 +1,4 @@
 # v monit
-# - requires:
-#   - create_ssl_certificate
 COPY monit-files/30_create_monit_filesystem_check.sh \
      monit-files/30_create_monit_filesystem_check.inc.sh \
      monit-files/31_create_monit_http_conf.sh \
@@ -18,8 +16,9 @@ COPY monit-files/monit-mail.conf.tmpl /var/local/monit-mail.conf.tmpl
 COPY monit-files/monit-http.conf /var/local/monit-http.conf
 COPY monit-files/enable-monit-ssl.sh /usr/local/bin
 
-RUN ${APTGET_INSTALL} --update monit && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} monit && \
+    ${SYSTEM_CLEANUP} && \
     mkdir -p /etc/service/monit/log && \
     chmod +x /usr/local/bin/enable-monit-ssl.sh && \
     /usr/local/bin/enable-monit-ssl.sh && \

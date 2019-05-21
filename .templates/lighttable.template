@@ -1,6 +1,7 @@
 # v lighttable
-RUN ${APTGET_INSTALL} -u libgtk2.0-0 libgconf-2-4 libnss3-dev libasound2 libxtst6 && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} libgtk2.0-0 libgconf-2-4 libnss3-dev libasound2 libxtst6 && \
+    ${SYSTEM_CLEANUP} && \
     cd /opt && \
     wget ${LIGHTTABLE_DOWNLOAD_URL} && \
     tar xvfz ${LIGHTTABLE_ARTIFACT} && \

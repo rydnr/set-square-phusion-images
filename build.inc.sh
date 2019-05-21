@@ -1,3 +1,10 @@
+defineEnvVar DATE MANDATORY "The date format used to tag images" "$(date '+%Y%m')";
+defineEnvVar TIME MANDATORY "A timestamp" "$(date)";
+defineEnvVar RANDOM_PASSWORD MANDATORY "A random password" "secret" 'head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1';
+defineEnvVar PUSH_TO_DOCKERHUB MANDATORY "Whether to push to Docker HUB" 'false';
+defineEnvVar BUILDER MANDATORY "The builder of the image" '${AUTHOR}';
+defineEnvVar SETSQUARE_FLAVOR MANDATORY "The flavor of set-square" "";
+defineEnvVar INCLUDES_FOLDER MANDATORY "The folder where 'include' files are located" "./.templates";
 defineEnvVar ROOT_IMAGE_VERSION MANDATORY "The root image version" "0.11";
 defineEnvVar ROOT_IMAGE MANDATORY "The default root image" "phusion/baseimage"
 defineEnvVar ROOT_IMAGE_64BIT MANDATORY "The default root image for 64 bits" '${ROOT_IMAGE}';
@@ -5,6 +12,10 @@ defineEnvVar ROOT_IMAGE_32BIT MANDATORY "The default root image for 32 bits" "${
 defineEnvVar BASE_IMAGE_64BIT MANDATORY "The base image for 64 bits" '${NAMESPACE}/base';
 defineEnvVar BASE_IMAGE_32BIT MANDATORY "The base image for 32 bits" '${BASE_IMAGE_64BIT_DEFAULT%%64}32';
 defineEnvVar JAVA_VERSION MANDATORY "The Java version" "8";
+defineEnvVar SYSTEM_UPDATE \
+             MANDATORY \
+             "The script to update the package catalog" \
+             '/usr/local/bin/system-update.sh -v ';
 defineEnvVar PKG_INSTALL \
              MANDATORY \
              "Installs a program via apt-get" \
@@ -82,7 +93,7 @@ defineEnvVar SSL_CERTIFICATE_ORGANIZATIONAL_UNIT MANDATORY "The organizational u
 defineEnvVar SSL_CERTIFICATE_ORGANIZATION MANDATORY "The organization behind the SSL certificate" '${DOMAIN}';
 defineEnvVar SSL_CERTIFICATE_ALIAS MANDATORY "The certificate alias" '${IMAGE}';
 defineEnvVar SSL_CERTIFICATE_SUBJECT MANDATORY "The certificate subject" '/cn=${DOMAIN}';
-defineEnvVar SSL_CERTIFICATE_LOCALITY MANDATORY "The locality information in the SSL certificate" "Madrid";
+
 defineEnvVar SSL_CERTIFICATE_STATE MANDATORY "The state information in the SSL certificate" "Madrid";
 defineEnvVar SSL_CERTIFICATE_COUNTRY MANDATORY "The country information in the SSL certificate" "ES";
 defineEnvVar SSL_CERTIFICATE_EXPIRATION_DAYS MANDATORY "The number of days until the certificate expires" "3650";

@@ -1,6 +1,7 @@
 # v sdkman
-RUN ${APTGET_INSTALL} zip unzip && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} zip unzip && \
+    ${SYSTEM_CLEANUP} && \
     touch /tmp/.drywit.log && chmod a+w /tmp/.drywit.log && \
     su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && wget -q -O- http://get.sdkman.io | bash && chmod +x ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh'
 # ^ sdkman

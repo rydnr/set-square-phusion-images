@@ -1,8 +1,9 @@
 # v letsencrypt
-RUN ${APTGET_INSTALL} -u python-pip python-dev libffi-dev libssl-dev && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -u python-pip python-dev libffi-dev libssl-dev && \
     pip install --upgrade pip && \
     pip install setuptools && \
     pip install certbot && \
     pip install certbot-external-auth && \
-    ${APTGET_CLEANUP}
+    ${SYSTEM_CLEANUP}
 # ^ letsencrypt
