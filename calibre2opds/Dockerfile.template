@@ -15,17 +15,16 @@ ENV DOBACKUP="true" \
 
 @include("service_user")
 @include("service")
+@include("openjdk")
 
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
-RUN ${APTGET_INSTALL} --update openjdk && \
-    mkdir {SERVICE_USER_HOME}/$(basename ${CALIBRE2OPDS_ARTIFACT}) && \
+RUN mkdir {SERVICE_USER_HOME}/$(basename ${CALIBRE2OPDS_ARTIFACT}) && \
     ln -s ${SERVICE_USER_HOME}/$(basename ${CALIBRE2OPDS_ARTIFACT}) ${SERVICE_USER_HOME}/calibre2opds && \
     cd ${SERVICE_USER_HOME}/calibre2opds && \
     wget -O ${CALIBRE2OPDS_ARTIFACT} ${CALIBRE2OPDS_DOWNLOAD_URL} && \
     mkdir ${SERVICE_USER_HOME}/.calibre2opds && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOHE} && \
-    ${APTGET_CLEANUP}
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOHE}
 
 COPY default.profile.xml ${SERVICE_USER_HOME}/.calibre2opds/default.profile.xml
 

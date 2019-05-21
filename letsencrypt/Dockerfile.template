@@ -9,7 +9,9 @@ COPY service /sbin/my_exec
 RUN cd /tmp && \
     wget https://dl.eff.org/certbot-auto -O /usr/sbin/certbot-auto && \
     chmod a+x /usr/sbin/certbot-auto && \
-    ${APTGET_INSTALL} -u python-dev python3-dev libxml2-dev python-setuptools gcc git libssl-dev libffi-dev python-pip && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} python-dev python3-dev libxml2-dev python-setuptools gcc git libssl-dev libffi-dev python-pip && \
+    ${SYSTEM_CLEANUP} && \
     pip install --upgrade pip && \
     pip install acme && \
     certbot-auto -n --os-packages-only && \

@@ -6,13 +6,14 @@ FROM ${NAMESPACE}/apache:${TAG}
 
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
-RUN ${APTGET_INSTALL} libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-mcrypt php5-json php-pear snmp fping \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} libapache2-mod-php5 php5-cli php5-mysql php5-gd php5-mcrypt php5-json php-pear snmp fping \
     mysql-client python-mysqldb rrdtool subversion whois mtr-tiny ipmitool graphviz imagemagick \
     libvirt-bin && \
+    ${SYSTEM_CLEANUP} && \
     mkdir -p /opt/observium && cd /opt && \
     wget http://www.observium.org/observium-community-latest.tar.gz && \
-    tar zxvf observium-community-latest.tar.gz && \
-    ${APTGET_CLEANUP}
+    tar zxvf observium-community-latest.tar.gz
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
@@ -22,4 +23,5 @@ VOLUME /var/lib/mysql
 VOLUME /var/lib/mysql-sql
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

@@ -10,8 +10,9 @@ ENV DOBACKUP="false" \
     SERVICE_USER="${SERVICE_USER}" \
     SERVICE_GROUP="${SERVICE_GROUP}" \
 
-RUN ${APTGET_INSTALL} zip unzip && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} zip unzip && \
+    ${SYSTEM_CLEANUP} && \
     rm -f /etc/my_init.d/* && \
     (/usr/sbin/groupadd ${SERVICE_GROUP} 2> /dev/null || echo "Group ${SERVICE_GROUP} already exists") && \
     (/usr/sbin/groupadd docker 2> /dev/null || echo "Group docker already exists") && \

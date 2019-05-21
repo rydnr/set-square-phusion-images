@@ -9,10 +9,11 @@ ENV DOBACKUP="false" \
 
 ADD https://raw.githubusercontent.com/harshjv/docker-texlive-2015/master/install-tl-ubuntu /var/local/install-tl-ubuntu
 
-RUN ${APTGET_INSTALL} --update -np wget && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -np wget && \
+    ${SYSTEM_CLEANUP} && \
     chmod +x /var/local/install-tl-ubuntu && \
-    /var/local/install-tl-ubuntu && \
-    ${APTGET_CLEANUP}
+    /var/local/install-tl-ubuntu
 
 VOLUME /var/texlive
 VOLUME /usr/local/texlive/texmf-local

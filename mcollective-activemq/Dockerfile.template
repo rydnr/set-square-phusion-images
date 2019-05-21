@@ -9,11 +9,12 @@ COPY rc.local /etc/rc.local
 # From Learning MCollective
 RUN wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb && \
     dpkg -i puppetlabs-release-trusty.deb && \
-    ${APTGET_UPDATE} activemq patch && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_UPDATE} activemq patch && \
     update-rc.d activemq defaults && \
     cd /etc/activemq/instances-enabled && \
     ln -s ../instances-available/main . && \
-    ${APTGET_CLEANUP} && \
+    ${SYSTEM_CLEANUP} && \
     cd /etc/activemq/instances-enabled/main && \
     mv activemq.xml activemq.xml.dist && \
     wget https://svn.apache.org/repos/asf/activemq/trunk/assembly/src/release/conf/activemq.xml && \
@@ -34,4 +35,5 @@ RUN patch activemq.xml activemq_xml.patch && \
 EXPOSE ${MCOLLECTIVE_ACTIVEMQ_PORT}
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

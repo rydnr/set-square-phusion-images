@@ -24,7 +24,7 @@ RUN chmod +x /sbin/my_exec && \
     echo "${SERVICE_USER} ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/${SERVICE_USER} && \
     chmod 0440 /etc/sudoers.d/${SERVICE_USER} && \
     ln -s /home/${SERVICE_USER}/.AndroidStudio${ANDROID_STUDIO_COMMERCIAL_MAJOR_VERSION} /root && \
-    ${APTGET_CLEANUP}
+    ${SYSTEM_CLEANUP}
 
 VOLUME /data
 

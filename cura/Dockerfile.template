@@ -8,11 +8,13 @@ RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/$
 COPY service /etc/service/${IMAGE}/run
 
 RUN cd /tmp && \
-    ${APTGET_INSTALL} python-wxgtk2.8 python-opengl python-serial python-numpy && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} python-wxgtk2.8 python-opengl python-serial python-numpy && \
     wget ${CURA_URL} && \
     dpkg -i ${CURA_ARTIFACT} && \
-    chmod +x /etc/service/${IMAGE}/run && \
-    ${APTGET_CLEANUP}
+    ${PKG_CLEANUP} && \
+    chmod +x /etc/service/${IMAGE}/run
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

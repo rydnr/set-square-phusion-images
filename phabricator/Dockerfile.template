@@ -32,16 +32,16 @@ COPY apache-files/service /usr/local/bin/run-apache
 #COPY php7.patch /usr/local/src/php7.patch
 
 RUN chmod +x /usr/local/bin/run-apache && \
-    ${APTGET_INSTALL} -u libapache2-mod-php dpkg-dev \
-        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php7.0-xml && \
-    ${APTGET_INSTALL} --no-pin mysql-server=${MYSQL_VERSION} python-pip openjdk-8-jre-headless && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} libapache2-mod-php dpkg-dev \
+        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php7.0-xml php-mcrypt && \
+    ${PKG_INSTALL} --no-pin mysql-server=${MYSQL_VERSION} python-pip openjdk-8-jre-headless && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     chmod +x /etc/service/${IMAGE}/run && \
     mkdir /usr/local/share/liquibase && \
     a2dissite 000-default.conf && \
     a2enmod rewrite && \
-    ${APTGET_INSTALL} php-mcrypt && \
     phpenmod mcrypt && \
     ln -s /backup/${IMAGE}-repo /var/repo && \
     ln -s /backup/${IMAGE}-local /var/local/phabricator && \
@@ -115,7 +115,6 @@ RUN chmod +x /usr/local/bin/run-apache && \
     done && \
     mysqldump -u root -psecret -h localhost --create-options --add-drop-database --events --routines --triggers --databases $(mysql -u root -psecret --skip-column-names -e "SET SESSION group_concat_max_len=10000; SELECT GROUP_CONCAT(schema_name SEPARATOR ' ') FROM information_schema.schemata WHERE schema_name NOT IN ('mysql','performance_schema','information_schema');") > /usr/local/share/sql/phabricator.sql && \
     service mysql stop && \
-    ${APTGET_CLEANUP} && \
     rm -rf /var/lib/mysql && \
     rm -rf /opt/liquibase* && \
     rm -rf /opt/php* && \
@@ -126,7 +125,8 @@ RUN chmod +x /usr/local/bin/run-apache && \
       ln -s /usr/local/bin/arcanist-wrapper /usr/local/bin/$(basename $s); \
     done && \
     rm -f /usr/local/bin/help.sh && \
-    ln -s /usr/local/bin/help.phabricator.sh /usr/local/bin/help.sh
+    ln -s /usr/local/bin/help.phabricator.sh /usr/local/bin/help.sh && \
+    ${SYSTEM_CLEANUP}
 
 #    bin/config set config.ignore-issues '{ "security.security.alternate-file-domain": true }' && \
 

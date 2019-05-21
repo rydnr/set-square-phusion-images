@@ -7,13 +7,15 @@ FROM ${NAMESPACE}/mcollective-common:${TAG}
 COPY rc.local /etc/rc.local
 
 # From Learning MCollective
-RUN ${APTGET_INSTALL} -y ruby-stomp mcollective-plugins-facts-facter mcollective mcollective-filemgr-agent mcollective-nettest-agent mcollective-package-agent mcollective-service-agent mcollective-puppet-agent && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -y ruby-stomp mcollective-plugins-facts-facter mcollective mcollective-filemgr-agent mcollective-nettest-agent mcollective-package-agent mcollective-service-agent mcollective-puppet-agent && \
+    ${SYSTEM_CLEANUP} && \
     update-rc.d mcollective defaults && \
     chmod +x /etc/rc.local && \
-    echo "RUN=yes" > /etc/default/mcollective && \
-    ${APTGET_CLEANUP}
+    echo "RUN=yes" > /etc/default/mcollective
 
 COPY server.cfg /etc/mcollective/server.cfg
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

@@ -4,12 +4,14 @@ FROM ${NAMESPACE}/java:${TAG}
 
 @include("addon-toggles")
 
-RUN ${APTGET_INSTALL} puppet-common puppet mcollective-common && \
-    ${APTGET_CLEANUP}
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} puppet-common puppet mcollective-common && \
+    ${SYSTEM_CLEANUP}
 
 COPY facts.sh /usr/local/bin/facts.sh
 RUN chmod +x /usr/local/bin/facts.sh
 COPY facts.cron /etc/cron.d/facts.sh
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

@@ -7,8 +7,9 @@ FROM ${BASE_IMAGE}:${TAG}
 RUN cd /tmp && \
     wget https://apt.puppetlabs.com/puppetlabs-release-trusty.deb && \
     dpkg -i puppetlabs-release-trusty.deb && \
-    ${APTGET_INSTALL} --update && \
-    ${APTGET_CLEANUP}
+    ${SYSTEM_UPDATE} && \
+    ${SYSTEM_CLEANUP}
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

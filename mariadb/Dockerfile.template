@@ -31,14 +31,15 @@ COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh 
 #RUN apt-get install software-properties-common
 RUN ([ ! -d /backup ] && rm -f /backup) && \
     mkdir -p /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump && \
-    ${APTGET_INSTALL} --update mariadb-server=${TAG} bc && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} mariadb-server=${TAG} bc && \
+    ${SYSTEM_CLEANUP} && \
     sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
     sed -i -e"s/^log_error/#log_error/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
     sed -i -e"s|^datadir.*|datadir = /backup/${IMAGE}-db|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
     sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
     sed -i -e"s|# ssl-cert\s*.*|ssl-cert=/etc/ssl/private/${IMAGE}.crt|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
     sed -i -e"s|# ssl-key\s*.*|ssl-key=/etc/ssl/private/${IMAGE}.key|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    ${APTGET_CLEANUP} && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     rm -rf /var/lib/mysql && \
     ln -s /backup/${IMAGE}-db /var/lib/mysql && \

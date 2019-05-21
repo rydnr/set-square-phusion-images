@@ -7,8 +7,10 @@ FROM ${NAMESPACE}/apache:${TAG}
 COPY graphite-vhost.conf /etc/apache2/sites-available/001-graphite-vhost.conf
 COPY service /etc/service/apache/run-graphite
 
-RUN ${APTGET_INSTALL} --update python python-cairo libapache2-mod-wsgi python-django python-memcache python-sqlite python-pip && \
-    ${APTGET_INSTALL} -np python-dev && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} python python-cairo libapache2-mod-wsgi python-django python-memcache python-sqlite python-pip && \
+    ${PKG_INSTALL} -np python-dev && \
+    ${SYSTEM_CLEANUP} && \
     mv /etc/service/apache/run /etc/service/apache/run-apache && \
     mv /etc/service/apache/run-graphite /etc/service/apache/run && \
     chmod +x /etc/service/apache/run && \
@@ -22,8 +24,7 @@ RUN ${APTGET_INSTALL} --update python python-cairo libapache2-mod-wsgi python-dj
     a2ensite 001-graphite-vhost && \
     a2dissite 000-default && \
     a2enmod wsgi && \
-    sed -i 's/ENABLE_LOGROTATION = True/ENABLE_LOGROTATION = False/g' /etc/carbon/carbon.conf && \
-    ${APTGET_CLEANUP}
+    sed -i 's/ENABLE_LOGROTATION = True/ENABLE_LOGROTATION = False/g' /etc/carbon/carbon.conf
 
 # Place custom configuration files for carbon here. They'll override the default ones.
 VOLUME /graphite-carbon-conf
@@ -32,4 +33,5 @@ VOLUME /graphite-carbon-conf
 VOLUME /graphite-webapp
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

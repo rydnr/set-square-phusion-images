@@ -21,8 +21,10 @@ COPY service.inc.sh /etc/service/${IMAGE}/run.inc.sh
 
 VOLUME /backup/${IMAGE}
 
-RUN ${APTGET_INSTALL} uuid-runtime && \
-    ${APTGET_INSTALL} -np git fakeroot && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} uuid-runtime && \
+    ${PKG_INSTALL} -np git fakeroot && \
+    ${SYSTEM_CLEANUP} && \
     cd /tmp && \
     git clone https://github.com/rundeck/rundeck && \
     cd rundeck && \
@@ -34,7 +36,6 @@ RUN ${APTGET_INSTALL} uuid-runtime && \
     echo 'RDECK_JVM="-Dserver.http.host=0.0.0.0 ${RDECK_JVM}";' >> /etc/rundeck/profile && \
     cd && \
     rm -rf /tmp/rundeck && \
-    ${APTGET_CLEANUP} && \
     rm -rf /root/.ssh && \
     ln -s /backup/${IMAGE} /var/lib/rundeck/storage && \
     ln -s /backup/${IMAGE}/var/storage/content/ssh /root/.ssh
@@ -42,4 +43,5 @@ RUN ${APTGET_INSTALL} uuid-runtime && \
 EXPOSE ${DEFAULT_VIRTUAL_PORT}
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

@@ -8,13 +8,14 @@ RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/$
 COPY service /etc/service/${IMAGE}/run
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
-RUN ${APTGET_INSTALL} -np unzip && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -np unzip && \
+    ${SYSTEM_CLEANUP} && \
     mkdir -p /var/www/ghost && \
     cd /var/www/ghost && \
     wget ${GHOST_URL} && \
     unzip ${GHOST_ARTIFACT} && \
     npm install --production && \
-    ${APTGET_CLEANUP} && \
     chmod +x /usr/local/bin/help && \
     chmod +x /etc/service/${IMAGE}/run
 

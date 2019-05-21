@@ -7,7 +7,9 @@ FROM ${BASE_IMAGE}:${TAG}
 RUN mkdir -p /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
 
-RUN ${APTGET_INSTALL} -y mediatomb && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -y mediatomb && \
+    ${SYSTEM_CLEANUP} && \
     cd /etc/mediatomb && \
     mv config.xml config.xml.official && \
     chmod +x /etc/service/${IMAGE}/run
@@ -21,4 +23,5 @@ VOLUME /media
 EXPOSE 49152
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

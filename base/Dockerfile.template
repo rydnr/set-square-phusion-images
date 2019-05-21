@@ -65,8 +65,8 @@ CMD ["/sbin/my_init"]
 # COPY service /etc/rc.local
 # RUN chmod +x /etc/rc.local
 #
-# Before finishing the Dockerfile, please RUN ${DOLLAR}{APTGET_CLEANUP} if the
-# image installs packages via ${DOLLAR}{APTGET_INSTALL}.
+# Before finishing the Dockerfile, please RUN ${DOLLAR}{SYSTEM_CLEANUP} if the
+# image installs packages via ${DOLLAR}{PKG_INSTALL}. You'd need to run ${DOLLAR}{SYSTEM_UPDATE} first.
 #
 # Additionaly, every Dockerfile should add its own Dockerfile to the /Dockerfiles
 # folder:

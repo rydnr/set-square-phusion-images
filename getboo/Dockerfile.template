@@ -6,16 +6,17 @@ FROM ${BASE_IMAGE}:${TAG}
 
 COPY rc.local /etc/rc.local
 
-RUN ${APTGET_INSTALL} mariadb-client apache2 libapache2-mod-php5 php-pear php5-mysql wget unzip && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} mariadb-client apache2 libapache2-mod-php5 php-pear php5-mysql wget unzip && \
     cd ${GETBOO_HOME} && \
+    ${SYSTEM_CLEANUP} && \
     wget -O ${GETBOO_FILE} ${GETBOO_DOWNLOAD_URL} && \
     unzip ${GETBOO_FILE} && ln -s ${GETBOO_FOLDER} getboo && \
     chown ${APACHE_USER}.${APACHE_GROUP} -R ${GETBOO_HOME}/getboo* && \
     rm -rf ${GETBOO_HOME}/getboo/install && \
     mv /etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf.orig && \
     chmod +x /etc/rc.local && \
-    ${APTGET_CLEANUP}
-    
+
 COPY config.inc.php /usr/local/src/getboo/config.inc.php.tpl
 COPY 000-default.conf /etc/apache2/sites-available/000-default.conf
 COPY setup.sql  /usr/local/src/setup.sql.tpl
@@ -24,4 +25,5 @@ COPY ddl.sql dml.sql ${GETBOO_HOME}/
 EXPOSE 8080
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

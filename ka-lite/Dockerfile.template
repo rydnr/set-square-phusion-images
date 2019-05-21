@@ -6,16 +6,18 @@ FROM ${BASE_IMAGE}:${TAG}
 
 COPY rc.local /etc/rc.local
 
-RUN ${APTGET_INSTALL} install python2.7 git-core python-m2crypto && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} install python2.7 git-core python-m2crypto && \
+    ${SYSTEM_CLEANUP} && \
     mkdir /var/www && \
     cd /var/www && git clone https://github.com/learningequality/ka-lite.git && \
     cd ka-lite && scripts/runatboot.sh && \
-    chmod +x /etc/rc.local 
+    chmod +x /etc/rc.local
 
 VOLUME /var/www/ka-lite
 
 EXPOSE 8008
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")
-

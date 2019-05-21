@@ -11,15 +11,16 @@ COPY create-db.inc.sh /etc/my_init.d/50-create-db.inc.sh
 COPY create-ttrss-database.sql /usr/local/share/sql/create-ttrss-database.sql
 COPY create-ttrss-user.sql /usr/local/share/sql/create-ttrss-user.sql.tpl
 
-RUN ${APTGET_INSTALL} -np git && \
-    ${APTGET_INSTALL} libapache2-mod-php5 php5-mysql php5-mcrypt && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -np git && \
+    ${PKG_INSTALL} libapache2-mod-php5 php5-mysql php5-mcrypt && \
+    ${SYSTEM_CLEANUP} && \
     cd /opt && \
     git clone https://tt-rss.org/git/tt-rss.git tt-rss && \
     a2ensite 001-${TTRSS_VIRTUAL_HOST} && \
     a2dissite 000-default.conf && \
     php5enmod mcrypt && \
     chown -R www-data:www-data /opt/tt-rss && \
-    ${APTGET_CLEANUP} && \
     echo "USE ${TTRSS_DB_NAME};" > /usr/local/share/sql/${TTRSS_DB_USER}/ttrss_schema.sql && \
     cat /opt/tt-rss/schema/ttrss_schema_mysql.sql >> /usr/local/share/sql/${TTRSS_DB_USER}/ttrss_schema.sql && \
     echo "${TTRSS_DB_PASSWORD}" >> /usr/local/share/sql/${TTRSS_DB_USER}/.${TTRSS_DB_USER} && \
@@ -32,4 +33,5 @@ VOLUME /var/lib/mysql-sql
 EXPOSE 80
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

@@ -20,15 +20,19 @@ COPY default.cfg ${PLONE3_HOME}/.buildout/default.cfg
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY plonebackup zeopack /etc/cron.d/
 
-#RUN ${APTGET_INSTALL} -u build-essential python-dev libjpeg-dev libxslt1-dev poppler-utils zlib1g-dev wv libjpeg-dev libxml2-dev libreadline6-dev libssl-dev python-pip && \
+#RUN ${SYSTEM_UPDATE} && \
+#    ${PKG_INSTALL} build-essential python-dev libjpeg-dev libxslt1-dev poppler-utils zlib1g-dev wv libjpeg-dev libxml2-dev libreadline6-dev libssl-dev python-pip && \
 #    pip install --upgrade pip && \
 #    for i in setuptools accesscontrol App documenttemplate docutils initgroups interface mechanize missing multimapping nt_svcutils OFS signals structuredtext tempstorage ThreadLock zlog zodbcode zope2 zserver zc.buildout Pillow; do \
 #      pip install ${i}; \
 #    done && \
+#    ${SYSTEM_CLEANUP}
 
-RUN ${APTGET_INSTALL} -u build-essential python-dev python-virtualenv libssl-dev libxml2-dev libxslt1-dev libbz2-dev python-tk python-gdbm libxslt1-dev \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} build-essential python-dev python-virtualenv libssl-dev libxml2-dev libxslt1-dev libbz2-dev python-tk python-gdbm libxslt1-dev \
       python-setuptools libjpeg62-dev \
       libreadline-dev wv poppler-utils && \
+    ${SYSTEM_CLEANUP} && \
     mkdir -p /opt && \
     wget -O /opt/${PLONE3_FILE} ${PLONE3_DOWNLOAD_URL} && \
     tar xvfz /opt/${PLONE3_FILE} -C /opt && \
@@ -38,7 +42,6 @@ RUN ${APTGET_INSTALL} -u build-essential python-dev python-virtualenv libssl-dev
     grep 'Username: ' ${PLONE3_HOME}/install.log > /username && \
     grep 'Password: ' ${PLONE3_HOME}/install.log > /password && \
     rm -rf /opt/${PLONE3_FILE} /opt/${PLONE3_ARTIFACT} && \
-    ${APTGET_CLEANUP} && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${PLONE3_HOME}
 
 EXPOSE 8080

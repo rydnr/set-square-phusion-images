@@ -9,8 +9,10 @@ COPY service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 
-RUN ${APTGET_INSTALL} --update puppetmaster && \
-    ${APTGET_CLEANUP}
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} puppetmaster && \
+    ${SYSTEM_CLEANUP}
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

@@ -9,12 +9,14 @@ FROM ${NAMESPACE}/apache:${TAG}
 RUN echo 'deb http://dl.ajaxplorer.info/repos/apt stable main' >> /etc/apt/sources.list && \
     echo 'deb-src http://dl.ajaxplorer.info/repos/apt stable main' >> /etc/apt/sources.list && \
     wget -O - http://dl.ajaxplorer.info/repos/charles@ajaxplorer.info.gpg.key | sudo apt-key add - && \
-    ${APTGET_INSTALL} --update pydio && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} pydio && \
+    ${SYSTEM_CLEANUP} && \
     cp /usr/share/doc/pydio/apache2.sample.conf /etc/apache2/sites-available/pydio.conf && \
     a2ensite pydio && a2enmod rewrite && \
-    php5enmod mcrypt && \
-    ${APTGET_CLEANUP}
+    php5enmod mcrypt
 #    chmod +x /etc/rc.local
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

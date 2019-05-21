@@ -9,8 +9,9 @@ COPY my_exec /sbin/my_exec
 COPY service /usr/local/bin/${IMAGE}
 COPY service.inc.sh /usr/local/bin/${IMAGE}.inc.sh
 
-RUN ${APTGET_INSTALL} postgresql-client && \
-    ${APTGET_CLEANUP} && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} postgresql-client && \
+    ${SYSTEM_CLEANUP} && \
     chmod +x /sbin/my_exec && \
     chmod +x /usr/local/bin/${IMAGE} && \
     chmod -x /usr/local/bin/${IMAGE}.inc.sh

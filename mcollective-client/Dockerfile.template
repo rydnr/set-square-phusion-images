@@ -8,13 +8,14 @@ FROM ${NAMESPACE}/mcollective-common:${TAG}
 COPY rc.local /etc/rc.local
 
 # From Learning MCollective
-RUN ${APTGET_INSTALL} -y mcollective-client \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} -y mcollective-client \
        mcollective-filemgr-client \
        mcollective-nettest-client \
        mcollective-package-client \
        mcollective-service-client \
        mcollective-puppet-client && \
-    ${APTGET_CLEANUP} && \
+    ${SYSTEM_CLEANUP} && \
     chmod +x /etc/rc.local
 
 COPY client.cfg /etc/mcollective/client.cfg

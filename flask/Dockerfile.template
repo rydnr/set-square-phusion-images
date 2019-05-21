@@ -2,7 +2,9 @@
 FROM ${BASE_IMAGE}:${TAG}
 @include("maintainer")
 
-RUN ${APTGET_INSTALL} wget python python-pip python-dev build-essential && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} wget python python-pip python-dev build-essential && \
+    ${SYSTEM_CLEANUP} && \
     pip install --upgrade pip && \
     pip install --upgrade virtualenv && \
     pip install --upgrade flask-restful && \
@@ -18,12 +20,12 @@ RUN ${APTGET_INSTALL} wget python python-pip python-dev build-essential && \
     pip install --upgrade flipflop && \
     pip install --upgrade coverage && \
     groupadd flask && \
-    useradd -s /bin/bash -g flask -G flask,www-data -m -d /var/www -c "Flask user running /var/www/run.py" flask && \
-    ${APTGET_CLEANUP}
+    useradd -s /bin/bash -g flask -G flask,www-data -m -d /var/www -c "Flask user running /var/www/run.py" flask
 
 VOLUME /var/www
 
 EXPOSE 8080
 
 @include("copy-metadata")
+@include("symlinks")
 @include("instructions")

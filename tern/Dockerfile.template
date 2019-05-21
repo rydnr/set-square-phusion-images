@@ -16,9 +16,10 @@ ENV DOBACKUP="false" \
 #    git checkout ${TERN_TAG} && \
 
 RUN chmod +x /sbin/my_exec && \
-    ${APTGET_INSTALL} --update --no-pin git && \
-    npm install -g tern && \
-    ${APTGET_CLEANUP}
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} --no-pin git && \
+    ${SYSTEM_CLEANUP} && \
+    npm install -g tern
 
 EXPOSE 36515
 

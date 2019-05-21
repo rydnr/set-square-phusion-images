@@ -7,8 +7,9 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("service_user")
 
 RUN cd /tmp && \
-    ${APTGET_INSTALL} -u bzip2 && \
-    ${APTGET_CLEANUP} && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} bzip2 && \
+    ${SYSTEM_CLEANUP} && \
     rm -rf ${SERVICE_USER_HOME} && \
     wget ${ANACONDA_DOWNLOAD_URL} && \
     rm -rf ${SERVICE_USER_HOME} && \
@@ -27,6 +28,5 @@ WORKDIR ${SERVICE_USER_HOME}
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-
 @include("entrypoint")
 @include("image_user")

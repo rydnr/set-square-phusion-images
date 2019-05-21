@@ -28,7 +28,9 @@ COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 RUN ([ ! -d /backup ] && rm -f /backup || echo -n '') && \
     export CONFIG_FILE=/etc/mysql/${IMAGE}.conf.d/mysqld.cnf && \
     mkdir -p /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump && \
-    ${APTGET_INSTALL} --update ${IMAGE}-server=${TAG} bc && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} ${IMAGE}-server=${TAG} bc && \
+    ${SYSTEM_CLEANUP} && \
     sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" ${CONFIG_FILE} && \
     sed -i -e"s/^log_error/#log_error/" ${CONFIG_FILE} && \
     sed -i -e"s|^datadir.*|datadir = /backup/${IMAGE}-db|" ${CONFIG_FILE} && \
@@ -36,7 +38,6 @@ RUN ([ ! -d /backup ] && rm -f /backup || echo -n '') && \
     sed -i -e"s|# ssl-cert\s*.*|# ssl-cert=/etc/ssl/private/${IMAGE}.crt|" ${CONFIG_FILE} && \
     sed -i -e"s|# ssl-key\s*.*|# ssl-key=/etc/ssl/private/${IMAGE}.key|" ${CONFIG_FILE} && \
     echo 'explicit_defaults_for_timestamp=1' >> ${CONFIG_FILE} && \
-    ${APTGET_CLEANUP} && \
     /usr/local/bin/create_ssl_certificate_openssl.sh -v && \
     rm -rf /var/lib/mysql && \
     ln -s /backup/${IMAGE}-db /var/lib/mysql && \
@@ -64,5 +65,3 @@ VOLUME [ "/backup/${IMAGE}-db", "/backup/rsnapshot", "/backup/${IMAGE}-dump", "/
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-
-

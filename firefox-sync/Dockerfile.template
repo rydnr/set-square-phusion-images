@@ -12,9 +12,10 @@ COPY syncserver.ini /usr/local/src/syncserver/syncserver.ini.tpl
 
 # From https://docs.services.mozilla.com/howtos/run-sync-1.5.html
 # RUN add-apt-repository ppa:kernel-ppa/ppa
-RUN ${APTGET_INSTALL} python-dev git-core python-virtualenv mariadb-client && \
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} python-dev git-core python-virtualenv mariadb-client && \
+    ${SYSTEM_CLEANUP} && \
     cd /usr/local/src && git clone https://github.com/mozilla-services/syncserver && cd syncserver && make build && \
-    ${APTGET_CLEANUP} && \
     chmod +x /etc/service/${IMAGE}/run
 
 EXPOSE 5000
