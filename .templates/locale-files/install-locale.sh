@@ -185,7 +185,7 @@ function dw_parse_encoding_cli_flag() {
 addError "LOCALEGEN_IS_NOT_INSTALLED" "locale-gen is not installed";
 checkReq locale-gen LOCALEGEN_IS_NOT_INSTALLED;
 addError "APTGET_IS_NOT_INSTALLED" "apt-get is not installed";
-checkReq aptget APTGET_IS_NOT_INSTALLED;
+checkReq apt-get APTGET_IS_NOT_INSTALLED;
 addError "TARGET_LOCALE_IS_MANDATORY" "The locale parameter is mandatory";
 addError "TARGET_ENCODING_IS_MANDATORY" "The encoding parameter is mandatory";
 #

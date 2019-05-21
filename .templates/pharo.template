@@ -1,13 +1,12 @@
 # v pharo
 RUN dpkg --add-architecture i386 && \
     ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} lib32z1 libx11-6:i386 libgl1-mesa-glx:i386 libfontconfig1:i386 libssl1.0.0:i386 libcairo2:i386 && \
-    ${PKG_INSTALL} -np unzip && \
+    ${PKG_INSTALL} libcurl4-gnutls-dev ca-certificates libgtk2.0-dev libgtk-3-dev mesa-common-dev libgl1-mesa-dev libc6 unzip && \
     ${SYSTEM_CLEANUP} && \
     ([ -d /opt ] || mkdir /opt) && \
     mkdir /opt/pharo${PHARO_MAJOR_VERSION} && \
     cd /opt/pharo${PHARO_MAJOR_VERSION} && \
-    curl get.pharo.org/vmT${PHARO_VERSION_ZEROCONF} | bash && \
+    curl get.pharo.org/64/vmT${PHARO_VERSION_ZEROCONF} | bash && \
     cd /opt && \
     ln -s pharo${PHARO_MAJOR_VERSION} pharo && \
     echo '*      hard    rtprio  2' >  /etc/security/limits.d/pharo.conf && \

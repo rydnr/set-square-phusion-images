@@ -15,19 +15,19 @@ defineEnvVar JAVA_VERSION MANDATORY "The Java version" "8";
 defineEnvVar SYSTEM_UPDATE \
              MANDATORY \
              "The script to update the package catalog" \
-             '/usr/local/bin/system-update.sh -v ';
+             '/usr/local/sbin/system-update.sh -v ';
 defineEnvVar PKG_INSTALL \
              MANDATORY \
              "Installs a program via apt-get" \
-             '/usr/local/bin/pkg-install.sh -vv ';
+             '/usr/local/sbin/pkg-install.sh -vv ';
 defineEnvVar PKG_CLEANUP \
              MANDATORY \
              "The cleanup commands after an apt-get so that the resulting image size is optimal" \
-             '/usr/local/bin/pkg-cleanup.sh -v ';
+             '/usr/local/sbin/pkg-cleanup.sh -v ';
 defineEnvVar SYSTEM_CLEANUP \
              MANDATORY \
              "The cleanup commands after an apt-get so that the resulting image size is optimal" \
-             '/usr/local/bin/system-cleanup.sh -v ';
+             '/usr/local/sbin/system-cleanup.sh -v ';
 defineEnvVar SMTP_HOST \
              MANDATORY \
              "The SMTP host to send emails, including monit's" \
