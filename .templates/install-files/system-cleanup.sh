@@ -27,6 +27,10 @@ function autoremove_packages() {
 function clean_system() {
   local -i _rescode;
 
+  if isEmpty "${SYSTEM_CLEAN}"; then
+      exitWithErrorCode SYSTEM_CLEAN_IS_MANDATORY;
+  fi
+
   logInfo -n "Cleaning up the system";
   ${SYSTEM_CLEAN} > /dev/null
   _rescode=$?;
@@ -123,7 +127,6 @@ function main() {
 setScriptDescription "Cleans up the system by removing unused packages.";
 
 addError "INVALID_OPTION" "Unrecognized option";
-addError "APTGET_NOT_INSTALLED" "apt-get not found";
-checkReq apt-get APTGET_NOT_INSTALLED;
+addError SYSTEM_CLEAN_IS_MANDATORY "SYSTEM_CLEAN is mandatory";
 addError "ERROR_REMOVING_UNUSED_PACKAGES" "Error removing unused packages";
 #

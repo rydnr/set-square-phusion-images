@@ -1,3 +1,6 @@
+overrideEnvVar SETSQUARE_FLAVOR "phusion";
+overrideEnvVar LICENSE_FILE "LICENSE.gpl3";
+overrideEnvVar COPYRIGHT_PREAMBLE_FILE "copyright-preamble.gpl3";
 defineEnvVar DATE MANDATORY "The date format used to tag images" "$(date '+%Y%m')";
 defineEnvVar TIME MANDATORY "A timestamp" "$(date)";
 defineEnvVar RANDOM_PASSWORD MANDATORY "A random password" "secret" 'head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1';
