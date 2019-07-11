@@ -3,7 +3,7 @@ defineEnvVar TIME MANDATORY "A timestamp" "$(date)";
 defineEnvVar RANDOM_PASSWORD MANDATORY "A random password" "secret" 'head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1';
 defineEnvVar PUSH_TO_DOCKERHUB MANDATORY "Whether to push to Docker HUB" 'false';
 defineEnvVar BUILDER MANDATORY "The builder of the image" '${AUTHOR}';
-defineEnvVar SETSQUARE_FLAVOR MANDATORY "The flavor of set-square" "";
+defineEnvVar SETSQUARE_FLAVOR MANDATORY "The flavor of set-square" "phusion";
 defineEnvVar INCLUDES_FOLDER MANDATORY "The folder where 'include' files are located" "./.templates";
 defineEnvVar ROOT_IMAGE_VERSION MANDATORY "The root image version" "0.11";
 defineEnvVar ROOT_IMAGE MANDATORY "The default root image" "phusion/baseimage"
