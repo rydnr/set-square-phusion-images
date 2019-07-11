@@ -3,8 +3,6 @@
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-DW.import command;
-
 ## Updates the system via apt-get update
 ## <- 0 if the system gets updated; 1 otherwise.
 ## Example:
@@ -44,7 +42,7 @@ function check_packages_file_writable() {
 ## Example:
 ##   if no_pin_enabled; then [..]; fi
 function no_pin_enabled() {
-  flagEnabled NO_PIN;
+  _flagEnabled NO_PIN;
 }
 
 ## Installs a package.
@@ -83,12 +81,12 @@ function install_package() {
 function pin_package() {
   local _package="${1}";
   logInfo -n "Pinning ${_package}";
-  ${PIN_PACKAGE} ${_package} > /dev/null 2>&1
+  ${HOLD_PACKAGE} ${_package} > /dev/null 2>&1
   if isTrue $?; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
-    exitWithErrorCode ERROR_PINNING_PACKAGE "${_package} ($(${PIN_PACKAGE} ${_package}))";
+    exitWithErrorCode ERROR_PINNING_PACKAGE "${_package} ($(${HOLD_PACKAGE} ${_package}))";
   fi
 }
 
@@ -123,6 +121,10 @@ function main() {
   local _package;
   local _oldIFS="${IFS}";
 
+  if isTrue ${UPDATE} || isUbuntuAptCacheMissing; then
+    update_system;
+  fi
+
   check_packages_file_writable;
 
   IFS="${DWIFS}";
@@ -142,6 +144,7 @@ setScriptDescription "Installs packages via apt-get, so that their impact in the
 overall image size is better. It requires the Dockerfile to install
 packages using this script, and afterwards call aptget-cleanup.sh
 to remove unnecessary dependencies.";
+addCommandLineFlag "update" "u" "Update the system before installing anything" OPTIONAL NO_ARGUMENT "false";
 addCommandLineFlag "no-pin" "np" "Do not pin the package" OPTIONAL NO_ARGUMENT "false";
 
 addCommandLineParameter "packages" "The package(s) to install" MANDATORY MULTIPLE;
@@ -152,9 +155,7 @@ function dw_parse_packages_cli_parameter() {
 
 addError "INVALID_OPTION" "Unrecognized option";
 addError "APTGET_NOT_INSTALLED" "apt-get not found";
-checkReq apt-get APTGET_NOT_INSTALLED;
 addError "APTMARK_NOT_INSTALLED" "apt-mark not found";
-checkReq apt-mark APTMARK_NOT_INSTALLED;
 addError "NO_PACKAGES_SPECIFIED" "No packages specified";
 addError "CANNOT_WRITE_TO_INSTALLED_PACKAGES_FILE" 'Cannot write to ';
 addError "ERROR_INSTALLING_PACKAGE" "Error installing ";

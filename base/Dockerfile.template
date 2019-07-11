@@ -8,6 +8,7 @@ FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 
 # Housekeeping
+@include("dry-wit")
 @include("install")
 @include("syslog")
 @include("rsyslog")

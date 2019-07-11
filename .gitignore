@@ -16,8 +16,10 @@ base/create_ssl_certificate.inc.sh
 base/create-ssl-certificate.inc.sh
 base/create-ssl-certificate-openssl.inc.sh
 base/dry-wit
+base/dry-wit-files
 base/exim.00_local_macros
 base/help-files
+base/install-files
 base/logger
 base/monit-files
 base/monit-mail.conf.template
@@ -70,7 +72,6 @@ grails/setup.sql
 graphite/local_settings.py
 **/gui-files
 */help
-**/install-files
 java/41_create_ssl_certificate_keytool.inc.sh
 */java-files
 java/my_exec
@@ -206,6 +207,7 @@ sdkman/setup.sql
 .templates/image_user
 .templates/install
 .templates/instructions
+.templates/java
 .templates/jenkins
 .templates/kibana
 .templates/letsencrypt
