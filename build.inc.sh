@@ -1,3 +1,4 @@
+defineEnvVar REGISTRY MANDATORY "cloud.docker.com";
 overrideEnvVar SETSQUARE_FLAVOR "phusion";
 overrideEnvVar LICENSE_FILE "LICENSE.gpl3";
 overrideEnvVar COPYRIGHT_PREAMBLE_FILE "copyright-preamble.gpl3";
