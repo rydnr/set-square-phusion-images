@@ -1,3 +1,2 @@
-defineEnvVar DOCKERFILES_LOCATION \
-             "The folder containing the dockerfiles" \
-             "/Dockerfiles";
+defineEnvVar DOCKERFILES_LOCATION MANDATORY "The folder containing the dockerfiles" "/Dockerfiles";
+#

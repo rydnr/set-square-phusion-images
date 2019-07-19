@@ -2,96 +2,19 @@
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2016-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Changes the ownership of all declared volumes.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-    esac
-  done
-}
-
-## Changes the ownership of a Docker volume specification.
-## -> 1: The user.
-## -> 2: The group.
-## -> 3: The volume folder.
-## <- 0/${TRUE} if all volumes are processed successfully; 1/${FALSE} otherwise.
-## <- ERROR: The error message, if any.
-## Example:
-##   if chown_volume mysql mysql /var/lib/mysql; then
-##     echo "Permissions on /var/lib/mysql changed successfully";
-##   fi
+# fun: chown_volume
+# api: public
+# txt: Changes the ownership of a Docker volume specification.
+# opt: user: The user.
+# opt: group: The group.
+# opt: folder: The volume folder.
+# txt: Returns 0/TRUE if all volumes are processed successfully; 1/FALSE otherwise.
+# use: if chown_volume mysql mysql /var/lib/mysql; then echo "Permissions on /var/lib/mysql changed successfully"; fi
 function chown_volume() {
   local _user="${1}";
   local _group="${2}";
   local _volume="${3}";
-  local _rescode=${TRUE};
+  local -i _rescode=${TRUE};
   local _single;
   local _item;
   local _oldIFS;
@@ -118,6 +41,7 @@ function chown_volume() {
     _oldIFS="${IFS}";
     IFS='"';
     for _item in $(echo ${_volume} | tr -d '[],'); do
+      IFS="${_oldIFS}";
       _item="$(echo ${_item} | sed 's ^"  g' | sed 's "$  g')";
       chown -R ${_user}:${_group} "${_item}";
       _aux=$?;
@@ -133,12 +57,14 @@ function chown_volume() {
   return ${_rescode};
 }
 
-## Processes the volumes from a given Dockerfile.
-## -> 1: the user.
-## -> 2: the group.
-## -> 3: the Dockerfile.
-## Example:
-##   process_volumes mysql mysql /Dockerfiles/Dockerfile
+# fun: process_volumes
+# api: public
+# txt: Processes the volumes from a given Dockerfile.
+# opt: user: The user.
+# opt: group: The group.
+# opt: dockerfile: The Dockerfile.
+# txt: Returns 0/TRUE always.
+# use: process_volumes mysql mysql /Dockerfiles/Dockerfile
 function process_volumes() {
   local _user="${1}";
   local _group="${2}";
@@ -160,17 +86,22 @@ function process_volumes() {
       for _aux in ${_volumes}; do
         IFS=$' ';
         for _entry in ${_aux}; do
+          IFS="${_oldIFS}";
           logInfo -n "Changing the ownership of ${_entry} to ${_user}/${_group} (from ${DOCKERFILES_LOCATION}/${p})";
           chown_volume "${_user}" "${_group}" "${_entry}";
           logInfoResult SUCCESS "done";
         done
+        IFS="${_oldIFS}";
       done
       IFS="${_oldIFS}";
   fi
 }
 
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt:  Main logic
+# txt: Returns 0/TRUE always.
+# use: main
 function main() {
   local _user="${SERVICE_USER}";
   if isEmpty "${SERVICE_USER}"; then
@@ -187,3 +118,6 @@ function main() {
   done
 }
 
+## Script metadata and CLI settings.
+
+setScriptDescription "Changes the ownership of all declared volumes."
