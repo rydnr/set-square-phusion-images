@@ -10,7 +10,7 @@ ENV DOBACKUP="true" \
 @include("service_user")
 #@include("create_ssl_certificate")
 @include("mongodb")
-#@include("filebeat")
+@include("filebeat")
 
 COPY mongodb-files/service /etc/service/mongodb/run
 

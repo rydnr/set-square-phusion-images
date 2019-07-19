@@ -1,4 +1,4 @@
-defineButDoNotOverrideEnvVar MONGODB_MAJOR_VERSION "The mongodb major version" "3.4";
-defineButDoNotOverrideEnvVar MONGODB_VERSION "The mongodb version" '${MONGODB_MAJOR_VERSION}.8';
+defineButDoNotOverrideEnvVar MONGODB_MAJOR_VERSION "The mongodb major version" "4";
+defineButDoNotOverrideEnvVar MONGODB_VERSION "The mongodb version" '${MONGODB_MAJOR_VERSION}.0';
 defineButDoNotOverrideEnvVar REPLICA_SET_NAME "The name of the replica set" '${NAMESPACE}';
-echo -n ''
+#

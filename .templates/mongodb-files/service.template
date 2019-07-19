@@ -26,3 +26,4 @@ else
   echo "Launching MongoDB to accept bootstrapping via cron"
   exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} -- /backup/mongodb/db /usr/bin/mongod --config /etc/mongod.conf --master $@
 fi
+#
