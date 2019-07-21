@@ -33,4 +33,4 @@ defineEnvVar BACKUP_HOST_SSH_PORT MANDATORY \
 defineEnvVar INVALID_PATCHES MANDATORY \
              "Patches that are invalid for some reason" \
              "resources/sql/autopatches/20161026.calendar.01.importtriggers.sql";
-
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -7,4 +7,4 @@ defineEnvVar SERVICE_GROUP MANDATORY "The service group" "pharo";
 defineEnvVar SERVICE_USER_HOME MANDATORY "The home of the service user" "/home/pharo";
 defineEnvVar SERVICE_USER_SHELL MANDATORY "The shell of the service user" "/bin/bash";
 defineEnvVar WORKSPACE MANDATORY "The workspace folder" '${SERVICE_USER_HOME}/work';
-#
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

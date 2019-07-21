@@ -9,4 +9,4 @@ defineEnvVar SERVICE_USER_SHELL MANDATORY "The shell of ElasticSearch user" "/bi
 defineEnvVar LOGSTASH_INPUT_PLUGINS MANDATORY "The space-separated list of Logstash input plugins" "logstash-input-stdin";
 defineEnvVar LOGSTASH_FILTER_PLUGINS MANDATORY "The space-separated list of Logstash filter plugins" "logstash-filter-grok logstash-filter-date logstash-filter-json";
 defineEnvVar LOGSTASH_OUTPUT_PLUGINS MANDATORY "The space-separated list of Logstash output plugins" "logstash-output-elasticsearch logstash-output-stdout";
-#
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

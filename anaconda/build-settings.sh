@@ -8,4 +8,4 @@ defineEnvVar SERVICE_USER MANDATORY "The Anaconda user" "anaconda";
 defineEnvVar SERVICE_GROUP MANDATORY "The Anaconda group" "anaconda";
 defineEnvVar SERVICE_USER_HOME MANDATORY "The home of Anaconda user" "/work/anaconda";
 defineEnvVar SERVICE_USER_SHELL MANDATORY "The shell of Anaconda user" "/bin/bash";
-#
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

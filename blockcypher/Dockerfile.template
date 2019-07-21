@@ -1,0 +1,38 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="true"
+
+@include("service_user")
+@include("python")
+@include("git")
+@include("service")
+
+RUN ${APTGET_INSTALL} postgresql libpq-dev ngrok-client ngrok-server && \
+    rm -rf /opt/blockcypher && \
+    cd /opt/ && git clone https://github.com/blockcypher/explorer.git blockcypher && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/blockcypher && \
+    virtualenv -p python3 venv && \
+    source venv/bin/activate && \
+    pip3 install -r requirements.txt
+    
+COPY dotenv /opt/blockcypher/.env
+
+USER ${SERVICE_USER}
+RUN   cd /opt/blockcypher && git checkout ${BLOCKCYPHER_VERSION} && \
+      npm install && \
+      gulp stylus && \
+      cd app && bower install
+
+USER root
+
+VOLUME [ "/backup/${IMAGE}/data" ]
+
+EXPOSE 80
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
