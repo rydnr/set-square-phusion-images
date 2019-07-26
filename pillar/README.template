@@ -1,0 +1,8 @@
+# Pillar
+
+This image runs Pillar.
+
+You'll need to mount the folder with the Pillar content so it can be accessed by the Docker container.
+
+docker run -it --rm -v [pillar-content]:${SERVICE_USER_HOME} ${NAMESPACE}/${IMAGE}:${TAG} [pillar-opts]
+

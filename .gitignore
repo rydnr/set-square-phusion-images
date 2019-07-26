@@ -147,6 +147,7 @@ pharo-launcher/service
 pharo/service
 phppgadmin/apache-files
 phppgadmin/apache-vhost.conf
+*/pillar-files
 plone3/default.cfg
 plone3/service
 plone5/default.cfg
