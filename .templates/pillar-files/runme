@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd ${SERVICE_USER_HOME}
+/opt/pillar/pillar $@
+#

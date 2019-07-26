@@ -6,7 +6,7 @@ RUN dpkg --add-architecture i386 && \
     ([ -d /opt ] || mkdir /opt) && \
     mkdir /opt/pharo${PHARO_MAJOR_VERSION} && \
     cd /opt/pharo${PHARO_MAJOR_VERSION} && \
-    curl get.pharo.org/64/vmT${PHARO_VERSION_ZEROCONF} | bash && \
+    curl get.pharo.org/vmT${PHARO_VERSION_ZEROCONF} | bash && \
     cd /opt && ln -s pharo${PHARO_MAJOR_VERSION} pharo && \
     cd /opt/pharo/pharo-vm/lib/pharo/5.0-201901051900 && \
     wget https://files.pharo.org/sources/PharoV60.sources && \
