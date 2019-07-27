@@ -237,9 +237,11 @@ sdkman/setup.sql
 .templates/pencil
 .templates/phabricator
 .templates/pharo
+.templates/pharo32b
 .templates/pharo6
 .templates/pharo-launcher
 .templates/pika
+.templates/pillar
 .templates/pip
 .templates/pip
 .templates/plone5

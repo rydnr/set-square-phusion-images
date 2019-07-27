@@ -6,7 +6,6 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("service_user")
 @include("pharo32b")
 @include("pillar")
-@include("runme")
 
 RUN rm -f /sbin/my_exec && ln -s /etc/service/pharo/run /sbin/my_exec
 
