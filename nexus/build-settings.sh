@@ -1,5 +1,5 @@
 defineEnvVar PARENT_IMAGE_TAG MANDATORY "The version of the parent image" "0.11";
-defineEnvVar NEXUS_VERSION MANDATORY "The version of Sonatype Nexus" "3.13.0-01";
+defineEnvVar NEXUS_VERSION MANDATORY "The version of Sonatype Nexus" "3.18.0-01";
 defineEnvVar TAG MANDATORY "The image tag" '${NEXUS_VERSION}';
 defineEnvVar NEXUS_ARTIFACT MANDATORY "The Nexus artifact" 'nexus-${NEXUS_VERSION}-unix.tar.gz';
 defineEnvVar NEXUS_DOWNLOAD_URL MANDATORY "The url to download Nexus from" 'https://download.sonatype.com/nexus/3/${NEXUS_ARTIFACT}';
