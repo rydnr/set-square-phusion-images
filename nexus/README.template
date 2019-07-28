@@ -20,7 +20,7 @@ Examples:
 # Backup
 
 The built-in backup mechanism copies regularly the contents of /backup/${IMAGE}-* and /backup/rsnapshot to a remote server ${IMAGE}${BACKUP_HOST_SUFFIX},
-which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT).
+which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH_PORT}.
 
 ## Preparation
 
@@ -37,6 +37,8 @@ In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as 
 > docker run -d --name nginx -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock:ro jwilder/nginx-proxy
 
 ## Launching Nexus
+
+The VIRTUAL_HOST variable is used by nginx-proxy to auto-configure virtual hosting.
 
 > docker run -d -p 443:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -e VIRTUAL_HOST=${VIRTUAL_HOST} -e VIRTUAL_PORT=${NEXUS_UI_HTTP_PORT} -v ${_rootFolder}/${IMAGE}/conf:/backup/${IMAGE}-conf -v ${_rootFolder}/${IMAGE}/blobs:/backup/${IMAGE}-blobs -v ${_rootFolder}/${IMAGE}/db:/backup/${IMAGE}-db -v ${_rootFolder}/rsnapshot:/backup/${IMAGE}-rsnapshot ${NAMESPACE}/${IMAGE}:${TAG}
 

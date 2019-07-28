@@ -1,6 +1,6 @@
 defineEnvVar PARENT_IMAGE_TAG MANDATORY "The version of the parent image" "0.11";
 defineEnvVar NEXUS_VERSION MANDATORY "The version of Sonatype Nexus" "3.18.0-01";
-defineEnvVar TAG MANDATORY "The image tag" '${NEXUS_VERSION}';
+overrideEnvVar TAG "${NEXUS_VERSION}";
 defineEnvVar NEXUS_ARTIFACT MANDATORY "The Nexus artifact" 'nexus-${NEXUS_VERSION}-unix.tar.gz';
 defineEnvVar NEXUS_DOWNLOAD_URL MANDATORY "The url to download Nexus from" 'https://download.sonatype.com/nexus/3/${NEXUS_ARTIFACT}';
 defineEnvVar NEXUS_MIN_MEMORY MANDATORY "The minimal memory setting for Nexus" "1024m";
@@ -16,5 +16,6 @@ defineEnvVar SERVICE_USER MANDATORY "The service user" "nexus";
 defineEnvVar SERVICE_GROUP MANDATORY "The service group" "nexus";
 defineEnvVar SERVICE_USER_HOME MANDATORY 'The home of the ${SERVICE_USER} user' '${NEXUS_WORK_FOLDER}';
 defineEnvVar SERVICE_USER_SHELL MANDATORY 'The shell of the ${SERVICE_USER} user' '/bin/bash';
+defineEnvVar SERVICE_USER_PASSWORD MANDATORY 'The password of the ${SERVICE_USER} user' 'aoumlk]{(pk/3{';
 overrideEnvVar ENABLE_LOGSTASH MANDATORY "true";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
