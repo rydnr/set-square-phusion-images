@@ -124,20 +124,6 @@ if isEmpty "${DOLLAR}{SSL_CERTIFICATE_COUNTRY}"; then
     defineEnvVar SSL_CERTIFICATE_COUNTRY "The country information in the SSL certificate" "${SQ_SSL_CERTIFICATE_COUNTRY}";
   fi
 fi
-if isEmpty "${DOLLAR}{SSL_CERTIFICATE_SUBJECT}"; then
-  if isEmpty "${DOLLAR}{SQ_SSL_CERTIFICATE_SUBJECT}"; then
-    defineEnvVar SSL_CERTIFICATE_SUBJECT "The subject of the SSL certificate" "${SSL_CERTIFICATE_SUBJECT}";
-  else
-    defineEnvVar SSL_CERTIFICATE_SUBJECT "The subject of the SSL certificate" "${SQ_SSL_CERTIFICATE_SUBJECT}";
-  fi
-fi
-if isEmpty "${DOLLAR}{SSL_CERTIFICATE_DNAME}"; then
-  if isEmpty "${DOLLAR}{SSL_CERTIFICATE_DNAME}"; then
-    defineEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" "${SSL_CERTIFICATE_DNAME}";
-  else
-    defineEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" "${SQ_SSL_CERTIFICATE_DNAME}";
-  fi
-fi
 if isEmpty "${DOLLAR}{SSL_CERTIFICATE_EXPIRATION_DAYS}"; then
   if isEmpty "${DOLLAR}{SQ_SSL_CERTIFICATE_EXPIRATION_DAYS}"; then
     defineEnvVar SSL_CERTIFICATE_EXPIRATION_DAYS "The number of days until the certificate expires" "${SSL_CERTIFICATE_EXPIRATION_DAYS}";
@@ -160,3 +146,21 @@ if isEmpty "${DOLLAR}{SSL_SAN_EXTENSIONS}"; then
   fi
 fi
 
+export SQ_SSL_CERTIFICATE_SUBJECT="/C=${SSL_CERTIFICATE_COUNTRY}/ST=${SSL_CERTIFICATE_STATE}/L=${SSL_CERTIFICATE_LOCALITY}/O=${SSL_CERTIFICATE_ORGANIZATION}/OU=${SSL_CERTIFICATE_ORGANIZATIONAL_UNIT}/CN=${SSL_CERTIFICATE_COMMON_NAME}";
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_SUBJECT}"; then
+  if isEmpty "${DOLLAR}{SQ_SSL_CERTIFICATE_SUBJECT}"; then
+    defineEnvVar SSL_CERTIFICATE_SUBJECT "The subject of the SSL certificate" "${SSL_CERTIFICATE_SUBJECT}";
+  else
+    defineEnvVar SSL_CERTIFICATE_SUBJECT "The subject of the SSL certificate" "${SQ_SSL_CERTIFICATE_SUBJECT}";
+  fi
+fi
+
+export SQ_SSL_CERTIFICATE_DNAME='CN=${SSL_CERTIFICATE_WILDCARD_COMMON_NAME}, OU=${SSL_CERTIFICATE_ORGANIZATIONAL_UNIT}, O=${SSL_CERTIFICATE_ORGANIZATION}, L=${SSL_CERTIFICATE_LOCALITY}, S=${SSL_CERTIFICATE_STATE}, C=${SSL_CERTIFICATE_COUNTRY}';
+if isEmpty "${DOLLAR}{SSL_CERTIFICATE_DNAME}"; then
+  if isEmpty "${DOLLAR}{SSL_CERTIFICATE_DNAME}"; then
+    defineEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" "${SSL_CERTIFICATE_DNAME}";
+  else
+    defineEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" "${SQ_SSL_CERTIFICATE_DNAME}";
+  fi
+fi
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
