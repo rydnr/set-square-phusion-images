@@ -6,10 +6,11 @@ You can provide yours when launching the image, by volume-mounting
 
 Examples:
 - Default invocation:
-> docker run -d -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/conf:/backup/${IMAGE}/conf -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/blobs:/backup/${IMAGE}/blobs -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/db:/backup/${IMAGE}/db --name ${IMAGE} ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/conf:/backup/${IMAGE}/conf -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/blobs:/backup/${IMAGE}/blobs -v ${HOST_VOLUMES_ROOT_FOLDER}/${IMAGE}/db:/backup/${IMAGE}/db --name ${NEXUS_DEFAULT_VIRTUAL_HOST} ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Run Nexus, using a data container to store its persistent data (which declares /backup/${IMAGE}-* as volumes):
-> docker run -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT}  --volumes-from [data-container] ${NAMESPACE}/${IMAGE}:${TAG}
+
+> docker run -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -p ${NEXUS_UI_HTTPS_PORT}:${NEXUS_UI_HTTPS_PORT} -p ${NEXUS_DOCKER_REGISTRY_PORT}:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} --volumes-from [data-container] ${NAMESPACE}/${IMAGE}:${TAG}
 
 - To customize how Logstash processes Nexus logs:
 > docker run .. -v [my-logstash-conf]:/etc/logstash/conf.d/${IMAGE}.conf ..
@@ -24,13 +25,21 @@ which is expected to be running a SSH server listening at port ${BACKUP_HOST_SSH
 
 ## Preparation
 
+Choose a root folder to contain all data stored in Nexus. We'll use this variable extensively.
+
+> export ROOT_FOLDER=${HOME}/${NEXUS_DEFAULT_VIRTUAL_HOST}-data
+
 In the host where Nexus will be running, create a folder to store all persistent information:
 
-> mkdir -p ${_rootFolder}/${IMAGE}/conf ${_rootFolder}/${IMAGE}/blobs ${_rootFolder}/${IMAGE}/db ${_rootFolder}/rsnapshot
+> mkdir -p ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/conf ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/blobs ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/db ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/rsnapshot
+
+Optionally, use a data container to simplify the access to the persistent data:
+
+> docker run --name ${NEXUS_DEFAULT_VIRTUAL_HOST}-data -d -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/conf:/backup/${IMAGE}-conf -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/blobs:/backup/${IMAGE}-blobs -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/db:/backup/${IMAGE}-db -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/rsnapshot:/backup/${IMAGE}-rsnapshot acmsl-phusion/data:latest
 
 In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows (adapt this _rootFolder accordingly):
 
-> docker run -d --name ${IMAGE}-backup -v ${_rootFolder}/${IMAGE}/blobs:/backup/${IMAGE}-blobs -v ${_rootFolder}/${IMAGE}/conf:/backup/${IMAGE}-conf -v ${_rootFolder}/${IMAGE}/db:/backup/${IMAGE}-db -v ${_rootFolder}/${IMAGE}/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+> docker run -d --name ${NEXUS_DEFAULT_VIRTUAL_HOST}-backup -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/blobs:/backup/${IMAGE}-blobs -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/conf:/backup/${IMAGE}-conf -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/db:/backup/${IMAGE}-db -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
 
 ## Launching nginx-proxy
 
@@ -40,7 +49,11 @@ In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as 
 
 The VIRTUAL_HOST variable is used by nginx-proxy to auto-configure virtual hosting.
 
-> docker run -d -p 443:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -e VIRTUAL_HOST=${VIRTUAL_HOST} -e VIRTUAL_PORT=${NEXUS_UI_HTTP_PORT} -v ${_rootFolder}/${IMAGE}/conf:/backup/${IMAGE}-conf -v ${_rootFolder}/${IMAGE}/blobs:/backup/${IMAGE}-blobs -v ${_rootFolder}/${IMAGE}/db:/backup/${IMAGE}-db -v ${_rootFolder}/rsnapshot:/backup/${IMAGE}-rsnapshot ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p 443:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -e VIRTUAL_HOST=${NEXUS_DEFAULT_VIRTUAL_HOST} -e VIRTUAL_PORT=${NEXUS_UI_HTTP_PORT} -v ${ROOT_FOLDER}/${IMAGE}/conf:/backup/${IMAGE}-conf -v ${ROOT_FOLDER}/${IMAGE}/blobs:/backup/${IMAGE}-blobs -v ${ROOT_FOLDER}/${IMAGE}/db:/backup/${IMAGE}-db -v ${ROOT_FOLDER}/rsnapshot:/backup/${IMAGE}-rsnapshot ${NAMESPACE}/${IMAGE}:${TAG}
+
+If you created the data-container previously, launch Nexus with:
+
+> docker run -d -p 443:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -e VIRTUAL_HOST=${NEXUS_DEFAULT_VIRTUAL_HOST} -e VIRTUAL_PORT=${NEXUS_UI_HTTP_PORT} --volumes-from ${NEXUS_DEFAULT_VIRTUAL_HOST}-data ${NAMESPACE}/${IMAGE}:${TAG}
 
 ## Configuration
 
@@ -79,7 +92,7 @@ Go to Components.
 ## Recovery
 
 The recovery process, once the original Nexus instance is shutdown, consists of:
-- Copying the contents of ${_rootFolder}/${IMAGE}/blobs, ${_rootFolder}/${IMAGE}/conf, ${_rootFolder}/nexus/db, and ${_rootFolder}/rsnapshot to the server where Nexus will run.
+- Copying the contents of ${ROOT_FOLDER}/${IMAGE}/blobs, ${ROOT_FOLDER}/${IMAGE}/conf, ${ROOT_FOLDER}/nexus/db, and ${ROOT_FOLDER}/rsnapshot to the server where Nexus will run.
 - Launch a new container as defined in this document, binding the volumes of the container to the host folders.
 
 ## Important notice
