@@ -96,7 +96,6 @@ defineEnvVar SSL_KEY_PASSWORD MANDATORY "The key password" 'K8emqG04hZKlOUY3rET1
 defineEnvVar SSL_CERTIFICATE_ORGANIZATIONAL_UNIT MANDATORY "The organizational unit for the SSL certificate" "IT";
 defineEnvVar SSL_CERTIFICATE_ORGANIZATION MANDATORY "The organization behind the SSL certificate" '${DOMAIN}';
 defineEnvVar SSL_CERTIFICATE_ALIAS MANDATORY "The certificate alias" '${IMAGE}';
-defineEnvVar SSL_CERTIFICATE_SUBJECT MANDATORY "The certificate subject" '/cn=${DOMAIN}';
 
 defineEnvVar SSL_CERTIFICATE_STATE MANDATORY "The state information in the SSL certificate" "Madrid";
 defineEnvVar SSL_CERTIFICATE_COUNTRY MANDATORY "The country information in the SSL certificate" "ES";
