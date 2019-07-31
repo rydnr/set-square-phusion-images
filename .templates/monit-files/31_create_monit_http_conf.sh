@@ -1,101 +1,17 @@
 #!/bin/bash dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
+# mod: monit/31_create_monit_http_conf
+# api: public
+# txt: Creates Monit configuration to enable the web interface.
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
+DW.import net;
 
-Creates Monit configuration to enable the web interface.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -X:e | --X:eval-defaults: whether to eval all default values, which potentially slows down the script unnecessarily.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-## Defines the requirements
-## dry-wit hook
-function defineReq() {
-  checkReq cut;
-  checkReq grep;
-  checkReq awk;
-  checkReq ifconfig;
-  checkReq tr;
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-  addError "CUT_NOT_INSTALLED" "cut is not installed";
-  addError "GREP_NOT_INSTALLED" "grep not installed";
-  addError "AWK_NOT_INSTALLED" "awk not installed";
-  addError "IFCONFIG_NOT_INSTALLED" "ifconfig not installed";
-  addError "TR_NOT_INSTALLED" "tr not installed";
-  addError "CANNOT_RETRIEVE_INTERFACE_NAME" "Cannot retrieve the interface name";
-  addError "CANNOT_RETRIEVE_SUBNET_24_FOR_IFACE" "Cannot retrieve the /24 subnet";
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q | --quiet | -X:e | --X:eval-defaults)
-         shift;
-         ;;
-      --) shift;
-          break;
-          ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q | -X:e | --X:eval-defaults)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-    esac
-  done
-}
-
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt: Creates Monit configuration to enable the web interface.
+# txt: Returns 0/TRUE always.
+# use: main
 function main() {
   local _iface;
   local _subnet;
@@ -144,9 +60,8 @@ EOF
   fi
 }
 
-
-
-
-
-
-
+## Script metadata and CLI options
+setScriptDescription "Creates Monit configuration to enable the web interface";
+addError CANNOT_RETRIEVE_INTERFACE_NAME "Cannot retrieve the interface name";
+addError CANNOT_RETRIEVE_SUBNET_24_FOR_IFACE "Cannot retrieve the /24 subnet";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

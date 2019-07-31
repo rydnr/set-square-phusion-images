@@ -1,3 +1,4 @@
 #!/bin/bash
 
 SERVICE_USER=root SERVICE_GROUP=root SSL_CERTIFICATE_ALIAS=monit-${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
