@@ -29,7 +29,7 @@ Choose a root folder to contain all data stored in Nexus. We'll use this variabl
 
 > export ROOT_FOLDER=${HOME}/${NEXUS_DEFAULT_VIRTUAL_HOST}-data
 
-In the host where Nexus will be running, create a folder to store all persistent information:
+Create a folder to store all persistent information both in the host where Nexus will be running, and in the backup host (if you use such approach):
 
 > mkdir -p ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/conf ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/blobs ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/db ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/rsnapshot
 
@@ -37,9 +37,13 @@ Optionally, use a data container to simplify the access to the persistent data:
 
 > docker run --name ${NEXUS_DEFAULT_VIRTUAL_HOST}-data -d -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/conf:/backup/${IMAGE}-conf -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/blobs:/backup/${IMAGE}-blobs -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/db:/backup/${IMAGE}-db -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/rsnapshot:/backup/${IMAGE}-rsnapshot acmsl-phusion/data:latest
 
-In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows (adapt this _rootFolder accordingly):
+In the host at ${IMAGE}${BACKUP_HOST_SUFFIX}, launch another Nexus container as follows:
 
 > docker run -d --name ${NEXUS_DEFAULT_VIRTUAL_HOST}-backup -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/blobs:/backup/${IMAGE}-blobs -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/conf:/backup/${IMAGE}-conf -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/db:/backup/${IMAGE}-db -v ${ROOT_FOLDER}/${NEXUS_DEFAULT_VIRTUAL_HOST}/rsnapshot:/backup/rsnapshot ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
+
+Alternatively, if you chose to use a data container,
+
+> docker run -d --name ${NEXUS_DEFAULT_VIRTUAL_HOST}-backup --volumes-from ${NEXUS_DEFAULT_VIRTUAL_HOST}-data ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG} backup
 
 ## Launching nginx-proxy
 
