@@ -70,6 +70,6 @@ addError CANNOT_GENERATE_SSL_CERTIFICATE "Cannot generate the SSL certificate";
 addError CANNOT_SIGN_SSL_CERTIFICATE "Cannot sign the SSL certificate";
 addError CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS "Cannot update the permissions of ${SSL_KEY_FOLDER}";
 addError CANNOT_UPDATE_SSL_KEY_PERMISSIONS "Cannot update the permissions of the generated key file in ${SSL_KEY_FOLDER}";
-defineEnvVar SERVICE_USER MANDATORY "${SQ_SERVICE_USER}";
-defineEnvVar SERVICE_GROUP MANDATORY "${SQ_SERVICE_GROUP}";
+defineButDoNotOverrideEnvVar SERVICE_USER "The name of the service user" "${SQ_SERVICE_USER}";
+defineButDoNotOverrideEnvVar SERVICE_GROUP "The name of the service group" "${SQ_SERVICE_GROUP}";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
