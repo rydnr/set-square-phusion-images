@@ -20,7 +20,7 @@ function main() {
   IFS=$' ';
   for _d in ${DOCKERFILES_LOCATION}/*; do
     IFS="${_oldIFS}";
-    if extractPortsFromDockerfile "${_d}"; then
+    if retrievePortsFromDockerfile "${_d}"; then
       _ports="${_ports} $(echo ${RESULT} | tr "\n" " ")";
     fi
   done
