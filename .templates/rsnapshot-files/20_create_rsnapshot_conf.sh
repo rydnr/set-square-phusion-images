@@ -80,7 +80,7 @@ function extract_volumes() {
   checkNotEmpty dockerfile "${_dockerfile}" 1;
 
   IFS="${DWIFS}";
-  for _aux in $(grep VOLUME "${_dockerfile}" | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
+  for _aux in $(grep VOLUME "${_dockerfile}" | grep -v 'VOLUMES' | grep -v 'VOLUMEs' | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
     IFS="${_oldIFS}";
     if is_backup_volume "${_aux}"; then
       process_volume "${_aux}";
