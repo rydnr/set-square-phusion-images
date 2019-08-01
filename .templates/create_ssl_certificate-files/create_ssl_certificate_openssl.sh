@@ -70,11 +70,6 @@ addError CANNOT_GENERATE_SSL_CERTIFICATE "Cannot generate the SSL certificate";
 addError CANNOT_SIGN_SSL_CERTIFICATE "Cannot sign the SSL certificate";
 addError CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS "Cannot update the permissions of ${SSL_KEY_FOLDER}";
 addError CANNOT_UPDATE_SSL_KEY_PERMISSIONS "Cannot update the permissions of the generated key file in ${SSL_KEY_FOLDER}";
-addError SSL_CERTIFICATE_ALIAS_IS_MANDATORY "SSL_CERTIFICATE_ALIAS environment variable is mandatory";
-addError SSL_KEY_ENCRYPTION_IS_MANDATORY "SSL_KEY_ENCRYPTION environment variable is mandatory";
-addError SSL_KEY_PASSWORD_IS_MANDATORY "SSL_KEY_PASSWORD environment variable is mandatory";
-addError SSL_CERTIFICATE_SUBJECT_IS_MANDATORY "SSL_CERTIFICATE_SUBJECT environment variable is mandatory";
-addError SSL_KEY_FOLDER_IS_MANDATORY "SSL_KEY_FOLDER environment variable is mandatory";
-addError SERVICE_USER_IS_MANDATORY "SERVICE_USER environment variable is mandatory";
-addError SERVICE_GROUP_IS_MANDATORY "SERVICE_GROUP environment variable is mandatory";
+defineEnvVar SERVICE_USER MANDATORY "${SQ_SERVICE_USER}";
+defineEnvVar SERVICE_GROUP MANDATORY "${SQ_SERVICE_GROUP}";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
