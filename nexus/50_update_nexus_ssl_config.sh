@@ -48,7 +48,7 @@ function main() {
   fi
 
   logInfo -n "Updating TrustStorePath in ${JETTY_HTTPS_CONFIG_FILE}";
-  if updateTrustStorePathInJettyConf "${_keyStorePassword}" "${JETTY_HTTPS_CONFIG_FILE}"; then
+  if updateTrustStorePathInJettyConf "${SSL_KEYSTORE_PATH}" "${JETTY_HTTPS_CONFIG_FILE}"; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";

@@ -13,8 +13,8 @@ ENV DOBACKUP="true" \
 
 @include("create_ssl_certificate")
 @include("java")
-#@include("elk-common")
-#@include("logstash")
+@include("elk-common")
+@include("logstash")
 #@include("filebeat")
 @include("service")
 
