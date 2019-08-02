@@ -3,7 +3,7 @@ from ${ROOT_IMAGE}, and to provide a common
 style when writing Dockerfiles.
 
 This image also injects (and enables by default) rsnapshot [1],
-Monit [2] and cron  which can be configured specifically for any
+Monit [2] and cron which can be configured specifically for any
 child image.
 
 Examples:
