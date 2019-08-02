@@ -13,9 +13,9 @@ ENV DOBACKUP="true" \
 
 @include("create_ssl_certificate")
 @include("java")
-@include("elk-common")
-@include("logstash")
-@include("filebeat")
+#@include("elk-common")
+#@include("logstash")
+#@include("filebeat")
 @include("service")
 
 COPY INSTALL.tmpl /usr/local/share/INSTALL.tmpl
@@ -40,8 +40,7 @@ RUN chmod +x /etc/service/${IMAGE}/run && \
     chmod +x /etc/my_init.d/50_update_nexus_ssl_config.sh && \
     mkdir -p /opt/sonatype/nexus/etc/ssl && \
     ln -s /opt/sonatype/sonatype-work /sonatype-work && \
-    ln -s /etc/ssl/private/${IMAGE}.jks /opt/sonatype/nexus/etc/ssl/keystore.jks && \
-    ln -s /usr/local/bin/help.phabricator.sh /usr/local/bin/help.sh
+    ln -s /etc/ssl/private/${IMAGE}.jks /opt/sonatype/nexus/etc/ssl/keystore.jks
 
 VOLUME /backup/${IMAGE}/conf /backup/${IMAGE}/blobs /backup/${IMAGE}/db /backup/rsnapshot
 
