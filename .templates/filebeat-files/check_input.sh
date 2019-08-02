@@ -14,3 +14,4 @@ if [ ${_elasticSearchEnabled} -ne 0 ] && [ ${_logstashEnabled} -ne 0 ]; then
   echo "Neither ElasticSearch nor Logstash are enabled. Skipping filebeat"
   rm -rf /etc/service/filebeat
 fi
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

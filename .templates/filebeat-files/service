@@ -44,3 +44,4 @@ else
   #exec chpst -u filebeat filebeat -c /etc/filebeat/filebeat.yml $@
   exec filebeat -c /etc/filebeat/filebeat.yml $@
 fi
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
