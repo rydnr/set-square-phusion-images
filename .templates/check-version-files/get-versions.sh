@@ -1,21 +1,22 @@
-#!/bin/bash
+#!/bin/bash dry-wit
+# Copyright 2016-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+# mod: check-version/get-versions
+# api: public
+# txt: Retrieves the available versions of a package.
 
-set -e
+# fun: main
+# api: public
+# txt: Retrieves the available versions of a package.
+function main() {
+  cat <(apt-cache --recurse --no-pre-depends --no-recommends --no-suggests --no-enhances --no-conflicts --no-breaks --no-replaces depends $PKG) <(echo $PKG) | grep "^[a-z]" | xargs apt-cache show | grep ^Package | sed 's/^Package: \(.*\)/dpkg -l \1 | grep ^ii | awk "{print \\$2,\\$3}"/g' | sh 2>/dev/null | sed 's/\(.*\) \(.*\)/\1=\2/' | tr '\n' ' '
+}
 
-for c in apt-get apt-cache
-do
-	if [ $(which $c | wc -c) = 0 ]
-	then
-		echo "Could not find ${c} command on path. Is this a debian-based distro?"
-		exit 1
-	fi
-done
+## Script metadata and CLI options
+setScriptDescription "Retrieves the available versions of a package.";
 
-PKG=${1:?"please supply package name"}
+addCommandLineParameter "package" "The software package" MANDATORY SINGLE;
 
-apt-get install -y -q $PKG > /dev/null 2>&1
-
-cat <(apt-cache --recurse --no-pre-depends --no-recommends --no-suggests --no-enhances --no-conflicts --no-breaks --no-replaces depends $PKG) <(echo $PKG) | grep "^[a-z]" | xargs apt-cache show | grep ^Package | sed 's/^Package: \(.*\)/dpkg -l \1 | grep ^ii | awk "{print \\$2,\\$3}"/g' | sh 2>/dev/null | sed 's/\(.*\) \(.*\)/\1=\2/' | tr '\n' ' ' | sed 's/^/RUN apt-get install -y /g'
-
-echo ""
-
+checkReq apt-get;
+checkReq apt-cache;
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
