@@ -1,80 +1,37 @@
 #!/bin/bash dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
+# mod: backup/22_add_backup_host_to_etc_hosts
+# api: public
+# txt: Performs some tuning on rsync configuration, to avoid consuming too many resources.
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Performs some tuning on rsync configuration, to avoid consuming
-too many resources.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-    esac
-  done
-}
-
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt: Performs some tuning on rsync configuration, to avoid consuming too many resources.
+# txt: Returns 0/TRUE always, unless an error is thrown.
+# use: main
 function main() {
-  logInfo -n "Tuning ${RSYNC_CONF}";
+  logInfo -n "Updating RSYNC_NICE in ${RSYNC_CONF}";
   sed -i -e "s/^#\?\s*RSYNC_NICE=.*/RSYNC_NICE='${RSYNC_NICE}'/g" ${RSYNC_CONF};
+  if isTrue $?; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_REPLACE_RSYNC_NICE_IN_RSYNC_CONF "${RSYNC_CONF}";
+  fi
+
+  logInfo -n "Updating RSYNC_IONICE in ${RSYNC_CONF}";
   sed -i -e "s/^#\?\s*RSYNC_IONICE=.*/RSYNC_IONICE='${RSYNC_IONICE}'" ${RSYNC_CONF};
-  logInfoResult SUCCESS "done";
+  if isTrue $?; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode CANNOT_REPLACE_RSYNC_IONICE_IN_RSYNC_CONF "${RSYNC_CONF}";
+  fi
 }
+
+## Script metadata and CLI options
+setScriptDescription "Performs some tuning on rsync configuration, to avoid consuming too many resources.";
+addError CANNOT_REPLACE_RSYNC_NICE_IN_RSYNC_CONF "Could not replace RSYNC_NICE in ";
+addError CANNOT_REPLACE_RSYNC_IONICE_IN_RSYNC_CONF "Could not replace RSYNC_IONICE in ";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
