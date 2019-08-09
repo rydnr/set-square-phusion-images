@@ -47,7 +47,7 @@ Alternatively, if you chose to use a data container,
 
 ## Launching nginx-proxy
 
-> docker run -d --name nginx -p 80:80 -v /var/run/docker.sock:/var/run/docker.sock:ro jwilder/nginx-proxy
+> docker run -d --name nginx -p 80:80 -v /var/run/docker.sock:/tmp/docker.sock:ro jwilder/nginx-proxy
 
 ## Launching Nexus
 
@@ -57,19 +57,24 @@ The VIRTUAL_HOST variable is used by nginx-proxy to auto-configure virtual hosti
 
 If you created the data-container previously, launch Nexus with:
 
-> docker run -d -p 443:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -e VIRTUAL_HOST=${NEXUS_DEFAULT_VIRTUAL_HOST} -e VIRTUAL_PORT=${NEXUS_UI_HTTP_PORT} --volumes-from ${NEXUS_DEFAULT_VIRTUAL_HOST}-data ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d --name ${NEXUS_DEFAULT_VIRTUAL_HOST} -p 443:${NEXUS_DOCKER_REGISTRY_PORT} -p ${NEXUS_DOCKER_GROUP_PORT}:${NEXUS_DOCKER_GROUP_PORT} -p ${NEXUS_UI_HTTP_PORT}:${NEXUS_UI_HTTP_PORT} -e VIRTUAL_HOST=${NEXUS_DEFAULT_VIRTUAL_HOST} -e VIRTUAL_PORT=${NEXUS_UI_HTTP_PORT} --volumes-from ${NEXUS_DEFAULT_VIRTUAL_HOST}-data ${NAMESPACE}/${IMAGE}:${TAG}
 
 ## Configuration
 
+What follows assumes you're interested to use Nexus as a Docker registry for your private images.
+
 In the web interface, you'll need to create three groups: a proxy for Docker hub, a hosted group for in-house images, and a group containing them.
 
-To do so, assuming you have an nginx-proxy upfront (or the ${NEXUS_UI_HTTP_PORT} port is mapped to 80), first visit http://${VIRTUAL_HOST}. Then, login as admin/admin123.
+To do so, assuming you have an nginx-proxy upfront (or the ${NEXUS_UI_HTTP_PORT} port is mapped to 80), first visit http://${VIRTUAL_HOST}.
+The first thing you'll be asked for is the temporary password. You can see it as follows (or you can pipe it to xclip directly).
 
-Go to Components.
+> docker exec -it ${NEXUS_DEFAULT_VIRTUAL_HOST} cat /opt/sonatype/sonatype-work/nexus3/admin.password
+
+Follow the instructions to reset the admin password. Then, go to Components (the gear icon), and create the required repositories.
 
 ### Docker Hub
 
-- Create a new 'docker (proxy)'.
+- Create a new 'docker (proxy)' repository.
 - Use 'Docker-Hub-proxy' as name.
 - Specify https://registry-1.docker.io for the Remote storage URL.
 - Enable Docker V1 API support, if required by the remote repository.
@@ -78,7 +83,7 @@ Go to Components.
 
 ### In-house images
 
-- Create a new 'docker (hosted)'.
+- Create a new 'docker (hosted)' repository.
 - Name it as 'Docker-${NAMESPACE}-images'.
 - Enable the HTTPS connector, on port ${NEXUS_DOCKER_REGISTRY_PORT}.
 - Enable Docker v1 API support if required.
