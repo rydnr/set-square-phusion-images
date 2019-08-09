@@ -1,5 +1,5 @@
 defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "0.11";
-defineEnvVar ELASTICSEARCH_VERSION MANDATORY "The version of ElasticSearch" "7.2.0";
+defineEnvVar ELASTICSEARCH_VERSION MANDATORY "The version of ElasticSearch" "7.3.0";
 defineEnvVar ELASTICSEARCH_MAJOR_VERSION MANDATORY "The major version of ElasticSearch" "7";
 defineEnvVar TAG MANDATORY "The elasticsearch tag" '${ELASTICSEARCH_VERSION}';
 defineEnvVar SERVICE_USER MANDATORY "The ElasticSearch user" "elasticsearch";

@@ -44,5 +44,5 @@ for attr in $(export | grep NODE_ATTR | cut -d'=' -f 1 | tr '[:upper:]' '[:lower
   echo "${name}=${value}" >> ${_confFile}
 done
 
-exec /usr/local/bin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} /backup/elasticsearch/data elasticsearch $@
+exec /usr/local/sbin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} /backup/elasticsearch/data elasticsearch $@
 #exec chpst -u ${SERVICE_USER} elasticsearch $@
