@@ -18,7 +18,7 @@ function main() {
   local _key;
 
   logDebug -n "Checking SSL certificate for monit";
-  _key=$(find /etc/ssl/private/ -name 'monit-*.key');
+  _key="$(find /etc/ssl/private/ -name 'monit-*.key' | head -n 1)";
   if isEmpty "${_key}"; then
     logDebugResult FAILURE "failed";
   else
