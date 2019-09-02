@@ -1,0 +1,32 @@
+# PulseConnect client
+
+This image runs PulseConnect client to connect to PulseConnect VPNs.
+
+# Usage
+
+## Run the VPN client with the PulseUi tool.
+
+Requirements:
+- VPN_NAME: The name of the VPN.
+- VPN_BASEURL: The baseurl of the VPN.
+- VPN_REALM: The realm.
+- VPN_USER: The user to authenticate with the VPN.
+- VPN_PASSWORD: The password.
+- The path to the CA certificate.
+- The path to the certificate itself.
+
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> xhost +
+> docker run -it --rm --name ${IMAGE} \
+    -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH \
+    --net=host --cap-add NET_ADMIN --device /dev/net/tun:/dev/net/tun \
+    -v /etc/resolv.conf:/etc/resolv.conf \
+    -e VPN_NAME=example \
+    -e VPN_REALM=myRealm -e VPN_BASEURL=https://vpn.\${VPN_NAME}.com \
+    -e VPN_USER=myUser -e VPN_PASSWORD=myPassword \
+    -v theCaFile:/etc/ssl/vpn-ca.pem \
+    -v theCertFile:/etc/ssl/vpn-cert.pem \
+    ${NAMESPACE}/${IMAGE}:${TAG}
+#

@@ -1,0 +1,26 @@
+@include("preamble")
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="false"
+
+@include("service_user")
+
+@include("service")
+
+RUN chmod +x /etc/service/${IMAGE}/run && \
+  cd /var/tmp && wget ${PULSECONNECT_DOWNLOAD_URL} && \
+  ${SYSTEM_UPDATE} && \
+  ${PKG_INSTALL} clamav clamav-daemon libwebkitgtk-1.0-0 libproxy1v5 libproxy1-plugin-gsettings libproxy1-plugin-webkit libdconf1 libgnome-keyring0 dconf-gsettings-backend && \
+  dpkg -i ${PULSECONNECT_ARTIFACT} && \
+  ${SYSTEM_CLEANUP} && \
+  cd /usr/local/pulse && \
+  ./PulseClient_x86_64.sh install_dependency_packages && \
+  rm -f /var/tmp/${PULSECONNECT_ARTIFACT}
+
+@include("copy-metadata")
+@include("instructions")
+@include("symlinks")
+#

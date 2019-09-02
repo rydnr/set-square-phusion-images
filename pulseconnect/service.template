@@ -1,0 +1,21 @@
+#!/bin/bash
+
+nohup /usr/bin/freshclam -d --foreground=true &
+nohup /usr/sbin/clamd --foreground=true &
+
+mkdir -p ~/.pulse_secure/pulse
+
+cat <<EOF > ~/.pulse_secure/pulse/config
+host=${VPN_HOST}
+user=${VPN_USER}
+password=${VPN_PASSWORD}
+realm=${VPN_REALM}
+cafile=/etc/ssl/vpn-ca.pem
+certfile=/etc/ssl/vpn-cert.pem
+EOF
+
+cat <<EOF > ~/.pulse_secure/pulse/.pulse_Connections.txt
+{"connName": "${VPN_NAME}, "baseUrl": "${VPN_BASEURL}", "preferredCert": ""}
+EOF
+/usr/local/pulse/pulseUi
+#

@@ -163,6 +163,7 @@ postgresql/service
 postgresql/setup.sh
 postgresql/setup.sql
 prometheus/service
+pulseconnect/service
 rabbitmq/create_bootstrap_cron_job.sh
 rabbitmq-perf-test/service
 rabbitmq-publisher/rabbitmq-publisher.py
