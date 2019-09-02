@@ -1,4 +1,4 @@
-defineButDoNotOverrideEnvVar ELASTICSEARCH_VERSION "The version of ElasticSearch" "7.2.0";
+defineButDoNotOverrideEnvVar ELASTICSEARCH_VERSION "The version of ElasticSearch" "7.3.0";
 defineButDoNotOverrideEnvVar ELASTICSEARCH_MAJOR_VERSION "The major version of ElasticSearch" "7";
 #defineButDoNotOverrideEnvVar ELASTICSEARCH_HOME "The home folder of ElasticSearch" "/usr/share/elasticsearch";
 defineButDoNotOverrideEnvVar ELASTICSEARCH_HOME "The home folder of ElasticSearch" "/opt/elasticsearch";

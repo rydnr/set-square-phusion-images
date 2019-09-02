@@ -1,98 +1,26 @@
 #!/bin/bash dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
+# mod: monit/33_create_monit_mail_conf
+# api: public
+# txt: Creates Monit configuration file to send alerts via email.
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Creates Monit configuration file to send alerts via email.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-## Defines the requirements
-## dry-wit hook
-function defineReq() {
-  checkReq "process-file.sh" PROCESSFILE_NOT_INSTALLED;
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-  addError "PROCESSFILE_NOT_INSTALLED" "process-file.sh is not installed";
-
-  export ERROR_MESSAGES;
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-    esac
-  done
-}
-
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt: Creates Monit configuration file to send alerts via email.
+# txt: Returns the result of processing MONIT_MAIL_TEMPLATE_FILE.
+# use: main
 function main() {
 
   if isEmpty "${SMTP_HOST}"; then
     export SMTP_HOST="localhost";
   fi
 
-  process-file.sh -o ${MONIT_MAIL_OUTPUT_FILE} ${MONIT_MAIL_TEMPLATE_FILE}
+  process-file.sh -o ${MONIT_MAIL_OUTPUT_FILE} ${MONIT_MAIL_TEMPLATE_FILE};
 }
+
+## Script metadata and CLI options
+setScriptDescription "Creates Monit configuration file to send alerts via email";
+addError PROCESSFILE_NOT_INSTALLED "process-file.sh is not installed";
+checkReq "process-file.sh" PROCESSFILE_NOT_INSTALLED;
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

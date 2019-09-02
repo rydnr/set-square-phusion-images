@@ -3,3 +3,4 @@
 echo "### RSNAPSHOT MONTHLY ###"
 rsnapshot monthly
 echo
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

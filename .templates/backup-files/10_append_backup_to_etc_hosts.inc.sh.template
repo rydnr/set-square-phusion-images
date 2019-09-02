@@ -1,3 +1,4 @@
-defineEnvVar BACKUP_HOST \
+defineEnvVar BACKUP_HOST MANDATORY \
              "The backup host to send the backup files" \
              "${BACKUP_HOST}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

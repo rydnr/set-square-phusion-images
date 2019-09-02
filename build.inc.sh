@@ -106,4 +106,4 @@ defineEnvVar SSL_KEYSTORE_TYPE MANDATORY "The type of the keystore" "jks";
 defineEnvVar SSL_JAVA_SIGN_ALGORITHM MANDATORY "The algorithm used to sign the SSL certificate" "SHA256withRSA";
 defineEnvVar HOST_VOLUMES_ROOT_FOLDER MANDATORY "The root folder for host volumes" "/var/lib/docker/data";
 defineEnvVar DEVELOPMENT_USER_ID MANDATORY "The user id used when developing code (to match host user id)" "$(id -u)";
-#
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

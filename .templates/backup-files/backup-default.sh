@@ -1,97 +1,32 @@
 #!/bin/bash dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
+# mod: backup/backup-default
+# api: public
+# txt: Copies the contents of a folder to a remote host, via SSH.
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Copies the contents of a folder to a remote host, using
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export SOURCE_IS_MANDATORY="source is mandatory";
-  export DESTINATION_IS_MANDATORY="destination is mandatory";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    SOURCE_IS_MANDATORY \
-    DESTINATION_IS_MANDATORY \
-  );
-
-  export ERROR_MESSAGES;
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  if [[ -z ${SOURCE} ]]; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode SOURCE_IS_MANDATORY;
-  fi
-
-  if [[ -z ${DESTINATION} ]]; then
-      logDebugResult FAILURE "fail";
-      exitWithErrorCode DESTINATION_IS_MANDATORY;
-  fi
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-    esac
-  done
-}
-
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt: Copies the contents of a folder to a remote host, via SSH.
+# txt: Returns 0/TRUE always, unless an error is thrown.
+# use: main
 function main() {
-#  ssh -p ${PORT} ${SSH_OPTIONS} ${DESTINATION%:.*} 'mkdir -p ~/$(hostname)';
-  rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}
+  local -i _success;
+
+  #  ssh -p ${PORT} ${SSH_OPTIONS} ${DESTINATION%:.*} 'mkdir -p ~/$(hostname)';
+  logInfo "Transferring ${SOURCE%/} to ${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}";
+  rsync ${RSYNC_OPTIONS} -e "ssh -p ${SQ_BACKUP_HOST_SSH_PORT} ${SSH_OPTIONS}" ${SOURCE%/}/ ${SQ_BACKUP_USER}@${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION};
+  _success=$?;
+  logInfo -n "Transferring ${SOURCE%/} to ${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}";
+  if isTrue ${_success}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    exitWithErrorCode ERROR_TRANSMITTING_DATA;
+  fi
 }
+
+## Script metadata and CLI options
+setScriptDescription "Copies the contents of a folder to a remote host, via SSH.";
+addError ERROR_TRANSMITTING_DATA "Error transmitting data from ${SOURCE} to ${SQ_IMAGE}${SQ_BACKUP_HOST_SUFFIX}:${DESTINATION}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

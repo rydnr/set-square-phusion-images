@@ -1,110 +1,70 @@
 #!/bin/bash dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
+# mod: backup/backup-volumes
+# api: public
+# txt: Backs up VOLUMEs defined in the Dockerfiles.
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
+# fun: main
+# api: public
+# txt: Backs up VOLUMEs defined in the Dockerfiles.
+# txt: Returns 0/TRUE if the VOLUMEs are backed up successfully; 1/FALSE otherwise.
+# use: main
+function main() {
+  local p;
+  local -i _rescode;
 
-Backs up a given VOLUME.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
+  if isFalse "${DOBACKUP}"; then
+    logDebug "Backup disabled";
+  else
+    for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
+      process_volumes "${DOCKERFILES_LOCATION}/${p}";
+      _rescode=$?;
+      if isFalse ${_rescode}; then
+        exitWithErrorCode CANNOT_BACKUP_VOLUME_IN_DOCKERFILE "${DOCKERFILES_LOCATION}/${pe;}"
+      fi
+    done
+  fi
 }
 
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-  );
-
-  export ERROR_MESSAGES;
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-    esac
-  done
-}
-
-## Processes the volumes from a given Dockerfile.
-## -> 1: the Dockerfile.
-## Example:
-##   process_volumes /Dockerfiles/Dockerfile
+# fun: process_volumes
+# api: public
+# txt: Processes the volumes from a given Dockerfile.
+# opt: dockerfile: The Dockerfile.
+# txt: Returns 0/TRUE if the volumes are processed successfully, but it can throw an error if any of them don't.
+# use: if process_volumes /Dockerfiles/Dockerfile; then echo "Volumes processed successfully"; fi
 function process_volumes() {
   local _dockerfile="${1}";
   local _aux;
   local _single;
+  local -i _rescode;
+  local _oldIFS="${IFS}";
+
   grep -e '^\s*VOLUME\s' "${_dockerfile}" > /dev/null 2>&1
-  if [ $? -eq 0 ]; then
-    local _oldIFS="${IFS}";
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
     IFS=$'\n';
     for _aux in $(grep -e '^\s*VOLUME\s' "${_dockerfile}" 2> /dev/null | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
       IFS="${_oldIFS}";
       logInfo -n "Backing up ${_aux} to ${SQ_IMAGE}-backup";
       /usr/local/bin/backup-folder.sh "${_aux}" "${_aux}";
-      logInfoResult SUCCESS "done";
+      _rescode=$?;
+      if isTrue ${_rescode}; then
+        logInfoResult SUCCESS "done";
+      else
+        logInfoResult SUCCESS "failed";
+      fi
     done
+    IFS="${_oldIFS}";
+  else
+    _rescode=${TRUE};
   fi
+
+  return ${_rescode};
 }
 
-## Main logic
-## dry-wit hook
-function main() {
-  if    [[ -z "${DOBACKUP}" ]] \
-     || [[ "${DOBACKUP}" != "true" ]]; then
-    logDebug "Backup disabled";
-  else
-    for p in $(ls ${DOCKERFILES_LOCATION} | grep -v -e '^Dockerfile'); do
-      process_volumes "${DOCKERFILES_LOCATION}/${p}";
-    done
-  fi
-}
+## Script metadata and CLI options
+setScriptDescription "Backs up VOLUMEs defined in the Dockerfiles.";
+addError CANNOT_BACKUP_VOLUME_IN_DOCKERFILE "Could not backup a VOLUME in ";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
