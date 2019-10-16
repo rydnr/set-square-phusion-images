@@ -17,5 +17,11 @@ EOF
 cat <<EOF > ~/.pulse_secure/pulse/.pulse_Connections.txt
 {"connName": "${VPN_NAME}, "baseUrl": "${VPN_BASEURL}", "preferredCert": ""}
 EOF
+/etc/init.d/clamd-freshclam start
+rescode=1;
+while [ $rescode -ne 0 ]; do
+  /etc/init.d/clamd-daemon start
+  rescode=$?;
+done
 /usr/local/pulse/pulseUi
 #
