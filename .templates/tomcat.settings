@@ -7,7 +7,7 @@ defineButDoNotOverrideEnvVar TOMCAT_MAJOR_VERSION \
              "9";
 defineButDoNotOverrideEnvVar TOMCAT_VERSION \
              "The version of the Apache Tomcat server" \
-             "9.0.1" \
+             "9.0.30" \
              'curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/ | grep folder.gif | tail -n 1 | cut -d ">" -f 3 | cut -d "/" -f 1 | sed "s_^v__g"';
 defineButDoNotOverrideEnvVar TOMCAT_CACHE_MAX_SIZE \
              "The maximum size of the static resource cache in kilobytes" \
