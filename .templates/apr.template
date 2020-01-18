@@ -7,5 +7,5 @@ RUN ${SYSTEM_UPDATE} && \
     ./configure && make && make install && \
     cd /usr/local/src && wget -O ${TOMCAT_NATIVE_FILE} ${TOMCAT_NATIVE_DOWNLOAD_URL} && \
     tar xvfz ${TOMCAT_NATIVE_FILE} && cd ${TOMCAT_NATIVE_FOLDER}/native && \
-    ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java && make && make install
+    ./configure --with-apr=/usr/local/apr --with-java-home=/usr/lib/jvm/java-${JAVA_VERSION}-openjdk-amd64 && make && make install
 # ^ apr

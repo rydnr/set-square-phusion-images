@@ -1,4 +1,3 @@
-_debugEcho "Sourcing tomcat.settings";
 defineButDoNotOverrideEnvVar TOMCAT_HOME "The home directory of Tomcat" "/opt/tomcat";
 defineButDoNotOverrideEnvVar TOMCAT_USER "The Tomcat user" 'tomcat';
 defineButDoNotOverrideEnvVar TOMCAT_GROUP "The Tomcat group" 'tomcat';
@@ -21,4 +20,4 @@ defineButDoNotOverrideEnvVar TOMCAT_FILE \
 defineButDoNotOverrideEnvVar TOMCAT_DOWNLOAD_URL \
              "The url to download Tomcat" \
              'http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/${TOMCAT_FILE}';
-echo -n ''
+#
