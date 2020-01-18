@@ -1,3 +1,3 @@
-defineButDoNotOverrideEnvVar ANT_VERSION "The default Ant version" "1.9.7";
-defineButDoNotOverrideEnvVar ANT_VERSIONS "The versions of Ant" '${ANT_VERSION}';
-echo -n ''
+defineButDoNotOverrideEnvVar ANT_VERSION "The default Ant version" "1.10.1";
+defineButDoNotOverrideEnvVar ANT_VERSIONS "The versions of Ant" '${ANT_VERSION} 1.9.9';
+#

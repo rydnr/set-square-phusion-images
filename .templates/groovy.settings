@@ -1,3 +1,3 @@
-defineButDoNotOverrideEnvVar GROOVY_VERSION "The default Groovy version" "2.4.6";
-defineButDoNotOverrideEnvVar GROOVY_VERSIONS "The versions of Groovy to include" '${GROOVY_DEFAULT_VERSION}';
-echo -n ''
+defineButDoNotOverrideEnvVar GROOVY_VERSION "The default Groovy version" "2.5.9";
+defineButDoNotOverrideEnvVar GROOVY_VERSIONS "The versions of Groovy to include" "${GROOVY_VERSION} 2.4.18 2.3.11 2.2.2 2.1.9 2.0.8 1.8.9 1.7.11 1.6.9 1.5.8";
+#

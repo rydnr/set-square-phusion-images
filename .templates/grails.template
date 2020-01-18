@@ -1,5 +1,3 @@
 # v grails
-# - requires:
-#   - sdkman
 RUN su - ${SERVICE_USER} -c "source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh && sdk i groovy ${GRAILS_VERSION} && if [ -n \"${GRAILS_VERSIONS}\" ]; then for p in ${GRAILS_VERSIONS}; do yes no | sdk i grails \${p}; done; fi"
 # ^ grails

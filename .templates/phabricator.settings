@@ -1,4 +1,4 @@
-defineButDoNotOverrideEnvVar GITHUB_PHABRICATOR_HASH "The hash of Phabricator's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/phabricator.git stable)";
-defineButDoNotOverrideEnvVar GITHUB_ARCANIST_HASH "The hash of Arcanist's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/arcanist.git stable)";
-defineButDoNotOverrideEnvVar GITHUB_LIBPHUTIL_HASH "The hash of Libphutil's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/libphutil.git stable)";
-echo -n ''
+defineButDoNotOverrideEnvVar GITHUB_PHABRICATOR_HASH "The hash of Phabricator's stable branch in github" "c4b4a53cad7722f031b725f8b41511e9d341d033"; #"$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/phabricator.git stable)";
+defineButDoNotOverrideEnvVar GITHUB_ARCANIST_HASH "The hash of Arcanist's stable branch in github" "bac2028421a4be6e34e08764bbbda49e68b3a604"; #"$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/arcanist.git stable)";
+defineButDoNotOverrideEnvVar GITHUB_LIBPHUTIL_HASH "The hash of Libphutil's stable branch in github" "1750586fdc50a6cd98adba4aa2f5a7649bd91dbe"; #"$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/libphutil.git stable)";
+#

@@ -1,5 +1,3 @@
 # v ant
-# - requires:
-#   - sdkman
 RUN su - ${SERVICE_USER} -c "source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh && sdk i ant ${ANT_VERSION} && if [ -n \"${ANT_VERSIONS}\" ]; then for p in ${ANT_VERSIONS}; do yes no | sdk i ant \${p}; done; fi"
 # ^ ant

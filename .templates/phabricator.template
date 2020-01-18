@@ -1,14 +1,9 @@
 # v phabricator
-# - requires:
-#   - git
-#   - install
 #COPY phabricator-files/php7.patch /usr/local/src/
-
-#    ${SYSTEM_UPDATE} && \
+#RUN ${SYSTEM_UPDATE} && \
 #    ${PKG_INSTALL} -np patch && \
 #    patch -p0 < /usr/local/src/php7.patch && \
 #    ${SYSTEM_CLEANUP} && \
-
 RUN cd /opt && \
     ([ -d /opt/phabricator ] && rm -rf /opt/phabricator || echo "") && \
     git clone https://github.com/phacility/phabricator.git && \

@@ -1,3 +1,3 @@
-defineButDoNotOverrideEnvVar GRAILS_VERSION "The Grails default version" "3.1.12";
-defineButDoNotOverrideEnvVar GRAILS_VERSIONS "The versions of Grails to include" '${GRAILS_VERSION} 2.5.5';
-echo -n ''
+defineButDoNotOverrideEnvVar GRAILS_VERSION "The Grails default version" "4.0.1";
+defineButDoNotOverrideEnvVar GRAILS_VERSIONS "The versions of Grails to include" '${GRAILS_VERSION} 3.3.11 3.2.9 3.1.16 3.0.17 2.5.6 2.4.5 2.3.11 2.2.5 2.1.5 2.0.4 1.3.9 1.2.5';
+#
