@@ -76,7 +76,7 @@ function main() {
 
   if isTrue "${LOCAL_FLAG}"; then
     logDebug -n "Retrieving HEAD for remote ${BRANCH} in ${LOCAL_REPOSITORY}";
-    if retrieveGitRemoteHead "${LOCAL_REPOSITORY}" "${BRANCH}"; then
+    if retrieveRemoteHead "${LOCAL_REPOSITORY}" "${BRANCH}"; then
         _hash="${RESULT}";
         logDebugResult SUCCESS "${_hash}";
     else
@@ -85,7 +85,7 @@ function main() {
     fi
   else
     logDebug -n "Retrieving HEAD for remote ${BRANCH} in ${REMOTE_URL}";
-    if retrieveGitRemoteHeadFromURL "${REMOTE_URL}" "${BRANCH}"; then
+    if retrieveRemoteHeadFromURL "${REMOTE_URL}" "${BRANCH}"; then
       _hash="${RESULT}";
       logDebugResult SUCCESS "${_hash}";
     else
