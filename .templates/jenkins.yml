@@ -4,6 +4,7 @@
   - tomcat
   - git
   - phabricator
+  - sdkman
   - gradle
   - groovy
   - maven

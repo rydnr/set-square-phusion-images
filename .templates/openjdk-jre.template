@@ -1,7 +1,7 @@
 # v java
-COPY java-files/logstash /etc/service/.template/log/run
-COPY java-files/logstash-cron.sh /etc/service/cron/log/run
-COPY java-files/logstash-cron.sh /etc/service/cron/log/
+#COPY java-files/logstash /etc/service/.template/log/run
+#COPY java-files/logstash-cron.sh /etc/service/cron/log/run
+#COPY java-files/logstash-cron.sh /etc/service/cron/log/
 COPY java-files/create_ssl_certificate_keytool.sh /usr/local/bin/create_ssl_certificate_keytool.sh
 
 ENV JAVA_HEAP_MIN="${JAVA_HEAP_MIN}" \
@@ -14,7 +14,8 @@ RUN ${SYSTEM_UPDATE} && \
     chmod +x /etc/service/.template/log/run && \
     chmod +x /etc/service/cron/log/run && \
     ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_keytool.inc.sh && \
-    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh
+    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh && \
+    cd /usr/lib/jvm && ln -s java-${JAVA_VERSION}-openjdk-amd64 java
 
 COPY java-files/my_exec.logstash /etc/my_exec.d/logstash
 COPY java-files/logstash-cron.conf /etc/logstash/conf.d/cron.conf

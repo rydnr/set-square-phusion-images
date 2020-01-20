@@ -23,7 +23,9 @@ export CATALINA_OPTS="-DJENKINS_HOME=$JENKINS_BASEDIR -Xmx512m -Djava.awt.headle
 
 [ -f $TOMCAT_HOME/bin/catalina.sh ] || exit 0
 
-export PATH=$PATH:/usr/bin:/usr/local/bin
+[ -f /home/jenkins/jenkins.model.JenkinsLocationConfiguration.xml ] || /usr/local/sbin/process-file.sh -o /home/jenkins/jenkins.model.JenkinsLocationConfiguration.xml /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
+
+export PATH=$PATH:/usr/bin:/usr/local/sbin:/usr/local/bin
 
 # See how we were called.
 case "$1" in
@@ -59,3 +61,4 @@ case "$1" in
 esac
 
 exit 0
+#
