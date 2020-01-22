@@ -194,6 +194,8 @@ sdkman/setup.sql
 .templates/couchbase
 .templates/dbeaver
 .templates/discord
+.templates/dry-wit
+.templates/dry-wit-files
 .templates/elasticsearch
 .templates/elk-common
 .templates/entrypoint
