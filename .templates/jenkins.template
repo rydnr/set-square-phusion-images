@@ -4,8 +4,7 @@ COPY jenkins-files/update-jenkins.sh jenkins-files/update-jenkins.inc.sh \
      jenkins-files/backup-jenkins-configs.sh jenkins-files/backup-jenkins-configs.inc.sh \
      /usr/local/bin/
 
-RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/service/update-jenkins && \
-    cp -r /root/.dry-wit ${SERVICE_USER_HOME} && \
+RUN cp -r /root/.dry-wit ${SERVICE_USER_HOME} && \
     cd /var && ln -s ${SERVICE_USER_HOME} /var/jenkins_home && \
     mkdir -p ${JENKINS_HOME} ${SERVICE_USER_HOME}/.m2 /usr/share/jenkins/ref ${SERVICE_USER_HOME}/init.groovy.d && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} /var/lock/tomcat /var/run/tomcat /var/log/tomcat ${TOMCAT_HOME} /opt/${TOMCAT_FOLDER} /usr/share/jenkins/ref /var/jenkins_home && \
@@ -14,6 +13,12 @@ RUN mkdir /etc/service/update-jenkins && cp -r /etc/service/.template/* /etc/ser
     ${SYSTEM_UPDATE} && \
     ${PKG_INSTALL} git graphviz php php-curl php-cli unzip nodejs build-essential && \
     ${SYSTEM_CLEANUP}
+
+COPY jenkins-files/ssh-config ${SERVICE_USER_HOME}/.ssh/config
+COPY jenkins-files/known_hosts ${SERVICE_USER_HOME}/.ssh/known_hosts
+COPY jenkins-files/jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/
+COPY jenkins-files/hudson.tasks.Mailer.xml jenkins-files/config.xml ${SERVICE_USER_HOME}/
+COPY jenkins-files/settings.xml ${SERVICE_USER_HOME}/.m2/
 
 USER ${SERVICE_USER}
 ENV PATH=${PATH}:${SERVICE_USER_HOME}/.dry-wit/src
@@ -26,11 +31,6 @@ RUN wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
     sed -i '/<\/tomcat-users>/i \  <user username="jenkins-admin" password="${JENKINS_PASSWORD}" roles="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
     [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml && \
     rm -rf ${TOMCAT_HOME}/webapps/* && \
-    chmod -R g+w ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins && \
-    mkdir ${TOMCAT_HOME}/.ssh  && \
-    chmod 700 ${TOMCAT_HOME}/.ssh && \
-    mkdir -p ${SERVICE_USER_HOME}/plugins ${SERVICE_USER_HOME}/updates && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 ${JENKINS_HOME} /var/jenkins_home && \
     cd ${SERVICE_USER_HOME}/plugins/ && \
     for m in ${JENKINS_MODULES}; do \
       echo "Downloading ${m} plugin"; \
@@ -46,16 +46,21 @@ RUN wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
     /usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} && \
     /usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && \
     /usr/local/bin/generate-jenkins-plugin-configs.sh nodejs && \
+    /usr/local/bin/generate-jenkins-plugin-configs.sh slack && \
+    /usr/local/sbin/process-file.sh -o ${SERVICE_USER_HOME}/jenkins.model.JenkinsLocationConfiguration.xml /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl && \
     echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> ${TOMCAT_HOME}/bin/setenv.sh
-#    ln -s /usr/local/bin/backup-jenkins-configs.sh /etc/cron.hourly/backup-jenkins-configs.sh && \
-#    ln -s /usr/local/bin/backup-jenkins-configs.inc.sh /etc/cron.hourly/backup-jenkins-configs.inc.sh
 
 USER root
 
+RUN chmod -R g+w ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins && \
+    mkdir ${TOMCAT_HOME}/.ssh  && \
+    chmod 700 ${TOMCAT_HOME}/.ssh && \
+    mkdir -p ${SERVICE_USER_HOME}/plugins ${SERVICE_USER_HOME}/updates && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 ${JENKINS_HOME} /var/jenkins_home && \
+    ln -s /usr/local/bin/backup-jenkins-configs.sh /etc/cron.hourly/backup-jenkins-configs.sh && \
+    ln -s /usr/local/bin/backup-jenkins-configs.inc.sh /etc/cron.hourly/backup-jenkins-configs.inc.sh && \
+    ln -s /usr/local/bin/update-jenkins.sh /etc/cron.hourly/update-jenkins.sh
+
 COPY jenkins-files/context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
 COPY jenkins-files/config /etc/default/tomcat
-COPY jenkins-files/ssh-config ${JENKINS_HOME}/.ssh/config
-COPY jenkins-files/known_hosts ${JENKINS_HOME}/.ssh/known_hosts
-COPY jenkins-files/jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
-COPY jenkins-files/hudson.tasks.Mailer.xml jenkins-files/config.xml ${SERVICE_USER_HOME}/
 # ^ jenkins

@@ -2,90 +2,17 @@
 # Copyright 2016-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2016-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
+setScriptDescription "Updates Jenkins plugins.";
 
-Updates Jenkins plugins.
+addError CANNOT_UPDATE_JENKINS "Could not update Jenkins";
+addError CANNOT_RETRIEVE_UPDATE_CENTER_JSON "Could not retrieve update-center.json file from ${JENKINS_UPDATE_CENTER_JSON}";
 
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError INVALID_OPTION "Unrecognized option";
-  addError CANNOT_UPDATE_JENKINS "Could not update Jenkins";
-  addError CANNOT_RETRIEVE_UPDATE_CENTER_JSON "Could not retrieve update-center.json file from ${JENKINS_UPDATE_CENTER_JSON}";
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-    esac
-  done
-}
-
-## Retrieves the information from the update-center view.
-## <- 0 if successful, 1 otherwise.
-## <- RESULT: the path of the json file.
-## Example:
-##   if retrieve_update_center_json; then
-##     echo "update-center.json is located in ${RESULT}"
-##   fi
+# fun: retrieve_update_center_json
+# api: public
+# txt: Retrieves the information from the update-center view.
+# txt: Returns 0/TRUE if tthe json file could be retrieved; 1/FALSE otherwise.
+# txt: If the function returns 0/TRUE, the variable RESULT contains the path of the json file.
+# use: if retrieve_update_center_json; then echo "update-center.json is located in ${RESULT}"; fi
 function retrieve_update_center_json() {
   local -i _rescode;
 
@@ -105,13 +32,13 @@ function retrieve_update_center_json() {
   return ${_rescode};
 }
 
-## Processes the update-center.json file.
-## -> 1: The update-center.json file.
-## <- 0 if successful, 1 otherwise.
-## <- RESULT: The processed file.
-## Example:
-##   process_update_center_json /tmp/my.json
-##   echo "Processed update-center.json: ${RESULT}"
+# fun: process_update_center_json
+# api: public
+# txt: Processes the update-center.json file.
+# opt: source: The update-center.json file.
+# txt: Returns 0/TRUE if the file gets processes successfully;  1/FALSE otherwise.
+# txt: If the function returns 0/TRUE, the variable RESULT contains the processed file.
+# use: if process_update_center_json /tmp/my.json; then echo "Processed update-center.json: ${RESULT}"; fi
 function process_update_center_json() {
   local _source="${1}";
   checkNotEmpty "source" "${_source}" 1;
@@ -134,13 +61,13 @@ function process_update_center_json() {
   return ${_rescode};
 }
 
-## Updates the local Jenkins instance.
-## -> 1: The json file to upload.
-## <- 0 if successful, 1 otherwise.
-## <- RESULT: The processed file.
-## Example:
-##   process_update_center_json /tmp/my.json
-##   echo "Processed update-center.json: ${RESULT}"
+# fun: update_jenkins
+# api: public
+# txt: Updates the local Jenkins instance.
+# opt: source: The json file to upload.
+# txt: Returns 0/TRUE if the file is uploaded successfully; 1/FALSE otherwise.
+# txt: If the function returns 0/TRUE, the variable RESULT contains the processed file.
+# use: if process_update_center_json /tmp/my.json; then echo "Processed update-center.json: ${RESULT}"; fi
 function update_jenkins() {
   local _source="${1}";
 
@@ -169,8 +96,11 @@ function update_jenkins() {
   return ${_rescode};
 }
 
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt: Main logic (dry-wit hook)
+# txt: Returns 0/TRUE always, but may exit with an error.
+# use: main
 function main() {
   local _jsonFile;
   if retrieve_update_center_json; then
@@ -181,4 +111,4 @@ function main() {
     exitWithErrorCode CANNOT_RETRIEVE_UPDATE_CENTER_JSON "${JENKINS_UPDATE_CENTER_JSON}";
   fi
 }
-
+#

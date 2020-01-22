@@ -389,14 +389,28 @@ addError CANNOT_CREATE_ANT_CONFIG_FILE "Cannot create Ant configuration file";
 addError CANNOT_CREATE_SLACK_CONFIG_FILE "Cannot create Slack configuration file";
 addError CANNOT_CREATE_NODEJS_CONFIG_FILE "Cannot create NodeJS configuration file";
 
+# fun: dw_parse_tool_cli_parameter
+# api: public
+# txt: Parses the "tool" cli parameter value (dry-wit hook).
+# opt: paramValue: The parameter value.
+# txt: Returns 0/TRUE always.
 function dw_parse_tool_cli_parameter() {
   export TOOL="${1}";
 }
 
+# fun: dw_parse_versions_cli_parameter
+# api: public
+# txt: Parses the "versions" cli parameter value (dry-wit hook).
+# opt: paramValue: The parameter value.
+# txt: Returns 0/TRUE always.
 function dw_parse_versions_cli_parameter() {
   export VERSIONS="${@}";
 }
 
+# fun: dw_check_tool_cli_parameter
+# api: public
+# txt: Checks the "tool" cli parameter value (dry-wit hook).
+# txt: Returns 0/TRUE always, but may exit if the TOOL variable is not valid.
 function dw_check_tool_cli_parameter() {
   case ${TOOL} in
     gradle | groovy | grails | maven | ant | slack | nodejs )
