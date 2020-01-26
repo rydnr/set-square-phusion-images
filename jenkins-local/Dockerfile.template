@@ -15,10 +15,7 @@ RUN chmod +x /etc/service/${IMAGE}/run
 COPY 41_jenkinsfile_to_pipeline_job.sh 41_jenkinsfile_to_pipeline_job.inc.sh \
      /etc/my_init.d/
 
-VOLUME /workspace
-VOLUME /var/jenkins_home/.m2
-VOLUME /var/jenkins_home/.gradle
-VOLUME /var/jenkins_home/.grails
+VOLUME [ /workspace, /var/jenkins_home/.m2, /var/jenkins_home/.gradle, /var/jenkins_home/.grails ]
 
 @include("copy-metadata")
 @include("instructions")
