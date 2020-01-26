@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [ ! -e ${SERVICE_USER_HOME}/work/gtoolkit.image ]; then
+  rsync -avz --exclude work ${SERVICE_USER_HOME}/ ${SERVICE_USER_HOME}/work/ > /dev/null 2> /dev/null;
+fi
+
+/usr/local/sbin/run-as.sh -q -U ${SERVICE_USER} -G ${SERVICE_GROUP} ${SERVICE_USER_HOME}/work /opt/pharo/pharo-ui ${SERVICE_USER_HOME}/work/gtoolkit.image
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

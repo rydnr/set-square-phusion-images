@@ -1,0 +1,24 @@
+# v gtoolkit
+COPY gtoolkit-files/my_exec /etc/my_exec.d/gtoolkit
+
+RUN chmod +x /etc/my_exec.d/gtoolkit && \
+    cd /opt/pharo && \
+    wget ${GTOOLKIT_DOWNLOAD_URL} && \
+    wget ${GTOOLKIT_LIBS_DOWNLOAD_URL} && \
+    unzip ${GTOOLKIT_ARTIFACT} && \
+    unzip ${GTOOLKIT_LIBS_ARTIFACT} && \
+    rm -f ${GTOOLKIT_ARTIFACT} ${GTOOLKIT_LIBS_ARTIFACT} && \
+    mv GToolkit-64*/* ${SERVICE_USER_HOME} && \
+    mv libLinux64-v${GTOOLKIT_VERSION}/* ${SERVICE_USER_HOME} && \
+    cd ${SERVICE_USER_HOME} && \
+    ln -s GToolkit-64*.image gtoolkit.image && \
+    ln -s GToolkit-64*.changes gtoolkit.changes && \
+    rm -rf /opt/pharo/libLinux64-v${GTOOLKIT_VERSION} && \
+    mv /root/.dry-wit ${SERVICE_USER_HOME} && \
+    ln -s ${SERVICE_USER_HOME}/.dry-wit /root/ && \
+    mkdir -p ${SERVICE_USER_HOME}/.config && \
+    ln -s ${SERVICE_USER_HOME}/.config /root/.config && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/pharo ${SERVICE_USER_HOME}
+
+ENV PATH=${PATH}:/opt/pharo
+# ^ gtoolkit
