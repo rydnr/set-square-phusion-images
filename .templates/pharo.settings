@@ -1,6 +1,7 @@
-defineEnvVar PHARO_MAJOR_VERSION MANDATORY "The major version of Pharo" "7";
+defineEnvVar PHARO_MAJOR_VERSION MANDATORY "The major version of Pharo" "8";
 defineEnvVar PHARO_MINOR_VERSION MANDATORY "The minor version of Pharo" "0";
 defineEnvVar PHARO_VERSION MANDATORY "The version of Pharo" "${PHARO_MAJOR_VERSION}.${PHARO_MINOR_VERSION}";
 defineEnvVar PHARO_VERSION_ZEROCONF MANDATORY "The Pharo version, as expected by the Zeroconf script in get.pharo.org" '$(echo ${PHARO_VERSION} | tr -d '.')';
 defineEnvVar PHARO_FOLDER MANDATORY "The Pharo folder" 'pharo${PHARO_MAJOR_VERSION}';
+defineEnvVar PHAROVM_VERSION MANDATORY "The version of the Pharo VM" '5.0-201902062351';
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
