@@ -31,6 +31,7 @@ RUN wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
     sed -i '/<\/tomcat-users>/i \  <user username="jenkins-admin" password="${JENKINS_PASSWORD}" roles="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
     [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml && \
     rm -rf ${TOMCAT_HOME}/webapps/* && \
+    mkdir -p ${SERVICE_USER_HOME}/plugins && \
     cd ${SERVICE_USER_HOME}/plugins/ && \
     for m in ${JENKINS_MODULES}; do \
       echo "Downloading ${m} plugin"; \
@@ -55,7 +56,7 @@ USER root
 RUN chmod -R g+w ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins && \
     mkdir ${TOMCAT_HOME}/.ssh  && \
     chmod 700 ${TOMCAT_HOME}/.ssh && \
-    mkdir -p ${SERVICE_USER_HOME}/plugins ${SERVICE_USER_HOME}/updates && \
+    mkdir -p ${SERVICE_USER_HOME}/updates && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 ${JENKINS_HOME} /var/jenkins_home && \
     ln -s /usr/local/bin/backup-jenkins-configs.sh /etc/cron.hourly/backup-jenkins-configs.sh && \
     ln -s /usr/local/bin/backup-jenkins-configs.inc.sh /etc/cron.hourly/backup-jenkins-configs.inc.sh && \

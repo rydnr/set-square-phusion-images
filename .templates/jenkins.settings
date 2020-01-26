@@ -1,6 +1,6 @@
 defineButDoNotOverrideEnvVar TOMCAT_HOME "The home directory of Tomcat" "/opt/tomcat";
 defineButDoNotOverrideEnvVar JENKINS_HOME "The home directory of Jenkins" "/home/jenkins";
-defineButDoNotOverrideEnvVar JENKINS_VERSION "The Jenkins version" "2.215";
+defineButDoNotOverrideEnvVar JENKINS_VERSION "The Jenkins version" "2.217";
 defineButDoNotOverrideEnvVar JENKINS_DOWNLOAD_URL "The url to download Jenkins" 'http://mirrors.jenkins.io/war/${JENKINS_VERSION}/jenkins.war';
 defineButDoNotOverrideEnvVar DEFAULT_JENKINS_MEMORY_MIN "The default Xms setting" "-Xms1024m";
 defineButDoNotOverrideEnvVar DEFAULT_JENKINS_MEMORY_MAX "The default Xmx setting" "-Xmx2048m";
