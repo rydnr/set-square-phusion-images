@@ -1,5 +1,5 @@
 defineEnvVar PARENT_IMAGE_TAG MANDATORY "The version of the parent image" "0.11";
-defineEnvVar JENKINS_VERSION MANDATORY "The Jenkins version" "2.215";
+defineEnvVar JENKINS_VERSION MANDATORY "The Jenkins version" "2.217";
 defineEnvVar TAG MANDATORY "The image tag" '${JENKINS_VERSION}';
 defineEnvVar SERVICE_USER MANDATORY "The service user" "jenkins";
 defineEnvVar SERVICE_USER_PASSWORD MANDATORY "The jenkins password" "${RANDOM_PASSWORD}";
