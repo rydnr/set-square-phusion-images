@@ -1,0 +1,3 @@
+defineButDoNotOverrideEnvVar GIT_USER_EMAIL 'The user.email git config' "${SERVICE_USER}@${DOMAIN}";
+defineButDoNotOverrideEnvVar GIT_USER_NAME 'The user.name git config' "${SERVICE_USER}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
