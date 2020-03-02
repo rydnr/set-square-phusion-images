@@ -5,6 +5,7 @@ abc/*
 android-studio/my_exec
 android-studio/studio.vmoptions
 **/apache-files
+artifactory/artifactory-files/*
 artifactory/entrypoint.sh
 backup/
 **/backup-files
@@ -207,6 +208,7 @@ sdkman/setup.sql
 .templates/gosu
 .templates/gradle
 .templates/grails
+.templates/gtoolkit
 .templates/gui
 .templates/image_user
 .templates/install
