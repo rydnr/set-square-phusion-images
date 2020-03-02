@@ -17,7 +17,11 @@ RUN cp -r /root/.dry-wit ${SERVICE_USER_HOME} && \
 COPY jenkins-files/ssh-config ${SERVICE_USER_HOME}/.ssh/config
 COPY jenkins-files/known_hosts ${SERVICE_USER_HOME}/.ssh/known_hosts
 COPY jenkins-files/jenkins.model.JenkinsLocationConfiguration.xml.tmpl /var/local/
-COPY jenkins-files/hudson.tasks.Mailer.xml jenkins-files/config.xml ${SERVICE_USER_HOME}/
+COPY jenkins-files/hudson.tasks.Mailer.xml \
+     jenkins-files/config.xml \
+     jenkins-files/hudson.plugins.emailext.ExtendedEmailPublisher.xml \
+     jenkins-files/hudson.plugins.git.GitSCM.xml \
+     ${SERVICE_USER_HOME}/
 COPY jenkins-files/settings.xml ${SERVICE_USER_HOME}/.m2/
 
 USER ${SERVICE_USER}

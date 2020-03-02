@@ -7,12 +7,12 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
 COPY 50-rsync-jenkins-home.sh /etc/my_init.d/50-rsync-jenkins-home.sh
 
-ENV SERVICE_USER="jenkins" \
-    SERVICE_GROUP="jenkins" \
+ENV SERVICE_USER="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_GROUP}" \
     JENKINS_HOME="${JENKINS_HOME}" \
     JENKINS_SLAVE_AGENT_PORT=50000 \
-    CATALINA_USER="jenkins" \
-    CATALINA_GROUP="jenkins" \
+    CATALINA_USER="${SERVICE_USER}" \
+    CATALINA_GROUP="${SERVICE_GROUP}" \
     JENKINS_UC="https://updates.jenkins-ci.org" \
     COPY_REFERENCE_FILE_LOG="${JENKINS_HOME}/copy_reference_file.log" \
     VIRTUAL_HOST="${JENKINS_DEFAULT_VIRTUAL_HOST}" \

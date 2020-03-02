@@ -70,27 +70,27 @@ function process_update_center_json() {
 # use: if process_update_center_json /tmp/my.json; then echo "Processed update-center.json: ${RESULT}"; fi
 function update_jenkins() {
   local _source="${1}";
-
-  checkNotEmpty "source" "${_source}" 1;
+  checkNotEmpty source "${_source}" 1;
 
   local -i _rescode;
 
   logDebug -n "Posting update-center.json";
-  curl -X POST -H "Accept: application/json" -d @"${_source}" http://localhost:${VIRTUAL_PORT}/updateCenter/byId/default/postBack
+  local _aux="$(curl -X POST -H "Accept: application/json" -d @"${_source}" http://localhost:${VIRTUAL_PORT}/updateCenter/byId/default/postBack)";
   _rescode=$?;
-  if isTrue ${_rescode}; then
-      logDebugResult SUCCESS "done";
+  if isTrue ${_rescode} && ! contains "${_aux}" "HTTP Status 404"; then
+    logDebugResult SUCCESS "done";
 
-      logDebug -n "Overwritting Jenkins update configuration";
-      mv "${_source}" ${JENKINS_HOME}/updates/default.json
-      _rescode=$?;
-      if isTrue ${_rescode}; then
-          logDebugResult SUCCESS "done";
-      else
-        logDebugResult FAILURE "failed";
-      fi
+    logDebug -n "Overwritting Jenkins update configuration";
+    mv "${_source}" ${JENKINS_HOME}/updates/default.json
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+    fi
   else
     logDebugResult FAILURE "failed";
+    logDebug "${_aux}";
   fi
 
   return ${_rescode};
@@ -104,9 +104,9 @@ function update_jenkins() {
 function main() {
   local _jsonFile;
   if retrieve_update_center_json; then
-      _jsonFile="${RESULT}";
-      process_update_center_json "${_jsonFile}";
-      update_jenkins "${_jsonFile}";
+    _jsonFile="${RESULT}";
+    process_update_center_json "${_jsonFile}";
+    update_jenkins "${_jsonFile}";
   else
     exitWithErrorCode CANNOT_RETRIEVE_UPDATE_CENTER_JSON "${JENKINS_UPDATE_CENTER_JSON}";
   fi

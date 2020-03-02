@@ -1,7 +1,12 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <jenkins.plugins.slack.SlackNotifier_-DescriptorImpl plugin="slack@2.0.1">
+  <baseUrl>${SLACK_BASEURL}</baseUrl>
   <teamDomain>${SLACK_TEAM_DOMAIN}</teamDomain>
   <token>${SLACK_TOKEN}</token>
+  <tokenCredentialId>${SLACK_TOKEN_CREDENTIAL_ID}</tokenCredentialId>
+  <botUser>${SLACK_BOT_USER}</botUser>
+  <sendAsText>${SLACK_SEND_AS_TEXT}</sendAsText>
+  <iconEmoji>${SLACK_ICON_EMOJI}</iconEmoji>
+  <username>${SLACK_USERNAME}</username>
   <room>${SLACK_ROOM}</room>
-  <buildServerUrl>${SLACK_BUILD_SERVER_URL}</buildServerUrl>
 </jenkins.plugins.slack.SlackNotifier_-DescriptorImpl>

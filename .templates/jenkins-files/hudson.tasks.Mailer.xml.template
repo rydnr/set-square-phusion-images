@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <hudson.tasks.Mailer_-DescriptorImpl plugin="mailer@1.11">
-  <defaultSuffix>@${DOMAIN}</defaultSuffix>
-  <smtpHost>localhost</smtpHost>
-  <useSsl>false</useSsl>
-  <charset>UTF-8</charset>
+  <defaultSuffix>@${EMAIL_DOMAIN}</defaultSuffix>
+  <smtpHost>${EMAIL_SMTP_HOST}</smtpHost>
+  <useSsl>${EMAIL_SMTP_HOST_USES_SSL}</useSsl>
+  <charset>${EMAIL_CHARSET}</charset>
 </hudson.tasks.Mailer_-DescriptorImpl>

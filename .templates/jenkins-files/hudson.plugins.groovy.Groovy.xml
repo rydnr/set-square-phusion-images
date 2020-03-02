@@ -1,14 +1,16 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<hudson.plugins.groovy.Groovy_-DescriptorImpl plugin="groovy@1.29">
-  <instanceCounter>
-    <value>0</value>
-  </instanceCounter>
-  <allowMacro>false</allowMacro>
+<hudson.plugins.groovy.Groovy_-DescriptorImpl plugin="groovy@2.2">
+  <allowMacro>${GROOVY_ALLOWMACRO}</allowMacro>
   <installations/>
   <installations2>
     <hudson.plugins.groovy.GroovyInstallation>
       <name>groovy</name>
       <home>/home/jenkins/.sdkman/candidates/groovy/current</home>
+      <properties/>
+    </hudson.plugins.groovy.GroovyInstallation>
+    <hudson.plugins.groovy.GroovyInstallation>
+      <name>groovy-${GROOVY_DEFAULT_VERSION></name>
+      <home>/home/jenkins/.sdkman/candidates/groovy/${GROOVY_DEFAULT_VERSION}</home>
       <properties/>
     </hudson.plugins.groovy.GroovyInstallation>
   </installations2>

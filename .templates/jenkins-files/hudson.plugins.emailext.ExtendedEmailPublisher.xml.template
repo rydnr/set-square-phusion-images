@@ -1,0 +1,31 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<hudson.plugins.emailext.ExtendedEmailPublisherDescriptor plugin="email-ext@2.68">
+  <defaultSuffix>@${EMAIL_DOMAIN}</defaultSuffix>
+  <mailAccount>
+    <smtpHost>${EMAIL_SMTP_HOST}</smtpHost>
+    <useSsl>${EMAIL_SMTP_HOST_USES_SSL}</useSsl>
+  </mailAccount>
+  <addAccounts/>
+  <charset>${EMAIL_CHARSET}</charset>
+  <defaultContentType>${EMAIL_EXT_DEFAULT_CONTENT_TYPE}</defaultContentType>
+  <defaultSubject>${EMAIL_EXT_DEFAULT_SUBJECT}</defaultSubject>
+  <defaultBody>${EMAIL_EXT_DEFAULT_BODY}</defaultBody>
+  <defaultPresendScript>${EMAIL_EXT_DEFAULT_PRESEND_SCRIPT}</defaultPresendScript>
+  <defaultPostsendScript>${EMAIL_EXT_DEFAULT_POSTSEND_SCRIPT}</defaultPostsendScript>
+  <defaultClasspath/>
+  <defaultTriggerIds>
+    <string>hudson.plugins.emailext.plugins.trigger.FailureTrigger</string>
+  </defaultTriggerIds>
+  <emergencyReroute>${EMAIL_EXT_EMERGENCY_REROUTE}</emergencyReroute>
+  <maxAttachmentSize>${EMAIL_EXT_ATTACHMENT_MAX_SIZE}</maxAttachmentSize>
+  <recipientList>${EMAIL_EXT_RECIPIENT_LIST}</recipientList>
+  <allowedDomains>${EMAIL_EXT_ALLOWED_DOMAINS}</allowedDomains>
+  <excludedCommitters>${EMAIL_EXT_EXCLUDED_COMMITTERS}</excludedCommitters>
+  <overrideGlobalSettings>${EMAIL_EXT_OVERRIDE_GLOBAL_SETTINGS}</overrideGlobalSettings>
+  <listId>${EMAIL_EXT_LIST_ID}</listId>
+  <precedenceBulk>${EMAIL_EXT_PRECEDENCE_BULK}</precedenceBulk>
+  <debugMode>${EMAIL_EXT_DEBUG_MODE}</debugMode>
+  <requireAdminForTemplateTesting>${EMAIL_EXT_REQUIRE_ADMIN_FOR_TEMPLATE_TESTING}</requireAdminForTemplateTesting>
+  <enableWatching>${EMAIL_EXT_ENABLE_WATCHING_FOR_JOBS}</enableWatching>
+  <enableAllowUnregistered>${EMAIL_EXT_ENABLE_SENDING_TO_UNREGISTERED_USERS}</enableAllowUnregistered>
+</hudson.plugins.emailext.ExtendedEmailPublisherDescriptor>
