@@ -7,11 +7,14 @@ by providing a Logstash config file (overriding
 
 Examples:
 
+- Running an instance with a data container, with nginx-proxy up front.
+> docker run -d --name ${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} --rm --volumes-from artifactory-data ${NAMESPACE}/${IMAGE}:${TAG}
+
 - Running an instance:
-> docker run -d -p [port]:8080 ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p [port]:8082 --name ${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} -v [my-data-folder]:/backup/${IMAGE}/data ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Running Artifactory with specific Logstash configuration:
-> docker run -d -p [port]:8080 -v [my-logstash-config]:/etc/logstash/conf.d/tomcat.conf ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p [port]:8080 -v [my-logstash-config]:/etc/logstash/conf.d/tomcat.conf --name ${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Running Artifactory disabling Logstash altogether:
 > docker run .. -e ENABLE_LOGSTASH=false ..

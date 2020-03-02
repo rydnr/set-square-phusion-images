@@ -4,31 +4,20 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-ENV SERVICE_USER="artifactory" \
-    SERVICE_GROUP="artifactory" \
-    SERVICE_USER_HOME="/home/artifactory" \
-    SERVICE_USER_SHELL="/bin/bash" \
-    SERVICE="tomcat-files/service"
+ENV SERVICE_USER="${SERVICE_USER}" \
+    SERVICE_GROUP="${SERVICE_GROUP}" \
+    DOBACKUP="true" \
+    DEFAULT_LOCALE="en_US" \
+    DEFAULT_ENCODING="UTF-8"
 
+@include("java")
+@include("create_ssl_certificate")
 @include("service_user")
-@include("tomcat")
-@include("service")
+@include("artifactory")
 
-RUN wget -O ${TOMCAT_HOME}/webapps/${ARTIFACTORY_FILE} ${ARTIFACTORY_DOWNLOAD_URL} && \
-    mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome && \
-    cd /home/ && /usr/lib/jvm/java/bin/jar -xvf ${TOMCAT_HOME}/webapps/${ARTIFACTORY_FILE} && \
-    rm -rf ${SERVICE_USER_HOME} && mv /home/artifactory-oss-${ARTIFACTORY_VERSION} ${SERVICE_USER_HOME} && \
-    mkdir -p ${TOMCAT_HOME}/.artifactory && \
-    cd ${TOMCAT_HOME}/.artifactory && /usr/lib/jvm/java/bin/jar -xvf ${SERVICE_USER_HOME}/webapps/artifactory.war && \
-    rm -rf ${TOMCAT_HOME}/webapps/* && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.artifactory && \
-    chmod -R g+w ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.artifactory
-
-COPY context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
-COPY artifactory-.bashrc ${SERVICE_USER_HOME}/.bashrc
-COPY config /etc/default/tomcat
-
-VOLUME /backup/${IMAGE}/db
+RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
+COPY artifactory-files/service /etc/service/${IMAGE}/run
+RUN chmod +x /etc/service/${IMAGE}/run
 
 @include("copy-metadata")
 @include("symlinks")

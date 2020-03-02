@@ -1,0 +1,8 @@
+defineButDoNotOverrideEnvVar ARTIFACTORY_VERSION 'The version of Artifactory' '7.2.1';
+
+defineButDoNotOverrideEnvVar ARTIFACTORY_FILE 'The Artifactory tar gz file' 'jfrog-artifactory-oss-${ARTIFACTORY_VERSION}.tar.gz';
+
+defineButDoNotOverrideEnvVar ARTIFACTORY_DOWNLOAD_URL 'The url to download Artifactory' 'https://api.bintray.com/content/jfrog/artifactory/org/artifactory/oss/jfrog-artifactory-oss/${ARTIFACTORY_VERSION}/jfrog-artifactory-oss-${ARTIFACTORY_VERSION}-linux.tar.gz';
+
+defineButDoNotOverrideEnvVar ARTIFACTORY_DEFAULT_VIRTUAL_HOST 'The default virtual host for Artifactory' 'maven.${DOMAIN}';
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -1,0 +1,16 @@
+# v artifactory
+RUN wget -O /${SERVICE_USER_HOME}/${ARTIFACTORY_FILE} '${ARTIFACTORY_DOWNLOAD_URL};bt_package=jfrog-artifactory-oss' && \
+    cd /${SERVICE_USER_HOME}/ && \
+    tar xvfz ${ARTIFACTORY_FILE} && \
+    rm -rf ${SERVICE_USER_HOME}/${ARTIFACTORY_FILE} && \
+    ln -s artifactory-oss-${ARTIFACTORY_VERSION} artifactory-oss && \
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} && \
+    cd ${SERVICE_USER_HOME}/artifactory-oss/var && \
+    ln -s /backup/${IMAGE}/data backup && \
+    ln -s /backup/${IMAGE}/db data
+
+ENV VIRTUAL_HOST=${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} \
+    VIRTUAL_PORT=8082
+
+VOLUME /backup/${IMAGE}/data
+# ^ artifactory

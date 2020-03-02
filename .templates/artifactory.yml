@@ -1,0 +1,3 @@
+- requires:
+  - java
+  - service_user
