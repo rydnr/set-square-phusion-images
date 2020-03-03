@@ -1,0 +1,4 @@
+defineButDoNotOverrideEnvVar BLOOMRPC_VERSION "The BloomRPC version" '1.4.1';
+defineButDoNotOverrideEnvVar BLOOMRPC_ARTIFACT "The BloomRPC file" 'bloomrpc_${BLOOMRPC_VERSION}_amd64.deb';
+defineButDoNotOverrideEnvVar BLOOMRPC_DOWNLOAD_URL "The BloomRPC download url" 'https://github.com/uw-labs/bloomrpc/releases/download/${BLOOMRPC_VERSION}/${BLOOMRPC_ARTIFACT}';
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

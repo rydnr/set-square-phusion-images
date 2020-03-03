@@ -1,0 +1,6 @@
+# v bloomrpc
+RUN cd /tmp && \
+    wget -O ${BLOOMRPC_ARTIFACT} ${BLOOMRPC_DOWNLOAD_URL} && \
+    dpkg -i ${BLOOMRPC_ARTIFACT} && \
+    rm -f ${BLOOMRPC_ARTIFACT}
+# ^ bloomrpc
