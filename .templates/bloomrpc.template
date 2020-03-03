@@ -1,6 +1,9 @@
 # v bloomrpc
 RUN cd /tmp && \
     wget -O ${BLOOMRPC_ARTIFACT} ${BLOOMRPC_DOWNLOAD_URL} && \
+    ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} gconf2 gconf-service libnotify4 libappindicator1 libxtst6 libnss3 libxss1 && \
     dpkg -i ${BLOOMRPC_ARTIFACT} && \
     rm -f ${BLOOMRPC_ARTIFACT}
+    ${SYSTEM_CLEANUP}
 # ^ bloomrpc
