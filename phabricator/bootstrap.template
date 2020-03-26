@@ -1,248 +1,12 @@
-#!/bin/bash /usr/local/bin/dry-wit
+#!/bin/bash dry-wit
 # Copyright 2016-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME [-d|--database=vendor]? create-db-user
-$SCRIPT_NAME [-d|--database=vendor]? change-db-password
-$SCRIPT_NAME [-d|--database=vendor]? db-grants
-$SCRIPT_NAME [-d|--database=vendor]? databases
-$SCRIPT_NAME [-d|--database=vendor]? sql
-$SCRIPT_NAME [-d|--database=vendor]? db-sql [dbName]
-$SCRIPT_NAME [-d|--database=ventor]? sql-post
-$SCRIPT_NAME [-d|--database=vendor]? liquibase [dbName]
-$SCRIPT_NAME [-h|--help]
-(c) 2016-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Prints the bootstrap information required to prepare a database
-to be used by Phabricator.
-
-Where:
-    * vendor: mysql or mariadb. It's optional, and defaults to mariadb.
-    * dbName: the database name.
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-# Requirements
-function checkRequirements() {
-  checkReq cat CAT_DOES_NOT_EXIST;
-}
-
-# Error messages
-function defineErrors() {
-  export INVALID_OPTION="Unrecognized option";
-  export CAT_DOES_NOT_EXIST="cat does not exist";
-  export NO_COMMAND_SPECIFIED="No command specified";
-  export NO_DB_VENDOR_SPECIFIED="No database vendor specified";
-  export UNSUPPORTED_DB_VENDOR="Unsupported database vendor";
-  export NO_LIQUIBASE_CHANGELOGS_FOLDER_SPECIFIED="No Liquibase changeLogs folder specified";
-  export LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND="The specified liquibase changeLogs folder is not found";
-  export DB_NAME_DOES_NOT_EXIST="The database does not exist";
-  export INVALID_COMMAND="Invalid command";
-  export DB_NAME_IS_MANDATORY="The database name is mandatory";
-
-  ERROR_MESSAGES=(\
-    INVALID_OPTION \
-    CAT_DOES_NOT_EXIST \
-    NO_COMMAND_SPECIFIED \
-    NO_DB_VENDOR_SPECIFIED \
-    UNSUPPORTED_DB_VENDOR \
-    NO_LIQUIBASE_CHANGELOGS_FOLDER_SPECIFIED \
-    LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND \
-    DB_NAME_DOES_NOT_EXIST \
-    INVALID_COMMAND \
-    DB_NAME_IS_MANDATORY \
-  );
-
-  export ERROR_MESSAGES;
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      -d | --db)
-        shift;
-        DB_VENDOR="${1}";
-        shift;
-        ;;
-    esac
-  done
-
-  if [[ -z ${DB_VENDOR} ]]; then
-    export DB_VENDOR="${DEFAULT_DB_VENDOR}";
-  fi
-
-  if [[ -z ${COMMAND} ]]; then
-    export COMMAND="${1}";
-    shift;
-  fi
-
-  if [[ -z ${DB_NAME} ]]; then
-    if    [[ "x${COMMAND}" == "xliquibase" ]] \
-       || [[ "x${COMMAND}" == "xdb-sql" ]]; then
-      DB_NAME="${1}";
-      shift;
-    fi
-  fi
-}
-
-## Checking input
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q | --quiet | -d | --db)
-         ;;
-      *) logDebugResult FAILURE "fail";
-         exitWithErrorCode INVALID_OPTION ${_flag};
-         ;;
-    esac
-  done
-
-  if [[ -z ${DB_VENDOR} ]]; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode NO_DB_VENDOR_SPECIFIED;
-  fi
-
-  case "${DB_VENDOR}" in
-    "mysql" | "mariadb")
-    ;;
-    *) logDebugResult FAILURE "fail";
-       exitWithErrorCode UNSUPPORTED_DB_VENDOR "${DB_VENDOR}";
-       ;;
-  esac
-
-  if [[ -z ${LIQUIBASE_CHANGELOGS_FOLDER} ]]; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode NO_LIQUIBASE_CHANGELOGS_FOLDER_SPECIFIED;
-  fi
-
-  if [[ ! -e ${LIQUIBASE_CHANGELOGS_FOLDER} ]]; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND;
-  fi
-
-  if [[ -z ${COMMAND} ]]; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode NO_COMMAND_SPECIFIED;
-  fi
-
-  case "${COMMAND}" in
-    "create-db-user" | "change-db-password" | "db-grants" | "databases" | "sql-post" | "sql")
-      logDebugResult SUCCESS "done";
-      ;;
-    "db-sql")
-      if    [[ -n ${DB_NAME} ]] \
-         && [[ ! -e "${SQL_DDL_FOLDER}/${DB_NAME}.sql" ]] \
-         && [[ ! -e "${SQL_DDL_FOLDER}/phabricator_${DB_NAME}.sql" ]]; then \
-        logDebugResult FAILURE "fail";
-        exitWithErrorCode DB_NAME_DOES_NOT_EXIST;
-      fi
-      ;;
-    "liquibase")
-      if [[ -z ${DB_NAME} ]]; then
-        logDebugResult FAILURE "fail";
-        exitWithErrorCode DB_NAME_IS_MANDATORY;
-      fi
-      if    [[ ! -e "${LIQUIBASE_CHANGELOGS_FOLDER}/${DB_NAME}/changelog.yml" ]] \
-         && [[ ! -e "${LIQUIBASE_CHANGELOGS_FOLDER}/phabricator_${DB_NAME}/changelog.yml" ]]; then \
-        logDebugResult FAILURE "fail";
-        exitWithErrorCode DB_NAME_DOES_NOT_EXIST;
-      fi
-      ;;
-    *)
-      logDebugResult FAILURE "fail";
-      exitWithErrorCode INVALID_COMMAND "${COMMAND}";
-      ;;
-  esac
-}
-
-## Prints the bootstrap SQL to create the Phabricator database user.
-function print_create_db_user_bootstrap() {
-  echo "create user ${PHABRICATOR_DB_USER}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
-}
-
-## Prints the bootstrap SQL to change the password of the Phabricator database user.
-function print_change_db_password_bootstrap() {
-  echo "SET PASSWORD FOR '${PHABRICATOR_DB_USER}'@'%' = PASSWORD('${PHABRICATOR_DB_PASSWORD}');";
-  echo 'flush privileges;';
-}
-
-## Prints the bootstrap SQL to add the required grants to the Phabricator database user.
-function print_db_grants_bootstrap() {
-  for _s in ${PHABRICATOR_DB_SCHEMAS[*]}; do
-    echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
-  done
-}
-
-## Prints the post SQL statements.
-function print_sql_post() {
-  echo "REPAIR TABLE phabricator_search.search_documentfield;";
-}
-
-## Prints the database names.
-function print_database_names() {
-  echo ${PHABRICATOR_DB_SCHEMAS[*]}
-}
-
-## Prints the DDL SQL for all databases.
-function print_databases_ddl() {
-  cat "${SQL_DDL_FOLDER}/phabricator.sql";
-  echo;
-}
-
-## Prints the DDL SQL for given database.
-## -> 1: The database name.
-function print_database_ddl() {
-  local _dbName="${1}";
-  local _file;
-  if [[ -e ${SQL_DDL_FOLDER}/databases/${_dbName}.sql ]]; then
-    _file="${SQL_DDL_FOLDER}/databases/${_dbName}";
-  elif [[ -e ${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}.sql ]]; then
-    _file="${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}";
-  fi
-  cat "${_file}";
-  echo;
-}
-
-## Prints the Liquibase changeLog file for given database.
-## -> 1: The database name.
-function print_liquibase_changeLog() {
-  local _dbName="${1}";
-  if [[ ! -e ${LIQUIBASE_CHANGELOGS_FOLDER}/${_dbName}/changelog.yml ]]; then
-    _dbName="phabricator_${_dbName}";
-  fi
-  cat "${LIQUIBASE_CHANGELOGS_FOLDER}/${_dbName}/changelog.yml"
-  echo;
-}
-
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt: Main logic. Gets called by dry-wit.
+# txt: Returns 0/TRUE always, but may exit due to errors.
+# use: main
 function main() {
   case "${COMMAND}" in
     "create-db-user")
@@ -261,13 +25,199 @@ function main() {
       print_databases_ddl;
       ;;
     "db-sql")
-      print_database_ddl "${DB_NAME}";
+      print_database_ddl "${DBNAME}";
       ;;
     "sql-post")
         print_sql_post;
         ;;
     "liquibase")
-      print_liquibase_changeLog "${DB_NAME}";
+      print_liquibase_changeLog "${DBNAME}";
+      ;;
+  esac
+}
+
+# fun: print_create_db_user_bootstrap
+# api: public
+# txt: Prints the bootstrap SQL to create the Phabricator database user.
+# txt: Returns 0/TRUE always.
+# use: print_create_db_user_bootstrap;
+function print_create_db_user_bootstrap() {
+  echo "create user ${PHABRICATOR_DB_USER}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
+}
+
+# fun: print_change_db_password_bootstrap
+# api: public
+# txt: Prints the bootstrap SQL to change the password of the Phabricator database user.
+# txt: Returns 0/TRUE always.
+# use: print_change_db_password_bootstrap;
+function print_change_db_password_bootstrap() {
+  echo "SET PASSWORD FOR '${PHABRICATOR_DB_USER}'@'%' = PASSWORD('${PHABRICATOR_DB_PASSWORD}');";
+  echo 'flush privileges;';
+}
+
+# fun: print_db_grants_bootstrap
+# api: public
+# txt: Prints the bootstrap SQL to add the required grants to the Phabricator database user.
+# txt: Returns 0/TRUE always.
+# use: print_db_grants_bootstrap;
+function print_db_grants_bootstrap() {
+  local _oldIFS="${IFS}";
+
+  IFS="${DWIFS}";
+  for _s in ${PHABRICATOR_DB_SCHEMAS[@]}; do
+    IFS="${_oldIFS}";
+    echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
+  done
+  IFS="${_oldIFS}";
+}
+
+# fun: print_sql_post
+# api: public
+# txt: Prints the post SQL statements.
+# txt: Returns 0/TRUE always
+# use: print_sql_post;
+function print_sql_post() {
+  echo "REPAIR TABLE phabricator_search.search_documentfield;";
+}
+
+# fun: print_database_names
+# api: public
+# txt: Prints the database names.
+# txt: Returns 0/TRUE always.
+# use: print_database_names;
+function print_database_names() {
+  echo ${PHABRICATOR_DB_SCHEMAS[@]}
+}
+
+# fun: print_databases_ddl
+# api: public
+# txt: Prints the DDL SQL for all databases.
+# txt: Returns 0/TRUE always.
+# use: print_databases_ddl;
+function print_databases_ddl() {
+  cat "${SQL_DDL_FOLDER}/phabricator.sql";
+  echo;
+}
+
+# fun: print_database_ddl dbName
+# api: public
+# txt: Prints the DDL SQL for given database.
+# opt: dbName: The database name.
+# txt: Returns 0/TRUE always.
+# use: print_database_ddl "almanac";
+function print_database_ddl() {
+  local _dbName="${1}";
+  checkNotEmpty dbName "${_dbName}" 1;
+
+  local _file;
+  if fileExists "${SQL_DDL_FOLDER}/databases/${_dbName}.sql"; then
+    _file="${SQL_DDL_FOLDER}/databases/${_dbName}.sql";
+  elif fileExists "${SQL_DDL_FOLDER}/databases/${_dbName}"; then
+    _file="${SQL_DDL_FOLDER}/databases/${_dbName}";
+  elif fileExists "${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}.sql"; then
+    _file="${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}.sql";
+  elif fileExists "${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}"; then
+    _file="${SQL_DDL_FOLDER}/databases/phabricator_${_dbName}";
+  fi
+  if isNotEmpty "${_file}"; then
+    cat "${_file}";
+    echo;
+  fi
+}
+
+# fun: print_liquibase_changelog
+# api: public
+# txt: Prints the Liquibase changeLog file for given database.
+# opt: dbName: The database name.
+# txt: Returns 0/TRUE always.
+# use: print_liquibase_changelog "almanac";
+function print_liquibase_changeLog() {
+  local _dbName="${1}";
+  checkNotEmpty dbName "${_dbName}" 1;
+
+  local _file;
+  if fileExists "${LIQUIBASE_CHANGELOGS_FOLDER}/${_dbName}/changelog.yml"; then
+    _file="${LIQUIBASE_CHANGELOGS_FOLDER}/${_dbName}/changelog.yml";
+  elif fileExists "${LIQUIBASE_CHANGELOGS_FOLDER}/phabricator_${_dbName}/changelog.yml"; then
+    _file="${LIQUIBASE_CHANGELOGS_FOLDER}/phabricator_${_dbName}/changelog.yml";
+  fi
+
+  if isNotEmpty "${_file}"; then
+    cat "${_file}";
+    echo;
+  fi
+}
+
+## Script metadata and CLI settings.
+
+setScriptDescription "Prints the boostrap information required to prepare a database to be used by Phabricator";
+
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
+
+addCommandLineFlag database d "The database vendor" OPTIONAL EXPECTS_ARGUMENT "mariadb";
+addCommandLineParameter command "The command. One of:
+- create-db-user
+- change-db-password
+- db-grants
+- databases
+- sql
+- db-sql [dbName]
+- sql-post
+- liquibase [dbName]" MANDATORY SINGLE;
+addCommandLineParameter dbName "The database name" OPTIONAL SINGLE;
+
+checkReq cat CAT_DOES_NOT_EXIST;
+
+addError UNSUPPORTED_DB_VENDOR "Unsupported database vendor";
+addError NO_LIQUIBASE_CHANGELOGS_FOLDER_SPECIFIED "No Liquibase changeLogs folder specified";
+addError LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND "The specified liquibase changeLogs folder is not found";
+addError DBNAME_DOES_NOT_EXIST "The database does not exist";
+addError INVALID_COMMAND "Invalid command";
+
+defineEnvVar PHABRICATOR_DB_USER MANDATORY "The Phabricator database user" "${SQ_PHABRICATOR_DB_USER}";
+defineEnvVar PHABRICATOR_DB_PASSWORD MANDATORY "The Phabricator database password" "${SQ_PHABRICATOR_DB_PASSWORD}";
+defineEnvVar DEFAULT_DB_VENDOR MANDATORY "The default database vendor" "mariadb";
+defineEnvVar SQL_DDL_FOLDER MANDATORY "The folder with the SQL files" "/usr/local/share/sql";
+defineEnvVar LIQUIBASE_CHANGELOGS_FOLDER MANDATORY "The folder with the Liquibase changelogs" "/usr/local/share/liquibase/";
+defineEnvVar PHABRICATOR_DB_SCHEMAS MANDATORY "The Phabricator schemas" "$(cat /usr/local/share/liquibase/phabricator-schemas.txt)";
+
+function dw_parse_database_cli_flag() {
+  local _flag="${1}";
+  if isEmpty "${_flag}" && isEmpty "${DB_VENDOR}"; then
+    export DB_VENDOR="${DEFAULT_DB_VENDOR}";
+  fi
+}
+
+function dw_check_liquibase_changelogs_folder_cli_envvar() {
+  if ! folderExists "${LIQUIBASE_CHANGELOGS_FOLDER}"; then
+    exitWithErrorCode LIQUIBASE_CHANGELOGS_FOLDER_NOT_FOUND;
+  fi
+}
+
+function dw_parse_dbName_cli_parameter() {
+  export DBNAME="${1}";
+}
+
+function dw_check_command_cli_parameter() {
+
+  case "${COMMAND}" in
+    "create-db-user" | "change-db-password" | "db-grants" | "databases" | "sql-post" | "sql")
+    ;;
+    "db-sql")
+      if    ! fileExists "${SQL_DDL_FOLDER}/databases/${DBNAME}.sql" \
+         && ! fileExists "${SQL_DDL_FOLDER}/databases/phabricator_${DBNAME}.sql"; then
+        exitWithErrorCode DBNAME_DOES_NOT_EXIST;
+      fi
+      ;;
+    "liquibase")
+      if    ! fileExists "${LIQUIBASE_CHANGELOGS_FOLDER}/${DBNAME}/changelog.yml" \
+         && ! fileExists "${LIQUIBASE_CHANGELOGS_FOLDER}/phabricator_${DBNAME}/changelog.yml"; then \
+        exitWithErrorCode DBNAME_DOES_NOT_EXIST;
+      fi
+      ;;
+    *)
+      exitWithErrorCode INVALID_COMMAND "${COMMAND}";
       ;;
   esac
 }

@@ -7,16 +7,17 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("service_user")
 @include("apache")
 @include("git")
-@include("phabricator")
 
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/${IMAGE}/run
-COPY bootstrap bootstrap.inc.sh runme phabricator-cli upgrade arcanist-wrapper help.phabricator.sh \
+COPY bootstrap runme phabricator-cli upgrade arcanist-wrapper help.phabricator.sh \
      /usr/local/bin/
 COPY phabricator-ssh-hook.sh sshd_config.phabricator /var/local/
 COPY phabricator-ssh.sudo /etc/sudoers.d/phabricator-ssh
 COPY phabricator-http.sudo /etc/sudoers.d/phabricator-http
 COPY INSTALL /INSTALL
+
+@include("phabricator")
 
 ADD conf.d /var/local/conf.d
 
@@ -30,105 +31,14 @@ ENV SERVICE="apache" \
 
 COPY apache-files/service /usr/local/bin/run-apache
 #COPY php7.patch /usr/local/src/php7.patch
+COPY docker-compose.yml /Dockerfiles
 
 RUN chmod +x /usr/local/bin/run-apache && \
-    ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} libapache2-mod-php dpkg-dev \
-        php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php7.0-xml php-mcrypt && \
-    ${PKG_INSTALL} --no-pin mysql-server=${MYSQL_VERSION} python-pip openjdk-8-jre-headless && \
     /usr/local/bin/create_ssl_certificate_openssl.sh && \
     /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
     chmod +x /etc/service/${IMAGE}/run && \
-    mkdir /usr/local/share/liquibase && \
-    a2dissite 000-default.conf && \
-    a2enmod rewrite && \
-    phpenmod mcrypt && \
-    ln -s /backup/${IMAGE}-repo /var/repo && \
-    ln -s /backup/${IMAGE}-local /var/local/phabricator && \
-    chown -R www-data:www-data /opt/{libphutil,arcanist,phabricator} /var/local/phabricator /var/repo && \
-    sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php/7.0/apache2/php.ini && \
-    sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php/7.0/apache2/php.ini && \
-    echo 'always_populate_raw_post_data=-1' >> /etc/php/7.0/apache2/php.ini && \
-
-    pip install --upgrade pip && \
-    pip install pygments && \
-    /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user && \
-    /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git && \
-    sed -i 's/^git:!:\(.*\)/git:*:\1/' /etc/shadow && \
-    service mysql start && \
-    sleep 5 && \
-    cd /opt/phabricator && \
-    bin/config set pygments.enabled true && \
-    bin/config set metamta.default-address ${PHABRICATOR_FROM_ADDRESS} && \
-    bin/config set metamta.domain ${DOMAIN} && \
-    bin/config set phabricator.timezone ${DEFAULT_TIMEZONE} && \
-    bin/config set environment.append-paths '["/usr/lib/git-core"]' && \
-    bin/config set phd.user daemon-user && \
-    bin/config set diffusion.ssh-user git && \
-    bin/config set diffusion.allow-http-auth true && \
-    bin/config set mysql.host localhost && \
-    bin/config set mysql.user root && \
-    bin/config set mysql.pass secret && \
-    mysqladmin -u root password 'secret' && \
-    for f in $(find resources/sql/autopatches/ -name '*.sql' -exec grep 'CREATE TABLE {$NAMESPACE}' \{} /dev/null \; | cut -d':' -f 1); do \
-      sed -i 's/CREATE TABLE {$NAMESPACE}/CREATE TABLE IF NOT EXISTS {$NAMESPACE}/g' ${f}; \
-    done && \
-    if [ -n "${INVALID_PATCHES}" ]; then \
-      mkdir invalid-patches && \
-      for p in ${INVALID_PATCHES}; do \
-        mv ${p} invalid-patches/; \
-      done; \
-    fi && \
-    bin/storage upgrade --force && \
-    bin/config set storage.local-disk.path /var/local/phabricator && \
-    chmod 755 /var/local/phabricator-ssh-hook.sh && \
-    mkdir -p /var/tmp/phd/log && \
-    chown -R daemon-user /var/tmp/phd && \
-    cd /usr/local/bin && \
-    chmod +x bootstrap runme phabricator-cli runme upgrade && \
-    for s in create-db-user change-db-password db-grants databases db-sql sql sql-post liquibase; do \
-      ln -s runme ${s}; \
-    done && \
-    for p in libphputil arcanist phabricator; do \
-      ln -s remote-git-version.sh remote-version-${p}.sh && \
-      ln -s local-git-version.sh local-version-${p}.sh && \
-      ln -s check-version.sh check-version-${p}.sh; \
-    done && \
-    for f in /opt/phabricator/bin/*; do ln -s phabricator-cli $(basename ${f}); done && \
-    mkdir -p /usr/local/share/liquibase && \
-    mkdir -p /usr/local/share/sql && \
-    echo "before sql" && \
-    echo "select schema_name from information_schema.schemata where schema_name like 'phabricator_%'" | mysql -N -u root --password=secret >> /usr/local/share/liquibase/phabricator-schemas.txt && \
-    mkdir /opt/liquibase-${LIQUIBASE_VERSION} && \
-    cd /opt && \
-    ln -s liquibase-${LIQUIBASE_VERSION} liquibase && \
-    wget ${LIQUIBASE_URL} && \
-    tar xvf ${LIQUIBASE_ARTIFACT} -C /opt/liquibase && \
-    cd /opt/liquibase/lib && \
-    wget ${MYSQL_JDBC_DRIVER_URL} && \
-    mkdir -p /usr/local/share/sql/databases && \
-    for s in $(cat /usr/local/share/liquibase/phabricator-schemas.txt); do \
-      mkdir -p /usr/local/share/liquibase/${s} && \
-      echo "Extracting database ${s}"; \
-      /opt/liquibase/liquibase --driver=${MYSQL_JDBC_DRIVER} --username=root --password=secret --url="jdbc:mysql://localhost/${s}?user=root" --changeLogFile=/usr/local/share/liquibase/${s}/changelog.yml generateChangeLog; \
-      mysqldump -d -u root -psecret -h localhost --create-options --add-drop-database -B --events --routines --triggers ${s} > /usr/local/share/sql/databases/${s}.sql; \
-    done && \
-    mysqldump -u root -psecret -h localhost --create-options --add-drop-database --events --routines --triggers --databases $(mysql -u root -psecret --skip-column-names -e "SET SESSION group_concat_max_len=10000; SELECT GROUP_CONCAT(schema_name SEPARATOR ' ') FROM information_schema.schemata WHERE schema_name NOT IN ('mysql','performance_schema','information_schema');") > /usr/local/share/sql/phabricator.sql && \
-    service mysql stop && \
-    rm -rf /var/lib/mysql && \
-    rm -rf /opt/liquibase* && \
-    rm -rf /opt/php* && \
-    for s in /opt/libphutil/bin/*; do \
-      ln -s $s /usr/local/bin/; \
-    done && \
-    for s in /opt/arcanist/bin/*; do \
-      ln -s /usr/local/bin/arcanist-wrapper /usr/local/bin/$(basename $s); \
-    done && \
     rm -f /usr/local/bin/help.sh && \
-    ln -s /usr/local/bin/help.phabricator.sh /usr/local/bin/help.sh && \
-    ${SYSTEM_CLEANUP}
-
-#    bin/config set config.ignore-issues '{ "security.security.alternate-file-domain": true }' && \
+    ln -s /usr/local/bin/help.phabricator.sh /usr/local/bin/help.sh
 
 # Phabricator HTTP UI
 EXPOSE 8000
