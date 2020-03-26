@@ -1,140 +1,56 @@
-#!/bin/bash /usr/local/bin/dry-wit
+#!/bin/bash dry-wit
 # Copyright 2014-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
+# mod: service
+# api: public
+# txt: mariadb-bootstrap service script.
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME [-v[v]|-q|--quiet|-p=pass|--password=pass|-u=user|--user=user] [sql-folder]?
-$SCRIPT_NAME [-h|--help]
-(c) 2014-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
+# fun: main
+# api: public
+# txt: Main logic. Gets called by dry-wit
+# txt: Returns 0/TRUE always, but can exit due to errors.
+# use: main
+function main() {
+  local _sqlFiles;
 
-Connects to a MariaDB server and processes the SQL files in sql-folder.
+  local _atLeastOneFile=${FALSE};
 
-Where:
-  * sql-folder: the folder where the SQL files are located. Can be overridden
-with the SQL_FOLDER environment variable.
-Flags:
-  * -u | --user: the database user. Defaults to "root"
-  * -p | --password: the database password.
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
+  find_sql_files "${SQL_FOLDER}";
+  _sqlFiles="${RESULT}";
 
-# Requirements
-function checkRequirements() {
-  checkReq awk AWK_NOT_INSTALLED;
-}
+  local _file;
+  local _oldIFS="${IFS}";
 
-# Error messages
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-  addError "AWK_NOT_INSTALLED" "awk is not installed";
-  addError "NO_DB_USER_SPECIFIED" "The database user cannot be empty";
-  addError "NO_SQL_FOLDER_SPECIFIED" "The SQL folder is mandatory";
-  addError "NO_SQL_FILES_FOUND" "No SQL files found in ${SQL_FOLDER}";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      -u | --user)
-         shift;
-         DB_USER="${1}";
-         shift;
-         ;;
-      -p | --password)
-         shift;
-         DB_PASSWORD="${1}";
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-    esac
+  IFS="${DWIFS}";
+  for _file in ${_sqlFiles}; do
+    IFS="${_oldIFS}";
+    _atLeastOneFile=${TRUE};
+    process_sql_file "${SQL_FOLDER}/${_file}";
   done
+  IFS="${_oldIFS}";
 
-  if isEmpty "${DB_USER}"; then
-    DB_USER="${DEFAULT_DB_USER}";
-  fi
-
-  # Parameters
-  if isEmpty "${SQL_FOLDER}"; then
-    SQL_FOLDER="$1";
-    shift;
+  if isFalse "${_atLeastOneFile}"; then
+    exitWithErrorCode NO_SQL_FILES_FOUND;
   fi
 }
 
-## Checking input
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q | --quiet | -u | --user | -p | --password)
-        ;;
-      --)
-        shift;
-        break;
-        ;;
-      *) logDebugResult FAILURE "fail";
-         exitWithErrorCode INVALID_OPTION ${_flag};
-         ;;
-    esac
-  done
-
-  if isEmpty "${DB_USER}"; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode NO_DB_USER_SPECIFIED;
-  fi
-
-  if isEmpty "${SQL_FOLDER}"; then
-    logDebugResult FAILURE "fail";
-    exitWithErrorCode NO_SQL_FOLDER_SPECIFIED;
-  else
-    logDebugResult SUCCESS "valid";
-  fi
-}
-
-## Checks whether given SQL file is marked as processed.
-## -> 1: The SQL folder.
-## -> 2: The SQL file.
-## <- 0 if it's marked as processed already, 1 otherwise.
-## Example:
-##   if is_sql_file_marked_as_processed /tmp my.sql; then echo "/tmp/my.sql Already processed"; fi
+# fun: is_sql_file_marked_as_processed folder file
+# api: public
+# txt: Checks whether given SQL file is marked as processed.
+# opt: folder: The SQL folder.
+# opt: file: The SQL file.
+# txt: Returns 0/TRUE if it's marked as processed already; 1/FALSE otherwise.
+# use: if is_sql_file_marked_as_processed /tmp my.sql; then echo "/tmp/my.sql Already processed"; fi
 function is_sql_file_marked_as_processed() {
   local _folder="${1}";
+  checkNotEmpty folder "${_folder}" 1;
+
   local _file="${2}";
+  checkNotEmpty file "${_file}" 2;
+
   local -i _rescode;
 
-  checkNotEmpty "folder" "${_folder}" 1;
-  checkNotEmpty "file" "${_file}" 2;
-
-  if [ -e "${_folder}"/."${_file}".done ]; then
+  if fileExists "${_folder}"/."${_file}".done; then
     _rescode=${TRUE};
   else
     _rescode=${FALSE};
@@ -143,34 +59,38 @@ function is_sql_file_marked_as_processed() {
   return ${_rescode};
 }
 
-## Marks given SQL file as processed.
-## -> 1: The SQL folder.
-## -> 2: The SQL file.
-## <- 0 if it's marked successfully, 1 otherwise.
-## Example:
-##   if ! mark_sql_file_as_processed /tmp/my.sql; then echo "Cannot mark SQL file as processed"; fi
+# fun: mark_sql_file_as_processed folder file
+# api: public
+# txt: Marks given SQL file as processed.
+# opt: folder: The SQL folder.
+# opt: file: The SQL file.
+# txt: Returns 0/TRUE if it's marked successfully; 1/FALSE otherwise.
+# use: if ! mark_sql_file_as_processed /tmp/my.sql; then echo "Cannot mark SQL file as processed"; fi
 function mark_sql_file_as_processed() {
   local _folder="${1}";
-  local _file="${2}";
+  checkNotEmpty folder "${_folder}" 1;
 
-  checkNotEmpty "folder" "${_folder}" 1;
-  checkNotEmpty "file" "${_file}" 2;
+  local _file="${2}";
+  checkNotEmpty file "${_file}" 2;
 
   touch ${_folder}/."${_file}".done #2> /dev/null;
   return $?;
 }
 
-## Finds the SQL files in given folder.
-## -> 1: The folder
-## <- RESULT: A space-separated list of file names (relative to the folder).
-## Example:
-##   for f in find_sql_files /tmp; do echo "Found SQL: $f"; done
+# fun: find_sql_files folder
+# api: public
+# txt: Finds the SQL files in given folder.
+# opt: folder: The folder
+# txt: Returns 0/TRUE always.
+# txt: The variable RESULT contains a space-separated list of file names (relative to the folder).
+# use: for f in find_sql_files /tmp; do echo "Found SQL: $f"; done
 function find_sql_files() {
   local _folder="${1}";
-  local _result=();
+  checkNotEmpty folder "${_folder}" 1;
 
-  checkNotEmpty "folder" "${_folder}" 1;
+  local -a _result=();
 
+  local _aux;
   for _aux in $(ls -a "${_folder}" | grep -v '^\..*$'); do
     if ! is_sql_file_marked_as_processed "${_folder}" "${_aux}"; then
       _result[${#_result[@]}]="${_aux}";
@@ -179,27 +99,28 @@ function find_sql_files() {
   export RESULT=${_result[@]};
 }
 
-## Processes given SQL file.
-## -> 1: The SQL file to process.
-## <- 0 if the file is processed, 1 otherwise.
-## Example:
-##   if process_sql_file /tmp/my.dll; then echo "Done"; else echo "Failed"; fi
+# fun: process_sql_file file
+# api: public
+# txt: Processes given SQL file.
+# opt: file: The SQL file to process.
+# txt: Returns 0/TRUE if the file is processed; 1/FALSE otherwise.
+# use: if process_sql_file /tmp/my.dll; then echo "Done"; else echo "Failed"; fi
 function process_sql_file() {
   local _file="${1}";
-  local _logFile;
+  checkNotEmpty file "${_file}" 1;
 
-  checkNotEmpty "file" "${_file}" 1;
+  local _logFile;
 
   logInfo -n "Processing ${_file}";
 
   createTempFile;
   _logFile="${RESULT}";
 
-  if isEmpty "${DB_PASSWORD}"; then
+  if isEmpty "${PASSWORD}"; then
       /usr/bin/mysql -h ${DB_HOST} -u ${DB_USER} < ${_file} 2>&1 > ${_logFile};
       _rescode=$?;
   else
-    /usr/bin/mysql -h ${DB_HOST} -u ${DB_USER} --password="${DB_PASSWORD}" < ${_file} 2>&1 > ${_logFile};
+    /usr/bin/mysql -h ${DB_HOST} -u ${DB_USER} --password="${PASSWORD}" < ${_file} 2>&1 > ${_logFile};
     _rescode=$?;
   fi
   if isTrue ${_rescode}; then
@@ -215,24 +136,22 @@ function process_sql_file() {
   fi
 }
 
-## Main logic
-## dry-wit hook
-function main() {
-  local _sqlFiles;
+## Script metadata and CLI settings.
 
-  local _atLeastOneFile=${FALSE};
+setScriptDescription "Connects to a MariaDB server and processes the SQL files in sql-folder.";
 
-  find_sql_files "${SQL_FOLDER}";
-  _sqlFiles="${RESULT}";
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
 
-  for _file in ${_sqlFiles}; do
-    _atLeastOneFile=${TRUE};
-    process_sql_file "${SQL_FOLDER}/${_file}";
-  done
+defineEnvVar DB_HOST MANDATORY "The MariaDB host" "db";
+defineEnvVar SQL_FOLDER MANDATORY "The folder storing the SQL files to run" "/sql";
+defineEnvVar DEFAULT_USER MANDATORY "The default database user" "root";
 
-  if isFalse "${_atLeastOneFile}"; then
-    exitWithErrorCode NO_SQL_FILES_FOUND;
-  fi
-}
+addCommandLineFlag user u "The database user" OPTIONAL EXPECTS_ARGUMENT "${DEFAULT_USER}";
+addCommandLineFlag password p "The database password" MANDATORY EXPECTS_ARGUMENT;
 
+addCommandLineParameter sqlFolder "the folder where the SQL files are located. Can be overridden." OPTIONAL SINGLE;
+checkReq awk AWK_NOT_INSTALLED;
+
+addError NO_SQL_FILES_FOUND "No SQL files found in ${SQL_FOLDER}";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -7,22 +7,12 @@ FROM ${REGISTRY}/${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 COPY my_exec /sbin/my_exec
 
 COPY service /usr/local/bin/${IMAGE}
-COPY service.inc.sh /usr/local/bin/${IMAGE}.inc.sh
 
 ENV SERVICE_PACKAGE="mariadb-client" \
     SERVICE_USER="mysql" \
     SERVICE_GROUP="mysql";
 
-RUN ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} ${SERVICE_PACKAGE}=${TAG} && \
-    ${SYSTEM_CLEANUP} && \
-    chmod +x /sbin/my_exec && \
-    cd /usr/local/bin && \
-    ln -s check-version.sh check-version-${IMAGE}.sh && \
-    ln -s local-ubuntu-version.sh local-version-${IMAGE}.sh && \
-    ln -s remote-ubuntu-version.sh remote-version-${IMAGE}.sh && \
-    chmod +x /usr/local/bin/${IMAGE} && \
-    chmod -x /usr/local/bin/${IMAGE}.inc.sh
+@include("mariadb-bootstrap")
 
 VOLUME /sql
 
