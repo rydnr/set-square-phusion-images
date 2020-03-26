@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -18,45 +18,22 @@ COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
 COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh admin.sh \
      /usr/local/bin/
 
-@include("create_ssl_certificate")
 #@include("java")
 #@include("logstash")
-
 #COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
+@include("mariadb")
 
 #ADD conf.d /etc/mysql/conf.d
 
-#RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
-#RUN add-apt-repository \'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
-#RUN apt-get install software-properties-common
-RUN ([ ! -d /backup ] && rm -f /backup) && \
-    mkdir -p /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump && \
-    ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} mariadb-server=${TAG} bc && \
-    ${SYSTEM_CLEANUP} && \
-    sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s/^log_error/#log_error/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s|^datadir.*|datadir = /backup/${IMAGE}-db|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s|# ssl-cert\s*.*|ssl-cert=/etc/ssl/private/${IMAGE}.crt|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    sed -i -e"s|# ssl-key\s*.*|ssl-key=/etc/ssl/private/${IMAGE}.key|" /etc/mysql/mariadb.conf.d/50-server.cnf && \
-    /usr/local/bin/create_ssl_certificate_openssl.sh && \
-    rm -rf /var/lib/mysql && \
-    ln -s /backup/${IMAGE}-db /var/lib/mysql && \
-    update-rc.d mysql disable && \
-    gpasswd -a ${SERVICE_USER} crontab && \
-    rm -f /etc/init.d/mysql && \
-    for s in check local-ubuntu remote-ubuntu; do \
+@include("create_ssl_certificate")
+
+RUN gpasswd -a ${SERVICE_USER} crontab \
+ && for s in check local-ubuntu remote-ubuntu; do \
       ln -s /usr/local/bin/${s}-version.sh ${s}-version-${IMAGE}.sh; \
-    done && \
-    chmod +x /etc/service/${IMAGE}/run && \
-    chmod +x /usr/local/bin/bootstrap-db.sh && \
-    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    for p in daily weekly monthly; do \
-      ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.${p}; \
-    done && \
-    mv /usr/local/bin/restart.sh /usr/local/bin/_restart.sh && \
-    ln -s /usr/local/bin/apply-config-changes.sh /usr/local/bin/restart.sh
+    done \
+ && chmod +x /etc/service/${IMAGE}/run \
+ && /etc/my_init.d/00_regen_ssh_host_keys.sh -f
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
@@ -67,5 +44,3 @@ VOLUME [ "/backup/${IMAGE}-db", "/backup/rsnapshot", "/backup/${IMAGE}-dump", "/
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-
-
