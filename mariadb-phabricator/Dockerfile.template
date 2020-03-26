@@ -1,0 +1,11 @@
+@include("preamble")
+FROM ${CUSTOM_NAMESPACE}/mariadb:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+RUN mkdir /sql
+
+COPY *.sql /sql/
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
