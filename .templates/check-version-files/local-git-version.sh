@@ -22,13 +22,10 @@ function main() {
 
 ## Script metadata and CLI options
 setScriptDescription "Retrieves the latest revision of the git repository.";
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2015-today Automated Computing Machinery S.L.";
 
-addError LOCAL_REPOSITORY_NOT_AVAILABLE "The local repository ${LOCAL_REPOSITORY} is not available";
 addError COULD_NOT_RETRIEVE_LATEST_VERSION "Error retrieving the latest revision";
 
-function dw_check_local_repository_cli_envvar() {
-  if isEmpty "${LOCAL_REPOSITORY}"; then
-    exitWithErrorCode LOCAL_REPOSITORY_NOT_AVAILABLE;
-  fi
-}
+defineEnvVar LOCAL_REPOSITORY MANDATORY "The local repository" "${SQ_LOCAL_REPOSITORY}";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

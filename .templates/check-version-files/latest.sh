@@ -55,8 +55,9 @@ function retrieve_version() {
 }
 
 ## Script metadata and CLI options
-
 setScriptDescription "Retrieves the latest version identifier.";
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2015-today Automated Computing Machinery S.L.";
 
 addError CANNOT_RETRIEVE_SERVICE_VERSION "Cannot retrieve the service version, neither via SERVICE_VERSION environment variable nor using dpkg -p ${SERVICE_PACKAGE}";
 addError CHECK_VERSION_SCRIPT_UNAVAILABLE "The check-version.sh script is not available";
@@ -67,6 +68,4 @@ function dw_check_check_version_script_cli_envvar() {
         exitWithErrorCode CHECK_VERSION_SCRIPT_UNAVAILABLE;
     fi
 }
-
-
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

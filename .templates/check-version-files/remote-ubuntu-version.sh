@@ -2,87 +2,6 @@
 # Copyright 2016-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-function usage() {
-cat <<EOF
-$SCRIPT_NAME
-$SCRIPT_NAME [-h|--help]
-(c) 2015-today Automated Computing Machinery S.L.
-    Distributed under the terms of the GNU General Public License v3
-
-Retrieves the current version of the package.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-## Defines the errors
-## dry-wit hook
-function defineErrors() {
-  addError "INVALID_OPTION" "Unrecognized option";
-  addError "CANNOT_RETRIEVE_SERVICE_VERSION" "Cannot retrieve the service version, neither via SERVICE_VERSION environment variable nor using dpkg -p ${SERVICE_PACKAGE}";
-}
-
-## Validates the input.
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-      *) logDebugResult FAILURE "failed";
-         exitWithErrorCode INVALID_OPTION;
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q)
-         shift;
-         ;;
-      --)
-        shift;
-        break;
-        ;;
-    esac
-  done
-
-  if isEmpty "${PACKAGE}"; then
-    PACKAGE="${1}";
-    shift;
-  fi
-}
-
 ## Main logic
 ## dry-wit hook
 function main() {
@@ -97,18 +16,38 @@ function main() {
   fi
 
   logDebug -n "Checking ${PACKAGE} local version";
-  _result="$(apt-get update > /dev/null; apt-cache madison ${_package} | grep 'Packages' | head -n 1 | awk '{print $3;}'; /usr/local/bin/aptget-cleanup.sh > /dev/null)";
+  _result="$(apt-get update > /dev/null; apt-cache madison ${_package} | grep 'Packages' | head -n 1 | awk '{print $3;}'; /usr/local/sbin/system-cleanup.sh > /dev/null)";
   _rescode=$?;
   if ! isTrue ${_rescode}; then
     logDebugResult FAILURE "${_result}";
-    exitWithErrorCode CANNOT_RETRIEVE_SERVICE_VERSION;
+    exitWithErrorCode CANNOT_RETRIEVE_PACKAGE_VERSION;
   fi
 
   if isEmpty ${_result}; then
     logDebugResult FAILURE "${_result}";
-    exitWithErrorCode CANNOT_RETRIEVE_SERVICE_VERSION;
+    exitWithErrorCode CANNOT_RETRIEVE_PACKAGE_VERSION;
   else
     logDebugResult SUCCESS "${_result}";
     echo "${_result}";
   fi
 }
+
+## Script metadata and CLI options
+setScriptDescription "Retrieves the current version of a given package."
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2015-today Automated Computing Machinery S.L.";
+
+addCommandLineParameter package "The package to check the version of" OPTIONAL SINGLE;
+defineEnvVar SERVICE_PACKAGE OPTIONAL "The default package of this image" "${SQ_SERVICE_PACKAGE}";
+
+addError EITHER_PACKAGE_OR_SERVICE_PACKAGE_MUST_BE_PROVIDED "Either package parameter or SERVICE_PACKAGE environment variable must be provided";
+addError CANNOT_RETRIEVE_PACKAGE_VERSION "Cannot retrieve the packge version";
+
+## Validates the input.
+## dry-wit hook
+function dw_checkInput() {
+  if isEmpty "${PACKAGE}" && isEmpty "${SERVICE_PACKAGE}"; then
+    exitWithErrorCode EITHER_PACKAGE_OR_SERVICE_PACKAGE_MUST_BE_PROVIDED;
+  fi
+}
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
