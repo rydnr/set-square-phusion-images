@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -7,8 +7,8 @@ FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
 ENV DOBACKUP="false"
 
 @include("service_user")
-
 @include("service")
+@include("runme")
 
 RUN chmod +x /etc/service/${IMAGE}/run && \
   cd /var/tmp && wget ${PULSECONNECT_DOWNLOAD_URL} && \
