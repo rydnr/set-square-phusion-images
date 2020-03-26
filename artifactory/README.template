@@ -11,7 +11,7 @@ Examples:
 > docker run -d --name ${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} --rm --volumes-from artifactory-data ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Running an instance:
-> docker run -d -p [port]:8082 --name ${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} -v [my-data-folder]:/backup/${IMAGE}/data ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p [port]:8082 --name ${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} -v [my-data-folder]:/backup/${IMAGE}/data -v [my-db-folder]:/backup/${IMAGE}/db -v [my-security-folder]:/backup/${IMAGE}/security ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Running Artifactory with specific Logstash configuration:
 > docker run -d -p [port]:8080 -v [my-logstash-config]:/etc/logstash/conf.d/tomcat.conf --name ${ARTIFACTORY_DEFAULT_VIRTUAL_HOST} ${NAMESPACE}/${IMAGE}:${TAG}
