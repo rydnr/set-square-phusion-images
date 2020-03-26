@@ -1,5 +1,4 @@
 defineEnvVar REGISTRY MANDATORY "cloud.docker.com";
-overrideEnvVar SETSQUARE_FLAVOR "phusion";
 overrideEnvVar LICENSE_FILE "LICENSE.gpl3";
 overrideEnvVar COPYRIGHT_PREAMBLE_FILE "copyright-preamble.gpl3";
 defineEnvVar DATE MANDATORY "The date format used to tag images" "$(date '+%Y%m')";
@@ -13,7 +12,8 @@ defineEnvVar ROOT_IMAGE_VERSION MANDATORY "The root image version" "0.11";
 defineEnvVar ROOT_IMAGE MANDATORY "The default root image" "phusion/baseimage"
 defineEnvVar ROOT_IMAGE_64BIT MANDATORY "The default root image for 64 bits" '${ROOT_IMAGE}';
 defineEnvVar ROOT_IMAGE_32BIT MANDATORY "The default root image for 32 bits" "${ROOT_IMAGE_64BIT_DEFAULT}32";
-defineEnvVar BASE_IMAGE_64BIT MANDATORY "The base image for 64 bits" '${NAMESPACE}-${SETSQUARE_FLAVOR}/base';
+defineEnvVar CUSTOM_NAMESPACE MANDATORY "The custom namespace" '${NAMESPACE}-${SETSQUARE_FLAVOR}';
+defineEnvVar BASE_IMAGE_64BIT MANDATORY "The base image for 64 bits" '${CUSTOM_NAMESPACE}/base';
 defineEnvVar BASE_IMAGE_32BIT MANDATORY "The base image for 32 bits" '${BASE_IMAGE_64BIT_DEFAULT%%64}32';
 defineEnvVar JAVA_VERSION MANDATORY "The Java version" "8";
 defineEnvVar SYSTEM_UPDATE \
