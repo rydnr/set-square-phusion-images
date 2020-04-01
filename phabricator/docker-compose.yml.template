@@ -1,0 +1,72 @@
+version: '3.2'
+services:
+  phabricator:
+    image: ${NAMESPACE}/${IMAGE}:${TAG}
+    ports:
+      - "8000:8000"
+      - "22:22"
+    depends_on:
+      - db
+    links:
+      - "db:db"
+    environment:
+      VIRTUAL_HOST: ${PHABRICATOR_VIRTUAL_HOST}
+    networks:
+      phabricator: {}
+    volumes:
+      - type: volume
+        source: phabricator-liquibase
+        target: /usr/local/share/liquibase
+      - type: volume
+        source: phabricator-sql
+        target: /usr/local/share/sql
+      - type: volume
+        source: phabricator-confd
+        target: /var/local/mysql/conf.d
+      - type: volume
+        source: phabricator-arc
+        target: /arc
+      - type: volume
+        source: phabricator-local
+        target: /backup/phabricator-local
+      - type: volume
+        source: phabricator-repo
+        target: /backup/phabricator-repo
+      - type: volume
+        source: phabricator-rsnapshot
+        target: /backup/rsnapshot
+
+  db:
+    image: ${NAMESPACE}/mariadb:latest
+    networks:
+      phabricator: {}
+    volumes:
+      - type: volume
+        source: mariadb-db
+        target: /backup/mariadb-db
+      - type: volume
+        source: mariadb-rsnapshot
+        target: /backup/rsnapshot
+      - type: volume
+        source: mariadb-dump
+        target: /backup/mariadb-dump
+      - type: volume
+        source: mariadb-confd
+        target: /var/local/mysql/conf.d
+
+volumes:
+  phabricator-liquibase:
+  phabricator-sql:
+  phabricator-confd:
+  phabricator-arc:
+  phabricator-local:
+  phabricator-repo:
+  phabricator-rsnapshot:
+  mariadb-db:
+  mariadb-rsnapshot:
+  mariadb-dump:
+  mariadb-confd:
+
+networks:
+  phabricator:
+    internal: true
