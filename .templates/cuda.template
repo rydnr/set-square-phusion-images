@@ -1,0 +1,14 @@
+# v cuda
+RUN cd /tmp \
+ && wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-repo-ubuntu1804_10.1.243-1_amd64.deb \
+ && apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/7fa2af80.pub \
+ && ${SYSTEM_UPDATE} \
+ && dpkg -i cuda-repo-ubuntu1804_10.1.243-1_amd64.deb \
+ && wget http://developer.download.nvidia.com/compute/machine-learning/repos/ubuntu1804/x86_64/nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb \
+ && apt install ./nvidia-machine-learning-repo-ubuntu1804_1.0.0-1_amd64.deb \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} nvidia-driver-430 \
+ && ${PKG_INSTALL} cuda-10-1 libcudnn7=7.6.4.38-1+cuda10.1 libcudnn7-dev=7.6.4.38-1+cuda10.1 \
+ && ${PKG_INSTALL} libnvinfer6=6.0.1-1+cuda10.1 libnvinfer-dev=6.0.1-1+cuda10.1 libnvinfer-plugin6=6.0.1-1+cuda10.1 \
+ && ${SYSTEM_CLEANUP}
+# ^ cuda
