@@ -1,0 +1,24 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+@include("service")
+@include("service_user")
+
+@include("pip")
+@include("cuda")
+@include("tensorflow")
+@include("tacotron")
+
+ENV PATH=${PATH}:${SERVICE_USER_HOME}/bin
+
+WORKDIR ${SERVICE_USER_HOME}
+
+VOLUME /data
+
+EXPOSE 9000
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

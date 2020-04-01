@@ -1,0 +1,9 @@
+# v tacotron
+RUN (mkdir /work || true) \
+ && cd /work \
+ && git clone https://github.com/keithito/tacotron.git \
+ && cd /work/tacotron \
+ && (curl ${TACOTRON_DOWNLOAD_URL} | tar xzC .) \
+ && pip install -r requirements.txt \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /work/tacotron
+# ^ tacotron

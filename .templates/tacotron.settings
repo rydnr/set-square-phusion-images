@@ -1,0 +1,4 @@
+defineEnvVar TACOTRON_VERSION MANDATORY "The Tacotron version" '20180906';
+defineEnvVar TACOTRON_ARTIFACT MANDATORY "The Tacotron model" "tacotron-${TACOTRON_VERSION}.tar.gz";
+defineEnvVar TACOTRON_DOWNLOAD_URL MANDATORY "The Tacotron download url" "https://data.keithito.com/data/speech/${TACOTRON_ARTIFACT}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

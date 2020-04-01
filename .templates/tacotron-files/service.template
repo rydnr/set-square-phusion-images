@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd /work/tacotron
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} python3 demo_server.py --checkpoint ${SERVICE_USER_HOME}/tacotron-${TAG}/model.ckpt
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

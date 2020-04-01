@@ -1,0 +1,7 @@
+# Tacotron image
+
+This image provides an environment for Tacotron experiments.
+
+## Usage
+
+docker run -it --rm -p 9000:9000 -v ${PWD}:/data ${NAMESPACE}/${IMAGE}:${TAG}
