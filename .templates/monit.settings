@@ -7,12 +7,11 @@ defineButDoNotOverrideEnvVar MONIT_HTTP_USER \
 defineButDoNotOverrideEnvVar MONIT_HTTP_PASSWORD \
              "The password to login in monit's webapp" \
              '${RANDOM_PASSWORD}' \
-             "head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1";
+             "$(head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1)";
 defineButDoNotOverrideEnvVar MONIT_HTTP_TIMEOUT \
              "The timeout before alerting that monit's own http interface is down" \
              "15 seconds";
 defineButDoNotOverrideEnvVar MONIT_ALERT_EMAIL \
              "The email address to send alerts to" \
              '${AUTHOR_EMAIL}';
-
-echo -n ''
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
