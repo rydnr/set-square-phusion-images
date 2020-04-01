@@ -62,7 +62,7 @@ function parseInput() {
   done
  
   if [[ ! -n ${DDL} ]]; then
-    TAG="201710";
+    TAG="202003";
   fi
 
 # Parameters
