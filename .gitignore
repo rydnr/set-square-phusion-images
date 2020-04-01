@@ -103,6 +103,8 @@ mariadb/bootstrap-db
 mariadb-bootstrap/my_exec
 mariadb/conf.d/*
 mariadb/my.cnf
+mariadb-phabricator/*.sql
+mariadb-phabricator/*.yml
 mariadb/process-sqls
 mariadb/process-sqls.sh
 mariadb/rc.local
@@ -141,6 +143,7 @@ padlock-cloud/ssl
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
+phabricator/docker-compose.yml
 **/phabricator-files
 phabricator/git-files
 phabricator/INSTALL
@@ -187,6 +190,7 @@ sdkman/setup.sql
 **/ssh-files
 */syslog-files
 .templates/addon-toggles
+.templates/anaconda
 .templates/android-sdk
 .templates/apache
 .templates/apr
@@ -196,7 +200,9 @@ sdkman/setup.sql
 .templates/bloomrpc
 .templates/copy-metadata
 .templates/couchbase
+.templates/cuda
 .templates/dbeaver
+.templates/deepfakes
 .templates/discord
 .templates/dry-wit
 .templates/dry-wit-files
@@ -225,7 +231,10 @@ sdkman/setup.sql
 .templates/locale
 .templates/logstash
 .templates/maintainer
+.templates/mariadb
+.templates/mariadb-bootstrap
 .templates/metricbeat
+.templates/microsoft-teams
 .templates/mongodb
 .templates/mongodb2
 .templates/monit-files/31_create_monit_http_conf.inc.sh
@@ -266,6 +275,8 @@ sdkman/setup.sql
 .templates/service_user
 .templates/studio3t
 .templates/superset
+.templates/tacotron
+.templates/tensorflow
 .templates/tini
 .templates/tomcat
 .templates/truffle
