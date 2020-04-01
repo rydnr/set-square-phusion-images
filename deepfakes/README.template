@@ -1,0 +1,9 @@
+# Deep fakes
+
+This image sets up the tool from the paper First Order Motion Model for Image Animation:
+
+https://aliaksandrsiarohin.github.io/first-order-model-website/
+
+# Usage
+
+docker run -it --rm -v ${PWD}:/data ${IMAGE}:${TAG} 
