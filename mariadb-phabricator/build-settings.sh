@@ -7,7 +7,7 @@ cp mariadb-bootstrap/service mariadb-phabricator/mariadb-bootstrap;
 
 sqlIndex=0;
 
-for cmd in create-db-user change-db-password db-grants sql sql-post; do
+for cmd in create-db-user change-db-password db-grants sql; do
   ((sqlIndex++));
   file="$(printf "%03d" ${sqlIndex})-${cmd}.sql";
   if ! fileExists mariadb-phabricator/${file}; then
@@ -18,14 +18,14 @@ for cmd in create-db-user change-db-password db-grants sql sql-post; do
 done
 
 logInfo -n "Extracting the names of all databases";
-defineEnvVar PHABRICATOR_DATABASES MANDATORY "The Phabricator databases to bootstrap" "$(docker run -it --rm ${CUSTOM_NAMESPACE}/phabricator:${GITHUB_PHABRICATOR_HASH} databases)";
+defineEnvVar PHABRICATOR_DATABASES MANDATORY "The Phabricator databases to bootstrap" "$(docker run -it --rm ${CUSTOM_NAMESPACE}/phabricator:${GITHUB_PHABRICATOR_HASH} databases | sed 's///g')";
 logInfoResult SUCCESS "done";
 
 for db in ${PHABRICATOR_DATABASES}; do
   ((sqlIndex++));
-  file="$(printf "%03d" ${sqlIndex})-liquibase-${db}.sql";
+  file="$(printf "%03d" ${sqlIndex})-liquibase-${db}.yml";
   if ! fileExists mariadb-phabricator/${file}; then
-    logInfo -n "Extracting liquibase-${db}.sql";
+    logInfo -n "Extracting ${file}";
     (docker run -it --rm ${CUSTOM_NAMESPACE}/phabricator:${GITHUB_PHABRICATOR_HASH} liquibase ${db}) > mariadb-phabricator/${file}
     logInfoResult SUCCESS "done";
   fi
