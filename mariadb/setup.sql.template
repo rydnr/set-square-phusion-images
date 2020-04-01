@@ -6,5 +6,5 @@ GRANT ${MARIADB_ADMIN_PRIVILEGES} ON *.* TO '${MARIADB_ADMIN_USER}'@'%' IDENTIFI
 DELETE FROM mysql.user WHERE User='';
 DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1');
 DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%';
-GRANT ALL PRIVILEGES on *.* TO 'debian-sys-maint'@'localhost' IDENTIFIED BY '___DEBIAN_SYS_MAINT_PASSWORD_HASH___' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
+#

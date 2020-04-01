@@ -1,41 +1,228 @@
-#!/bin/bash
+#!/bin/bash dry-wit
 
-_sleep=3;
+# fun: main
+# api: public
+# txt: Bootstraps the database.
+# txt: Returns 0/TRUE always.
+# use: main
+function main() {
 
-_datadir=/backup/${IMAGE}-db
+  logInfo -n "Tuning configuration";
 
-if [[ ! -e ${_datadir}/.bootstrapped ]]; then
-  /usr/local/bin/bootstrap-db.sh
-  while [ ! -e ${_datadir}/.bootstrapped ]; do
-    echo "Waiting ${_sleep}s for db bootstrap"
-    sleep ${_sleep}
-  done
-fi
+  if ! isEmpty "${INNODB_BUFFER_POOL_SIZE_FACTOR}"; then
+    customize_pool_size "${INNODB_BUFFER_POOL_SIZE_FACTOR_CONFIG_FILE}" ${INNODB_BUFFER_POOL_SIZE_FACTOR};
+  fi
 
-chmod 755 ${_datadir}
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${_datadir}
+  if isTrue "${ENABLE_STRICT_MODE}"; then
+    enable_strict_mode "${ENABLE_STRICT_MODE_CONFIG_FILE}";
+  fi
 
-_poolSize=$(cat /proc/meminfo | grep MemTotal | awk -v f=${INNODB_POOL_SIZE_FACTOR:-${INNODB_DEFAULT_POOL_SIZE_FACTOR}} '{printf("%s*%s*1024\n", $2, f);}' | bc -l | cut -d'.' -f 1)
-[[ -d /usr/local/etc/mysql ]] && rsync -avz /etc/mysql/conf.d/* /usr/local/etc/mysql && cp /usr/local/etc/mysql/*.cnf /etc/mysql/conf.d/
-#[[ "${DISABLE_STRICT_MODE}" == "true" ]] && rm -f /etc/mysql/conf.d/mysqld_strict_mode.cnf
-#[[ "${ALTERNATE_BOOLEAN_SYNTAX}" == "true" ]] && rm -f /etc/mysql/conf.d/mysqld_alternate_boolean_syntax.cnf
+  if isTrue "${ENABLE_LOCAL_INFILE}"; then
+    enable_local_infile "${ENABLE_LOCAL_INFILE_CONFIG_FILE}";
+  fi
 
-cat <<EOF > /etc/mysql/conf.d/mysqld_innodb_buffer_pool_size.cnf
+  logInfoResult SUCCESS "done";
+
+  bootstrap_if_not_already_bootstrapped;
+
+  setup_folder_permissions "${DATA_DIR}" "${SERVICE_USER}" "${SERVICE_GROUP}";
+
+  logInfo -n "Synchronizing data";
+  sync_folders;
+  logInfoResult SUCCESS "done";
+
+  if ! folderExists /var/run/mysql; then
+    mkdir /var/run/mysql;
+  fi
+  setup_folder_permissions /var/run/mysql "${SERVICE_USER}" "${SERVICE_GROUP}";
+
+  logInfo "Launching MariaDB";
+  launch_mysql "${SERVICE_USER}" "${MARIADB_ROOT_PASSWORD}" "${ENABLE_LOGSTASH}";
+
+  logInfo "Exiting";
+}
+
+# fun: already_bootstrapped dataDir markFile
+# api: public
+# txt: Checks if the database has been already bootstrapped.
+# opt: dataDir: The data folder.
+# opt: markFile: The file used to mark the bootstrapping process as already done.
+# txt: Returns 0/TRUE if already bootstrapped; 1/FALSE otherwise.
+# use: if already_bootstrapped /var/lib/mysql .bootstrapped; then echo "Already bootstrapped"; fi
+function already_bootstrapped() {
+  local _dataDir="${1}";
+  checkNotEmpty dataDir "${_dataDir}" 1;
+
+  local _markFile="${2}";
+  checkNotEmpty markFile "${_markFile}" 2;
+
+  fileExists "${_dataDir}"/"${_markFile}";
+}
+
+# fun: bootstrap_if_not_already_bootstrapped
+# api: public
+# txt: Bootstraps the server if not already bootstrapped.
+# txt: Returns 0/TRUE always.
+# use: bootstrap_if_not_already_bootstrapped
+function bootstrap_if_not_already_bootstrapped() {
+  logInfo -n "Checking if service already bootstrapped";
+  if fileExists "${BOOTSTRAP_MARK_FILE}"; then
+    logInfoResult SUCCESS "already bootstrapped";
+  else
+    logInfoResult SUCCESS "not bootstrapped";
+
+    logInfo "Bootstrapping service ...";
+    /usr/local/bin/bootstrap-db.sh
+
+    while ! fileExists "${DATA_DIR}/${BOOTSTRAP_MARK_FILE}"; do
+      logInfo -n "Waiting ${SLEEP}s for the bootstrap process to finish";
+      sleep ${SLEEP}
+      logInfoResult SUCCESS "done";
+    done
+
+    logInfo -n "Bootstrapping service";
+    logInfoResult SUCCESS "done";
+  fi
+}
+
+# fun: setup_folder_permissions
+# api: public
+# txt: Sets up the folder permissions.
+# opt: folder: The folder.
+# opt: user: The user.
+# opt: group: The group.
+# txt: Returns 0/TRUE always.
+# use: setup_folder_permissions /var/lib/mysql mysql mysql
+function setup_folder_permissions() {
+  local _folder="${1}";
+  checkNotEmpty folder "${_folder}" 1;
+
+  local _user="${2}";
+  checkNotEmpty user "${_user}" 2;
+
+  local _group="${3}";
+  checkNotEmpty group "${_group}" 3;
+
+  chmod 755 ${_folder};
+  chown -R ${_user}:${_group} ${_folder};
+}
+
+# fun: customize_pool_size file
+# api: public
+# txt: Customizes the innodb_buffer_pool_size setting into given file.
+# opt: file: The file to write.
+# txt: Returns 0/TRUE always.
+# api: customize_pool_size /etc/mysql/conf.d/mysqld_innodb_buffer_pool_size.cnf
+function customize_pool_size() {
+  local _file="${1}";
+  checkNotEmpty file "${_file}" 1;
+
+  local _poolFactor="${2}";
+  checkNotEmpty poolFactor "${_poolFactor}" 2;
+
+  local _poolSize=$(cat /proc/meminfo | grep MemTotal | awk -v f=${_poolFactor} '{printf("%s*%s*1024\n", $2, f);}' | bc -l | cut -d'.' -f 1)
+  cat <<EOF > ${_file}
 [mysqld]
 innodb_buffer_pool_size=${_poolSize}
 EOF
+  local -i _rescode=$?;
 
-rsync -avz /etc/mysql/conf.d/ /var/local/conf.d/
-rsync -avz /var/local/conf.d/ /etc/mysql/conf.d/
+  return ${_rescode};
+}
 
-mkdir /var/run/mysql
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/run/mysql
+# fun: enable_strict_mode configFile
+# api: public
+# txt: Enables strict made.
+# opt: configFile: The configuration file to write.
+# txt: Returns 0/TRUE if strict mode could be enabled; 1/FALSE otherwise.
+# use: if disable_strict_mode /etc/mysql/conf.d/enable_strict_mode.cnf; then echo "strict mode enabled"; fi
+function enable_strict_mode() {
+  local _file="${1}";
+  checkNotEmpty file "${_file}" 1;
 
-exec 2>&1
-if [ "${ENABLE_LOGSTASH}-" == "true" ]; then
-    exec /usr/bin/mysqld_safe --console --user=${SERVICE_USER} | logstash agent -f /etc/logstash/conf.d/mariadb.conf
-else
-  exec /usr/bin/mysqld_safe --console --user=${SERVICE_USER} \
-      || mysqladmin -u root --password="${SQ_MARIADB_ROOT_PASSWORD}" -h127.0.0.1 --protocol=tcp shutdown
-fi
+  cat <<EOF > ${_file}
+[mysqld]
+sql_mode=STRICT_ALL_TABLES
+EOF
+  local -i _rescode=$?;
+
+  return ${_rescode};
+}
+
+# fun: enable_local_infile configFile
+# api: public
+# txt: Enables local infile.
+# opt: configFile: The configuration file to write.
+# txt: Returns 0/TRUE if local infile could be enabled; 1/FALSE otherwise.
+# use: if enable_local_infile /etc/mysql/conf.d/enable_local_infile.cnf; then echo "Local infile enabled"; fi
+function enable_local_infile() {
+  local _file="${1}";
+  checkNotEmpty file "${_file}" 1;
+
+  cat <<EOF > ${_file}
+[mysqld]
+local_infile=0
+EOF
+  local -i _rescode=$?;
+
+  return ${_rescode};
+}
+
+# fun: sync_folders
+# api: public
+# txt: Synchronizes folders.
+# txt: Returns 0/TRUE always.
+# use: sync_folders;
+function sync_folders() {
+
+  [[ -d /usr/local/etc/mysql ]] && rsync -az /etc/mysql/conf.d/* /usr/local/etc/mysql && cp /usr/local/etc/mysql/*.cnf /etc/mysql/conf.d/
+
+  rsync -az /etc/mysql/conf.d/ /var/local/conf.d/
+  rsync -az /var/local/conf.d/ /etc/mysql/conf.d/
+}
+
+# fun: launch_mysql user rootPassword logstash?
+# api: public
+# txt: Launches the MariaDB service. It runs in foreground, so this function doesn't return until the process no longer runs.
+# opt: user: The owner of the account.
+# opt: rootPassword: The root password (in case booting fails, to shut down gracefully).
+# txt: Returns 0/TRUE if the process has been terminated successfully; 1/FALSE otherwise.
+# use: if launch_mysql mysql secret; then echo "MySQL launched"; done
+function launch_mysql() {
+  local _user="${1}";
+  checkNotEmpty user "${_user}" 1;
+
+  local _password="${2}";
+  checkNotEmpty rootPassword "${_password}" 2;
+
+  local _logstash="${3}";
+  checkNotEmpty logstash "${_logstash}" 3;
+
+  exec 2>&1
+  if isTrue ${_logstash} && which logstash > /dev/null 2>&1; then
+    exec /usr/bin/mysqld_safe --console --user=${_user} | logstash agent -f /etc/logstash/conf.d/mariadb.conf \
+      || (logInfo "mysqld_safe is stopping") && mysqladmin -u root --password="${_password}" -h127.0.0.1 --protocol=tcp shutdown
+  else
+    exec /usr/bin/mysqld_safe --console --user=${_user} \
+      || (logInfo "mysqld_safe is stopping" && mysqladmin -u root --password="${_password}" -h127.0.0.1 --protocol=tcp shutdown)
+  fi
+}
+
+## Script metadata and CLI settings.
+setScriptDescription "Runs MariaDB.";
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
+
+defineEnvVar SLEEP OPTIONAL "The interval in seconds before checking if mysql is stopped" 10;
+defineEnvVar DATA_DIR OPTIONAL "The folder with the db data" "/backup/${IMAGE}-db";
+defineEnvVar BOOTSTRAP_MARK_FILE OPTIONAL "The file indicating the server has been already bootstrapped" ".bootstrapped";
+defineEnvVar BOOTSTRAP_SETUP_FILE OPTIONAL "The file with the initial sql" "/usr/local/src/setup.sql";
+defineEnvVar BOOTSTRAP_SQL_FOLDER OPTIONAL "The folder with the bootstrap SQL files" "/sql";
+defineEnvVar INNODB_BUFFER_POOL_SIZE_FACTOR OPTIONAL "The default pool size factor for InnoDB" "${DEFAULT_INNODB_BUFFER_POOL_SIZE_FACTOR}";
+defineEnvVar INNODB_BUFFER_POOL_SIZE_FACTOR_CONFIG_FILE OPTIONAL "The location of the config file to customize the InnoDB buffer pool size factor" "${DEFAULT_INNODB_BUFFER_POOL_SIZE_FACTOR_CONFIG_FILE}";
+defineEnvVar ENABLE_STRICT_MODE OPTIONAL "Whether to enable strict mode" ${DEFAULT_ENABLE_STRICT_MODE};
+defineEnvVar ENABLE_STRICT_MODE_CONFIG_FILE OPTIONAL "The location of the config file to enable strict mode" "${DEFAULT_ENABLE_STRICT_MODE_CONFIG_FILE}";
+defineEnvVar ENABLE_LOCAL_INFILE OPTIONAL "Whether to enable LOAD DATA LOCAL INFILE" ${DEFAULT_ENABLE_LOCAL_INFILE};
+defineEnvVar ENABLE_LOCAL_INFILE_CONFIG_FILE OPTIONAL "The location of the config file to enable LOAD DATA LOCAL INFILE" "${DEFAULT_ENABLE_LOCAL_INFILE_CONFIG_FILE}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 

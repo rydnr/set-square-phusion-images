@@ -9,36 +9,38 @@ function main() {
   # Just in case Monit is configured to restart MariaDB
   stop_monit;
 
-  wait_until_mysql_stops ${SLEEP};
+  wait_until_mariadb_stops ${SLEEP} "${MARIADB_ROOT_PASSWORD}";
 
-  process_setup_file "${BOOSTRAP_SETUP_FILE}";
+  install_mariadb_db "${DATA_DIR}";
 
-  install_mysql_db "${DATA_DIR}";
+  start_mariadb "${DATA_DIR}" "${SERVICE_USER}";
 
-  start_mysql "${DATA_DIR}" "${SERVICE_USER}";
+  wait_until_mariadb_starts "${SLEEP}";
 
-  sleep ${SLEEP}
+  process_setup_file "${BOOTSTRAP_SETUP_FILE}";
 
-  run_sql_file "${BOOTSTRAP_SETUP_FILE}" "${MARIADB_ROOT_PASSWORD}";
+  run_sql_file "${BOOTSTRAP_SETUP_FILE}";
 
   if folderExists "${BOOTSTRAP_SQL_FOLDER}"; then
     local _oldIFS="${IFS}";
     IFS="${DWIFS}";
     local _file;
-    for _file in $(ls "${BOOTSTRAP_SQL_FOLDER}/*.sql"); do
+    for _file in $(ls "${BOOTSTRAP_SQL_FOLDER}"/*.sql); do
+      IFS="${_oldIFS}";
       run_sql_file "${_file}" "${MARIADB_ROOT_PASSWORD}";
     done
+    IFS="${_oldIFS}";
   fi
 
-  upgrade_mysql "${MARIADB_ROOT_PASSWORD}";
+  upgrade_mariadb "${MARIADB_ROOT_PASSWORD}";
 
-  shutdown_mysql "${MARIADB_ROOT_PASSWORD}";
+  shutdown_mariadb "${MARIADB_ROOT_PASSWORD}";
 
-  wait_until_mysql_stops ${SLEEP};
+  wait_until_mariadb_stops ${SLEEP} "${MARIADB_ROOT_PASSWORD}";
 
   process_data_folder "${DATA_DIR}" "${SERVICE_USER}" "${SERVICE_GROUP}";
 
-  mark_db_as_bootstrapped "${DATA_DIR}";
+  mark_db_as_bootstrapped "${DATA_DIR}" "${BOOTSTRAP_MARK_FILE}";
 
   start_monit;
 }
@@ -61,22 +63,77 @@ function start_monit() {
   service monit start;
 }
 
-# fun: wait_until_mysql_stops sleep
+# fun: wait_until_mariadb_stops sleep rootPassword
 # api: public
-# txt: Waits until mysql stops.
+# txt: Waits until mariadb stops.
 # opt: sleep: The amount of seconds to wait between checks.
-# txt: Returns 0/TRUE always.
-# use: wait_until_mysql_stops 2;
-function wait_until_mysql_stops() {
+# opt: rootPassword: The password of the root user.
+# txt: Returns 0/TRUE if MariaDB is not running; 1/FALSE otherwise.
+# use: wait_until_mariadb_stops 2 secret;
+function wait_until_mariadb_stops() {
   local _sleep="${1}";
   checkNotEmpty sleep "${_sleep}" 1;
 
-  while ps -ef | grep mysql | grep -v grep > /dev/null; do
-    echo "Waiting ${_sleep}s for MariaDB to shut down";
-    killall mysqld;
-    killall mysqld_safe;
-    sleep ${_sleep};
+  local _password="${2}";
+  checkNotEmpty rootPassword "${_password}" 2;
+
+  local -i _rescode=${TRUE};
+
+  netstat -putadon | grep ':3306' > /dev/null;
+  local -i _alive=$?;
+
+  while isTrue ${_alive}; do
+    logInfo -n "Shutting MariaDB down";
+    if shutdown_mariadb "${_password}"; then
+      logInfoResult SUCCESS "done";
+      logInfo -n "Waiting ${_sleep}s for MariaDB to shut down before trying again";
+      sleep ${_sleep};
+      logInfoResult SUCCESS "done";
+      netstat -putadon | grep ':3306' > /dev/null;
+      _alive=$?;
+    else
+      logInfoResult SUCCESS "failed";
+      break;
+    fi
   done
+
+  if isFalse ${_alive}; then
+    _rescode=${TRUE};
+  fi
+
+  if isFalse ${_rescode}; then
+    logInfo "MariaDB is not running";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: wait_until_mariadb_starts sleep
+# api: public
+# txt: Waits until MariaDB starts.
+# opt: sleep: The amount of seconds to wait between checks.
+# txt: Returns 0/TRUE if MariaDB is running; 1/FALSE otherwise.
+# use: wait_until_mariadb_starts 2 secret;
+function wait_until_mariadb_starts() {
+  local _sleep="${1}";
+  checkNotEmpty sleep "${_sleep}" 1;
+
+  netstat -putadon | grep ':3306' > /dev/null;
+  local -i _rescode=$?;
+
+  while isFalse ${_rescode}; do
+    logInfo -n "Waiting ${_sleep}s for MariaDB to boot";
+    sleep ${_sleep};
+    logInfoResult SUCCESS "done";
+    netstat -putadon | grep ':3306' > /dev/null;
+    _rescode=$?;
+  done
+
+  if isTrue ${_rescode}; then
+    logInfo "MariaDB up and running";
+  fi
+
+  return ${_rescode};
 }
 
 # fun: process_setup_file file
@@ -89,38 +146,88 @@ function process_setup_file() {
   local _file="${1}";
   checkNotEmpty file "${_file}" 1;
 
-  sed "s ___LAN___ $(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.%%\n", $1, $2, $3);}') g" ${_file}.tpl > ${_file}
-  sed -i "s ___DEBIAN_SYS_MAINT_PASSWORD_HASH___ $(grep password /etc/mysql/debian.cnf  | head -n 1 | cut -d' ' -f 3) g" ${_file};
+  local -i _rescode;
+
+  logDebug -n "Finding out own IP";
+  local _ip="$(ifconfig eth0 | grep 'inet addr' | cut -d':' -f 2 | awk '{print $1;}' | awk -F'.' '{printf("%d.%d.%d.%%\n", $1, $2, $3);}')";
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
+    logDebugResult SUCCESS "${_ip}";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Replacing ___LAN___ with ${_ip} in ${_file}.tpl";
+    sed "s ___LAN___ ${_ip} g" ${_file}.tpl > ${_file};
+    _rescode=$?;
+
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+    fi
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Retrieving password from /etc/mysql/debian.cnf";
+    local _password="$(grep password /etc/mysql/debian.cnf  | head -n 1 | cut -d' ' -f 3)";
+    _rescode=$?;
+
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "${_password}";
+    else
+      logDebugResult FAILURE "failed";
+    fi
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Replacing ___DEBIAN_SYS_MAINT_PASSWORD_HASH___ with ${_password} in ${_file}";
+    sed -i "s ___DEBIAN_SYS_MAINT_PASSWORD_HASH___ ${_password} g" ${_file};
+    logDebugResult SUCCESS "done";
+    _rescode=$?;
+
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+    fi
+  fi
+
+  return ${_rescode};
 }
 
-# fun: install_mysql_db dataDir
+# fun: install_mariadb_db dataDir
 # api: public
-# txt: Installs a fresh MySQL database.
+# txt: Installs a fresh MariaDB database.
 # opt: dataDir: The database folder.
 # txt: Returns 0/TRUE if the database is installed successfully; 1/FALSE otherwise.
-# use: if install_mysql_db /var/lib/mysql; then echo "MySQL db installed successfully"; fi
-function install_mysql_db() {
+# use: if install_mariadb_db /var/lib/mysql; then echo "MySQL db installed successfully"; fi
+function install_mariadb_db() {
   local _dataDir="${1}";
   checkNotEmpty dataDir "${_dataDir}" 1;
 
   mysql_install_db --datadir=${_dataDir};
 }
 
-# fun: start_mysql dataDir user
+# fun: start_mariadb dataDir user
 # api: public
-# txt: Starts MySQL
+# txt: Starts MariaDB.
 # opt: dataDir: The database folder.
-# opt: user: The user to run MySQL as.
+# opt: user: The user to run MariaDB as.
 # txt: Returns 0/TRUE if the process starts; 1/FALSE otherwise.
-# use: if start_mysql /var/lib/mysql ${SERVICE_USER}; then echo "MySQL started successfully"; fi
-function start_mysql() {
+# use: if start_mariadb /var/lib/mysql ${SERVICE_USER}; then echo "MySQL started successfully"; fi
+function start_mariadb() {
   local _dataDir="${1}";
   checkNotEmpty dataDir "${_dataDir}" 1;
 
   local _user="${2}";
   checkNotEmpty user "${_user}" 2;
 
-  /usr/bin/mysqld_safe --console --user=${_user} --datadir=${_dataDir} &
+  logInfo -n "Starting MariaDB";
+  /usr/bin/mysqld_safe --nowatch --no-auto-restart --user=${_user} --datadir=${_dataDir};
+  logInfoResult SUCCESS "done";
 }
 
 # fun: run_sql_file file password
@@ -135,36 +242,56 @@ function run_sql_file() {
   checkNotEmpty file "${_file}" 1;
 
   local _password="${2}";
-  checkNotEmpty password "${_password}" 2;
 
-  /usr/bin/mysql -u root < ${_file} \
-  || /usr/bin/mysql -u root --password="${_password}" < ${_file}
+  local -i _rescode=${FALSE};
+
+  if isEmpty "${_password}"; then
+    logInfo -n "Running ${_file} as root with no password";
+    /usr/bin/mysql -u root < ${_file};
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "done";
+    else
+      logInfoResult FAILURE "failed";
+    fi
+  else
+    logInfo -n "Running ${_file} as root with password";
+    /usr/bin/mysql -u root --password="${_password}" < ${_file};
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "done";
+    else
+      logInfoResult FAILURE "failed";
+    fi
+  fi
+
+  return ${_rescode};
 }
 
-# fun: upgrade_mysql rootPassword
+# fun: upgrade_mariadb rootPassword
 # api: public
 # txt: Upgrades MySQL.
 # opt: rootPassword: The root password.
 # txt: Returns 0/TRUE if the database installation is upgraded; 1/FALSE otherwise.
-# use: if upgrade_mysql "secret"; then echo "MySQL upgraded successfully"; fi
-function upgrade_mysql() {
+# use: if upgrade_mariadb "secret"; then echo "MySQL upgraded successfully"; fi
+function upgrade_mariadb() {
   local _password="${1}";
   checkNotEmpty rootPassword "${_password}" 1;
 
   mysql_upgrade -u root --password="${_password}"
 }
 
-# fun: shutdown_mysql rootPassword
+# fun: shutdown_mariadb rootPassword
 # api: public
 # txt: Shuts down MySQL.
 # opt: rootPassword: The root password.
 # txt: Returns 0/TRUE if the database shutdown process starts; 1/FALSE otherwise.
-# use: if shutdown_mysql "secret"; then echo "mysql shutting down"; fi
-function shutdown_mysql() {
+# use: if shutdown_mariadb "secret"; then echo "mysql shutting down"; fi
+function shutdown_mariadb() {
   local _password="${1}";
   checkNotEmpty rootPassword "${_password}" 1;
 
-  mysqladmin -u root --password="${_password}" -h127.0.0.1 --protocol=tcp shutdown
+  mysqladmin -u root --password="${_password}" -h127.0.0.1 --protocol=tcp shutdown 2> /dev/null
 }
 
 # fun: process_data_folder dataDir user group
@@ -189,17 +316,21 @@ function process_data_folder() {
   && chmod 755 ${_dataDir};
 }
 
-# fun: mark_db_as_bootstrapped dataDir
+# fun: mark_db_as_bootstrapped dataDir markFile
 # api: public
 # txt: Marks the database installation as bootstrapped.
-# opt: dataDir: The database folder.
+# opt: dataDir: The data folder.
+# opt: markFile: The mark file.
 # txt: Returns 0/TRUE if the installation is marked as bootstrapped successfully; 1/FALSE otherwise.
-# use: if mark_db_as_bootstrapped /var/lib/mysql; then echo "Database installation bootstrapped"; fi
+# use: if mark_db_as_bootstrapped /var/lib/mysql .bootstrapped; then echo "Database installation bootstrapped"; fi
 function mark_db_as_bootstrapped() {
   local _dataDir="${1}";
   checkNotEmpty dataDir "${_dataDir}" 1;
 
-  touch ${_dataDir}/.bootstrapped;
+  local _markFile="${2}";
+  checkNotEmpty markFile "${_markFile}" 2;
+
+  touch ${_dataDir}/"${_markFile}";
 }
 
 ## Script metadata and CLI settings.
@@ -210,6 +341,7 @@ setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
 
 defineEnvVar SLEEP MANDATORY "The interval in seconds before checking if mysql is stopped" 10;
 defineEnvVar DATA_DIR MANDATORY "The folder with the db data" "/backup/${IMAGE}-db";
+defineEnvVar BOOTSTRAP_MARK_FILE MANDATORY "The file indicating the server has been already bootstrapped" ".bootstrapped";
 defineEnvVar BOOTSTRAP_SETUP_FILE MANDATORY "The file with the initial sql" "/usr/local/src/setup.sql";
 defineEnvVar BOOTSTRAP_SQL_FOLDER MANDATORY "The folder with the bootstrap SQL files" "/sql";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

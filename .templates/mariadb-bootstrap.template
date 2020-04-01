@@ -1,0 +1,11 @@
+# v mariadb-bootstrap
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} ${SERVICE_PACKAGE} \
+ && ${SYSTEM_CLEANUP} \
+ && chmod +x /sbin/my_exec \
+ && cd /usr/local/bin \
+ && ln -s check-version.sh check-version-${IMAGE}.sh \
+ && ln -s local-ubuntu-version.sh local-version-${IMAGE}.sh \
+ && ln -s remote-ubuntu-version.sh remote-version-${IMAGE}.sh \
+ && chmod +x /usr/local/bin/${IMAGE}
+# ^ mariadb-bootstrap
