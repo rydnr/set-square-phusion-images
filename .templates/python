@@ -1,2 +1,4 @@
 # v python
-RUN /usr/local/bin/aptget-install.sh -vv  -u python2.7 && /usr/local/bin/aptget-cleanup.sh -v 
+RUN /usr/local/sbin/system-update.sh -v && \
+    /usr/local/sbin/pkg-install.sh -vv python2.7 && \
+    /usr/local/sbin/system-cleanup.sh -v

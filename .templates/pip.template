@@ -1,4 +1,7 @@
 # v pip
-RUN cd /tmp && curl -O https://bootstrap.pypa.io/get-pip.py && \
-    python3 get-pip.py
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} python3.pip \
+ && pip3 install --upgrade pip \
+ && ${SYSTEM_CLEANUP}
 # ^ pip
+#
