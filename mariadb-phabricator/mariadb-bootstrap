@@ -1,0 +1,157 @@
+#!/bin/bash dry-wit
+# Copyright 2014-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+# mod: service
+# api: public
+# txt: mariadb-bootstrap service script.
+
+# fun: main
+# api: public
+# txt: Main logic. Gets called by dry-wit
+# txt: Returns 0/TRUE always, but can exit due to errors.
+# use: main
+function main() {
+  local _sqlFiles;
+
+  local _atLeastOneFile=${FALSE};
+
+  find_sql_files "${SQL_FOLDER}";
+  _sqlFiles="${RESULT}";
+
+  local _file;
+  local _oldIFS="${IFS}";
+
+  IFS="${DWIFS}";
+  for _file in ${_sqlFiles}; do
+    IFS="${_oldIFS}";
+    _atLeastOneFile=${TRUE};
+    process_sql_file "${SQL_FOLDER}/${_file}";
+  done
+  IFS="${_oldIFS}";
+
+  if isFalse "${_atLeastOneFile}"; then
+    exitWithErrorCode NO_SQL_FILES_FOUND;
+  fi
+}
+
+# fun: is_sql_file_marked_as_processed folder file
+# api: public
+# txt: Checks whether given SQL file is marked as processed.
+# opt: folder: The SQL folder.
+# opt: file: The SQL file.
+# txt: Returns 0/TRUE if it's marked as processed already; 1/FALSE otherwise.
+# use: if is_sql_file_marked_as_processed /tmp my.sql; then echo "/tmp/my.sql Already processed"; fi
+function is_sql_file_marked_as_processed() {
+  local _folder="${1}";
+  checkNotEmpty folder "${_folder}" 1;
+
+  local _file="${2}";
+  checkNotEmpty file "${_file}" 2;
+
+  local -i _rescode;
+
+  if fileExists "${_folder}"/."${_file}".done; then
+    _rescode=${TRUE};
+  else
+    _rescode=${FALSE};
+  fi
+
+  return ${_rescode};
+}
+
+# fun: mark_sql_file_as_processed folder file
+# api: public
+# txt: Marks given SQL file as processed.
+# opt: folder: The SQL folder.
+# opt: file: The SQL file.
+# txt: Returns 0/TRUE if it's marked successfully; 1/FALSE otherwise.
+# use: if ! mark_sql_file_as_processed /tmp/my.sql; then echo "Cannot mark SQL file as processed"; fi
+function mark_sql_file_as_processed() {
+  local _folder="${1}";
+  checkNotEmpty folder "${_folder}" 1;
+
+  local _file="${2}";
+  checkNotEmpty file "${_file}" 2;
+
+  touch ${_folder}/."${_file}".done #2> /dev/null;
+  return $?;
+}
+
+# fun: find_sql_files folder
+# api: public
+# txt: Finds the SQL files in given folder.
+# opt: folder: The folder
+# txt: Returns 0/TRUE always.
+# txt: The variable RESULT contains a space-separated list of file names (relative to the folder).
+# use: for f in find_sql_files /tmp; do echo "Found SQL: $f"; done
+function find_sql_files() {
+  local _folder="${1}";
+  checkNotEmpty folder "${_folder}" 1;
+
+  local -a _result=();
+
+  local _aux;
+  for _aux in $(ls -a "${_folder}" | grep -v '^\..*$'); do
+    if ! is_sql_file_marked_as_processed "${_folder}" "${_aux}"; then
+      _result[${#_result[@]}]="${_aux}";
+    fi
+  done
+  export RESULT=${_result[@]};
+}
+
+# fun: process_sql_file file
+# api: public
+# txt: Processes given SQL file.
+# opt: file: The SQL file to process.
+# txt: Returns 0/TRUE if the file is processed; 1/FALSE otherwise.
+# use: if process_sql_file /tmp/my.dll; then echo "Done"; else echo "Failed"; fi
+function process_sql_file() {
+  local _file="${1}";
+  checkNotEmpty file "${_file}" 1;
+
+  local _logFile;
+
+  logInfo -n "Processing ${_file}";
+
+  createTempFile;
+  _logFile="${RESULT}";
+
+  if isEmpty "${PASSWORD}"; then
+      /usr/bin/mysql -h ${DB_HOST} -u ${DB_USER} < ${_file} 2>&1 > ${_logFile};
+      _rescode=$?;
+  else
+    /usr/bin/mysql -h ${DB_HOST} -u ${DB_USER} --password="${PASSWORD}" < ${_file} 2>&1 > ${_logFile};
+    _rescode=$?;
+  fi
+  if isTrue ${_rescode}; then
+    if ! mark_sql_file_as_processed "$(dirname ${_file})" "$(basename ${_file})"; then
+      logInfoResult SUCCESS "warning";
+      logInfo "Cannot mark ${_file} as processed";
+    else
+      logInfoResult SUCCESS "done";
+    fi
+  else
+    logInfoResult FAILURE "failed";
+    cat ${_logFile};
+  fi
+}
+
+## Script metadata and CLI settings.
+
+setScriptDescription "Connects to a MariaDB server and processes the SQL files in sql-folder.";
+
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
+
+defineEnvVar DB_HOST MANDATORY "The MariaDB host" "db";
+defineEnvVar SQL_FOLDER MANDATORY "The folder storing the SQL files to run" "/sql";
+defineEnvVar DEFAULT_USER MANDATORY "The default database user" "root";
+
+addCommandLineFlag user u "The database user" OPTIONAL EXPECTS_ARGUMENT "${DEFAULT_USER}";
+addCommandLineFlag password p "The database password" MANDATORY EXPECTS_ARGUMENT;
+
+addCommandLineParameter sqlFolder "the folder where the SQL files are located. Can be overridden." OPTIONAL SINGLE;
+checkReq awk AWK_NOT_INSTALLED;
+
+addError NO_SQL_FILES_FOUND "No SQL files found in ${SQL_FOLDER}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
