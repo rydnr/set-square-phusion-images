@@ -1,0 +1,6 @@
+# v tensorflow
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} python3-dev \
+ && ${SYSTEM_CLEANUP} \
+ && pip install tensorflow
+ # ^ tensorflow
