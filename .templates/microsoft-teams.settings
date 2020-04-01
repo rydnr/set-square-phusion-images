@@ -1,0 +1,4 @@
+defineEnvVar MICROSOFT_TEAMS_VERSION MANDATORY "The Microsoft Teams client version" "1.3.00.958";
+defineEnvVar MICROSOFT_TEAMS_ARTIFACT MANDATORY "The Microsoft Teams client artifact" "teams_${MICROSOFT_TEAMS_VERSION}_amd64.deb";
+defineEnvVar MICROSOFT_TEAMS_DOWNLOAD_URL MANDATORY "The url to download Microsoft Teams client" "https://packages.microsoft.com/repos/ms-teams/pool/main/t/teams/${MICROSOFT_TEAMS_ARTIFACT}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -1,0 +1,14 @@
+= Microsoft Teams
+
+This image runs Microsoft Teams client
+
+= Usage
+
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> xhost +
+
+Then, assuming ${PWD} contains the gRPC protos you want to use with BloomRPC,
+
+> docker run -it --rm -v ${PWD}:${SERVICE_USER_HOME} -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH --ipc=host -e DISPLAY=unix:0 ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}

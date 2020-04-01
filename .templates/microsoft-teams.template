@@ -1,0 +1,9 @@
+# v microsoft-teams
+RUN cd /tmp \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} libasound2 libatk-bridge2.0-0 libatk1.0-0 libcairo2 libcups2 libgdk-pixbuf2.0-0 libgtk-3.0 libnspr4 libnss3 libpango-1.0-0 libpangocairo-1.0-0 libsecret-1-0 libx11-xcb1 libxcomposite1 libxdamage1 libxi6 libxrandr2 libxss1 libxtst6 \
+ && wget -O ${MICROSOFT_TEAMS_ARTIFACT} ${MICROSOFT_TEAMS_DOWNLOAD_URL} \
+ && dpkg -i ${MICROSOFT_TEAMS_ARTIFACT} \
+ && rm -f ${MICROSOFT_TEAMS_ARTIFACT} \
+ && ${SYSTEM_CLEANUP}
+# ^ microsoft-teams
