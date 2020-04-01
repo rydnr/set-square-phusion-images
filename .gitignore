@@ -189,6 +189,8 @@ rundeck/service.inc.sh
 sdkman/setup.sql
 **/ssh-files
 */syslog-files
+**/tacotron-files
+tacotron/service
 .templates/addon-toggles
 .templates/anaconda
 .templates/android-sdk
