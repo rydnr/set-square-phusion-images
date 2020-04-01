@@ -1,0 +1,7 @@
+#!/bin/bash
+
+chown root:root /etc/ssl/private/monit*
+echo "Starting monit"
+exec 2>&1
+exec monit -I
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
