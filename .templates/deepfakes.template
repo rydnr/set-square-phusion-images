@@ -1,0 +1,11 @@
+# v deepfakes
+RUN /work/anaconda/bin/conda remove PyYAML dask \
+ && cd /work \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} python3.setuptools \
+ && ${SYSTEM_CLEANUP} \
+ && git clone https://github.com/AliaksandrSiarohin/first-order-model.git deepfakes \
+ && cd /work/deepfakes \
+ && pip install -r requirements.txt \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /work
+# ^ deepfakes
