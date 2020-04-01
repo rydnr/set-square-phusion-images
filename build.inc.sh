@@ -3,7 +3,7 @@ overrideEnvVar LICENSE_FILE "LICENSE.gpl3";
 overrideEnvVar COPYRIGHT_PREAMBLE_FILE "copyright-preamble.gpl3";
 defineEnvVar DATE MANDATORY "The date format used to tag images" "$(date '+%Y%m')";
 defineEnvVar TIME MANDATORY "A timestamp" "$(date)";
-defineEnvVar RANDOM_PASSWORD MANDATORY "A random password" "secret" 'head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1';
+defineEnvVar RANDOM_PASSWORD MANDATORY "A random password" "$(head -c 20 /dev/urandom | sha1sum | cut -d' ' -f1)";
 defineEnvVar PUSH_TO_DOCKERHUB MANDATORY "Whether to push to Docker HUB" 'false';
 defineEnvVar BUILDER MANDATORY "The builder of the image" '${AUTHOR}';
 defineEnvVar SETSQUARE_FLAVOR MANDATORY "The flavor of set-square" "phusion";
