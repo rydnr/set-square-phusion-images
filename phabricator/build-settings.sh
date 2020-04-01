@@ -3,4 +3,5 @@ defineEnvVar GITHUB_PHABRICATOR_HASH MANDATORY "The hash of Phabricator's stable
 defineEnvVar GITHUB_ARCANIST_HASH MANDATORY "The hash of Arcanist's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/arcanist.git stable)";
 defineEnvVar GITHUB_LIBPHUTIL_HASH MANDATORY "The hash of Libphutil's stable branch in github" "$(.templates/check-version-files/remote-git-version.sh -r https://github.com/phacility/libphutil.git stable)";
 overrideEnvVar TAG '${GITHUB_PHABRICATOR_HASH}';
+defineEnvVar PHABRICATOR_DB_USER MANDATORY "The database user" "phabricator";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

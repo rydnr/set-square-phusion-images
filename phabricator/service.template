@@ -1,17 +1,17 @@
 #!/bin/bash
 
-[ -z ${VIRTUAL_HOST} ] && echo "VIRTUAL_HOST environment not defined. Using ${PHABRICATOR_VIRTUAL_HOST}." && exit 1;
+[ -z ${VIRTUAL_HOST} ] && echo "VIRTUAL_HOST environment not defined." && exit 1;
 
 cd /opt/phabricator
 bin/config set mysql.host db
 bin/config set mysql.user ${PHABRICATOR_DB_USER}
 bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
 bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
-bin/config set phpmailer.smtp-host ${SMTP_HOST:-localhost}
+bin/config set cluster.mailers '[ { "key": "default", "type": "smtp", "options": { "host": "${SMTP_HOST:-localhost}" } } ]';
 bin/storage upgrade --force
 
-sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php/7.0/apache2/php.ini
-chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo
+sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php/7.2/apache2/php.ini
+chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo /backup/phabricator-local
 rsync -az /var/local/mysql/conf.d/ /var/local/conf.d/
 rsync -az /var/local/conf.d/ /var/local/mysql/conf.d/
 
@@ -21,11 +21,10 @@ chpst -u daemon-user bin/phd restart
 chmod 0755 /var/local
 chmod 775 /backup/phabricator-local/
 
-/usr/local/bin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
+/usr/local/sbin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
 sed -i "s/^Listen 80$/Listen ${VIRTUAL_PORT}/g" /etc/apache2/ports.conf
 
 /usr/sbin/sshd -f /var/local/sshd_config.phabricator
 
 a2ensite 001-phabricator.conf && /usr/local/bin/run-apache
-
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet

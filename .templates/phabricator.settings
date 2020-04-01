@@ -3,6 +3,7 @@ defineEnvVar SERVICE_USER MANDATORY "The service user" "phabricator";
 defineEnvVar SERVICE_GROUP MANDATORY "The service group" "phabricator";
 defineEnvVar SERVICE_USER_SHELL MANDATORY "The service account shell" "/bin/bash";
 defineEnvVar SERVICE_USER_HOME MANDATORY "The home of the service user" "/opt/phabricator";
+defineEnvVar DEFAULT_VIRTUAL_HOST MANDATORY "The default virtual host" "phabricator.${DOMAIN}";
 defineEnvVar PHABRICATOR_PORT MANDATORY "The port used by Phabricator" "8000";
 defineEnvVar PHABRICATOR_DB_NAME MANDATORY "The database name" "phabricator";
 defineEnvVar PHABRICATOR_DB_USER MANDATORY "The database user" "phabricator";

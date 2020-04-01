@@ -27,9 +27,6 @@ function main() {
     "db-sql")
       print_database_ddl "${DBNAME}";
       ;;
-    "sql-post")
-        print_sql_post;
-        ;;
     "liquibase")
       print_liquibase_changeLog "${DBNAME}";
       ;;
@@ -42,7 +39,7 @@ function main() {
 # txt: Returns 0/TRUE always.
 # use: print_create_db_user_bootstrap;
 function print_create_db_user_bootstrap() {
-  echo "create user ${PHABRICATOR_DB_USER}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
+  echo "CREATE USER '${PHABRICATOR_DB_USER}'@'%' IDENTIFIED BY '${PHABRICATOR_DB_PASSWORD}';";
 }
 
 # fun: print_change_db_password_bootstrap
@@ -52,7 +49,7 @@ function print_create_db_user_bootstrap() {
 # use: print_change_db_password_bootstrap;
 function print_change_db_password_bootstrap() {
   echo "SET PASSWORD FOR '${PHABRICATOR_DB_USER}'@'%' = PASSWORD('${PHABRICATOR_DB_PASSWORD}');";
-  echo 'flush privileges;';
+  echo 'FLUSH PRIVILEGES;';
 }
 
 # fun: print_db_grants_bootstrap
@@ -66,7 +63,7 @@ function print_db_grants_bootstrap() {
   IFS="${DWIFS}";
   for _s in ${PHABRICATOR_DB_SCHEMAS[@]}; do
     IFS="${_oldIFS}";
-    echo "grant all on ${_s}.* to ${PHABRICATOR_DB_NAME}@'%' identified by '${PHABRICATOR_DB_PASSWORD}';";
+    echo "GRANT ALL ON ${_s}.* to '${PHABRICATOR_DB_USER}'@'%' IDENTIFIED BY '${PHABRICATOR_DB_PASSWORD}';";
   done
   IFS="${_oldIFS}";
 }
@@ -163,7 +160,6 @@ addCommandLineParameter command "The command. One of:
 - databases
 - sql
 - db-sql [dbName]
-- sql-post
 - liquibase [dbName]" MANDATORY SINGLE;
 addCommandLineParameter dbName "The database name" OPTIONAL SINGLE;
 
@@ -202,7 +198,7 @@ function dw_parse_dbName_cli_parameter() {
 function dw_check_command_cli_parameter() {
 
   case "${COMMAND}" in
-    "create-db-user" | "change-db-password" | "db-grants" | "databases" | "sql-post" | "sql")
+    "create-db-user" | "change-db-password" | "db-grants" | "databases" | "sql")
     ;;
     "db-sql")
       if    ! fileExists "${SQL_DDL_FOLDER}/databases/${DBNAME}.sql" \

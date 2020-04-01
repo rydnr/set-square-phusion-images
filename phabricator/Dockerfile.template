@@ -7,6 +7,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("service_user")
 @include("apache")
 @include("git")
+@include("pip")
 
 COPY apache-vhost.conf.tmpl /usr/local/src/001-phabricator.conf.tmpl
 COPY service /etc/service/${IMAGE}/run
@@ -22,7 +23,7 @@ COPY INSTALL /INSTALL
 ADD conf.d /var/local/conf.d
 
 ENV SERVICE="apache" \
-    VIRTUAL_HOST="${PHABRICATOR_VIRTUAL_HOST}" \
+    VIRTUAL_HOST="${DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8000 \
     TIMEZONE="${DEFAULT_TIMEZONE}" \
     DOBACKUP="true" \
@@ -57,3 +58,4 @@ VOLUME /backup/rsnapshot
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+@include("build-log")

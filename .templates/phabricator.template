@@ -21,7 +21,7 @@ RUN cd /opt \
  && mkdir /usr/local/share/liquibase \
  && ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} libapache2-mod-php dpkg-dev \
-      php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php7.2-xml php7.2-dev libmcrypt-dev php-pear \
+      php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php7.2-xml php7.2-dev libmcrypt-dev php-pear php-apcu php-zip \
  && ${PKG_INSTALL} --no-pin mysql-server python-pip openjdk-8-jre-headless gcc make autoconf libc6-dev pkg-config \
  && pecl channel-update pecl.php.net \
  && pecl install mcrypt-1.0.1 \
@@ -35,8 +35,8 @@ RUN cd /opt \
  && sed -i 's/^post_max_size = 8M$/post_max_size = 64M/g' /etc/php/7.2/apache2/php.ini \
  && sed -i 's/^;opcache.validate_timestamps=1$/opcache.validate_timestamps=0/g' /etc/php/7.2/apache2/php.ini \
  && echo 'always_populate_raw_post_data=-1' >> /etc/php/7.2/apache2/php.ini \
- && python -m pip install --upgrade pip \
- && python -m pip install pygments \
+ && python3 -m pip install --upgrade pip \
+ && python3 -m pip install pygments \
  && /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user \
  && /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git \
  && sed -i 's/^git:!:\(.*\)/git:*:\1/' /etc/shadow \
