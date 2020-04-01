@@ -4,4 +4,5 @@ This image allows using Anaconda ${ANACONDA_VERSION} within a Docker container.
 
 # Examples:
 - Run a shell:
-  docker run -it --rm --name anaconda ${REGISTRY}/${IMAGE}:${TAG}
+  docker run -it --rm --name anaconda ${REGISTRY}/${IMAGE}:${TAG} 
+#

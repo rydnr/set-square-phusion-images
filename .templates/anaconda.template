@@ -1,6 +1,7 @@
 # v anaconda
 RUN cd /tmp && \
     ${SYSTEM_UPDATE} && \
+    apt -y upgrade && \
     ${PKG_INSTALL} bzip2 && \
     ${SYSTEM_CLEANUP} && \
     rm -rf ${SERVICE_USER_HOME} && \
