@@ -4,21 +4,21 @@ FROM ${ROOT_IMAGE}
 
 ENV DEBIAN_FRONTEND noninteractive
 
-COPY dry-wit /usr/local/bin/
+@include("common")
+
 COPY display-dockerfile.sh /usr/local/bin/Dockerfile
 COPY display-file.sh /usr/local/bin/show
 COPY display-help.sh /usr/local/bin/help
 
 @include("addon-toggles")
 
-RUN chmod +x /usr/local/bin/dry-wit && \
-    chmod +x /usr/local/bin/show && \
-    mkdir /Dockerfiles && \
-    cd /bin && rm -f /bin/sh && ln -s /bin/bash sh && \
-    chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show && \    
-    ln -s -- /usr/local/bin/help /usr/local/bin/-h && \
-    ln -s -- /usr/local/bin/help /usr/local/bin/--help && \
-    ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile
+RUN chmod +x /usr/local/bin/show \
+ && mkdir /Dockerfiles \
+ && cd /bin && rm -f /bin/sh && ln -s /bin/bash sh \
+ && chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show \
+ && ln -s -- /usr/local/bin/help /usr/local/bin/-h \
+ && ln -s -- /usr/local/bin/help /usr/local/bin/--help \
+ && ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile
 
 @include("copy-metadata")
 @include("instructions")
