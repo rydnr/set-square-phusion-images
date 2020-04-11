@@ -1,60 +1,38 @@
 @include("preamble")
-FROM ${REGISTRY}/${NAMESPACE}/base:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 
 ENV SERVICE_PACKAGE="mysql-server" \
+    SERVICE_USER="mysql" \
+    SERVICE_GROUP="mysql" \
     DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
-    INNODB_POOL_SIZE_FACTOR="${INNODB_DEFAULT_POOL_SIZE_FACTOR}"
+    INNODB_POOL_SIZE_FACTOR="0.4"
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
 COPY service /etc/service/${IMAGE}/run
-COPY backup-${IMAGE}.sh \
-     bootstrap-db.sh bootstrap-db.inc.sh \
-     apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh admin.sh \
+COPY bootstrap-db /usr/local/bin/bootstrap-db.sh
+COPY backup.sh /usr/local/bin/backup-${IMAGE}.sh
+COPY apply-config-changes.sh apply-config-changes.inc.sh upgrade.sh shutdown.sh admin.sh \
      /usr/local/bin/
 
-@include("service_user")
+#@include("java")
+#@include("logstash")
+#COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
+
 @include("create_ssl_certificate")
-@include("java")
-@include("elk-common")
-@include("logstash")
+@include("mysql")
 
-COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-#ADD conf.d /etc/mysql/
+#ADD conf.d /etc/mysql/conf.d
 
-RUN ([ ! -d /backup ] && rm -f /backup || echo -n '') && \
-    export CONFIG_FILE=/etc/mysql/${IMAGE}.conf.d/mysqld.cnf && \
-    mkdir -p /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump && \
-    ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} ${IMAGE}-server=${TAG} bc && \
-    ${SYSTEM_CLEANUP} && \
-    sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" ${CONFIG_FILE} && \
-    sed -i -e"s/^log_error/#log_error/" ${CONFIG_FILE} && \
-    sed -i -e"s|^datadir.*|datadir = /backup/${IMAGE}-db|" ${CONFIG_FILE} && \
-    sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" ${CONFIG_FILE} && \
-    sed -i -e"s|# ssl-cert\s*.*|# ssl-cert=/etc/ssl/private/${IMAGE}.crt|" ${CONFIG_FILE} && \
-    sed -i -e"s|# ssl-key\s*.*|# ssl-key=/etc/ssl/private/${IMAGE}.key|" ${CONFIG_FILE} && \
-    echo 'explicit_defaults_for_timestamp=1' >> ${CONFIG_FILE} && \
-    /usr/local/bin/create_ssl_certificate_openssl.sh -v && \
-    rm -rf /var/lib/mysql && \
-    ln -s /backup/${IMAGE}-db /var/lib/mysql && \
-    update-rc.d mysql disable && \
-    gpasswd -a ${SERVICE_USER} crontab && \
-    rm -f /etc/init.d/mysql && \
-    for s in check local-ubuntu remote-ubuntu; do \
+RUN gpasswd -a ${SERVICE_USER} crontab \
+ && for s in check local-ubuntu remote-ubuntu; do \
       ln -s /usr/local/bin/${s}-version.sh ${s}-version-${IMAGE}.sh; \
-    done && \
-    chmod +x /etc/service/${IMAGE}/run && \
-    chmod +x /usr/local/bin/bootstrap-db.sh && \
-    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    for p in daily weekly monthly; do \
-      ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.${p}; \
-    done && \
-    mv /usr/local/bin/restart.sh /usr/local/bin/_restart.sh && \
-    ln -s /usr/local/bin/apply-config-changes.sh /usr/local/bin/restart.sh
+    done \
+ && chmod +x /etc/service/${IMAGE}/run \
+ && /etc/my_init.d/00_regen_ssh_host_keys.sh -f
 
 COPY setup.sql /usr/local/src/setup.sql.tpl
 
