@@ -1,0 +1,13 @@
+# v liquibase
+RUN mkdir -p /usr/local/share/liquibase \
+ && mkdir /opt/liquibase-${LIQUIBASE_VERSION} \
+ && cd /opt \
+ && ln -s liquibase-${LIQUIBASE_VERSION} liquibase \
+ && wget ${LIQUIBASE_URL} \
+ && tar xvf ${LIQUIBASE_ARTIFACT} -C /opt/liquibase \
+ && cd /opt/liquibase/lib \
+ && wget ${MYSQL_JDBC_DRIVER_URL} \
+ && cd /usr/local/bin \
+ && ln -s runme liquibase \
+ && rm -rf /opt/${LIQUIBASE_ARTIFACT}
+# ^ liquibase
