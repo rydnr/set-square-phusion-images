@@ -1,0 +1,9 @@
+# v liquibase-phabricator
+RUN echo "select schema_name from information_schema.schemata where schema_name like 'phabricator_%'" | mysql -N -u root --password=${PHABRICATOR_DB_PASSWORD} >> /usr/local/share/liquibase/phabricator-schemas.txt \
+ && for s in $(cat /usr/local/share/liquibase/phabricator-schemas.txt); do \
+         mkdir -p /usr/local/share/liquibase/${s} \
+      && echo "Extracting database ${s}" \
+      && /opt/liquibase/liquibase --driver=${MYSQL_JDBC_DRIVER} --username=root --password=${PHABRICATOR_DB_PASSWORD} --url="jdbc:mysql://localhost/${s}?user=root" --changeLogFile=/usr/local/share/liquibase/${s}/changelog.yml generateChangeLog \
+      && mysqldump -d -u root -p${PHABRICATOR_DB_PASSWORD} -h localhost --create-options --add-drop-database -B --events --routines --triggers ${s} > /usr/local/share/sql/databases/${s}.sql; \
+    done
+# ^ liquibase-phabricator
