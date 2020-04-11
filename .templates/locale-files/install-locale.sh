@@ -26,16 +26,16 @@ function install_locale() {
   local _lang="${_locale%_*}";
 
   logInfo -n "Checking if ${_locale} is already installed";
-  if is_locale_supported "${_locale}" "${_encoding}"; then
+  if isLocaleSupported "${_locale}" "${_encoding}"; then
       logInfoResult SUCCESS "installed";
   else
     logInfoResult SUCCESS "missing";
     DEBIAN_FRONTEND="noninteractive" apt-get install -y --reinstall language-pack-${_lang}-base
   fi
   logInfo -n "Checking if ${_locale} ${_encoding} is supported";
-  if is_locale_supported "${_locale}" "${_encoding}"; then
+  if isLocaleSupported "${_locale}" "${_encoding}"; then
       logInfoResult SUCCESS "valid";
-      if locale_requires_encoding_suffix "${_locale}" "${_encoding}"; then
+      if localeRequiresEncodingSuffix "${_locale}" "${_encoding}"; then
           logInfo "Generating '${_locale}.${_encoding} ${_encoding}' locale";
           echo "${_locale}.${_encoding} ${_encoding}" >> ${LOCALEGEN};
           locale-gen "${_locale}.${_encoding}"
