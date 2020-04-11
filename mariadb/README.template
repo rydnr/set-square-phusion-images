@@ -3,7 +3,21 @@ after removing unneeded objects and applying some safe practices.
 
 Examples:
 
-- Run a MariaDB stand-alone instance:
+- Preferred way: With volumes for enabling backups and an explicit volume to let other containers know when MariaDB's bootstrapping process has finished.
+
+export CONTAINER_NAME="${IMAGE}";
+for v in ${CONTAINER_NAME}-db ${CONTAINER_NAME}-rsnapshot ${CONTAINER_NAME}-dump ${CONTAINER_NAME}-confd ${CONTAINER_NAME}-bootstrap-monitor; do
+  docker volume create ${v};
+done;
+docker run -d --name db -h db \
+  --mount 'type=volume,src=${CONTAINER_NAME}-db,dst=/backup/${IMAGE}-db' \
+  --mount 'type=volume,src=${CONTAINER_NAME}-rsnapshot,dst=/backup/rsnapshot' \
+  --mount 'type=volume,src=${CONTAINER_NAME}-dump,dst=/backup/${IMAGE}-dump' \
+  --mount 'type=volume,src=${CONTAINER_NAME}-confd,dst=/var/local/mysql/conf.d' \
+  --mount 'type=volume,src=${CONTAINER_NAME}-bootstrap-monitor,dst=/remote/mysql' \
+  ${NAMESPACE}/${IMAGE}:${TAG}
+
+- Simplest way to run it, albeit probably not good enough:
 > docker run -d --name db -h db ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Run a MariaDB instance, to be used outside Docker containers:

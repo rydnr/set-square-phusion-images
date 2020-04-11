@@ -23,23 +23,29 @@ function main() {
 
   logInfoResult SUCCESS "done";
 
-  bootstrap_if_not_already_bootstrapped;
+  if bootstrap_if_not_already_bootstrapped; then
 
-  setup_folder_permissions "${DATA_DIR}" "${SERVICE_USER}" "${SERVICE_GROUP}";
+    setup_folder_permissions "${DATA_DIR}" "${SERVICE_USER}" "${SERVICE_GROUP}";
 
-  logInfo -n "Synchronizing data";
-  sync_folders;
-  logInfoResult SUCCESS "done";
+    logInfo -n "Synchronizing data";
+    sync_folders;
+    logInfoResult SUCCESS "done";
 
-  if ! folderExists /var/run/mysql; then
-    mkdir /var/run/mysql;
+    if ! folderExists /var/run/mysql; then
+      mkdir /var/run/mysql;
+    fi
+    setup_folder_permissions /var/run/mysql "${SERVICE_USER}" "${SERVICE_GROUP}";
+
+    logInfo "Launching MariaDB";
+    launch_mysql "${SERVICE_USER}" "${ROOT_PASSWORD}" "${ENABLE_LOGSTASH}";
+
+    logInfo "Exiting";
+  else
+    logInfo "Bootstrap failed. Container halted.";
+    while isTrue ${TRUE}; do
+      sleep 100;
+    done
   fi
-  setup_folder_permissions /var/run/mysql "${SERVICE_USER}" "${SERVICE_GROUP}";
-
-  logInfo "Launching MariaDB";
-  launch_mysql "${SERVICE_USER}" "${MARIADB_ROOT_PASSWORD}" "${ENABLE_LOGSTASH}";
-
-  logInfo "Exiting";
 }
 
 # fun: already_bootstrapped dataDir markFile
@@ -62,27 +68,43 @@ function already_bootstrapped() {
 # fun: bootstrap_if_not_already_bootstrapped
 # api: public
 # txt: Bootstraps the server if not already bootstrapped.
-# txt: Returns 0/TRUE always.
-# use: bootstrap_if_not_already_bootstrapped
+# txt: Returns 0/TRUE if the bootstrap was already done, or it finished successfully; 1/FALSE otherwise.
+# use: if bootstrap_if_not_already_bootstrapped; then echo "Database bootstrapped"; fi
 function bootstrap_if_not_already_bootstrapped() {
+  local -i _rescode;
+
   logInfo -n "Checking if service already bootstrapped";
-  if fileExists "${BOOTSTRAP_MARK_FILE}"; then
+  if fileExists "${BOOTSTRAP_SUCCESS_MARK_FILE}"; then
     logInfoResult SUCCESS "already bootstrapped";
+    _rescode=${TRUE};
+  elif fileExists "${BOOTSTRAP_FAILURE_MARK_FILE}"; then
+    logInfoResult FAILURE "bootstrap failed";
+    _rescode=${FALSE};
   else
     logInfoResult SUCCESS "not bootstrapped";
 
     logInfo "Bootstrapping service ...";
     /usr/local/bin/bootstrap-db.sh
+    _rescode=$?;
 
-    while ! fileExists "${DATA_DIR}/${BOOTSTRAP_MARK_FILE}"; do
+    while  ! fileExists "${BOOTSTRAP_SUCCESS_MARK_FILE}" \
+        && ! fileExists "${BOOTSTRAP_FAILURE_MARK_FILE}"; do
       logInfo -n "Waiting ${SLEEP}s for the bootstrap process to finish";
       sleep ${SLEEP}
       logInfoResult SUCCESS "done";
     done
 
-    logInfo -n "Bootstrapping service";
-    logInfoResult SUCCESS "done";
+    logInfo -n "Checking if bootstrap finished successfully";
+    if fileExists "${BOOTSTRAP_SUCCESS_MARK_FILE}"; then
+      logInfoResult SUCCESS "done";
+      _rescode=${TRUE};
+    elif fileExists "${BOOTSTRAP_FAILURE_MARK_FILE}"; then
+      logInfoResult FAILURE "failed";
+      _rescode=${FALSE};
+    fi
   fi
+
+  return ${_rescode};
 }
 
 # fun: setup_folder_permissions
@@ -215,7 +237,8 @@ setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
 
 defineEnvVar SLEEP OPTIONAL "The interval in seconds before checking if mysql is stopped" 10;
 defineEnvVar DATA_DIR OPTIONAL "The folder with the db data" "/backup/${IMAGE}-db";
-defineEnvVar BOOTSTRAP_MARK_FILE OPTIONAL "The file indicating the server has been already bootstrapped" ".bootstrapped";
+defineEnvVar BOOTSTRAP_SUCCESS_MARK_FILE OPTIONAL "The file indicating the server has been already bootstrapped successfully" "/remote/${IMAGE}/.bootstrapped";
+defineEnvVar BOOTSTRAP_FAILURE_MARK_FILE OPTIONAL "The file indicating the server couldn't be bootstrapped" "/remote/${IMAGE}/.bootstrap-failed";
 defineEnvVar BOOTSTRAP_SETUP_FILE OPTIONAL "The file with the initial sql" "/usr/local/src/setup.sql";
 defineEnvVar BOOTSTRAP_SQL_FOLDER OPTIONAL "The folder with the bootstrap SQL files" "/sql";
 defineEnvVar INNODB_BUFFER_POOL_SIZE_FACTOR OPTIONAL "The default pool size factor for InnoDB" "${DEFAULT_INNODB_BUFFER_POOL_SIZE_FACTOR}";
@@ -224,5 +247,6 @@ defineEnvVar ENABLE_STRICT_MODE OPTIONAL "Whether to enable strict mode" ${DEFAU
 defineEnvVar ENABLE_STRICT_MODE_CONFIG_FILE OPTIONAL "The location of the config file to enable strict mode" "${DEFAULT_ENABLE_STRICT_MODE_CONFIG_FILE}";
 defineEnvVar ENABLE_LOCAL_INFILE OPTIONAL "Whether to enable LOAD DATA LOCAL INFILE" ${DEFAULT_ENABLE_LOCAL_INFILE};
 defineEnvVar ENABLE_LOCAL_INFILE_CONFIG_FILE OPTIONAL "The location of the config file to enable LOAD DATA LOCAL INFILE" "${DEFAULT_ENABLE_LOCAL_INFILE_CONFIG_FILE}";
+defineEnvVar ROOT_PASSWORD OPTIONAL "The root password" "${SQ_MARIADB_ROOT_PASSWORD}";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 
