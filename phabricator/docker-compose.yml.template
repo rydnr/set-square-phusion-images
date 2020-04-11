@@ -3,7 +3,7 @@ services:
   phabricator:
     image: ${NAMESPACE}/${IMAGE}:${TAG}
     ports:
-      - "8000:8000"
+      - "80:8000"
       - "22:22"
     depends_on:
       - db
@@ -35,9 +35,13 @@ services:
       - type: volume
         source: phabricator-rsnapshot
         target: /backup/rsnapshot
+      - type: volume
+        source: mariadb-remote
+        target: /remote/mysql
+        read_only: true
 
   db:
-    image: ${NAMESPACE}/mariadb:latest
+    image: ${NAMESPACE}/mariadb-phabricator:${TAG}
     networks:
       phabricator: {}
     volumes:
@@ -53,6 +57,10 @@ services:
       - type: volume
         source: mariadb-confd
         target: /var/local/mysql/conf.d
+      - type: volume
+        source: mariadb-remote
+        target: /remote/mariadb
+
 
 volumes:
   phabricator-liquibase:
@@ -66,6 +74,7 @@ volumes:
   mariadb-rsnapshot:
   mariadb-dump:
   mariadb-confd:
+  mariadb-remote:
 
 networks:
   phabricator:

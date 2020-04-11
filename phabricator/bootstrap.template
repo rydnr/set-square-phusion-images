@@ -148,7 +148,6 @@ function print_liquibase_changeLog() {
 ## Script metadata and CLI settings.
 
 setScriptDescription "Prints the boostrap information required to prepare a database to be used by Phabricator";
-
 setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
 setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
 
@@ -176,7 +175,7 @@ defineEnvVar PHABRICATOR_DB_PASSWORD MANDATORY "The Phabricator database passwor
 defineEnvVar DEFAULT_DB_VENDOR MANDATORY "The default database vendor" "mariadb";
 defineEnvVar SQL_DDL_FOLDER MANDATORY "The folder with the SQL files" "/usr/local/share/sql";
 defineEnvVar LIQUIBASE_CHANGELOGS_FOLDER MANDATORY "The folder with the Liquibase changelogs" "/usr/local/share/liquibase/";
-defineEnvVar PHABRICATOR_DB_SCHEMAS MANDATORY "The Phabricator schemas" "$(cat /usr/local/share/liquibase/phabricator-schemas.txt)";
+defineEnvVar PHABRICATOR_DB_SCHEMAS MANDATORY "The Phabricator schemas" "$(cat /usr/local/share/phabricator/schemas.txt)";
 
 function dw_parse_database_cli_flag() {
   local _flag="${1}";

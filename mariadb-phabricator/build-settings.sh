@@ -21,15 +21,15 @@ logInfo -n "Extracting the names of all databases";
 defineEnvVar PHABRICATOR_DATABASES MANDATORY "The Phabricator databases to bootstrap" "$(docker run -it --rm ${CUSTOM_NAMESPACE}/phabricator:${GITHUB_PHABRICATOR_HASH} databases | sed 's///g')";
 logInfoResult SUCCESS "done";
 
-for db in ${PHABRICATOR_DATABASES}; do
-  ((sqlIndex++));
-  file="$(printf "%03d" ${sqlIndex})-liquibase-${db}.yml";
-  if ! fileExists mariadb-phabricator/${file}; then
-    logInfo -n "Extracting ${file}";
-    (docker run -it --rm ${CUSTOM_NAMESPACE}/phabricator:${GITHUB_PHABRICATOR_HASH} liquibase ${db}) > mariadb-phabricator/${file}
-    logInfoResult SUCCESS "done";
-  fi
-done
+# for db in ${PHABRICATOR_DATABASES}; do
+#  ((sqlIndex++));
+#  file="$(printf "%03d" ${sqlIndex})-liquibase-${db}.yml";
+#  if ! fileExists mariadb-phabricator/${file}; then
+#    logInfo -n "Extracting ${file}";
+#    (docker run -it --rm ${CUSTOM_NAMESPACE}/phabricator:${GITHUB_PHABRICATOR_HASH} liquibase ${db}) > mariadb-phabricator/${file}
+#    logInfoResult SUCCESS "done";
+#  fi
+#done
 
 logInfo -n "Extracting db password";
 defineEnvVar PHABRICATOR_DB_PASSWORD MANDATORY "The database password of the Phabricator user" "$(docker run -it --rm ${CUSTOM_NAMESPACE}/phabricator:${GITHUB_PHABRICATOR_HASH} echo ${SQ_PHABRICATOR_DB_PASSWORD})";

@@ -1,3 +1,5 @@
 - requires:
   - git
   - install
+  - liquibase: optional
+  - liquibase-phabricator: optional

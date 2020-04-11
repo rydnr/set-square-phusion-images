@@ -9,16 +9,18 @@ RUN cd /opt \
  && git clone https://github.com/phacility/phabricator.git \
  && cd /opt/phabricator \
  && git checkout ${GITHUB_PHABRICATOR_HASH} \
+ && rm -rf .git \
  && cd /opt \
  && git clone https://github.com/phacility/libphutil.git \
  && cd /opt/libphutil \
  && git checkout ${GITHUB_LIBPHUTIL_HASH} \
+ && rm -rf .git \
  && cd /opt \
  && git clone https://github.com/phacility/arcanist.git \
  && cd /opt/arcanist \
  && git checkout ${GITHUB_ARCANIST_HASH} \
+ && rm -rf .git \
  && chmod +x /opt/arcanist/bin/arc \
- && mkdir /usr/local/share/liquibase \
  && ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} libapache2-mod-php dpkg-dev \
       php php-mysql php-gd php-dev php-curl php-cli php-json imagemagick php-mbstring php7.2-xml php7.2-dev libmcrypt-dev php-pear php-apcu php-zip \
@@ -40,22 +42,14 @@ RUN cd /opt \
  && /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator daemon user" daemon-user \
  && /usr/sbin/useradd -d /opt/phabricator -g www-data -G www-data -s /bin/bash -c "Phabricator VCS user" git \
  && sed -i 's/^git:!:\(.*\)/git:*:\1/' /etc/shadow \
- && mkdir -p /usr/local/share/liquibase \
  && mkdir -p /usr/local/share/sql \
- && mkdir /opt/liquibase-${LIQUIBASE_VERSION} \
- && cd /opt \
- && ln -s liquibase-${LIQUIBASE_VERSION} liquibase \
- && wget ${LIQUIBASE_URL} \
- && tar xvf ${LIQUIBASE_ARTIFACT} -C /opt/liquibase \
- && cd /opt/liquibase/lib \
- && wget ${MYSQL_JDBC_DRIVER_URL} \
  && mkdir -p /usr/local/share/sql/databases \
  && chmod 755 /var/local/phabricator-ssh-hook.sh \
  && mkdir -p /var/tmp/phd/log \
  && chown -R daemon-user /var/tmp/phd \
  && cd /usr/local/bin \
  && chmod +x bootstrap runme phabricator-cli runme upgrade \
- && for s in create-db-user change-db-password db-grants databases db-sql sql sql-post liquibase; do \
+ && for s in create-db-user change-db-password db-grants databases db-sql sql sql-post; do \
       ln -s runme ${s}; \
     done \
  && for p in libphputil arcanist phabricator; do \
@@ -97,17 +91,15 @@ RUN cd /opt \
        done; \
     fi \
  && bin/storage upgrade --force \
- && echo "select schema_name from information_schema.schemata where schema_name like 'phabricator_%'" | mysql -N -u root --password=${PHABRICATOR_DB_PASSWORD} >> /usr/local/share/liquibase/phabricator-schemas.txt \
- && for s in $(cat /usr/local/share/liquibase/phabricator-schemas.txt); do \
-         mkdir -p /usr/local/share/liquibase/${s} \
-      && echo "Extracting database ${s}" \
-      && /opt/liquibase/liquibase --driver=${MYSQL_JDBC_DRIVER} --username=root --password=${PHABRICATOR_DB_PASSWORD} --url="jdbc:mysql://localhost/${s}?user=root" --changeLogFile=/usr/local/share/liquibase/${s}/changelog.yml generateChangeLog \
+ && mkdir -p /usr/local/share/phabricator \
+ && echo "select schema_name from information_schema.schemata where schema_name like 'phabricator_%'" | mysql -N -u root --password=${PHABRICATOR_DB_PASSWORD} >> /usr/local/share/phabricator/schemas.txt \
+ && for s in $(cat /usr/local/share/phabricator/schemas.txt); do \
+         echo "Extracting database ${s}" \
       && mysqldump -d -u root -p${PHABRICATOR_DB_PASSWORD} -h localhost --create-options --add-drop-database -B --events --routines --triggers ${s} > /usr/local/share/sql/databases/${s}.sql; \
     done \
  && mysqldump -u root -p${PHABRICATOR_DB_PASSWORD} -h localhost --create-options --add-drop-database --events --routines --triggers --databases $(mysql -u root -p${PHABRICATOR_DB_PASSWORD} --skip-column-names -e "SET SESSION group_concat_max_len=10000; SELECT GROUP_CONCAT(schema_name SEPARATOR ' ') FROM information_schema.schemata WHERE schema_name NOT IN ('mysql','performance_schema','information_schema');") > /usr/local/share/sql/phabricator.sql \
  && service mysql stop \
  && rm -rf /var/lib/mysql \
- && rm -rf /opt/liquibase* \
  && rm -rf /opt/php* \
  && ${SYSTEM_CLEANUP}
 # ^ phabricator

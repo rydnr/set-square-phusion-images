@@ -1,30 +1,454 @@
-#!/bin/bash
+#!/bin/bash dry-wit
 
-[ -z ${VIRTUAL_HOST} ] && echo "VIRTUAL_HOST environment not defined." && exit 1;
+# fun: configure_phabricator phabricatorHome dbContainer dbUser dbPassword phabricatorUrl smtpHost?
+# api: public
+# txt: Configures Phabricator
+# opt: phabricatorHome: The home folder of Phabricator.
+# opt: dbContainer: The name of the database container.
+# opt: dbUser: The database user.
+# opt: dbPassword: The database password.
+# opt: phabricatorUrl: The URL of Phabricator.
+# opt: smtpHost: The SMTP host. Optional.
+# txt: Returns 0/TRUE if Phabricator could be configured successfully; 1/FALSE otherwise.
+# use: if configure_phabricator /opt/phabricator db phabricator secret http://phabricator.${DOMAIN}; then echo "Phabricator configured"; fi
+function configure_phabricator() {
+  local _phabricatorHome="${1}";
+  checkNotEmpty phabricatorHome "${_phabricatorHome}" 1;
 
-cd /opt/phabricator
-bin/config set mysql.host db
-bin/config set mysql.user ${PHABRICATOR_DB_USER}
-bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD}
-bin/config set phabricator.base-uri "http://${VIRTUAL_HOST}/"
-bin/config set cluster.mailers '[ { "key": "default", "type": "smtp", "options": { "host": "${SMTP_HOST:-localhost}" } } ]';
-bin/storage upgrade --force
+  local _dbContainer="${2}";
+  checkNotEmpty dbContainer "${_dbContainer}" 2;
 
-sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${TIMEZONE}\"+" /etc/php/7.2/apache2/php.ini
-chown -R www-data:www-data /usr/local/share/liquibase /usr/local/share/sql /var/local/phabricator /var/repo /backup/phabricator-local
-rsync -az /var/local/mysql/conf.d/ /var/local/conf.d/
-rsync -az /var/local/conf.d/ /var/local/mysql/conf.d/
+  local _dbUser="${3}";
+  checkNotEmpty dbUser "${_dbUser}" 3;
 
-echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
-chown -R daemon-user /var/tmp/phd /var/repo /backup/phabricator-repo /var/local/phabricator /backup/phabricator-local
-chpst -u daemon-user bin/phd restart
-chmod 0755 /var/local
-chmod 775 /backup/phabricator-local/
+  local _dbPassword="${4}";
+  checkNotEmpty dbPassword "${_dbPassword}" 4;
 
-/usr/local/sbin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
-sed -i "s/^Listen 80$/Listen ${VIRTUAL_PORT}/g" /etc/apache2/ports.conf
+  local _phabricatorUrl="${5}";
+  checkNotEmpty phabricatorUrl "${_phabricatorUrl}" 5;
 
-/usr/sbin/sshd -f /var/local/sshd_config.phabricator
+  local _smtpHost="${6}";
 
-a2ensite 001-phabricator.conf && /usr/local/bin/run-apache
+  pushd "${_phabricatorHome}" > /dev/null;
+
+  local -i _rescode;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  logDebug -n "Configuring mysql.host as ${_dbContainer}";
+  bin/config set mysql.host "${_dbContainer}" > ${_output} 2>&1;
+  _rescode=$?;
+  if isTrue ${_rescode}; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+    logDebugFile "${_output}";
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Configuring mysql.user as ${_dbUser}";
+    bin/config set mysql.user "${_dbUser}" > ${_output} 2>&1;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+      logDebugFile "${_output}";
+    fi
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Configuring mysql.pass";
+    bin/config set mysql.pass "${_dbPassword}" > ${_output} 2>&1;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+      logDebugFile "${_output}";
+    fi
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Configuring phabricator.base-uri as ${_phabricatorUrl}";
+    bin/config set phabricator.base-uri "${_phabricatorUrl}/" > ${_output} 2>&1;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+      logDebugFile "${_output}";
+    fi
+  fi
+
+  if isNotEmpty "${_smtpHost}" && isTrue ${_rescode}; then
+    logDebug -n "Configuring cluster.mailers as ${SMTP_HOST:-localhost}";
+    bin/config set cluster.mailers '[ { "key": "default", "type": "smtp", "options": { "host": "${SMTP_HOST:-localhost}" } } ]' > ${_output} 2>&1;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+      logDebugFile "${_output}";
+    fi
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Upgrading storage";
+    bin/storage upgrade --force > ${_output} 2>&1;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+      logDebugFile "${_output}";
+    fi
+  fi
+  popd > /dev/null
+
+  return ${_rescode};
+}
+
+# fun: restart_daemons phabricatorHome
+# api: public
+# txt: Restarts the Phabricator daemons.
+# opt: phabricatorHome: The home folder of Phabricator.
+# txt: Returns 0/TRUE if the daemons could be restarted; 1/FALSE otherwise.
+# use: if restart_daemons /opt/phabricator; then echo "Daemons restarted"; fi
+function restart_daemons() {
+  local _phabricatorHome="${1}";
+  checkNotEmpty phabricatorHome "${_phabricatorHome}" 1;
+
+  local -i _rescode;
+
+  pushd "${_phabricatorHome}" > /dev/null 2>&1;
+  createTempFile;
+  local _output="${RESULT}";
+
+  logInfo -n "Restarting daemons";
+  chpst -u daemon-user bin/phd restart > "${_output}" 2>&1;
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    logInfoFile "${_output}";
+  fi
+
+  popd > /dev/null 2>&1;
+
+  return ${_rescode};
+}
+
+# fun: configure_php phpConfigFile timezone
+# api: public
+# txt: Configures PHP options.
+# opt: phpConfigFile: The PHP config file.
+# opt: timezone: The timezone.
+# txt: Returns 0/TRUE if PHP is configured successfully; 1/FALSE otherwise.
+# use: if configure_php /etc/php/7.2/apache2/php.ini utc; then echo "PHP configured"; fi
+function configure_php() {
+  local _phpConfigFile="${1}";
+  checkNotEmpty phpConfigFile "${_phpConfigFile}" 1;
+
+  local _timezone="${2}";
+  checkNotEmpty timezone "${_timezone}" 2;
+
+  logDebug -n "Configuring ${_phpConfigFile}"
+  sed -i "s+^;*date.timezone\s*=$+date.timezone = \"${_timezone}\"+" "${_phpConfigFile}";
+  local -i _rescode=$?;
+
+  if isTrue ${_rescode}; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: is_db_bootstrapped_successfully
+# api: public
+# txt: Checks whether the database is bootstrapped successfully.
+# txt: Returns 0/TRUE if the database is bootstrapped; 1/FALSE otherwise.
+# use: if is_db_bootstrapped_successfully; then echo "Database bootstrapped successfully"; fi
+function is_db_bootstrapped_successfully() {
+  fileExists "${BOOTSTRAP_SUCCESS_MARK_FILE}";
+}
+
+# fun: db_bootstrap_process_failed
+# api: public
+# txt: Checks whether the database bootstrap process failed.
+# txt: Returns 0/TRUE if the database bootstrap process failed; 1/FALSE otherwise.
+# use: if db_bootstrap_process_failed; then echo "Database bootstrap failed"; fi
+function db_bootstrap_process_failed() {
+  fileExists "${BOOTSTRAP_FAILURE_MARK_FILE}";
+}
+
+# fun: db_bootstrap_process_finished
+# api: public
+# txt: Checks whether the database bootstrap process has finished.
+# txt: Returns 0/TRUE if the bootstrap process has finished; 1/FALSE otherwise.
+# use: if db_bootstrap_process_finished; then echo "Bootstrap process finished"; fi
+function db_bootstrap_process_finished() {
+  is_db_bootstrapped_successfully || db_bootstrap_process_failed;
+}
+
+# fun: wait_until_db_bootstrap_process_finishes
+# api: public
+# txt: Waits until the database bootstrap process finishes.
+# txt: Returns 0/TRUE if the database bootstrap process has finished successfully; 1/FALSE otherwise.
+# use: if wait_until_db_bootstrap_process_finishes db; then echo "Database bootstrap process finished successfully"; fi
+function wait_until_db_bootstrap_process_finishes() {
+  local -i _rescode=${FALSE};
+
+  while ! db_bootstrap_process_finished; do
+    logInfo -n "Waiting ${_sleep}s for the database bootstrap process to finish";
+    sleep ${_sleep};
+    logInfoResult SUCCESS "done";
+  done
+
+  if is_db_bootstrapped_successfully; then
+    logInfo "Database bootstrap finished successfully";
+    _rescode=${TRUE};
+  elif db_bootstrap_process_failed; then
+    logInfo "Database bootstrap failed";
+    _rescode=${FALSE};
+  else
+    logInfo "Script error: please fill-in a bug report at https://github.com/rydnr/set-square-phusion-images";
+    _rescode=${FALSE};
+  fi
+
+  return ${_rescode};
+}
+
+# fun: is_db_ready dbContainer dbUser dbPassword
+# api: public
+# txt: Checks whether given database is ready.
+# opt: dbContainer: The container name.
+# opt: dbUser: The database user.
+# opt: dbPassword: The database password.
+# txt: Returns 0/TRUE if the database is accepting connections; 1/FALSE otherwise.
+# use: if is_db_ready db phabricator secret; then echo "db ready"; fi
+function is_db_ready() {
+  local _dbContainer="${1}";
+  checkNotEmpty dbContainer "${_dbContainer}" 1;
+
+  local _dbUser="${2}";
+  checkNotEmpty dbUser "${_dbUser}" 2;
+
+  local _dbPassword="${3}";
+  checkNotEmpty dbPassword "${_dbPassword}" 3;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  logDebug -n "Connecting to ${_dbContainer}";
+  mysql -h ${_dbContainer} -u ${_dbUser} --password="${_dbPassword}" -e "select version()" > "${_output}" 2>&1;
+  local -i _rescode=$?;
+
+  if isTrue ${_rescode}; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+    logDebugFile "${_output}";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: wait_until_db_is_ready
+# api: public
+# txt: Waits until the database is ready.
+# txt: Returns 0/TRUE if the database is ready; 1/FALSE otherwise.
+# use: if wait_until_db_is_ready db; then echo "Database ready"; fi
+function wait_until_db_is_ready() {
+  local _dbContainer="${1}";
+  checkNotEmpty dbContainer "${_dbContainer}" 1;
+
+  local _dbUser="${2}";
+  checkNotEmpty dbUser "${_dbUser}" 2;
+
+  local _dbPassword="${3}";
+  checkNotEmpty dbPassword "${_dbPassword}" 3;
+
+  local -i _rescode=${FALSE};
+
+  while ! is_db_ready "${_dbContainer}" "${_dbUser}" "${_dbPassword}"; do
+    logInfo -n "Waiting ${_sleep}s for the database to start";
+    sleep ${_sleep};
+    logInfoResult SUCCESS "done";
+  done
+
+  if is_db_ready "${_dbContainer}" "${_dbUser}" "${_dbPassword}"; then
+    _rescode=${TRUE};
+    logInfo "Database ready";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: configure_apache
+# api: public
+# txt: Configures Apache.
+# txt: Returns 0/TRUE if Apache was configured successfully; 1/FALSE otherwise.
+# use: if configure_apache; then echo "Apache configured successfully"; fi
+function configure_apache() {
+  /usr/local/sbin/process-file.sh -o /etc/apache2/sites-available/001-phabricator.conf /usr/local/src/001-phabricator.conf.tmpl
+  echo "ServerName ${VIRTUAL_HOST}" >> /etc/apache2/apache2.conf
+  sed -i "s/^Listen 80$/Listen ${VIRTUAL_PORT}/g" /etc/apache2/ports.conf
+}
+
+# fun: start_ssh
+# api: public
+# txt: Starts Phabricator-specific SSH.
+# txt: Returns 0/TRUE if SSH was started successfully; 1/FALSE otherwise.
+# use: if start_ssh; then echo "SSH started"; fi
+function start_ssh() {
+  /usr/sbin/sshd -f /var/local/sshd_config.phabricator
+}
+
+# fun: process_folders
+# api: public
+# txt: Process certain folders.
+# txt: Returns 0/TRUE if the processing finishes successfully; 1/FALSE otherwise.
+# use: if process_folders; then echo "Folders processed successfully"; fi
+function process_folders() {
+  local -i _rescode;
+
+  chown -R www-data:www-data /usr/local/share/sql /var/local/phabricator /var/repo /backup/phabricator-local;
+  _rescode=$?;
+
+  if isTrue ${_rescode}; then
+    rsync -az /var/local/mysql/conf.d/ /var/local/conf.d/;
+    _rescode=$?;
+  fi
+
+  if isTrue ${_rescode}; then
+    rsync -az /var/local/conf.d/ /var/local/mysql/conf.d/;
+    _rescode=$?;
+  fi
+
+  if isTrue ${_rescode}; then
+    chown -R daemon-user /var/tmp/phd /var/repo /backup/phabricator-repo /var/local/phabricator /backup/phabricator-local
+    _rescode=$?;
+  fi
+
+  if isTrue ${_rescode}; then
+    chmod 0755 /var/local
+    _rescode=$?;
+  fi
+
+  if isTrue ${_rescode}; then
+    chmod 775 /backup/phabricator-local/
+  fi
+
+  return ${_rescode};
+}
+
+# fun: main
+# api: public
+# txt: Bootstraps the database.
+# txt: Returns 0/TRUE always.
+# use: main
+function main() {
+
+  local -i _continue=${TRUE};
+
+  logInfo -n "Configuring PHP";
+  if configure_php "${PHP_CONFIG_FILE}" "${TIMEZONE}"; then
+    logInfoResult SUCCESS "done";
+  else
+    _continue=${FALSE};
+    logInfoResult FAILURE "failed";
+    logInfo "Error configuring PHP.";
+  fi
+
+  if isTrue ${_continue}; then
+    logInfo -n "Configuring Apache";
+    if configure_apache; then
+      logInfoResult SUCCESS "done";
+    else
+      _continue=${FALSE};
+      logInfoResult FAILURE "failed";
+      logInfo "Error configuring Apache.";
+    fi
+  fi
+
+  if isTrue ${_continue}; then
+    logInfo -n "Processing container folders";
+    if process_folders; then
+      logInfoResult SUCCESS "done";
+    else
+      _continue=${FALSE};
+      logInfoResult FAILURE "failed";
+      logInfo "Error processing container folders.";
+    fi
+  fi
+
+  if isTrue ${_continue}; then
+    logInfo -n "Configuring Phabricator";
+    if configure_phabricator "${PHABRICATOR_HOME}" "${DB_CONTAINER}" "${DB_USER}" "${DB_PASSWORD}" "${PHABRICATOR_URL}" "${SMTP}"; then
+      logInfoResult SUCCESS "done";
+    else
+      _continue=${FALSE};
+      logInfoResult FAILURE "failed";
+      logInfo "Error configuring Phabricator.";
+    fi
+  fi
+
+  if isTrue ${_continue}; then
+    if wait_until_db_bootstrap_process_finishes; then
+      if wait_until_db_is_ready "${DB_CONTAINER}" "${DB_USER}" "${DB_PASSWORD}"; then
+        logInfo -n "Restarting Phabricator daemons";
+        if restart_daemons "${PHABRICATOR_HOME}"; then
+          logInfoResult SUCCESS "done";
+          logInfo -n "Starting SSH";
+          if start_ssh; then
+            logInfoResult SUCCESS "done";
+            logInfo "Starting Phabricator web application";
+            a2ensite 001-phabricator.conf && /usr/local/bin/run-apache > /dev/null 2>&1;
+          else
+            logInfoResult FAILURE "failed";
+            logInfo "Could not start SSH. Container halted.";
+          fi
+        else
+          logInfoResult FAILURE "failed";
+          logInfo "Error restarting Phabricator daemons. Container halted.";
+        fi
+      else
+        logInfo "Database not ready. Container halted.";
+      fi
+    else
+      logInfo "Database bootstrap process failed. Check database logs. Container halted.";
+    fi
+  else
+    logInfo "Container halted.";
+  fi
+
+  while [[ ${TRUE} -eq ${TRUE} ]]; do
+    sleep 1000000;
+  done
+}
+
+## Script metadata and CLI settings.
+setScriptDescription "Runs Phabricator.";
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
+
+defineEnvVar VIRTUAL_HOST MANDATORY "The virtual host";
+defineEnvVar PHABRICATOR_HOME OPTIONAL "The home folder of Phabricator" "/opt/phabricator";
+defineEnvVar DB_CONTAINER OPTIONAL "The name of the container database" "db";
+defineEnvVar DB_USER OPTIONAL "The database user used by Phabricator" "${PHABRICATOR_DB_USER}";
+defineEnvVar DB_PASSWORD OPTIONAL "The password of the database user used by Phabricator" "${PHABRICATOR_DB_PASSWORD}";
+defineEnvVar PHABRICATOR_URL OPTIONAL "The URL of Phabricator" "http://${VIRTUAL_HOST}";
+defineEnvVar SMTP OPTIONAL "The name of the SMTP host to use" "${SMTP_HOST:-localhost}";
+defineEnvVar TIMEZONE OPTIONAL "The timezone setting for Phabricator" UTC;
+defineEnvVar PHP_CONFIG_FILE OPTIONAL "The path of the php.ini file" "/etc/php/7.2/apache2/php.ini";
+
+defineEnvVar SLEEP OPTIONAL "The interval in seconds before checking if mysql is stopped" 10;
+defineEnvVar BOOTSTRAP_SUCCESS_MARK_FILE OPTIONAL "The file indicating the server has been already bootstrapped successfully" "/remote/mysql/.bootstrapped";
+defineEnvVar BOOTSTRAP_FAILURE_MARK_FILE OPTIONAL "The file indicating the server couldn't be bootstrapped" "/remote/mysql/.bootstrap-failed";
 # vim: syntax=sh ts=4 sw=4 sts=4 sr noet

@@ -47,15 +47,8 @@ EXPOSE 8000
 # Phabricator SSH
 EXPOSE 22
 
-VOLUME /usr/local/share/liquibase
-VOLUME /usr/local/share/sql
-VOLUME /var/local/mysql/conf.d
-VOLUME /arc
-VOLUME /backup/${IMAGE}-local
-VOLUME /backup/${IMAGE}-repo
-VOLUME /backup/rsnapshot
+VOLUME [ "/usr/local/share/liquibase", "/usr/local/share/sql", "/var/local/mysql/conf.d", "/arc", "/backup/${IMAGE}-local", "/backup/${IMAGE}-repo", "/backup/rsnapshot", "/remote/mysql" ]
 
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
-@include("build-log")
