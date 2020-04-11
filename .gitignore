@@ -124,6 +124,7 @@ mysql/admin.sh
 mysql/backup-mysql.sh
 mysql/conf.d
 mysql/my.cnf
+mysql/service
 nexus/50_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL
@@ -245,6 +246,7 @@ tacotron/service
 .templates/monit-files/enable-monit-ssl.sh
 .templates/monit-files/monit-http.conf
 .templates/monit-files/monit-mail.conf.tmpl
+.templates/mysql
 .templates/nginx
 .templates/nginx-files/letsencrypt.sh
 .templates/nginx-files/nginx-default-ssl
