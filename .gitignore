@@ -145,6 +145,7 @@ phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
 phabricator/docker-compose.yml
+phabricator/.env
 **/phabricator-files
 phabricator/git-files
 phabricator/INSTALL
