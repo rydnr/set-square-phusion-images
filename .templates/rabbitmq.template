@@ -1,25 +1,27 @@
 # v rabbitmq
-RUN wget -O /tmp/${RABBITMQ_DEB_ARTIFACT} ${RABBITMQ_DEB_DOWNLOAD_URL} && \
-    ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} erlang-nox socat && \
-    dpkg -i /tmp/${RABBITMQ_DEB_ARTIFACT} && \
-    ${SYSTEM_CLEANUP} && \
-    rm -f /tmp/${RABBITMQ_DEB_ARTIFACT} && \
-    rabbitmq-plugins enable --offline rabbitmq_management && \
-    for p in ${RABBITMQ_PLUGINS}; do \
+RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc | sudo apt-key add - \
+ && echo "deb https://packages.erlang-solutions.com/ubuntu bionic contrib" | sudo tee /etc/apt/sources.list.d/rabbitmq.list \
+ && wget -O /tmp/${RABBITMQ_DEB_ARTIFACT} ${RABBITMQ_DEB_DOWNLOAD_URL} \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} erlang erlang-nox socat \
+ && dpkg -i /tmp/${RABBITMQ_DEB_ARTIFACT} \
+ && ${SYSTEM_CLEANUP} \
+ && rm -f /tmp/${RABBITMQ_DEB_ARTIFACT} \
+ && rabbitmq-plugins enable --offline rabbitmq_management \
+ && for p in ${RABBITMQ_PLUGINS}; do \
       rabbitmq-plugins enable rabbitmq_${p} --offline; \
-    done && \
-    mkdir -p /backup/rabbitmq/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/rabbitmq/data/mnesia && \
-    mv /var/lib/rabbitmq/mnesia /backup/rabbitmq/data && \
-    ln -s /backup/rabbitmq/data/mnesia /var/lib/rabbitmq/mnesia && \
-    ln -s /backup/rabbitmq/data/mnesia /data/mnesia && \
-    mv /var/log/rabbitmq /data/log && \
-    ln -s /data/log /var/log/rabbitmq && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data && \
-    echo '[{rabbit, [{' >> /etc/rabbitmq/rabbitmq.config && \
-    echo '    loopback_users, []' >> /etc/rabbitmq/rabbitmq.config && \
-    echo '  }]}].' >> /etc/rabbitmq/rabbitmq.config && \
-    echo '  ${SERVICE_USER}  -   nofiles ${RABBITMQ_ULIMIT_N}' >> /etc/security/limits.conf
+    done \
+ && mkdir -p /backup/rabbitmq/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/rabbitmq/data/mnesia \
+ && mv /var/lib/rabbitmq/mnesia /backup/rabbitmq/data \
+ && ln -s /backup/rabbitmq/data/mnesia /var/lib/rabbitmq/mnesia \
+ && ln -s /backup/rabbitmq/data/mnesia /data/mnesia \
+ && mv /var/log/rabbitmq /data/log \
+ && ln -s /data/log /var/log/rabbitmq \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data \
+ && echo '[{rabbit, [{' >> /etc/rabbitmq/rabbitmq.config \
+ && echo '    loopback_users, []' >> /etc/rabbitmq/rabbitmq.config \
+ && echo '  }]}].' >> /etc/rabbitmq/rabbitmq.config \
+ && echo '  ${SERVICE_USER}  -   nofiles ${RABBITMQ_ULIMIT_N}' >> /etc/security/limits.conf
 
 
 #RUN wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && \
