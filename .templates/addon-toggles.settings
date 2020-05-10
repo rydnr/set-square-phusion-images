@@ -7,4 +7,4 @@ defineButDoNotOverrideEnvVar ENABLE_LOCAL_SMTP MANDATORY "Whether to run a local
 defineButDoNotOverrideEnvVar ENABLE_LOGSTASH MANDATORY \
              "Whether to enable logstash, if available for the specific image" \
              "false";
-#
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

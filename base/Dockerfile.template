@@ -4,6 +4,7 @@ FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 
 # Basic stuff. Sets sh to bash, required by addon-toggles
 @include("common")
+@include("dry-wit")
 
 @include("addon-toggles")
 
