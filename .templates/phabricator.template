@@ -82,7 +82,6 @@ RUN cd /opt \
  && bin/config set mysql.user root \
  && bin/config set mysql.pass ${PHABRICATOR_DB_PASSWORD} \
  && bin/config set storage.local-disk.path /var/local/phabricator \
- && bin/config set config.ignore-issues '[ { "security.security.alternate-file-domain": true } ]' \
  && service mysql start \
  && until tail -n 5 /var/log/mysql/error.log | grep "ready for connections" > /dev/null; do echo "Waiting until MySQL starts"; tail /var/log/mysql/error.log; sleep 1; done \
  && for i in 1 2; do mysql -u root <<< "ALTER USER 'root'@'localhost' IDENTIFIED BY '${PHABRICATOR_DB_PASSWORD}'; GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY '${PHABRICATOR_DB_PASSWORD}'; UPDATE mysql.user SET plugin = 'mysql_native_password' WHERE User = 'root'; DELETE FROM mysql.user WHERE User=''; DROP DATABASE IF EXISTS test; DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'; FLUSH PRIVILEGES;"; done \
