@@ -199,9 +199,13 @@ function db_bootstrap_process_finished() {
 # fun: wait_until_db_bootstrap_process_finishes
 # api: public
 # txt: Waits until the database bootstrap process finishes.
+# opt: sleep: The seconds to wait before checking if the bootstrap process has finished.
 # txt: Returns 0/TRUE if the database bootstrap process has finished successfully; 1/FALSE otherwise.
 # use: if wait_until_db_bootstrap_process_finishes db; then echo "Database bootstrap process finished successfully"; fi
 function wait_until_db_bootstrap_process_finishes() {
+  local -i _sleep=${1};
+  checkNotEmpty sleep "${_sleep}" 1;
+
   local -i _rescode=${FALSE};
 
   while ! db_bootstrap_process_finished; do
@@ -262,8 +266,12 @@ function is_db_ready() {
 # fun: wait_until_db_is_ready
 # api: public
 # txt: Waits until the database is ready.
+# opt: container: The DB container.
+# opt: user: The database user.
+# opt: password: The password.
+# opt: sleep: The number of seconds to wait before checking if the DB is ready.
 # txt: Returns 0/TRUE if the database is ready; 1/FALSE otherwise.
-# use: if wait_until_db_is_ready db; then echo "Database ready"; fi
+# use: if wait_until_db_is_ready db user secret 10; then echo "Database ready"; fi
 function wait_until_db_is_ready() {
   local _dbContainer="${1}";
   checkNotEmpty dbContainer "${_dbContainer}" 1;
@@ -273,6 +281,9 @@ function wait_until_db_is_ready() {
 
   local _dbPassword="${3}";
   checkNotEmpty dbPassword "${_dbPassword}" 3;
+
+  local -i _sleep=${4};
+  checkNotEmpty sleep "${_sleep}" 4;
 
   local -i _rescode=${FALSE};
 
@@ -400,8 +411,8 @@ function main() {
   fi
 
   if isTrue ${_continue}; then
-    if wait_until_db_bootstrap_process_finishes; then
-      if wait_until_db_is_ready "${DB_CONTAINER}" "${DB_USER}" "${DB_PASSWORD}"; then
+    if wait_until_db_bootstrap_process_finishes ${SLEEP}; then
+      if wait_until_db_is_ready "${DB_CONTAINER}" "${DB_USER}" "${DB_PASSWORD}" ${SLEEP}; then
         logInfo -n "Restarting Phabricator daemons";
         if restart_daemons "${PHABRICATOR_HOME}"; then
           logInfoResult SUCCESS "done";
