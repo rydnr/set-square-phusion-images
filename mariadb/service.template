@@ -237,8 +237,8 @@ setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
 
 defineEnvVar SLEEP OPTIONAL "The interval in seconds before checking if mysql is stopped" 10;
 defineEnvVar DATA_DIR OPTIONAL "The folder with the db data" "/backup/${IMAGE}-db";
-defineEnvVar BOOTSTRAP_SUCCESS_MARK_FILE OPTIONAL "The file indicating the server has been already bootstrapped successfully" "/remote/${IMAGE}/.bootstrapped";
-defineEnvVar BOOTSTRAP_FAILURE_MARK_FILE OPTIONAL "The file indicating the server couldn't be bootstrapped" "/remote/${IMAGE}/.bootstrap-failed";
+defineEnvVar BOOTSTRAP_SUCCESS_MARK_FILE OPTIONAL "The file indicating the server has been already bootstrapped successfully" "/remote/mysql/.bootstrapped";
+defineEnvVar BOOTSTRAP_FAILURE_MARK_FILE OPTIONAL "The file indicating the server couldn't be bootstrapped" "/remote/mysql/.bootstrap-failed";
 defineEnvVar BOOTSTRAP_SETUP_FILE OPTIONAL "The file with the initial sql" "/usr/local/src/setup.sql";
 defineEnvVar BOOTSTRAP_SQL_FOLDER OPTIONAL "The folder with the bootstrap SQL files" "/sql";
 defineEnvVar INNODB_BUFFER_POOL_SIZE_FACTOR OPTIONAL "The default pool size factor for InnoDB" "${DEFAULT_INNODB_BUFFER_POOL_SIZE_FACTOR}";
