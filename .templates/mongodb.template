@@ -1,7 +1,6 @@
 # v mongodb
-
-COPY mongodb-files/mongodb-dump.sh mongodb-files/mongodb-dump.inc.sh \
-     mongodb-files/mongodb-discard-old-dumps.sh mongodb-files/mongodb-discard-old-dumps.inc.sh \
+COPY mongodb-files/mongodb-dump.sh \
+     mongodb-files/mongodb-discard-old-dumps.sh \
      /usr/local/bin/
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
 
@@ -10,25 +9,26 @@ COPY mongodb-files/mongodb-dump.sh mongodb-files/mongodb-dump.inc.sh \
 # Installation:
 # Import MongoDB public GPG key AND create a MongoDB list file
 #RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/10gen.list
-RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv 9DA31620334BD75D9DCB49F368818C72E52529D4 && \
-    echo "deb [ arch=amd64 ] https://repo.mongodb.org/apt/ubuntu "$(lsb_release -sc)"/mongodb-org/${MONGODB_MAJOR_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list
-#RUN    ${SYSTEM_UPDATE}
-RUN    apt-get update -y
-RUN ${PKG_INSTALL} mongodb-org=${MONGODB_VERSION} && \
-    echo "mongodb-org hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-server hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-shell hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-mongos hold" | sudo dpkg --set-selections && \
-    echo "mongodb-org-tools hold" | sudo dpkg --set-selections && \
-    ${SYSTEM_CLEANUP} && \
-    cp /etc/mongod.conf /etc/mongod.conf.distrib && \
-    mv /etc/mongod.conf /etc/mongod.conf.template && \
-    sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf.template && \
-    sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf.template && \
-    sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf.template && \
-    sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf.template && \
-    ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump && \
-    ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} -np gnupg \
+ && wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add - \
+ && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} mongodb-org \
+ && echo "mongodb-org hold" | sudo dpkg --set-selections \
+ && echo "mongodb-org-server hold" | sudo dpkg --set-selections \
+ && echo "mongodb-org-shell hold" | sudo dpkg --set-selections \
+ && echo "mongodb-org-mongos hold" | sudo dpkg --set-selections \
+ && echo "mongodb-org-tools hold" | sudo dpkg --set-selections \
+ && ${SYSTEM_CLEANUP} \
+ && cp /etc/mongod.conf /etc/mongod.conf.distrib \
+ && mv /etc/mongod.conf /etc/mongod.conf.template \
+ && sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf.template \
+ && sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf.template \
+ && sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf.template \
+ && sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf.template \
+ && ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump \
+ && ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps
 
 #    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
 

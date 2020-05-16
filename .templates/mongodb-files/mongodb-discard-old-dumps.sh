@@ -1,89 +1,15 @@
 #!/bin/bash dry-wit
 # Copyright 2017-today Automated Computing Machinery
 # Licensed under GPLv3.
+# mod: mongodb-discard-old-dumps.sh
+# api: public
+# txt: Deletes MongoDB dumps older than a certain number of days.
 
-# Prints how to use this script.
-## dry-wit hook
-function usage() {
-  cat <<EOF
-$SCRIPT_NAME [-v[v]|-q]
-$SCRIPT_NAME [-h|--help]
-(c) 2017-today Automated Computing Machinery
-
-Deletes MongoDB dumps older than ${MONGODB_DUMP_RETAIN_DAYS}.
-
-Common flags:
-    * -h | --help: Display this message.
-    * -v: Increase the verbosity.
-    * -vv: Increase the verbosity further.
-    * -q | --quiet: Be silent.
-EOF
-}
-
-# Error messages
-function defineErrors() {
-  addError INVALID_OPTION "Unknown option";
-}
-
-## Parses the input
-## dry-wit hook
-function parseInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount=0;
-  local _currentCount;
-  local _help=${FALSE};
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help)
-        _help=${TRUE};
-        shift;
-        ;;
-      -v | -vv | -q | --quiet)
-        shift;
-        ;;
-      --)
-        shift;
-        break;
-        ;;
-    esac
-  done
-}
-
-## Checking input
-## dry-wit hook
-function checkInput() {
-
-  local _flags=$(extractFlags $@);
-  local _flagCount;
-  local _currentCount;
-  local _oldIfs;
-
-  logDebug -n "Checking input";
-
-  # Flags
-  for _flag in ${_flags}; do
-    _flagCount=$((_flagCount+1));
-    case ${_flag} in
-      -h | --help | -v | -vv | -q | --quiet)
-      ;;
-      --)
-        break;
-        ;;
-      *) logDebugResult FAILURE "fail";
-         exitWithErrorCode INVALID_OPTION ${_flag};
-         ;;
-    esac
-  done
-
-  logDebugResult SUCCESS "valid";
-}
-
-## Main logic
-## dry-wit hook
+# fun: main
+# api: public
+# txt: Deletes MongoDB dumps older than a certain number of days.
+# txt: Returns 0/TRUE always.
+# use: main;
 function main() {
   local _outputFolder="${MONGODB_DUMPS_FOLDER}";
 
@@ -97,3 +23,10 @@ function main() {
     logInfoResult FAILURE "failed";
   fi
 }
+
+# script metadata
+setScriptDescription "Deletes MongoDB dumps older than a certain number of days.";
+
+defineEnvVar MONGODB_DUMPS_FOLDER OPTIONAL "The folder where the dumps are stored" "/backup/mongodb/dumps";
+defineEnvVar MONGODB_DUMP_RETAIN_DAYS OPTIONAL "The number of days the dumps are retained" 7;
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
