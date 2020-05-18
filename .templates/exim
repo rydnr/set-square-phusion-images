@@ -4,7 +4,7 @@ RUN ${SYSTEM_UPDATE} && \
     ${SYSTEM_CLEANUP}
 
 RUN mkdir -p /etc/service/exim4/log; \
-    SERVICE_USER=Debian-exim SERVICE_GROUP=Debian-exim SSL_CERTIFICATE_ALIAS=exim-${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
+    SERVICE_USER=mail SERVICE_GROUP=mail SSL_CERTIFICATE_ALIAS=exim-${IMAGE}-${TAG} /usr/local/bin/create_ssl_certificate_openssl.sh -vv && \
     ln -s /etc/ssl/private/exim-${IMAGE}-${TAG}.key /etc/exim4/exim.key && \
     ln -s /etc/ssl/private/exim-${IMAGE}-${TAG}.crt /etc/exim4/exim.crt && \
     cp /etc/service/.template/log/run /etc/service/exim4/log/run
