@@ -51,7 +51,7 @@ function main() {
   fi
 
   logInfo -n "Fixing permissions of ${_key}";
-  if updateSslKeyPermissions "${_key}"; then
+  if changeSslKeyPermissions "${_key}"; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
@@ -59,7 +59,7 @@ function main() {
   fi
 
   logInfo -n "Fixing ownership of ${_key}";
-  if updateSslKeyOwnership "${_key}" "${SERVICE_USER}" "${SERVICE_GROUP}"; then
+  if changeSslKeyOwnership "${_key}" "${SERVICE_USER}" "${SERVICE_GROUP}"; then
     logInfoResult SUCCESS "done";
   else
     logInfoResult FAILURE "failed";
@@ -79,6 +79,7 @@ addError CANNOT_SIGN_SSL_CERTIFICATE "Cannot sign the SSL certificate";
 addError CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS "Cannot update the permissions of ${SSL_KEY_FOLDER}";
 addError CANNOT_UPDATE_SSL_KEY_PERMISSIONS "Cannot update the permissions of the generated key file";
 addError CANNOT_UPDATE_SSL_KEY_OWNERSHIP "Cannot update the ownership of the generated key file";
+
 defineButDoNotOverrideEnvVar SERVICE_USER "The name of the service user" "${SQ_SERVICE_USER}";
 defineButDoNotOverrideEnvVar SERVICE_GROUP "The name of the service group" "${SQ_SERVICE_GROUP}";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
