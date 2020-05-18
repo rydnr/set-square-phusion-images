@@ -22,11 +22,10 @@ RUN ${SYSTEM_UPDATE} \
  && echo "mongodb-org-tools hold" | sudo dpkg --set-selections \
  && ${SYSTEM_CLEANUP} \
  && cp /etc/mongod.conf /etc/mongod.conf.distrib \
- && mv /etc/mongod.conf /etc/mongod.conf.template \
- && sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf.template \
- && sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf.template \
- && sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf.template \
- && sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf.template \
+ && sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf \
+ && sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf \
+ && sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf \
+ && sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf \
  && ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump \
  && ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps
 
