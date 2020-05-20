@@ -3,6 +3,9 @@ COPY mongodb-files/mongodb-dump.sh \
      mongodb-files/mongodb-discard-old-dumps.sh \
      /usr/local/bin/
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
+#COPY mongodb-files/create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
+
+ENV AUTHENTICATION_MECHANISM="${AUTHENTICATION_MECHANISM}"
 
 # From http://docs.docker.com/examples/mongodb/
 # From http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
