@@ -68,9 +68,16 @@ function main() {
 
 # script metadata
 setScriptDescription "Launches MongoDB";
+
+# This environment variables can be overridden in a .inc.sh file in current folder.
+# env: DB_FOLDER: The database folder.
 defineEnvVar DB_FOLDER OPTIONAL "The database folder" "/backup/mongodb/db";
+# env: BOOTSTRAP_FILE: The bootstrap file.
 defineEnvVar BOOTSTRAP_FILE OPTIONAL "The bootstrap file" "{DB_FOLDER}/.bootstrapped";
+# env: MONGOD_CONFIG_FILE: The mongod config file.
 defineEnvVar MONGOD_CONFIG_FILE OPTIONAL "The mongod config file" "/etc/mongod.conf";
+# env: MONGOD_LOG_FILE The mongod log file.
 defineEnvVar MONGOD_LOG_FILE OPTIONAL "The mongod log file" "/var/log/mongodb/mongod.log";
-defineEnvVar SLEEP OPTIONAL "The number of seconds to sleep before checking in mongod is running again" 300;
+# env: SLEEP: The number of seconds to sleep before checking if mongod is running again.
+defineEnvVar SLEEP OPTIONAL "The number of seconds to sleep before checking if mongod is running again" 300;
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
