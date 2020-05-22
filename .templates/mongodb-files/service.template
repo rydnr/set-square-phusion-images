@@ -76,7 +76,7 @@ function main() {
   fi
 }
 
-# script metadata
+# Script metadata
 setScriptDescription "Launches MongoDB";
 
 # This environment variables can be overridden in a .inc.sh file in current folder.

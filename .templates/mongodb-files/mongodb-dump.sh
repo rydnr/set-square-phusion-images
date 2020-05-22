@@ -41,10 +41,10 @@ setScriptDescription "Performs dumps of the MongoDB database.";
 defineEnvVar MONGODB_DUMP_FOLDER OPTIONAL "The folder storing the generated dump file" "/backup/mongodb/dumps";
 # env: MONGODB_HOST: The MongoDB host. Defaults to localhost.
 defineEnvVar MONGODB_HOST OPTIONAL "The MongoDB host" "localhost";
-# env: MONGODB_USER: The MongoDB user. Defaults to ${ADMIN_USER}.
-defineEnvVar MONGODB_USER OPTIONAL "The MongoDB user" "${ADMIN_USER}";
-# env: MONGODB_PASSWORD: The password of the MongoDB user. Defaults to ${ADMIN_PASSWORD}.
-defineEnvVar MONGODB_PASSWORD OPTIONAL "The password of the MongoDB user" "${ADMIN_PASSWORD}";
+# env: MONGODB_USER: The MongoDB user. Defaults to ${BACKUP_USER}.
+defineEnvVar MONGODB_USER OPTIONAL "The MongoDB user" "${BACKUP_USER}";
+# env: MONGODB_PASSWORD: The password of the MongoDB user. Defaults to ${BACKUP_PASSWORD}.
+defineEnvVar MONGODB_PASSWORD OPTIONAL "The password of the MongoDB user" "${BACKUP_PASSWORD}";
 # env: AUTHENTICATION_DATABASE: The authentication database. Defaults to admin.
 defineEnvVar AUTHENTICATION_DATABASE OPTIONAL "The authentication database" "admin";
 # env: AUTHENTICATION_MECHANISM: The authentication mechanism. Defaults to SCRAM-SHA-256.
