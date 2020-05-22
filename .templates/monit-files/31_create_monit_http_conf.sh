@@ -5,6 +5,8 @@
 # api: public
 # txt: Creates Monit configuration to enable the web interface.
 
+export DW_DISABLE_ANSI_COLORS=TRUE;
+
 DW.import net;
 
 # fun: main

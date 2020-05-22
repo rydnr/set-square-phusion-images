@@ -5,6 +5,8 @@
 # api: public
 # txt: Creates Monit configuration to check the exposed ports are running correctly.
 
+export DW_DISABLE_ANSI_COLORS=TRUE;
+
 DW.import docker;
 
 ## Main logic

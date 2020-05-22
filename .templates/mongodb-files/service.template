@@ -15,6 +15,11 @@ DW.import mongodb;
 function main() {
   mkdir -p "${DB_FOLDER}";
 
+  DW.getScriptName;
+  local _scriptName="${RESULT}";
+
+  exec > >(sudo tee "${MONGODB_LOG_FOLDER}"/"${_scriptName}".log | sudo sh -c "logger -t \"${_scriptName}\" -s 2>/dev/console") 2>&1;
+
   local _oldIFS="${IFS}";
   local _d;
   IFS="${DWIFS}";
@@ -30,12 +35,12 @@ function main() {
 
   local -i _bootstrapNeeded=${TRUE};
   if     ! fileExists "${BOOTSTRAP_FILE}" \
-      && fileExists /usr/local/bin/${IMAGE}-bootstrap.sh; then
+      && fileExists "${BOOTSTRAP_SCRIPT}"; then
     _bootstrapNeeded=${TRUE};
   fi
 
   if isTrue ${_bootstrapNeeded}; then
-    /usr/local/bin/${IMAGE}-bootstrap.sh -v;
+    "${BOOTSTRAP_SCRIPT}";
     local _rescode=$?;
     if isTrue ${_rescode}; then
       logInfo -n "Bootstrap completed";
@@ -56,7 +61,12 @@ function main() {
       startMongodWithAuthenticationEnabled ${SERVICE_USER} ${SERVICE_GROUP} "${DB_FOLDER}" "${MONGOD_CONFIG_FILE}" "${SQ_AUTHENTICATION_MECHANISM}";
     fi
 
-    tail -f "${MONGOD_LOG_FILE}" &
+    IFS="${DWIFS}";
+    for _f in "${MONGODB_LOG_FOLDER}"/*; do
+      IFS="${_oldIFS}";
+      tail -f "${_f}" &
+    done;
+    IFS="${_oldIFS}";
 
     while isMongodRunning; do
       sleep ${SLEEP};
@@ -76,8 +86,10 @@ defineEnvVar DB_FOLDER OPTIONAL "The database folder" "/backup/mongodb/db";
 defineEnvVar BOOTSTRAP_FILE OPTIONAL "The bootstrap file" "{DB_FOLDER}/.bootstrapped";
 # env: MONGOD_CONFIG_FILE: The mongod config file.
 defineEnvVar MONGOD_CONFIG_FILE OPTIONAL "The mongod config file" "/etc/mongod.conf";
-# env: MONGOD_LOG_FILE The mongod log file.
-defineEnvVar MONGOD_LOG_FILE OPTIONAL "The mongod log file" "/var/log/mongodb/mongod.log";
+# env: MONGODB_LOG_FOLDER The MongoDB log folder. Defaults to /var/log/mongodb.
+defineEnvVar MONGODB_LOG_FOLDER OPTIONAL "The MongoDB log folder" "/var/log/mongodb";
 # env: SLEEP: The number of seconds to sleep before checking if mongod is running again.
 defineEnvVar SLEEP OPTIONAL "The number of seconds to sleep before checking if mongod is running again" 300;
+# env: BOOTSTRAP_SCRIPT: The script in charge of bootstrapping. Defaults to /usr/local/bin/${IMAGE}-bootstrap.sh.
+defineEnvVar BOOTSTRAP_SCRIPT OPTIONAL "The script in charge of bootstrapping" "/usr/local/bin/${IMAGE}-bootstrap.sh";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

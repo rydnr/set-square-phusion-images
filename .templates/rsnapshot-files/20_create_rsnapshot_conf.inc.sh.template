@@ -1,16 +1,11 @@
-defineEnvVar DOCKERFILES_LOCATION MANDATORY \
-             "The folder containing the dockerfiles" \
-             "/Dockerfiles";
-defineEnvVar RSNAPSHOT_CONF MANDATORY \
-             "The rsnapshot configuration file" \
-             "/etc/rsnapshot.conf";
-defineEnvVar CUSTOM_BACKUP_SCRIPTS_FOLDER MANDATORY \
-             "The folder where the backup scripts, if any, are located" \
-             "/usr/local/bin";
-defineEnvVar CUSTOM_BACKUP_SCRIPT_PREFIX MANDATORY \
-             "The prefix for all backup scripts" \
-             "backup-";
-defineEnvVar ENABLE_BACKUP_ENVIRONMENT_VARIABLE MANDATORY \
-             "The environment variable to enable built-in backup mechanism" \
-             "DOBACKUP";
+# env: DOCKERFILES_LOCATION: The folder containing the dockerfiles. Defaults to /Dockerfiles.
+defineEnvVar DOCKERFILES_LOCATION OPTIONAL "The folder containing the dockerfiles" "/Dockerfiles";
+# env: RSNAPSHOT_CONF: The rsnapshot configuration file. Defaults to /etc/rsnapshot.conf.
+defineEnvVar RSNAPSHOT_CONF OPTIONAL "The rsnapshot configuration file" "/etc/rsnapshot.conf";
+# env: CUSTOM_BACKUP_SCRIPTS_FOLDER: The folder where the backup scripts, if any, are located. Defaults to /usr/local/bin.
+defineEnvVar CUSTOM_BACKUP_SCRIPTS_FOLDER OPTIONAL "The folder where the backup scripts, if any, are located" "/usr/local/bin";
+# env: CUSTOM_BACKUP_SCRIPT_PREFIX: The prefix for all backup scripts. Defaults to backup-.
+defineEnvVar CUSTOM_BACKUP_SCRIPT_PREFIX OPTIONAL "The prefix for all backup scripts" "backup-";
+# env: ENABLE_BACKUP_ENVIRONMENT_VARIABLE: The environment variable to enable built-in backup mechanism. Defaults to DOBACKUP.
+defineEnvVar ENABLE_BACKUP_ENVIRONMENT_VARIABLE OPTIONAL "The environment variable to enable built-in backup mechanism" "DOBACKUP";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

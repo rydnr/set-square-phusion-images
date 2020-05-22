@@ -5,6 +5,8 @@
 # api: public
 # txt: Creates Monit configuration to check disk usage for the root partition.
 
+export DW_DISABLE_ANSI_COLORS=TRUE;
+
 # fun: retrieve_root_path
 # api: public
 # txt: Retrieves the root path.

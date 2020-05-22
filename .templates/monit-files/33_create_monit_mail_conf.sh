@@ -5,6 +5,8 @@
 # api: public
 # txt: Creates Monit configuration file to send alerts via email.
 
+export DW_DISABLE_ANSI_COLORS=TRUE;
+
 # fun: main
 # api: public
 # txt: Creates Monit configuration file to send alerts via email.

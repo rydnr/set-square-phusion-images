@@ -1,19 +1,13 @@
-defineEnvVar MONIT_CONF_FOLDER MANDATORY \
-             "Monit's configuration folder" \
-             "/etc/monit/conf-enabled";
-defineEnvVar MONIT_CONF_FILE MANDATORY \
-             "The Monit configuration file to make it check the root filesystem usage" \
-             '${MONIT_CONF_FOLDER}/httpd.conf';
-defineEnvVar MONIT_HTTP_PORT MANDATORY \
-             "The port used by Monit's webapp" \
-             "${MONIT_HTTP_PORT}";
-defineEnvVar MONIT_HTTP_USER MANDATORY \
-             "The user to login in monit's webapp" \
-             "${MONIT_HTTP_USER}";
-defineEnvVar MONIT_HTTP_PASSWORD MANDATORY \
-             "The password to login in monit's webapp" \
-             "${MONIT_HTTP_PASSWORD}";
-defineEnvVar MONIT_HTTP_TIMEOUT MANDATORY \
-             "The timeout before alerting that monit's own http interface is down" \
-             "${MONIT_HTTP_TIMEOUT}";
+# env: MONIT_CONF_FOLDER: Monit's configuration folder. Defaults to /etc/monit/conf-enabled.
+defineEnvVar MONIT_CONF_FOLDER OPTIONAL "Monit's configuration folder" "/etc/monit/conf-enabled";
+# env: MONIT_CONF_FILE: The Monit configuration file to make it check the HTTP port. Defaults to ${MONIT_CONF_FOLDER}/httpd.conf.
+defineEnvVar MONIT_CONF_FILE OPTIONAL "The Monit configuration file to make it check the HTTP port" '${MONIT_CONF_FOLDER}/httpd.conf';
+# env: MONIT_HTTP_PORT: The port used by Monit's webapp. Defaults to 2802.
+defineEnvVar MONIT_HTTP_PORT OPTIONAL "The port used by Monit's webapp" "2802";
+# env: MONIT_HTTP_USER: The user to login in Monit's webapp. Defaults to monit.
+defineEnvVar MONIT_HTTP_USER OPTIONAL "The user to login in Monit's webapp" "monit";
+# env: MONIT_HTTP_PASSWORD: The password to log in in Monit's webapp. Defaults to ${RANDOM_PASSWORD}.
+defineEnvVar MONIT_HTTP_PASSWORD OPTIONAL "The password to log in in Monit's webapp" "${RANDOM_PASSWORD}";
+# env: MONIT_HTTP_TIMEOUT: The timeout before alerting that Monit's own http interface is down. Defaults to 60.
+defineEnvVar MONIT_HTTP_TIMEOUT OPTIONAL "The timeout before alerting that monit's own http interface is down" 60;
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
