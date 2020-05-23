@@ -7,7 +7,7 @@
 # txt: Lists the volumes from a given Dockerfile.
 # opt: dockerfile: The Dockerfile.
 # txt: Returns 0/TRUE always.
-# use: list_volumes /Dockerfiles/Dockerfile
+# use: list_volumes /Dockerfiles/Dockerfile;
 function list_volumes() {
   local _dockerfile="${1}";
   local _aux;
@@ -29,8 +29,8 @@ function list_volumes() {
 # fun: main
 # api: public
 # txt: Main logic.
-# txt: Returns 0/TRUE always
-# use: main
+# txt: Returns 0/TRUE always.
+# use: main;
 function main() {
   local p;
   local _oldIFS="${IFS}";
@@ -45,3 +45,4 @@ function main() {
 ## Script metadata and CLI settings.
 
 setScriptDescription "Lists all volumes defined in this image (including ancestors')";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

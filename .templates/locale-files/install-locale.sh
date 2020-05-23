@@ -5,6 +5,8 @@
 # api: public
 # txt: Installs a locale (for an encoding).
 
+export DW_DISABLE_ANSI_COLORS=TRUE;
+
 DW.import locale;
 
 # fun: install_locale

@@ -12,17 +12,17 @@
 # use: if chown_volume mysql mysql /var/lib/mysql; then echo "Permissions on /var/lib/mysql changed successfully"; fi
 function chown_volume() {
   local _user="${1}";
+  checkNotEmpty user "${_user}" 1;
   local _group="${2}";
+  checkNotEmpty group "${_group}" 2;
   local _volume="${3}";
+  checkNotEmpty volume "${_volume}" 3;
   local -i _rescode=${TRUE};
   local _single;
   local _item;
   local _oldIFS;
   local _aux;
 
-  checkNotEmpty "user" "${_user}" 1;
-  checkNotEmpty "group" "${_group}" 2;
-  checkNotEmpty "volume" "${_volume}" 3;
 
   if [ "${_volume#[}" == "${_volume}" ]; then
       _single=${TRUE};
@@ -67,15 +67,14 @@ function chown_volume() {
 # use: process_volumes mysql mysql /Dockerfiles/Dockerfile
 function process_volumes() {
   local _user="${1}";
+  checkNotEmpty user "${_user}" 1;
   local _group="${2}";
+  checkNotEmpty group "${_group}" 2;
   local _dockerfile="${3}";
+  checkNotEmpty dockerfile "${_dockerfile}" 3;
   local _aux;
   local _item;
   local _volumes;
-
-  checkNotEmpty "user" "${_user}" 1;
-  checkNotEmpty "group" "${_group}" 2;
-  checkNotEmpty "dockerfile" "${_dockerfile}" 3;
 
   grep -e '^\s*VOLUME\s' "${_dockerfile}" > /dev/null 2>&1
   if isTrue $?; then
@@ -121,3 +120,4 @@ function main() {
 ## Script metadata and CLI settings.
 
 setScriptDescription "Changes the ownership of all declared volumes."
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -5,6 +5,8 @@
 # api: public
 # txt: Changes the system's default locale.
 
+export DW_DISABLE_ANSI_COLORS=TRUE;
+
 # fun: main
 # api: public
 # txt: Changes the locale and encoding (available after re-login).
