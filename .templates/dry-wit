@@ -1,0 +1,6 @@
+# v dry-wit
+ADD dry-wit-files/ /usr/local/src/dry-wit
+ENV PATH=${PATH}:/usr/local/src/dry-wit/src
+RUN ln -s /usr/local/src/dry-wit /root/.dry-wit \
+ && ln -s /root/.dry-wit/themes/${NAMESPACE}.dwt /root/.dry-wit/themes/current.dwt
+# ^ dry-wit
