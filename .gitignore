@@ -1,6 +1,6 @@
-.#*
-*~
 *#
+*~
+.#*
 abc/*
 android-studio/my_exec
 android-studio/studio.vmoptions
@@ -13,8 +13,8 @@ base/10_append_backup_to_etc_hosts.inc.sh
 base/20_create_rsnapshot_conf.inc.sh
 base/21_tune_rsync_conf.sh
 base/40_create_ssl_certificate_openssl.inc.sh
-base/create_ssl_certificate.inc.sh
 base/create-ssl-certificate.inc.sh
+base/create_ssl_certificate.inc.sh
 base/create-ssl-certificate-openssl.inc.sh
 base/dry-wit
 base/dry-wit-files
@@ -27,6 +27,7 @@ base/monit-mail.conf.template
 base/remote-rsyslogd.conf
 base/restart
 */.build*
+.build.inc
 \.build.inc.sh*
 .build-settings.sh
 .build.sh.*
@@ -38,8 +39,8 @@ copyright-preamble.*
 */create_ssl_certificate-files/*
 **/create_ssl_certificate-files/create_ssl_certificate.inc.sh
 **/cron-files
-Dockerfile
 */Dockerfile
+Dockerfile
 docs/set-square_overview.*
 elasticsearch/elasticsearch-files
 elasticsearch/service
@@ -90,8 +91,8 @@ jenkins/prepare-release.sh
 jenkins/settings.xml
 kibana/service
 letsencrypt/service
-*/LICENSE.*
 **/LICENSE
+*/LICENSE.*
 LICENSE.*
 **/locale-files
 *.log
@@ -261,7 +262,6 @@ tacotron/service
 .templates/pharo-launcher
 .templates/pika
 .templates/pillar
-.templates/pip
 .templates/pip
 .templates/plone5
 .templates/postgresql
