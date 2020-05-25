@@ -15,6 +15,7 @@ COPY monit-files/syslog.conf /etc/monit/monitrc.d/syslog
 COPY monit-files/monit-mail.conf.tmpl /var/local/monit-mail.conf.tmpl
 COPY monit-files/monit-http.conf /var/local/monit-http.conf
 COPY monit-files/enable-monit-ssl.sh /usr/local/bin
+COPY monit-files/monitrc /etc/monit/monitrc
 
 RUN ${SYSTEM_UPDATE} && \
     ${PKG_INSTALL} monit && \
