@@ -26,4 +26,3 @@ RUN ${SYSTEM_UPDATE} && \
     cp /etc/service/.template/log/run /etc/service/monit/log/run && \
     sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc
 # ^ monit
-
