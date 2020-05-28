@@ -1,5 +1,6 @@
 # v mongodb
 COPY mongodb-files/mongodb-dump.sh \
+     mongodb-files/mongodb-restore.sh \
      mongodb-files/mongodb-discard-old-dumps.sh \
      /usr/local/bin/
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
@@ -18,12 +19,13 @@ RUN ${SYSTEM_UPDATE} \
  && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
  && ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} mongodb-org \
+ && ${SYSTEM_CLEANUP} \
+ && chmod +x /usr/local/bin/mongodb-*.sh \
  && echo "mongodb-org hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-server hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-shell hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-mongos hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-tools hold" | sudo dpkg --set-selections \
- && ${SYSTEM_CLEANUP} \
  && cp /etc/mongod.conf /etc/mongod.conf.distrib \
  && sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf \
  && sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf \
