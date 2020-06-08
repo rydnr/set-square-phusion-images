@@ -2,4 +2,5 @@ defineButDoNotOverrideEnvVar MONGODB_MAJOR_VERSION "The mongodb major version" "
 defineButDoNotOverrideEnvVar MONGODB_VERSION "The mongodb version" '${MONGODB_MAJOR_VERSION}.2';
 defineButDoNotOverrideEnvVar REPLICA_SET_NAME "The name of the replica set" '${NAMESPACE}';
 defineButDoNotOverrideEnvVar AUTHENTICATION_MECHANISM "The authentication mechanism" "SCRAM-SHA-256";
+defineButDoNotOverrideEnvVar ENABLE_FREE_MONITORING "Whether to enable free monitoring" false;
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
