@@ -40,8 +40,9 @@ function main() {
   fi
 
   if isTrue ${_bootstrapNeeded}; then
+    rm -f /tmp/$(basename ${BOOTSTRAP_SCRIPT}-*);
     "${BOOTSTRAP_SCRIPT}";
-    local _rescode=$?;
+    local -i _rescode=$?;
     if isTrue ${_rescode}; then
       logInfo -n "Bootstrap completed";
       logInfoResult SUCCESS "done";
@@ -52,13 +53,21 @@ function main() {
     fi
   fi
 
+  if fileExists "${BOOTSTRAP_FILE}"; then
+    _runMongod=${FALSE};
+  fi
+
   if isTrue ${_runMongod}; then
-    if isEmpty "${SQ_AUTHENTICATION_MECHANISM}"; then
+    local _authMechanism="${AUTHENTICATION_MECHANISM:-}";
+    if isEmpty "${_authMechanism}"; then
+      _authMechanism="${SQ_AUTHENTICATION_MECHANISM}";
+    fi
+    if isEmpty "${_authMechanism}"; then
       logInfo "Launching MongoDB with no authentication";
       startMongodWithAuthenticationDisabled ${SERVICE_USER} ${SERVICE_GROUP} "${DB_FOLDER}" "${MONGOD_CONFIG_FILE}";
     else
-      logInfo "Launching MongoDB with ${SQ_AUTHENTICATION_MECHANISM} authentication mechanism";
-      startMongodWithAuthenticationEnabled ${SERVICE_USER} ${SERVICE_GROUP} "${DB_FOLDER}" "${MONGOD_CONFIG_FILE}" "${SQ_AUTHENTICATION_MECHANISM}";
+      logInfo "Launching MongoDB with ${_authMechanism} authentication mechanism";
+      startMongodWithAuthenticationEnabled ${SERVICE_USER} ${SERVICE_GROUP} "${DB_FOLDER}" "${MONGOD_CONFIG_FILE}" "${_authMechanism}";
     fi
 
     IFS="${DWIFS}";
