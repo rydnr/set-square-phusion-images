@@ -1,0 +1,8 @@
+# v java-logstash
+COPY java-files/logstash /etc/service/.template/log/run
+COPY java-files/logstash-cron.sh /etc/service/cron/log/run
+COPY java-files/logstash-cron.sh /etc/service/cron/log/
+COPY java-files/my_exec.logstash /etc/my_exec.d/logstash
+COPY java-files/logstash-cron.conf /etc/logstash/conf.d/cron.conf
+COPY java-files/logstash-default.conf /etc/logstash/conf.d/default.conf
+# ^ java-logstash
