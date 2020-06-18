@@ -17,12 +17,13 @@ COPY monit-files/monit-http.conf /var/local/monit-http.conf
 COPY monit-files/enable-monit-ssl.sh /usr/local/bin
 COPY monit-files/monitrc /etc/monit/monitrc
 
-RUN ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} monit && \
-    ${SYSTEM_CLEANUP} && \
-    mkdir -p /etc/service/monit/log && \
-    chmod +x /usr/local/bin/enable-monit-ssl.sh && \
-    /usr/local/bin/enable-monit-ssl.sh && \
-    cp /etc/service/.template/log/run /etc/service/monit/log/run && \
-    sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} monit \
+ && ${SYSTEM_CLEANUP} \
+ && mkdir -p /etc/service/monit/log \
+ && chmod +x /usr/local/bin/enable-monit-ssl.sh \
+ && /usr/local/bin/enable-monit-ssl.sh \
+ && cp /etc/service/.template/log/run /etc/service/monit/log/run \
+ && sed -i 's|^\(\s*\)set logfile\(.*\)|#\1set logfile\2|g' /etc/monit/monitrc \
+ && chmod 0700 /etc/monit/monitrc
 # ^ monit

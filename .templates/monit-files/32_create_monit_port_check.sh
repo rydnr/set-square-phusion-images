@@ -7,19 +7,17 @@
 
 export DW_DISABLE_ANSI_COLORS=TRUE;
 
-DW.import docker;
-
 ## Main logic
 ## dry-wit hook
 function main() {
-  local _ports="";
-  local _oldIFS="${IFS}";
-  local _d;
-  local _port;
 
   echo 'check host localhost with address 0.0.0.0' > ${MONIT_CONF_FILE}
 
+  DW.import docker;
+
+  local _oldIFS="${IFS}";
   IFS=$' ';
+  local _d;
   for _d in ${DOCKERFILES_LOCATION}/*; do
     IFS="${_oldIFS}";
     if retrievePortsFromDockerfile "${_d}"; then
@@ -27,8 +25,10 @@ function main() {
     fi
   done
   IFS="${_oldIFS}";
-  _ports=$(echo ${_ports} | tr " " "\n" | sort | uniq | tr "\n" " ");
+
+  local _ports=$(echo ${_ports} | tr " " "\n" | sort | uniq | tr "\n" " ");
   IFS=$' ';
+  local _port;
   for _port in ${_ports}; do
     IFS="${_oldIFS}";
     logInfo -n "Creating Monit check for ${_port} port";
