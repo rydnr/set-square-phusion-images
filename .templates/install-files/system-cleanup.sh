@@ -1,16 +1,36 @@
 #!/bin/bash dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
+# mod: system-cleanup
+# api: public
+# txt: Removes unused packages from the system.
 
-## Removes unused packages from the system.
-## Example:
-##   autoremove_packages
+DW.import ubuntu;
+
+# fun: main
+# api: public
+# txt: Removes unused packages from the system.
+# txt: Returns 0/TRUE always, but can exit in case an error occurs.
+# use: main;
+function main() {
+  autoremove_packages;
+  clean_system;
+  truncate_logs;
+  wipe_temporary_folder;
+}
+
+# fun: autoremove_packages
+# api: public
+# txt: Removes unused packages from the system.
+# txt: Returns 0/TRUE if the packages get removed; 1/FALSE otherwise.
+# use: if autoremove_packages; then
+# use:   ...
+# use: fi
 function autoremove_packages() {
-  local -i _rescode;
 
   logInfo -n "Removing unused packages";
-  ${PKG_REMOVE} > /dev/null
-  _rescode=$?;
+  autoremoveUbuntuPackages;
+  local -i _rescode=$?;
 
   if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
@@ -21,48 +41,18 @@ function autoremove_packages() {
   return ${_rescode};
 }
 
-## Cleans up the system.
-## Example:
-##   clean_system
+# fun: clean_system
+# api: public
+# txt: Cleans up the system.
+# txt: Returns 0/TRUE if the system gets cleaned; 1/FALSE otherwise.
+# use: if clean_system; then
+# use:   ...
+# use: fi
 function clean_system() {
-  local -i _rescode;
 
-  if isEmpty "${SYSTEM_CLEAN}"; then
-      exitWithErrorCode SYSTEM_CLEAN_IS_MANDATORY;
-  fi
-
-  logInfo -n "Cleaning up the system";
-  ${SYSTEM_CLEAN} > /dev/null
-  _rescode=$?;
-
-  if isTrue ${_rescode}; then
-    logInfoResult SUCCESS "done";
-
-    logInfo -n "Autoremoving unused packages";
-    ${PKG_AUTOREMOVE} > /dev/null;
-    _rescode=$?;
-
-    if isTrue ${_rescode}; then
-      logInfoResult SUCCESS "done";
-    else
-      logInfoResult FAILURE "failed";
-    fi
-  else
-    logInfoResult FAILURE "failed";
-  fi
-
-  return ${_rescode};
-}
-
-## Deletes all caches.
-## Example:
-##   remove_cache
-function delete_caches() {
-  local -i _rescode;
-
-  logInfo -n "Deleting caches";
-  ${SYSTEM_CLEAN} > /dev/null
-  _rescode=$?;
+  logInfo -n "Autoremoving unused packages";
+  cleanUbuntuSystem;
+  local -i _rescode=$?;
 
   if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
@@ -73,15 +63,18 @@ function delete_caches() {
   return ${_rescode};
 }
 
-## Truncates all log files.
-## Example:
-##   truncate_logs
+# fun: truncate_logs
+# api: public
+# txt: Truncates all log files.
+# txt: Returns 0/TRUE if the logs get truncated; 1/FALSE otherwise.
+# use: if truncate_logs; then
+# use:   ...
+# use: fi
 function truncate_logs() {
-  local -i _rescode;
 
   logInfo -n "Truncating log files";
-  find /var/log -type f -name '*.log' -exec bash -c 'echo > {}' \;
-  _rescode=$?;
+  truncateFiles /var/log '*.log';
+  local -i _rescode=$?;
 
   if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
@@ -92,15 +85,18 @@ function truncate_logs() {
   return ${_rescode};
 }
 
-## Wipes the contents of the /tmp.
-## Example:
-##   wipe_temporary_folder
+# fun: wipe_temporary_folder
+# api: public
+# txt: Wipes the contents of the /tmp.
+# txt: Returns 0/TRUE if the temporary folder gets wiped; 1/FALSE otherwise.
+# use: if wipe_temporary_folder; then
+# use:   ...
+# use: fi
 function wipe_temporary_folder() {
-  local -i _rescode;
 
   logInfo -n "Wiping /tmp";
-  rm -rf /tmp/*;
-  _rescode=$?;
+  rm -rf /tmp/* > /dev/null 2>&1;
+  local -i _rescode=$?;
 
   if isTrue ${_rescode}; then
     logInfoResult SUCCESS "done";
@@ -112,21 +108,8 @@ function wipe_temporary_folder() {
   return ${_rescode};
 }
 
-## Main logic
-## dry-wit hook
-function main() {
-  autoremove_packages;
-  clean_system;
-  delete_caches;
-  truncate_logs;
-  wipe_temporary_folder;
-}
-
 ## Script metadata and CLI settings.
-
 setScriptDescription "Cleans up the system by removing unused packages.";
 
-addError "INVALID_OPTION" "Unrecognized option";
-addError SYSTEM_CLEAN_IS_MANDATORY "SYSTEM_CLEAN is mandatory";
-addError "ERROR_REMOVING_UNUSED_PACKAGES" "Error removing unused packages";
-#
+addError ERROR_REMOVING_UNUSED_PACKAGES "Error removing unused packages";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
