@@ -1,9 +1,4 @@
 # v openjdk
-COPY java-files/logstash /etc/service/.template/log/run
-COPY java-files/logstash-cron.sh /etc/service/cron/log/run
-COPY java-files/logstash-cron.sh /etc/service/cron/log/
-COPY java-files/create_ssl_certificate_keytool.sh /usr/local/bin/create_ssl_certificate_keytool.sh
-
 ENV JAVA_HEAP_MIN="${JAVA_HEAP_MIN}" \
     JAVA_HEAP_MAX="${JAVA_HEAP_MAX}" \
     JAVA_OPTS="${JAVA_OPTS}"
@@ -12,11 +7,5 @@ RUN ${SYSTEM_UPDATE} && \
     ${PKG_INSTALL} openjdk-${JAVA_VERSION}-jdk && \
     ${SYSTEM_CLEANUP} && \
     chmod +x /etc/service/.template/log/run && \
-    chmod +x /etc/service/cron/log/run && \
-    ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_keytool.inc.sh && \
-    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh
-
-COPY java-files/my_exec.logstash /etc/my_exec.d/logstash
-COPY java-files/logstash-cron.conf /etc/logstash/conf.d/cron.conf
-COPY java-files/logstash-default.conf /etc/logstash/conf.d/default.conf
+    chmod +x /etc/service/cron/log/run
 # ^ openjdk
