@@ -23,7 +23,7 @@ defineEnvVar SYSTEM_UPDATE \
 defineEnvVar PKG_INSTALL \
              MANDATORY \
              "Installs a program via apt-get" \
-             '/usr/local/sbin/pkg-install.sh -vv ';
+             '/usr/local/sbin/pkg-install.sh -v ';
 defineEnvVar PKG_CLEANUP \
              MANDATORY \
              "The cleanup commands after an apt-get so that the resulting image size is optimal" \
