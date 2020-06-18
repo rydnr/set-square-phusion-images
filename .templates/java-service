@@ -1,0 +1,12 @@
+# v java-service
+ENV DOBACKUP="false" \
+    DEFAULT_LOCALE=${JAVA_DEFAULT_LOCALE} \
+    DEFAULT_ENCODING=${JAVA_DEFAULT_ENCODING} \
+    DEFAULT_JAVA_OPTS="${DEFAULT_JAVA_OPTS}" \
+    APP_HOME=/opt/bats-omp-service
+
+COPY java-service-files/start.sh java-service-files/start.inc.sh /opt/bats-omp-service/
+RUN chmod +x /opt/bats-omp-service/start.sh
+
+ENTRYPOINT ["/opt/bats-omp-service/start.sh"]
+# ^ java-service
