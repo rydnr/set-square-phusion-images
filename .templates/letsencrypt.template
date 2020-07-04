@@ -1,6 +1,6 @@
 # v letsencrypt
 RUN ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} -u python-pip python-dev libffi-dev libssl-dev && \
+    ${PKG_INSTALL} python-pip python-dev libffi-dev libssl-dev && \
     pip install --upgrade pip && \
     pip install setuptools && \
     pip install certbot && \
