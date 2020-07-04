@@ -1,4 +1,4 @@
 # v python
 RUN /usr/local/sbin/system-update.sh -v && \
-    /usr/local/sbin/pkg-install.sh -vv python2.7 && \
+    /usr/local/sbin/pkg-install.sh -v python2.7 && \
     /usr/local/sbin/system-cleanup.sh -v
