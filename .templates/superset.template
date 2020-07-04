@@ -5,18 +5,20 @@ ENV VIRTUAL_HOST="${SUPERSET_DEFAULT_VIRTUAL_HOST}" \
     LC_ALL=C.UTF-8 \
     LANG=C.UTF-8
 
-RUN ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} build-essential libssl-dev libffi-dev python-dev python-pip libsasl2-dev libldap2-dev python3-dev && \
-    ${SYSTEM_CLEANUP} && \
-    cd ${SERVICE_USER_HOME} && \
-    pip install --upgrade setuptools pip && \
-    pip install superset psycopg2 && \
-    fabmanager create-admin --app superset --username ${SUPERSET_ADMIN_USER} --password ${SUPERSET_ADMIN_PASSWORD} --firstname "${SUPERSET_ADMIN_FIRSTNAME}" --lastname "${SUPERSET_ADMIN_LASTNAME}" --email "${SUPERSET_ADMIN_EMAIL}" && \
-    superset db upgrade && \
-    ([[ "${SUPERSET_LOAD_EXAMPLES}" == "true" ]] && superset load_examples || echo -n) && \
-    superset init && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}/ && \
-    chmod g+w ${SERVICE_USER_HOME}/
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} build-essential libssl-dev libffi-dev python-dev python-pip libsasl2-dev libldap2-dev python3-dev \
+ && ${SYSTEM_CLEANUP} \
+ && cd ${SERVICE_USER_HOME} \
+ && pip3 install --upgrade setuptools pip
+
+RUN pip3 install superset psycopg2-binary flask-appbuilder wtforms_json flask_compress celery flask_migrate flask_talisman flask_caching sqlparse bleach markdown numpy pandas parsedatetime simplejson humanize geohash \
+ && flask fab create-app --name superset --engine SQLAlchemy
+ && FLASK_APP=superset flask fab create-admin --username ${SUPERSET_ADMIN_USER} --password ${SUPERSET_ADMIN_PASSWORD} --firstname "${SUPERSET_ADMIN_FIRSTNAME}" --lastname "${SUPERSET_ADMIN_LASTNAME}" --email "${SUPERSET_ADMIN_EMAIL}" \
+ && superset db upgrade \
+ && ([[ "${SUPERSET_LOAD_EXAMPLES}" == "true" ]] && superset load_examples || echo -n) \
+ && superset init \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}/ \
+ && chmod g+w ${SERVICE_USER_HOME}/
 
 EXPOSE 8088
 # ^ superset
