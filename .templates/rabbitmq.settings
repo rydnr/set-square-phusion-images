@@ -1,6 +1,6 @@
 defineButDoNotOverrideEnvVar RABBITMQ_ULIMIT_N "The ulimit -n value to use when launching RabbitMQ" "50000";
 defineButDoNotOverrideEnvVar RABBITMQ_PLUGINS "The list of plugins to install" "stomp shovel shovel_management federation federation_management mqtt";
-defineButDoNotOverrideEnvVar RABBITMQ_VERSION "The rabbitmq version" "3.8.3";
+defineButDoNotOverrideEnvVar RABBITMQ_VERSION "The rabbitmq version" "3.8.4";
 defineButDoNotOverrideEnvVar RABBITMQ_DEB_ARTIFACT "The rabbitmq deb file" 'rabbitmq-server_${RABBITMQ_VERSION}-1_all.deb';
 defineButDoNotOverrideEnvVar RABBITMQ_DEB_DOWNLOAD_URL "The rabbitmq deb file" 'https://github.com/rabbitmq/rabbitmq-server/releases/download/v${RABBITMQ_VERSION}/${RABBITMQ_DEB_ARTIFACT}';
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

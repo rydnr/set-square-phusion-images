@@ -1,12 +1,11 @@
 # v rabbitmq
 RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc | sudo apt-key add - \
  && echo "deb https://packages.erlang-solutions.com/ubuntu bionic contrib" | sudo tee /etc/apt/sources.list.d/rabbitmq.list \
- && wget -O /tmp/${RABBITMQ_DEB_ARTIFACT} ${RABBITMQ_DEB_DOWNLOAD_URL} \
- && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} erlang erlang-nox socat \
- && dpkg -i /tmp/${RABBITMQ_DEB_ARTIFACT} \
+ && curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add - \
+ && echo "deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang" > /etc/apt/sources.list.d/bintray.rabbitmq.list \
+ && echo "deb https://dl.bintray.com/rabbitmq/debian bionic main" >> /etc/apt/sources.list.d/bintray.rabbitmq.list \
+ && ${PKG_INSTALL} rabbitmq-server socat logrotate \
  && ${SYSTEM_CLEANUP} \
- && rm -f /tmp/${RABBITMQ_DEB_ARTIFACT} \
  && rabbitmq-plugins enable --offline rabbitmq_management \
  && for p in ${RABBITMQ_PLUGINS}; do \
       rabbitmq-plugins enable rabbitmq_${p} --offline; \
@@ -23,15 +22,20 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
  && echo '  }]}].' >> /etc/rabbitmq/rabbitmq.config \
  && echo '  ${SERVICE_USER}  -   nofiles ${RABBITMQ_ULIMIT_N}' >> /etc/security/limits.conf
 
-
 #RUN wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && \
 #    sudo dpkg -i erlang-solutions_1.0_all.deb && \
 #    ${SYSTEM_UPDATE} && \
 #    ${PKG_INSTALL} --force-yes rabbitmq-server && \
 #    ${SYSTEM_CLEANUP}
 
+COPY rabbitmq-files/check_input.sh /etc/my_init.d/01_check_input.sh
+COPY rabbitmq-files/bootstrap.sh /usr/local/bin/rabbitmq-bootstrap.sh
+COPY rabbitmq-files/pending_rabbitmq_scripts.sh /usr/local/bin/pending_rabbitmq_scripts.sh
+COPY rabbitmq-files/create_bootstrap_cron.sh /etc/my_init.d/56_create_bootstrap_cron.sh
+COPY rabbitmq-files/rabbitmq.config /etc/rabbitmq/
+
 # Define mount points.
-VOLUME ["/backup/rabbitmq/data/mnesia"]
+VOLUME ["/backup/rabbitmq/data/mnesia", "/backup/rabbitmq/changeset" ]
 
 # wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
 #    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \

@@ -1,0 +1,30 @@
+#!/bin/bash dry-wit
+# Copyright 2017-today OSOCO
+# mod: create_bootstrap_cron.sh
+# api: public
+# txt: Creates a cron job to bootstrap the RabbitMQ instance.
+
+# fun: main
+# api: public
+# txt: Creates a cron job to bootstrap the RabbitMQ instance.
+# txt: Returns 0/TRUE always.
+# use: main;
+function main() {
+
+  if fileExists /usr/local/bin/${IMAGE}-bootstrap.sh; then
+
+    cat <<EOF > /etc/cron.d/${IMAGE}-bootstrap
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/src/dry-wit/src
+RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
+
+*/1 * * * * root /usr/local/bin/${IMAGE}-bootstrap.sh -vv &> /tmp/${IMAGE}.log && rm -f /etc/cron.d/${IMAGE}-bootstrap
+*/5 * * * * root /usr/local/bin/pending-rabbitmq-scripts.sh -vv &> /tmp/${IMAGE}.log
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
+EOF
+  fi
+}
+
+setScriptDescription "Creates a cron job to bootstrap the RabbitMQ instance.";
+defineEnvVar RABBITMQ_NODENAME MANDATORY "The node name";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
