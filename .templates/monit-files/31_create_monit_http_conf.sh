@@ -53,10 +53,10 @@ EOF
 EOF
       logInfoResult SUCCESS "done";
     else
-      exitWithErrorCode CANNOT_RETRIEVE_SUBNET_24_FOR_IFACE "${_iface}";
+      logInfo "Cannot retrieve subnet ${_iface}/24";
     fi
   else
-    exitWithErrorCode CANNOT_RETRIEVE_INTERFACE_NAME;
+    logInfo "Cannot retrieve interface name";
   fi
 }
 
