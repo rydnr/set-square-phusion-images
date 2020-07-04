@@ -5,7 +5,7 @@ FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 
 @include("service_user")
-@include("java")
+@include("openjdk")
 @include("sdkman")
 @include("gradle")
 
