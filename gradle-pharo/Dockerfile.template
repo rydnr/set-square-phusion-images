@@ -1,35 +1,66 @@
-@include("preamble")
-FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
-@include("maintainer")
+FROM adoptopenjdk:8-jdk-hotspot
 
-@include("addon-toggles")
+LABEL MAINTAINER="Jose San Leandro <jose.sanleandro@barrabes.biz>"
 
-@include("gui")
-@include("service_user")
-@include("openjdk")
-@include("git")
-@include("sdkman")
-@include("gradle")
-@include("libgit2")
-@include("pharo")
+ENV DISPLAY=":0" \
+    SERVICE_USER=pharo \
+    SERVICE_GROUP=pharo \
+    SERVICE_USER_SHELL=/bin/bash \
+    SERVICE_USER_HOME=/home/pharo \
+    PHARO_VM=/opt/pharo/pharo \
+    GRADLE_VERSION=6.5 \
+    PATH=/opt/java/openjdk/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/pharo
 
-ENV WORKSPACE="${WORKSPACE}" \
-    GRADLE_USER_HOME="${WORKSPACE}/.gradle" \
-    DOCKER_API_VERSION="${DEFAULT_DOCKER_API_VERSION}"
+RUN set -o errexit -o nounset \
+    && dpkg --add-architecture i386 \
+    && apt-get update \
+    && apt-get install --yes \
+       libssl-dev libssh2-1-dev libffi-dev zlib1g-dev build-essential cmake gcc pkg-config git libhttp-parser-dev make \
+       zip unzip fontconfig wget git git-lfs openssh-client libcurl4-gnutls-dev ca-certificates libgtk2.0-dev libgtk-3-dev mesa-common-dev libgl1-mesa-dev libc6 unzip libx11-6 libgl1-mesa-glx libfontconfig1 libssl1.0.0 \
+    && ([ -d /opt ] || mkdir /opt) \
+    && mkdir /opt/pharo8 \
+    && cd /opt/pharo8 \
+    && wget https://files.pharo.org/sources/PharoV60.sources \
+    && curl get.pharo.org/64/vmT80 | bash \
+    && cd /opt && ln -s pharo8 pharo \
+    && cd /tmp \
+    && (/usr/sbin/groupadd ${SERVICE_GROUP} || echo -n "") \
+    && (mkdir -p $(dirname ${SERVICE_USER_HOME}) || echo -n "") \
+    && (/usr/sbin/useradd -m -g pharo -G ${SERVICE_USER} -d ${SERVICE_USER_HOME} -s /bin/bash -c "gradle-pharo user" ${SERVICE_USER} || echo -n "") \
+    && (echo "pharo:${SERVICE_USER_PASSWORD}" | chpasswd || echo -n "") \
+    && mkdir ${SERVICE_USER_HOME}/.gradle \
+    && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}/.gradle \
+    && ln -s ${SERVICE_USER_HOME}/.gradle /root/.gradle \
+    && wget https://github.com/libgit2/libgit2/archive/v0.25.0.tar.gz \
+    && tar xzf v0.25.0.tar.gz \
+    && cd libgit2-0.25.0/ \
+    && cmake . \
+    && make \
+    && make install \
+    && ldconfig \
+    && echo '*      hard    rtprio  2' >  /etc/security/limits.d/pharo.conf \
+    && echo '*      soft    rtprio  2' >> /etc/security/limits.d/pharo.conf \
+    && echo 'export PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.sh \
+    && echo 'setenv PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.csh \
+    && chmod +x /etc/profile.d/pharo.sh /etc/profile.d/pharo.csh \
+    && cd /opt/pharo/pharo-vm/lib/pharo/5.0-202002121043 \
+    && su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && wget -q -O- http://get.sdkman.io | bash && chmod +x ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh' \
+    && su - ${SERVICE_USER} -c 'source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh && sdk i gradle' \
+    && apt remove -y libssl-dev libssh2-1-dev libffi-dev zlib1g-dev build-essential cmake gcc pkg-config git libhttp-parser-dev make cmake zip \
+    && apt-get remove --purge -y \
+    && apt-get autoremove -y \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
-RUN chmod +x /sbin/my_exec && \
-    gpasswd -a ${SERVICE_USER} root && \
-    mkdir -p ${WORKSPACE} && \
-    chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE} && \
-    echo 'export SDKMAN_DIR="${SERVICE_USER_HOME}/.sdkman"' >> /root/.bashrc && \
-    echo '[[ -s "${SERVICE_USER_HAME}/.sdkman/bin/sdkman-init.sh" ]] && source "${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh"' >> /root/.bashrc && \
-    su - ${SERVICE_USER} -c 'ln -s ${WORKSPACE} ${SERVICE_USER_HOME}/workspace';
+COPY git-files/gitconfig ${SERVICE_USER_HOME}/.gitconfig
+COPY README /
+COPY copyright-preamble.barrabes /copyright.txt
+COPY LICENSE.barrabes /LICENSE
+COPY Dockerfile /Dockerfiles/barrabes-gradle-pharo.6.5-8.0
 
-@include("copy-metadata")
-@include("symlinks")
-@include("instructions")
+VOLUME ${SERVICE_USER_HOME}/.gradle
 
-#USER ${SERVICE_USER}
-WORKDIR ${WORKSPACE}
-ENTRYPOINT /bin/bash
+USER ${SERVICE_USER}
+
+WORKDIR ${SERVICE_USER_HOME}/work
 #
