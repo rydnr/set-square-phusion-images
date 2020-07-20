@@ -192,6 +192,8 @@ rundeck/service.inc.sh
 */runme
 sdkman/setup.sql
 */ssh-files
+*/superset-files
+superset/service
 */syslog-files
 */tacotron-files
 tacotron/service

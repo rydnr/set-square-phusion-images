@@ -1,0 +1,7 @@
+# PostgreSQL image
+
+This image runs PostgreSQL.
+
+# Usage
+
+docker run -d --name postgresql -p 5432:5432 ${NAMESPACE}/${IMAGE}:${TAG}
