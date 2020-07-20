@@ -1,9 +1,10 @@
 # v pillar
 COPY pillar-files/runme /usr/local/bin/runme
-RUN mkdir -p /opt/pillar && \
-    cd /opt/pillar && \
-    curl https://raw.githubusercontent.com/pillar-markup/pillar/dev-7/download.sh | bash && \
-    chmod +x /usr/local/bin/runme
+RUN mkdir -p /opt/pillar \
+ && chmod +x /usr/local/bin/runme \
+ && cd /opt/pillar \
+ && curl https://raw.githubusercontent.com/pillar-markup/pillar/dev-7/download.sh | bash
+
 ENV PATH=${PATH}:/opt/pillar \
     PILLAR_IMAGE=/opt/pillar/Pharo.image \
     MUSTACHE_IMAGE=/opt/pillar/Pharo.image
