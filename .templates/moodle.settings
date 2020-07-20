@@ -1,0 +1,2 @@
+defineButDoNotOverrideEnvVar MOODLE_BRANCH MANDATORY "The Moodle branch" MOODLE_37_STABLE;
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -1,0 +1,15 @@
+# v moodle
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} libapache2-mod-php graphviz aspell ghostscript clamav php7.2-pspell php7.2-curl php7.2-gd php7.2-intl php7.2-mysql php7.2-xml php7.2-xmlrpc php7.2-ldap php7.2-zip php7.2-soap php7.2-mbstring \
+ && cd /opt \
+ && git clone git://git.moodle.org/moodle.git \
+ && cd /opt/moodle \
+ && git branch -a \
+ && git branch --track ${MOODLE_BRANCH} origin/${MOODLE_BRANCH} \
+ && git checkout ${MOODLE_BRANCH} \
+ && mv /opt/moodle /var/www/html \
+ && mkdir /backup/moodle-data \
+ && chown -R www-data /backup/moodle-data \
+ && chmod -R 777 /backup/moodle-data
+ && chown -R 0755 /var/www/html/moodle
+# ^ moodle
