@@ -25,8 +25,6 @@ function main() {
     done;
     IFS="${_oldIFS}";
   fi
-
-  rabbitmqMigrate;
 }
 
 # fun: find_pending_scripts
@@ -38,7 +36,7 @@ function main() {
 # use:   echo "Pending scripts: ${RESULT}";
 # use: fi
 function find_pending_scripts() {
-  local _candidates="$(find "${PENDING_SCRIPTS_FOLDER}" --maxdepth 1)";
+  local _candidates="$(find "${PENDING_SCRIPTS_FOLDER}" -maxdepth 1 | grep -v -e "^${PENDING_SCRIPTS_FOLDER}$" | sort)";
 
   local _result="";
   local -i _rescode=${FALSE};
@@ -47,8 +45,11 @@ function find_pending_scripts() {
   local _candidate;
   IFS="${DWIFS}";
   for _candidate in ${_candidates}; do
-    if ! already_done "${_candidate}"; then
+    if   isExecutable "${_candidate}" \
+      && ! endsWith "${_candidate}" ".inc.sh" \
+      && ! already_done "${_candidate}"; then
       _rescode=${TRUE};
+
       if isNotEmpty "${_result}"; then
         _result="${_result} ";
       fi
@@ -63,7 +64,7 @@ function find_pending_scripts() {
   return ${_rescode};
 }
 
-# fun: already_done script.
+# fun: already_done script
 # api: public
 # txt: Checks whether given script is already done or not.
 # opt: script: The script.
@@ -100,7 +101,7 @@ function mark_script_as_done() {
   local -i _rescode=${FALSE};
 
   local _basename="$(basename "${_script}")";
-  touch "${DONE_SCRIPTS_FOLDER}${_basename}.done" 2> /dev/null;
+  touch "${DONE_SCRIPTS_FOLDER}/${_basename}.done" 2> /dev/null;
 
   if fileExists "${DONE_SCRIPTS_FOLDER}/${_basename}.done"; then
     _rescode=${TRUE};
@@ -121,14 +122,14 @@ function run_script() {
   local _script="${1}";
   checkNotEmpty script "${_script}" 1;
 
-  "${_script}";
+  "${_script}" -v;
 }
 
 # script metadata
 setScriptDescription "Detects pending RabbitMQ scripts, and runs them.";
 
 # env: PENDING_SCRIPTS_FOLDER: The folder with the pending scripts.
-defineEnvVar PENDING_SCRIPTS_FOLDER MANDATORY "The folder with the pending scripts" "/var/local/src/rabbitmq-pending";
+defineEnvVar PENDING_SCRIPTS_FOLDER MANDATORY "The folder with the pending scripts" "/backup/rabbitmq/changeset";
 # env: DONE_SCRIPTS_FOLDER: The folder with the scripts already executed.
-defineEnvVar DONE_SCRIPTS_FOLDER MANDATORY "The folder with the scripts already executed" "/var/local/src/rabbitmq-done";
+defineEnvVar DONE_SCRIPTS_FOLDER MANDATORY "The folder with the scripts already executed" "/backup/rabbitmq/changeset";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

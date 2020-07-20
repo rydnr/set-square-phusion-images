@@ -1,0 +1,87 @@
+#!/bin/bash dry-wit
+# mod: bootstrap.sh
+# api: public
+# txt: Bootstraps a local RabbitMQ server.
+
+DW.import rabbitmq-bootstrap;
+
+# fun: main
+# api: public
+# txt: Bootstraps Contestia exchanges and queues in a local RabbitMQ server.
+# txt: Returns 0/TRUE always, but can exit in case of error.
+# use: main
+function main() {
+  rabbitmqMigrate;
+}
+
+# fun: declare_virtual_hosts
+# api: public
+# txt: Declares the virtual hosts.
+# txt: Returns 0/TRUE if the virtual host gets created successfully; 1/FALSE otherwise.
+# use: if declare_virtual_hosts; then
+# use:   echo "Virtual hosts declared successfully";
+# use: fi
+function declare_virtual_hosts() {
+  local -i _rescode=${TRUE};
+
+  #  add_vhost /;
+
+  return ${_rescode};
+}
+
+# fun: declare_alternate_exchanges
+# api: public
+# txt: Declares the alternate exchanges.
+# txt: Returns 0/TRUE if the alternate exchanges get created successfully; 1/FALSE otherwise.
+# use: if declare_alternate_exchanges; then
+# use:   echo "Alternate exchanges created successfully";
+# use: fi
+function declare_alternate_exchanges() {
+  local -i _rescode=${TRUE};
+
+#  declare_exchange myexchange-alt fanout;
+
+  return ${_rescode};
+}
+
+# fun: enable_changesets
+# api: public
+# txt: Enables the processing of changesets.
+# txt: Returns 0/TRUE always.
+# use: enable_changesets;
+function enable_changesets() {
+
+  cat <<EOF > /etc/cron.d/rabbitmq-changesets
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/src/dry-wit/src
+RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
+NO_COLOR=true
+USECOLOR=no
+
+*/5 * * * * root /usr/local/bin/pending_rabbitmq_scripts.sh -v &> /tmp/${IMAGE}.log
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
+EOF
+
+  if   ! fileExists /usr/local/bin/pending_rabbitmq_scripts.inc.sh \
+    || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER"; then
+    cat <<EOF >> /usr/local/bin/pending_rabbitmq_scripts.inc.sh
+# env: ADMIN_USER: The name of the admin user.
+defineEnvVar ADMIN_USER MANDATORY "The name of the admin user" "${ADMIN_USER}";
+EOF
+  fi
+
+  if   ! fileExists /usr/local/bin/pending_rabbitmq_scripts.inc.sh \
+      || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_PASSWORD"; then
+    cat <<EOF >> /usr/local/bin/pending_rabbitmq_scripts.inc.sh
+# env: ADMIN_PASSWORD: The password of the admin user.
+defineEnvVar ADMIN_PASSWORD MANDATORY "The password of the admin user" "${ADMIN_PASSWORD}";
+EOF
+  fi
+}
+
+# Script metadata
+setScriptDescription "Bootstraps a local RabbitMQ server.";
+
+# env: LOCK_FILE: The file indicating if the bootstrap is running.
+defineEnvVar LOCK_FILE MANDATORY "The file indicating if the bootstrap is running" "/backup/rabbitmq/data/.bootstrap.lock";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

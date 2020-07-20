@@ -12,10 +12,8 @@ function main() {
 }
 
 # script metadata
-setScriptDescription "Checks the container is launched with the required runtime parameters.";
+setScriptDescription "Checks the container is launched with the ADMIN_PASSWORD set.";
 
 # env: ADMIN_PASSWORD: The password for the admin user.
 defineEnvVar ADMIN_PASSWORD MANDATORY "The password for the admin user";
-# env: MONITORING_PASSWORD: The password for the monitoring user.
-defineEnvVar MONITORING_PASSWORD MANDATORY "The password for the monitoring user";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

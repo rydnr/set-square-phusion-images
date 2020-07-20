@@ -4,7 +4,7 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
  && curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add - \
  && echo "deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang" > /etc/apt/sources.list.d/bintray.rabbitmq.list \
  && echo "deb https://dl.bintray.com/rabbitmq/debian bionic main" >> /etc/apt/sources.list.d/bintray.rabbitmq.list \
- && ${PKG_INSTALL} rabbitmq-server socat logrotate \
+ && ${PKG_INSTALL} rabbitmq-server socat logrotate jq \
  && ${SYSTEM_CLEANUP} \
  && rabbitmq-plugins enable --offline rabbitmq_management \
  && for p in ${RABBITMQ_PLUGINS}; do \
@@ -28,14 +28,20 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
 #    ${PKG_INSTALL} --force-yes rabbitmq-server && \
 #    ${SYSTEM_CLEANUP}
 
-COPY rabbitmq-files/check_input.sh /etc/my_init.d/01_check_input.sh
-COPY rabbitmq-files/bootstrap.sh /usr/local/bin/rabbitmq-bootstrap.sh
+COPY rabbitmq-files/check_admin_password.sh /etc/my_init.d/00_check_admin_password.sh
+COPY rabbitmq-files/check_monitoring_password.sh /etc/my_init.d/00_check_monitoring_password.sh
+COPY rabbitmq-files/bootstrap.sh /usr/local/bin/${IMAGE}-bootstrap.sh
 COPY rabbitmq-files/pending_rabbitmq_scripts.sh /usr/local/bin/pending_rabbitmq_scripts.sh
 COPY rabbitmq-files/create_bootstrap_cron.sh /etc/my_init.d/56_create_bootstrap_cron.sh
 COPY rabbitmq-files/rabbitmq.config /etc/rabbitmq/
 
+RUN chmod +x /etc/my_init.d/00_check_admin_password.sh \
+    /etc/my_init.d/00_check_monitoring_password.sh \
+    /usr/local/bin/${IMAGE}-bootstrap.sh \
+    /usr/local/bin/pending_rabbitmq_scripts.sh
+
 # Define mount points.
-VOLUME ["/backup/rabbitmq/data/mnesia", "/backup/rabbitmq/changeset" ]
+VOLUME ["/backup/rabbitmq/data/mnesia", "/backup/rabbitmq/changeset"]
 
 # wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
 #    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
