@@ -1,0 +1,22 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+@include("gui")
+@include("service_user")
+@include("oracle-jdk8")
+@include("icedtea-plugin")
+@include("firefox52")
+@include("clamav")
+@include("runme")
+
+COPY custom-ca.crt /usr/lib64/mozilla/certificates/
+
+RUN rm -f /sbin/my_exec && ln -s /usr/local/bin/runme /sbin/my_exec && chmod +x /usr/local/bin/runme
+
+VOLUME ${SERVICE_USER_HOME}
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
