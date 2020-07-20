@@ -1,0 +1,5 @@
+# v mysql-client
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} mysql-client \
+ && ${SYSTEM_CLEANUP}
+# ^ mysql-client
