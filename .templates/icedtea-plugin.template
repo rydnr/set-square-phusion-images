@@ -1,0 +1,5 @@
+# v icedtea-plugin
+RUN ${SYSTEM_UPDATE} && \
+    ${PKG_INSTALL} icedtea-8-plugin && \
+    ${SYSTEM_CLEANUP}
+# ^ icedtea-plugin
