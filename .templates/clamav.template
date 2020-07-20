@@ -1,0 +1,8 @@
+# v clamav
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} clamav clamav-daemon \
+ && ${SYSTEM_CLEANUP} \
+ && mkdir /var/run/clamav \
+ && freshclam \
+ && chown -R clamav:clamav /var/run/clamav
+# ^ clamav
