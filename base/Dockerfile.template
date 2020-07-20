@@ -21,9 +21,9 @@ FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 # Extra services
 @include("cron")
 @include("exim")
-@include("monit")
+# @include("monit")
 @include("rsnapshot")
-@include("ssh")
+# @include("ssh")
 
 ENTRYPOINT ["/sbin/my_exec"]
 CMD ["/sbin/my_init"]
