@@ -2,6 +2,6 @@
 COPY java-files/create_ssl_certificate_keytool.sh /usr/local/bin/create_ssl_certificate_keytool.sh
    JAVA_OPTS="${JAVA_OPTS}"
 
-RUN ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_keytool.inc.sh && \
-    chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh
+RUN ln -s /usr/local/bin/create_ssl_certificate.inc.sh /usr/local/bin/create_ssl_certificate_keytool.inc.sh \
+ && chmod +x /usr/local/bin/create_ssl_certificate_keytool.sh
 # ^ java-ssl
