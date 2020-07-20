@@ -1,0 +1,5 @@
+# v php
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} php \
+ && ${SYSTEM_CLEANUP}
+# ^ php
