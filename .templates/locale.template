@@ -28,5 +28,3 @@ RUN cd /usr/local/bin && ${PKG_INSTALL} localepurge apt-utils && \
     rm -f /etc/localtime && \
     ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
 # ^ locale
-
-
