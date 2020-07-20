@@ -1,0 +1,3 @@
+- requires:
+    oracle-jdk8
+    java-applet-plugin

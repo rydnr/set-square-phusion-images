@@ -1,0 +1,2 @@
+defineEnvVar FIREFOX52_ARTIFACT MANDATORY "The firefox artifact" "firefox-52.9.0esr.tar.bz2";
+defineEnvVar FIREFOX52_DOWNLOAD_URL MANDATORY "The firefox download url" "https://ftp.mozilla.org/pub/firefox/releases/52.9.0esr/linux-x86_64/en-US/${FIREFOX52_ARTIFACT}";
