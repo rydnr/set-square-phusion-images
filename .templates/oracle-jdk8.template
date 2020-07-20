@@ -1,0 +1,16 @@
+# v oracle-jdk8
+ENV JAVA_HEAP_MIN="${JAVA_HEAP_MIN}" \
+    JAVA_HEAP_MAX="${JAVA_HEAP_MAX}" \
+    JAVA_OPTS="${JAVA_OPTS}" \
+    PATH=${PATH}:/opt/jdk/bin
+
+COPY oracle-jdk8-files/${ORACLE_JDK8_ARTIFACT} /opt
+
+RUN cd /opt/ \
+ && tar -zxf /opt/${ORACLE_JDK8_ARTIFACT} \
+ && ln -s jdk1.8.0_${ORACLE_JDK8_VERSION} jdk \
+ && update-alternatives --install /usr/bin/java java /opt/jdk1.8.0_${ORACLE_JDK8_VERSION}/bin/java 100 \
+ && rm -f ${ORACLE_JDK8_ARTIFACT}
+
+@include("oracle-jce")
+# ^ oracle-jdk8

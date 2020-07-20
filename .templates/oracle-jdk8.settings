@@ -1,0 +1,4 @@
+defineEnvVar ORACLE_JDK8_VERSION MANDATORY "The specific Oracle JDK 8 version" "241";
+defineEnvVar ORACLE_JDK8_ARTIFACT MANDATORY "The Oracle JDK 8 artifact" "jdk-8u${ORACLE_JDK8_VERSION}-linux-x64.tar.gz";
+defineEnvVar ORACLE_JDK8_DOWNLOAD_URL MANDATORY "The download url for downloading Oracle JDK 8" "https://download.oracle.com/otn/java/jdk/8u241-b07/1f5b5a70bf22433b84d0e960903adac8/${ORACLE_JDK8_ARTIFACT}";
+#
