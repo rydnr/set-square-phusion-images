@@ -76,17 +76,21 @@ function extract_volumes() {
   local _aux;
   local _single;
   local _oldIFS="${IFS}";
+  local _v;
 
   checkNotEmpty dockerfile "${_dockerfile}" 1;
 
   IFS="${DWIFS}";
-  for _aux in $(grep VOLUME "${_dockerfile}" | grep -v 'VOLUMES' | grep -v 'VOLUMEs' | cut -d' ' -f 2- | sed -e 's/^ \+//g'); do
+  for _aux in $(grep -e '^\s*VOLUME' "${_dockerfile}" | grep -v 'VOLUMES' | grep -v 'VOLUMEs' | cut -d' ' -f 2- | sed -e 's/^ \+//g' | sed 's/^\[//g' | sed 's/\]$//g' | sed 's/^"//g' | sed 's/"$//g' | sed 's/"\s*,\s*"/ /g'); do
     IFS="${_oldIFS}";
     if is_backup_volume "${_aux}"; then
       process_volume "${_aux}";
-      for v in ${RESULT}; do
-        _result[${#_result[@]}]="${v}";
+      IFS="${DWIFS}";
+      for _v in ${RESULT}; do
+        IFS="${_oldIFS}";
+        _result[${#_result[@]}]="${_v}";
       done
+      IFS="${_oldIFS}";
     fi
   done
   IFS="${_oldIFS}";
