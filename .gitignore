@@ -122,6 +122,8 @@ mongodb/create_bootstrap_cron_job.sh
 mongodb/service
 mysql/admin.sh
 mysql/backup-mysql.sh
+mysql/backup.sh
+mysql/bootstrap-db
 mysql/conf.d
 mysql/my.cnf
 mysql/service
@@ -135,6 +137,9 @@ nexus/ssl
 nodejs/my_exec
 observium/setup.sql
 */openjdk-files
+*/openjdk-jre-files
+*/oracle-jdk8-files
+*/oracle-jdk-files
 */packetbeat-files
 packetbeat/service
 padlock/apache-files
@@ -206,6 +211,7 @@ tacotron/service
 .templates/aws
 .templates/backup
 .templates/bloomrpc
+.templates/clamav
 .templates/copy-metadata
 .templates/couchbase
 .templates/cuda
@@ -219,6 +225,7 @@ tacotron/service
 .templates/entrypoint
 .templates/exim-files/exim.00_local_macros
 .templates/filebeat
+.templates/firefox52
 .templates/ganache
 .templates/git
 .templates/go
@@ -227,6 +234,7 @@ tacotron/service
 .templates/grails
 .templates/gtoolkit
 .templates/gui
+.templates/icedtea-plugin
 .templates/image_user
 .templates/install
 .templates/instructions
@@ -257,7 +265,9 @@ tacotron/service
 .templates/npm
 .templates/openjdk
 .templates/openjdk-jre
+.templates/oracle-jce
 .templates/oracle-jdk
+.templates/oracle-jdk8
 .templates/oracle-jre
 .templates/packetbeat
 .templates/pencil
