@@ -5,7 +5,7 @@
 
 export DW_DISABLE_ANSI_COLORS=TRUE;
 
-DW.import mongodb;
+DW.import mongodb-bootstrap;
 
 # fun: main
 # api: public
@@ -88,17 +88,18 @@ function main() {
 # Script metadata
 setScriptDescription "Launches MongoDB";
 
-# This environment variables can be overridden in a .inc.sh file in current folder.
+# These environment variables can be overridden in a .inc.sh file in current folder.
+
 # env: DB_FOLDER: The database folder.
-defineEnvVar DB_FOLDER OPTIONAL "The database folder" "/backup/mongodb/db";
+defineEnvVar DB_FOLDER MANDATORY "The database folder" "/backup/mongodb/db";
 # env: BOOTSTRAP_FILE: The bootstrap file.
-defineEnvVar BOOTSTRAP_FILE OPTIONAL "The bootstrap file" "{DB_FOLDER}/.bootstrapped";
+defineEnvVar BOOTSTRAP_FILE MANDATORY "The bootstrap file" "{DB_FOLDER}/.bootstrapped";
 # env: MONGOD_CONFIG_FILE: The mongod config file.
-defineEnvVar MONGOD_CONFIG_FILE OPTIONAL "The mongod config file" "/etc/mongod.conf";
+defineEnvVar MONGOD_CONFIG_FILE MANDATORY "The mongod config file" "/etc/mongod.conf";
 # env: MONGODB_LOG_FOLDER The MongoDB log folder. Defaults to /var/log/mongodb.
-defineEnvVar MONGODB_LOG_FOLDER OPTIONAL "The MongoDB log folder" "/var/log/mongodb";
+defineEnvVar MONGODB_LOG_FOLDER MANDATORY "The MongoDB log folder" "/var/log/mongodb";
 # env: SLEEP: The number of seconds to sleep before checking if mongod is running again.
-defineEnvVar SLEEP OPTIONAL "The number of seconds to sleep before checking if mongod is running again" 300;
+defineEnvVar SLEEP MANDATORY "The number of seconds to sleep before checking if mongod is running again" 300;
 # env: BOOTSTRAP_SCRIPT: The script in charge of bootstrapping. Defaults to /usr/local/bin/${IMAGE}-bootstrap.sh.
-defineEnvVar BOOTSTRAP_SCRIPT OPTIONAL "The script in charge of bootstrapping" "/usr/local/bin/${IMAGE}-bootstrap.sh";
+defineEnvVar BOOTSTRAP_SCRIPT MANDATORY "The script in charge of bootstrapping" "/usr/local/bin/${IMAGE}-bootstrap.sh";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

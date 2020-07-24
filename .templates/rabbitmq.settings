@@ -3,4 +3,6 @@ defineButDoNotOverrideEnvVar RABBITMQ_PLUGINS "The list of plugins to install" "
 defineButDoNotOverrideEnvVar RABBITMQ_VERSION "The rabbitmq version" "3.8.4";
 defineButDoNotOverrideEnvVar RABBITMQ_DEB_ARTIFACT "The rabbitmq deb file" 'rabbitmq-server_${RABBITMQ_VERSION}-1_all.deb';
 defineButDoNotOverrideEnvVar RABBITMQ_DEB_DOWNLOAD_URL "The rabbitmq deb file" 'https://github.com/rabbitmq/rabbitmq-server/releases/download/v${RABBITMQ_VERSION}/${RABBITMQ_DEB_ARTIFACT}';
+# env: CHANGESET_MONITORING_INTERVAL: The number of minutes to wait before checking if there're new pending scripts.
+defineButDoNotOverrideEnvVar CHANGESET_MONITORING_INTERVAL "The number of minutes to wait before checking if there're new pending scripts." 5;
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

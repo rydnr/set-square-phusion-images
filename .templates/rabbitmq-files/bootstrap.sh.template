@@ -58,23 +58,23 @@ RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
 NO_COLOR=true
 USECOLOR=no
 
-*/5 * * * * root /usr/local/bin/pending_rabbitmq_scripts.sh -v &> /tmp/${IMAGE}.log
+*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/bin/pending_rabbitmq_scripts.sh -v &> /tmp/${IMAGE}.log
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 EOF
 
   if   ! fileExists /usr/local/bin/pending_rabbitmq_scripts.inc.sh \
-    || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER"; then
+    || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER_NAME"; then
     cat <<EOF >> /usr/local/bin/pending_rabbitmq_scripts.inc.sh
-# env: ADMIN_USER: The name of the admin user.
-defineEnvVar ADMIN_USER MANDATORY "The name of the admin user" "${ADMIN_USER}";
+# env: ADMIN_USER_NAME: The name of the admin user.
+defineEnvVar ADMIN_USER_NAME MANDATORY "The name of the admin user" "${ADMIN_USER_NAME}";
 EOF
   fi
 
   if   ! fileExists /usr/local/bin/pending_rabbitmq_scripts.inc.sh \
-      || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_PASSWORD"; then
+    || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER_PASSWORD"; then
     cat <<EOF >> /usr/local/bin/pending_rabbitmq_scripts.inc.sh
-# env: ADMIN_PASSWORD: The password of the admin user.
-defineEnvVar ADMIN_PASSWORD MANDATORY "The password of the admin user" "${ADMIN_PASSWORD}";
+# env: ADMIN_USER_PASSWORD: The password of the admin user.
+defineEnvVar ADMIN_USER_PASSWORD MANDATORY "The password of the admin user" "${ADMIN_USER_PASSWORD}";
 EOF
   fi
 }
@@ -84,4 +84,6 @@ setScriptDescription "Bootstraps a local RabbitMQ server.";
 
 # env: LOCK_FILE: The file indicating if the bootstrap is running.
 defineEnvVar LOCK_FILE MANDATORY "The file indicating if the bootstrap is running" "/backup/rabbitmq/data/.bootstrap.lock";
+# env: CHANGESET_MONITORING_INTERVAL: The number of minutes to wait before checking if there're new pending scripts.
+defineEnvVar CHANGESET_MONITORING_INTERVAL MANDATORY "The number of minutes to wait before checking if there're new pending scripts." ${CHANGESET_MONITORING_INTERVAL};
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

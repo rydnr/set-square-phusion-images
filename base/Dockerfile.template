@@ -10,21 +10,23 @@ FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 
 # Housekeeping
 @include("install")
-@include("syslog")
-@include("rsyslog")
+# @include("syslog")
+# @include("rsyslog")
 @include("volumes")
 @include("help")
 @include("locale")
-@include("create_ssl_certificate")
+# @include("create_ssl_certificate")
 @include("backup")
-@include("check-version")
+# @include("check-version")
 
 # Extra services
 @include("cron")
-@include("exim")
+# @include("exim")
 # @include("monit")
-@include("rsnapshot")
+# @include("rsnapshot")
 # @include("ssh")
+
+ENV DW_DISABLE_ANSI_COLORS=${DISABLE_ANSI_COLORS}
 
 ENTRYPOINT ["/sbin/my_exec"]
 CMD ["/sbin/my_init"]
