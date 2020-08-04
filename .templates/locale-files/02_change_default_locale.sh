@@ -15,7 +15,10 @@ export DW_DISABLE_ANSI_COLORS=TRUE;
 function main() {
   DW.import locale;
 
-  changeDefaultLocale "${LOCALE}" "${ENCODING}";
+  if    isNotEmpty "${LOCALE}" \
+     && isNotEmpty "${ENCODING}"; then
+    changeDefaultLocale "${LOCALE}" "${ENCODING}";
+  fi
 }
 
 ## Script metadata and CLI settings.

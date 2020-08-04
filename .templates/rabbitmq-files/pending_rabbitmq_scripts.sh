@@ -1,14 +1,12 @@
 #!/bin/bash dry-wit
 # Copyright 2017-today OSOCO
-# mod: pending_bootstrap_scripts.sh
+# mod: pending_[type]_scripts.sh
 # api: public
-# txt: Detects pending RabbitMQ scripts, and runs them.
-
-DW.import rabbitmq;
+# txt: Detects pending scripts, and runs them.
 
 # fun: main
 # api: public
-# txt: Detects pending RabbitMQ scripts, and runs them.
+# txt: Detects pending scripts, and runs them.
 # txt: Returns 0/TRUE always, but can exit in case of error.
 # use: main
 function main() {
@@ -69,7 +67,7 @@ function find_pending_scripts() {
 # txt: Checks whether given script is already done or not.
 # opt: script: The script.
 # txt: Returns 0/TRUE if the script is already done; 1/FALSE otherwise.
-# use: if already_done /var/local/src/rabbitmq-pending/00-myuser.sh; then
+# use: if already_done /var/local/src/[type]/00-myuser.sh; then
 # use:   echo "00-myuser.sh already applied";
 # use: fi
 function already_done() {
@@ -91,7 +89,7 @@ function already_done() {
 # txt: Marks given script as done.
 # opt: script: The script.
 # txt: Returns 0/TRUE if the script is marked as done successfully; 1/FALSE otherwise.
-# use: if mark_script_as_done /var/local/src/rabbitmq-pending/00-myuser.sh; then
+# use: if mark_script_as_done /var/local/src/[type]/00-myuser.sh; then
 # use:   echo "00-myuser.sh annotated as done";
 # use: fi
 function mark_script_as_done() {
@@ -115,7 +113,7 @@ function mark_script_as_done() {
 # txt: Runs given script.
 # opt: script: The script to run.
 # txt: Returns the return code of the script itself.
-# use: if run_script /var/local/src/rabbitmq-pending/00-myuser.sh; then
+# use: if run_script /var/local/src/[type]/00-myuser.sh; then
 # use:   echo "00-myuser.sh returned 0";
 # use: fi
 function run_script() {
@@ -128,8 +126,10 @@ function run_script() {
 # script metadata
 setScriptDescription "Detects pending RabbitMQ scripts, and runs them.";
 
+# env: TYPE: The type of the scripts: rabbitmq, mongodb, etc. Defaults to basename ${0} .sh | sed 's/^.*_\(.*\)_.*$/\1/g'
+defineEnvVar TYPE "The type of the scripts: rabbitmq, mongodb, etc." "$(basename ${0} .sh | sed 's/^.*_\(.*\)_.*$/\1/g')";
 # env: PENDING_SCRIPTS_FOLDER: The folder with the pending scripts.
-defineEnvVar PENDING_SCRIPTS_FOLDER MANDATORY "The folder with the pending scripts" "/backup/rabbitmq/changeset";
+defineEnvVar PENDING_SCRIPTS_FOLDER MANDATORY "The folder with the pending scripts" "/backup/${TYPE}/changeset";
 # env: DONE_SCRIPTS_FOLDER: The folder with the scripts already executed.
-defineEnvVar DONE_SCRIPTS_FOLDER MANDATORY "The folder with the scripts already executed" "/backup/rabbitmq/changeset";
+defineEnvVar DONE_SCRIPTS_FOLDER MANDATORY "The folder with the scripts already executed" "/backup/${TYPE}/changeset";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

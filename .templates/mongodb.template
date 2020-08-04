@@ -6,7 +6,10 @@ COPY mongodb-files/mongodb-dump.sh \
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
 #COPY mongodb-files/create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
 
-ENV AUTHENTICATION_MECHANISM="${AUTHENTICATION_MECHANISM}"
+ENV ADMIN_USER_NAME="${ADMIN_USER_NAME}" \
+    BACKUP_USER_NAME="${BACKUP_USER_NAME}" \
+    AUTHENTICATION_DATABASE="${AUTHENTICATION_DATABASE}" \
+    AUTHENTICATION_MECHANISM="${AUTHENTICATION_MECHANISM}"
 
 # From http://docs.docker.com/examples/mongodb/
 # From http://docs.mongodb.org/manual/tutorial/install-mongodb-on-ubuntu/
@@ -32,7 +35,8 @@ RUN ${SYSTEM_UPDATE} \
  && sed -i "s|^#\?\(\s*\)bindIp\(\s*\):\(\s*\).*$|\1bindIp\2:\30.0.0.0|g" /etc/mongod.conf \
  && sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf \
  && ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump \
- && ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps
+ && ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps \
+ && ln -s /usr/local/sbin/pending_scripts.sh /usr/local/sbin/pending_mongodb_scripts.sh
 
 #    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
 

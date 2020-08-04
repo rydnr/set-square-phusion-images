@@ -4,7 +4,7 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
  && curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add - \
  && echo "deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang" > /etc/apt/sources.list.d/bintray.rabbitmq.list \
  && echo "deb https://dl.bintray.com/rabbitmq/debian bionic main" >> /etc/apt/sources.list.d/bintray.rabbitmq.list \
- && ${PKG_INSTALL} rabbitmq-server socat logrotate jq \
+ && ${PKG_INSTALL} rabbitmq-server socat logrotate jq rsync \
  && ${SYSTEM_CLEANUP} \
  && rabbitmq-plugins enable --offline rabbitmq_management \
  && for p in ${RABBITMQ_PLUGINS}; do \
@@ -20,7 +20,8 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
  && echo '[{rabbit, [{' >> /etc/rabbitmq/rabbitmq.config \
  && echo '    loopback_users, []' >> /etc/rabbitmq/rabbitmq.config \
  && echo '  }]}].' >> /etc/rabbitmq/rabbitmq.config \
- && echo '  ${SERVICE_USER}  -   nofiles ${RABBITMQ_ULIMIT_N}' >> /etc/security/limits.conf
+ && echo '  ${SERVICE_USER}  -   nofiles ${RABBITMQ_ULIMIT_N}' >> /etc/security/limits.conf \
+ && ln -s /usr/local/sbin/pending_scripts.sh /usr/local/sbin/pending_rabbitmq_scripts.sh
 
 #RUN wget https://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb && \
 #    sudo dpkg -i erlang-solutions_1.0_all.deb && \
@@ -31,17 +32,17 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
 COPY rabbitmq-files/check_admin_password.sh /etc/my_init.d/00_check_admin_password.sh
 COPY rabbitmq-files/check_monitoring_password.sh /etc/my_init.d/00_check_monitoring_password.sh
 COPY rabbitmq-files/bootstrap.sh /usr/local/bin/${IMAGE}-bootstrap.sh
-COPY rabbitmq-files/pending_rabbitmq_scripts.sh /usr/local/bin/pending_rabbitmq_scripts.sh
 COPY rabbitmq-files/create_bootstrap_cron.sh /etc/my_init.d/56_create_bootstrap_cron.sh
 COPY rabbitmq-files/rabbitmq.config /etc/rabbitmq/
 
 RUN chmod +x /etc/my_init.d/00_check_admin_password.sh \
-    /etc/my_init.d/00_check_monitoring_password.sh \
-    /usr/local/bin/${IMAGE}-bootstrap.sh \
-    /usr/local/bin/pending_rabbitmq_scripts.sh
+             /etc/my_init.d/00_check_monitoring_password.sh \
+             /usr/local/bin/${IMAGE}-bootstrap.sh \
+             /usr/local/sbin/pending_scripts.sh \
+             /usr/local/sbin/pending_rabbitmq_scripts.sh
 
-# Define mount points.
-VOLUME ["/backup/rabbitmq/data/mnesia", "/backup/rabbitmq/changeset"]
+# Define those mount points in child images
+# VOLUME ["/backup/rabbitmq/data/mnesia", "/backup/rabbitmq/changesets"]
 
 # wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
 #    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \

@@ -58,21 +58,21 @@ RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
 NO_COLOR=true
 USECOLOR=no
 
-*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/bin/pending_rabbitmq_scripts.sh -v &> /tmp/${IMAGE}.log
+*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/sbin/pending_rabbitmq_scripts.sh -v &> /var/log/changesets.log
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 EOF
 
-  if   ! fileExists /usr/local/bin/pending_rabbitmq_scripts.inc.sh \
-    || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER_NAME"; then
-    cat <<EOF >> /usr/local/bin/pending_rabbitmq_scripts.inc.sh
+  if   ! fileExists /usr/local/sbin/pending_rabbitmq_scripts.inc.sh \
+    || ! fileContains /usr/local/sbin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER_NAME"; then
+    cat <<EOF >> /usr/local/sbin/pending_rabbitmq_scripts.inc.sh
 # env: ADMIN_USER_NAME: The name of the admin user.
 defineEnvVar ADMIN_USER_NAME MANDATORY "The name of the admin user" "${ADMIN_USER_NAME}";
 EOF
   fi
 
-  if   ! fileExists /usr/local/bin/pending_rabbitmq_scripts.inc.sh \
-    || ! fileContains /usr/local/bin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER_PASSWORD"; then
-    cat <<EOF >> /usr/local/bin/pending_rabbitmq_scripts.inc.sh
+  if   ! fileExists /usr/local/sbin/pending_rabbitmq_scripts.inc.sh \
+    || ! fileContains /usr/local/sbin/pending_rabbitmq_scripts.inc.sh "defineEnvVar ADMIN_USER_PASSWORD"; then
+    cat <<EOF >> /usr/local/sbin/pending_rabbitmq_scripts.inc.sh
 # env: ADMIN_USER_PASSWORD: The password of the admin user.
 defineEnvVar ADMIN_USER_PASSWORD MANDATORY "The password of the admin user" "${ADMIN_USER_PASSWORD}";
 EOF
