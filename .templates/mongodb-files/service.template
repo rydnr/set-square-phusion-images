@@ -5,6 +5,7 @@
 
 export DW_DISABLE_ANSI_COLORS=TRUE;
 
+DW.import mongodb;
 DW.import cron;
 
 setDebugEnabled;
@@ -68,7 +69,7 @@ function main() {
       logInfo "Changeset monitoring NOT enabled";
     fi
 
-    tail_log_files;
+    tail_log_files "${MONGODB_LOG_FOLDER}";
 
     if isEmpty "${_authMechanism}"; then
       logInfo "Launching MongoDB with no authentication";
@@ -95,6 +96,8 @@ function enable_changesets() {
 
   logInfo "Monitoring changesets in ${CHANGESET_MONITORING_FOLDER}";
 
+  rm -f "${CHANGESET_MONITORING_FOLDER}"/*.done;
+  
   cat <<EOF > /etc/cron.d/mongodb-changesets
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/src/dry-wit/src

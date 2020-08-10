@@ -58,7 +58,7 @@ RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
 NO_COLOR=true
 USECOLOR=no
 
-*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/sbin/pending_rabbitmq_scripts.sh -v &> /var/log/changesets.log
+*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/sbin/pending_rabbitmq_scripts.sh -v &> /var/log/rabbitmq/changesets.log
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 EOF
 
