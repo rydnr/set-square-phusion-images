@@ -3,5 +3,7 @@ externally.
 
 Examples:
 - Run Jekyll to serve content in a host folder:
-> docker run -d -p [port]:4000 -v [host-path]:/var/www/jekyll ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d --rm -p [port]:4000 -v [host-path]:/work ${NAMESPACE}/${IMAGE}:${TAG}
 
+- To enable livereload, you'll need to use the host network, since the ports are not fixed:
+> docker run -d --rm -p [port]:4000 -v [host-path]:/work --net=host ${NAMESPACE}/${IMAGE}:${TAG}

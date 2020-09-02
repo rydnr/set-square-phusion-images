@@ -3,23 +3,39 @@ FROM ${BASE_IMAGE}:${TAG}
 @include("maintainer")
 
 @include("addon-toggles")
+@include("openjdk")
 
 COPY rc.local /etc/rc.local
 
-RUN ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} ruby python python3-pygments git ruby-dev make nodejs && \
-    ${APTGET_CLEANUP} && \
-    gem install jekyll && \
-    groupadd jekyll && \
-    mkdir /var/www && \
-    /usr/sbin/useradd -m -d /var/www/jekyll -g jekyll -G jekyll -c "Jekyll user" jekyll && \
-    chown -R jekyll:jekyll /var/www/jekyll && \
-    chmod +x /etc/rc.local
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} ruby-full build-essential zlib1g-dev \
+ && ${SYSTEM_CLEANUP} \
+ && groupadd ${SERVICE_GROUP} \
+ && mkdir -p ${SERVICE_USER_HOME} \
+ && /usr/sbin/useradd -m -d ${SERVICE_USER_HOME} -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -c "Jekyll user" ${SERVICE_USER} \
+ && chmod +x /etc/rc.local \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} \
+ && gem install jekyll sass bundler \
+ && echo '# Install Ruby Gems to ~/gems' >> ${SERVICE_USER_HOME}/.bashrc \
+ && echo 'export GEM_HOME="$HOME/gems"' >> ${SERVICE_USER_HOME}/.bashrc \
+ && echo 'export PATH="$HOME/gems/bin:$PATH"' >> ${SERVICE_USER_HOME}/.bashrc
 
-VOLUME /var/www/jekyll
+USER ${SERVICE_USER}
+
+RUN source ${SERVICE_USER_HOME}/.bashrc \
+ && gem install jekyll sass bundler s3_website
+
+USER root
+
+VOLUME /work
+
+ENV SERVICE_USER=${SERVICE_USER} \
+    SERVICE_GROUP=${SERVICE_GROUP}
 
 EXPOSE 4000
 
 @include("copy-metadata")
 @include("symlinks")
 @include("instructions")
+
+USER ${SERVICE_USER}

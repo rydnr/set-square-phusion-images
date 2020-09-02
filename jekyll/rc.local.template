@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/usr/local/sbin/run-as.sh -U ${SERVICE_USER} -G ${SERVICE_GROUP} /work bundle exec jekyll serve --host 0.0.0.0 $@
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
