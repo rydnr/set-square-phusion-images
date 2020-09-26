@@ -10,10 +10,10 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
  && for p in ${RABBITMQ_PLUGINS}; do \
       rabbitmq-plugins enable rabbitmq_${p} --offline; \
     done \
- && mkdir -p /backup/rabbitmq/data /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/rabbitmq/data/mnesia \
- && mv /var/lib/rabbitmq/mnesia /backup/rabbitmq/data \
- && ln -s /backup/rabbitmq/data/mnesia /var/lib/rabbitmq/mnesia \
- && ln -s /backup/rabbitmq/data/mnesia /data/mnesia \
+ && mkdir -p /backup/rabbitmq/storage/mnesia /data ${SERVICE_USER_HOME}/data ${SERVICE_USER_HOME}/backup/rabbitmq/storage/mnesia \
+ && mv /var/lib/rabbitmq/mnesia /backup/rabbitmq/storage/ \
+ && ln -s /backup/rabbitmq/storage/mnesia /var/lib/rabbitmq/mnesia \
+ && ln -s /backup/rabbitmq/storage/mnesia /data/mnesia \
  && mv /var/log/rabbitmq /data/log \
  && ln -s /data/log /var/log/rabbitmq \
  && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data \
@@ -42,7 +42,7 @@ RUN chmod +x /etc/my_init.d/00_check_admin_password.sh \
              /usr/local/sbin/pending_rabbitmq_scripts.sh
 
 # Define those mount points in child images
-# VOLUME ["/backup/rabbitmq/data/mnesia", "/backup/rabbitmq/changesets"]
+# VOLUME ["/backup/rabbitmq/storage/mnesia", "/backup/rabbitmq/changesets"]
 
 # wget -qO - https://www.rabbitmq.com/rabbitmq-signing-key-public.asc | apt-key add - && \
 #    echo "deb http://www.rabbitmq.com/debian/ testing main" > /etc/apt/sources.list.d/rabbitmq.list && \
