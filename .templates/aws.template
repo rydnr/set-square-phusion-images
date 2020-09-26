@@ -1,10 +1,6 @@
 # v aws
-# - Requires:
-#   - unzip
-#   - python
-#   - pip
-RUN pip install awscli && \
-    ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} groff && \
-    ${SYSTEM_CLEANUP}
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} groff  python3-setuptools \
+ && ${SYSTEM_CLEANUP} \
+ && pip install awscli
 # ^ aws
