@@ -6,6 +6,8 @@
 # txt: Changes the system's default locale.
 
 export DW_DISABLE_ANSI_COLORS=TRUE;
+export NO_COLOR=true;
+export USECOLOR=no;
 
 # fun: main
 # api: public
