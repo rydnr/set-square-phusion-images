@@ -1,10 +1,10 @@
 defineButDoNotOverrideEnvVar MONGODB_MAJOR_VERSION "The mongodb major version" "4";
 defineButDoNotOverrideEnvVar MONGODB_VERSION "The mongodb version" '${MONGODB_MAJOR_VERSION}.2';
-defineButDoNotOverrideEnvVar REPLICA_SET_NAME "The name of the replica set" '${NAMESPACE}';
+defineButDoNotOverrideEnvVar REPLICA_SET_NAME "The name of the replica set" '${IMAGE}';
 defineButDoNotOverrideEnvVar ADMIN_USER_NAME "The admin user name" "admin";
 defineButDoNotOverrideEnvVar BACKUP_USER_NAME "The backup user name" "backup";
 defineButDoNotOverrideEnvVar AUTHENTICATION_DATABASE "The authentication database" "admin";
 defineButDoNotOverrideEnvVar AUTHENTICATION_MECHANISM "The authentication mechanism" "SCRAM-SHA-1";
-defineButDoNotOverrideEnvVar ENABLE_FREE_MONITORING "Whether to enable free monitoring" false;
+defineButDoNotOverrideEnvVar ENABLE_FREE_MONITORING "Whether to enable free monitoring" true;
 defineButDoNotOverrideEnvVar CHANGESET_MONITORING_INTERVAL "The number of minutes to wait before checking if there're new pending scripts." 5;
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
