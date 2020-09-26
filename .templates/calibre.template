@@ -1,0 +1,5 @@
+# v calibre
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} calibre \
+ && ${SYSTEM_CLEANUP}
+# ^ calibre
