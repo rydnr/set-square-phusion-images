@@ -1,17 +1,17 @@
 # v anaconda
-RUN cd /tmp && \
-    ${SYSTEM_UPDATE} && \
-    apt -y upgrade && \
-    ${PKG_INSTALL} bzip2 && \
-    ${SYSTEM_CLEANUP} && \
-    rm -rf ${SERVICE_USER_HOME} && \
-    wget ${ANACONDA_DOWNLOAD_URL} && \
-    rm -rf ${SERVICE_USER_HOME} && \
-    bash ${ANACONDA_ARTIFACT} -b -p ${SERVICE_USER_HOME} && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} && \
-    rm -f ${ANACONDA_ARTIFACT} && \
-    su - ${SERVICE_USER} -c '${SERVICE_USER_HOME}/bin/conda update --all' && \
-    su - ${SERVICE_USER} -c '${SERVICE_USER_HOME}/bin/jupyter notebook --generate-config' && \
-    echo "c.NotebookApp.ip = '*'" >> ${SERVICE_USER_HOME}/.jupyter_notebook_config.py && \
-    echo "c.NotebookApp.open_browser = False'" >> ${SERVICE_USER_HOME}/.jupyter_notebook_config.py
+RUN cd /tmp \
+ && ${SYSTEM_UPDATE} \
+ && apt -y upgrade \
+ && ${PKG_INSTALL} bzip2 \
+ && ${SYSTEM_CLEANUP} \
+ && rm -rf ${SERVICE_USER_HOME} \
+ && wget ${ANACONDA_DOWNLOAD_URL} \
+ && rm -rf ${SERVICE_USER_HOME} \
+ && bash ${ANACONDA_ARTIFACT} -b -p ${SERVICE_USER_HOME} \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} \
+ && rm -f ${ANACONDA_ARTIFACT} \
+ && su - ${SERVICE_USER} -c '${SERVICE_USER_HOME}/bin/conda update --all' \
+ && su - ${SERVICE_USER} -c '${SERVICE_USER_HOME}/bin/jupyter notebook --generate-config' \
+ && echo "c.NotebookApp.ip = '*'" >> ${SERVICE_USER_HOME}/.jupyter_notebook_config.py \
+ && echo "c.NotebookApp.open_browser = False'" >> ${SERVICE_USER_HOME}/.jupyter_notebook_config.py
 # ^ anaconda
