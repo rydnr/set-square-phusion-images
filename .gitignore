@@ -212,6 +212,7 @@ tacotron/service
 .templates/aws
 .templates/backup
 .templates/bloomrpc
+.templates/calibre
 .templates/clamav
 .templates/copy-metadata
 .templates/couchbase
@@ -289,6 +290,7 @@ tacotron/service
 .templates/redis
 .templates/robo3t
 .templates/robomongo
+.templates/scrapy
 .templates/sdkman
 .templates/service
 .templates/service_user
