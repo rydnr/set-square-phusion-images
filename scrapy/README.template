@@ -1,0 +1,8 @@
+# Scrapy Docker image
+
+This image allows running Scrapy within a Docker container.
+
+# Examples:
+- Run a shell:
+  docker run -it --rm --name scrapy ${IMAGE}:${TAG} bash
+#
