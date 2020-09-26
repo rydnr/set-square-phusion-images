@@ -20,12 +20,17 @@ RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
 NO_COLOR=true
 USECOLOR=no
 
-#*/1 * * * * root /usr/local/bin/${IMAGE}-bootstrap.sh -v &>> /var/log/rabbitmq/${IMAGE}-changesets.log && rm -f /etc/cron.d/${IMAGE}-bootstrap
+*/${BOOTSTRAP_RETRY_INTERVAL} * * * * root /usr/local/bin/${IMAGE}-bootstrap.sh -v &>> /var/log/rabbitmq/${IMAGE}-bootstrap.log && rm -f /etc/cron.d/${IMAGE}-bootstrap
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 EOF
   fi
 }
 
 setScriptDescription "Creates a cron job to bootstrap the RabbitMQ instance.";
+
+# env: RABBITMQ_NODENAME: The node name.
 defineEnvVar RABBITMQ_NODENAME MANDATORY "The node name";
+
+# env: BOOTSTRAP_RETRY_INTERVAL: The number of minutes to wait before attempting the bootstrap.
+defineEnvVar BOOTSTRAP_RETRY_INTERVAL MANDATORY "The number of minutes to wait before attempting the bootstrap." ${BOOTSTRAP_RETRY_INTERVAL};
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
