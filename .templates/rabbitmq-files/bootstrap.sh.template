@@ -58,7 +58,7 @@ RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
 NO_COLOR=true
 USECOLOR=no
 
-*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/sbin/pending_rabbitmq_scripts.sh -v &> /var/log/rabbitmq/changesets.log
+*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/sbin/pending_rabbitmq_scripts.sh -v &>> /var/log/rabbitmq/changesets.log
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 EOF
 
@@ -82,8 +82,12 @@ EOF
 # Script metadata
 setScriptDescription "Bootstraps a local RabbitMQ server.";
 
-# env: LOCK_FILE: The file indicating if the bootstrap is running.
-defineEnvVar LOCK_FILE MANDATORY "The file indicating if the bootstrap is running" "/backup/rabbitmq/data/.bootstrap.lock";
+# env: BOOTSTRAP_LOCK_FILE: The file indicating if the bootstrap is running.
+defineEnvVar BOOTSTRAP_LOCK_FILE MANDATORY "The file indicating if the bootstrap is running" "/backup/rabbitmq/storage/mnesia/.bootstrap.lock";
+# env: BOOTSTRAP_FAILED_FILE: The file indicating if the bootstrap has failed.
+defineEnvVar BOOTSTRAP_FAILED_FILE MANDATORY "The file indicating if the bootstrap has failed" "/backup/rabbitmq/storage/mnesia/.bootstrap.failed";
+# env: BOOTSTRAP_COMPLETED_FILE: The file indicating if the bootstrap has completed successfully.
+defineEnvVar BOOTSTRAP_COMPLETED_FILE MANDATORY "The file indicating if the bootstrap has completed successfully" "/backup/rabbitmq/storage/mnesia/.bootstrap.done";
 # env: CHANGESET_MONITORING_INTERVAL: The number of minutes to wait before checking if there're new pending scripts.
 defineEnvVar CHANGESET_MONITORING_INTERVAL MANDATORY "The number of minutes to wait before checking if there're new pending scripts." ${CHANGESET_MONITORING_INTERVAL};
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
