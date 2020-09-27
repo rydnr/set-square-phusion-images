@@ -2,6 +2,10 @@
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
+export DW_DISABLE_ANSI_COLORS=TRUE;
+export NO_COLOR=true;
+export USECOLOR=no;
+
 # fun: chown_volume
 # api: public
 # txt: Changes the ownership of a Docker volume specification.
