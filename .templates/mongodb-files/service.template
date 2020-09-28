@@ -4,6 +4,8 @@
 # txt: Launches MongoDB
 
 export DW_DISABLE_ANSI_COLORS=TRUE;
+export NO_COLOR=true;
+export USECOLOR=no;
 
 DW.import mongodb;
 DW.import cron;
