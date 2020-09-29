@@ -6,6 +6,8 @@
 # txt: Performs dumps of the MongoDB database.
 
 export DW_DISABLE_ANSI_COLORS=TRUE;
+export NO_COLOR=true;
+export USECOLOR=no;
 
 DW.import mongodb;
 

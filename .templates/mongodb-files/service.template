@@ -99,7 +99,7 @@ function enable_changesets() {
   logInfo "Monitoring changesets in ${CHANGESET_MONITORING_FOLDER}";
 
   rm -f "${CHANGESET_MONITORING_FOLDER}"/*.done;
-  
+
   cat <<EOF > /etc/cron.d/mongodb-changesets
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/src/dry-wit/src
@@ -108,7 +108,7 @@ USECOLOR=no
 AUTHENTICATION_DATABASE=${AUTHENTICATION_DATABASE}
 AUTHENTICATION_MECHANISM=${AUTHENTICATION_MECHANISM}
 
-*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/sbin/pending_mongodb_scripts.sh -v &> ${MONGODB_LOG_FOLDER}/changesets.log
+*/${CHANGESET_MONITORING_INTERVAL} * * * * root /usr/local/sbin/pending_mongodb_scripts.sh -v &>> ${MONGODB_LOG_FOLDER}/changesets.log
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 EOF
 
@@ -131,9 +131,9 @@ function restart_cron_daemon() {
 
   local -i _rescode=${FALSE};
 
-  if isCronDaemonRunning; then
+  if isCronRunning; then
     logDebug -n "Restarting cron to enable changeset monitoring";
-    if restartCronDaemon; then
+    if sendKillSignalToCronProcess; then
       logDebugResult SUCCESS "done";
       _rescode=${TRUE};
     else
