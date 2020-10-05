@@ -17,7 +17,7 @@ FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 @include("locale")
 # @include("create_ssl_certificate")
 @include("backup")
-# @include("check-version")
+@include("check-version")
 
 # Extra services
 @include("cron")
