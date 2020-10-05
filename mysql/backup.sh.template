@@ -1,0 +1,5 @@
+#!/bin/bash
+
+timestamp="$(date '+%F-%H-%M-%S')";
+
+mysqldump -u root -p${MARIADB_ROOT_PASSWORD} -h localhost --create-options --add-drop-database --events --routines --triggers -A | gzip > /backup/${IMAGE}-dump/$(hostname)-${timestamp}.sql.gz

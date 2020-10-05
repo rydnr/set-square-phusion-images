@@ -125,9 +125,11 @@ mysql/admin.sh
 mysql/backup-mysql.sh
 mysql/backup.sh
 mysql/bootstrap-db
+mysql/bootstrap-db.inc.sh
 mysql/conf.d
 mysql/my.cnf
 mysql/service
+mysql/setup.sql
 nexus/50_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL

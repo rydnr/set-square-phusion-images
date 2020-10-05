@@ -1,0 +1,590 @@
+#!/bin/bash dry-wit
+
+# fun: main
+# api: public
+# txt: Bootstraps the database.
+# txt: Returns 0/TRUE always.
+# use: main
+function main() {
+
+  local -i _monitRunning=${FALSE};
+
+  if is_monit_running; then
+    _monitRunning=${TRUE};
+
+    # Just in case Monit is configured to restart MariaDB
+    stop_monit;
+  fi
+
+  wait_until_mariadb_stops ${SLEEP} "${ROOT_PASSWORD}";
+
+  local -i _bootstrapFailed=${FALSE};
+
+  if ! install_mariadb_db "${DATA_DIR}"; then
+    _bootstrapFailed=${TRUE};
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    if ! start_mariadb "${DATA_DIR}" "${MARIADB_USER}"; then
+      _bootstrapFailed=${TRUE};
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    if ! wait_until_mariadb_starts "${SLEEP}"; then
+      _bootstrapFailed=${TRUE};
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    if ! process_setup_file "${BOOTSTRAP_SETUP_FILE}"; then
+      _bootstrapFailed=${TRUE};
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+
+    if ! run_sql_file "${BOOTSTRAP_SETUP_FILE}"; then
+      _bootstrapFailed=${TRUE};
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    if folderExists "${BOOTSTRAP_SQL_FOLDER}"; then
+      local _oldIFS="${IFS}";
+      IFS="${DWIFS}";
+      local _file;
+      for _file in $(ls "${BOOTSTRAP_SQL_FOLDER}"/*.sql); do
+        IFS="${_oldIFS}";
+        # if ! sanitize_sql_file "${_file}"; then
+        if ! run_sql_file "${_file}" "${ROOT_PASSWORD}"; then
+          _bootstrapFailed=${TRUE};
+          break;
+        fi
+      done
+      IFS="${_oldIFS}";
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    if ! upgrade_mariadb "${ROOT_PASSWORD}"; then
+      _bootstrapFailed=${TRUE};
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    shutdown_mariadb "${ROOT_PASSWORD}";
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    if ! wait_until_mariadb_stops ${SLEEP} "${ROOT_PASSWORD}"; then
+      _bootstrapFailed=${TRUE};
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    if ! process_data_folder "${DATA_DIR}" "${MARIADB_USER}" "${MARIADB_GROUP}"; then
+      _bootstrapFailed=${TRUE};
+    fi
+  fi
+
+  if isFalse ${_bootstrapFailed}; then
+    mark_db_as_bootstrapped "${BOOTSTRAP_SUCCESS_MARK_FILE}";
+  else
+    mark_db_as_bootstrapped "${BOOTSTRAP_FAILURE_MARK_FILE}";
+  fi
+
+  if isTrue ${_monitRunning}; then
+    start_monit;
+  fi
+}
+
+# fun: is_monit_running
+# api: public
+# txt: Checks whether Monit is running.
+# txt: Returns 0/TRUE if Monit is running; 1/FALSE otherwise.
+# use: if is_monit_running; then echo "Monit is running"; fi
+function is_monit_running() {
+  local -i _rescode;
+
+  ps -ef | grep monit | grep -v grep > /dev/null 2>&1;
+  local -i _notRunning=$?;
+
+  if isTrue ${_notRunning}; then
+    _rescode=${FALSE};
+  else
+    _rescode=${TRUE};
+  fi
+
+  return ${_rescode};
+}
+
+# fun: stop_monit
+# api: public
+# txt: Stops monit
+# txt: Returns 0/TRUE if Monit is stops successfully.
+# use: if stop_monit; then echo "Monit stopped";
+function stop_monit() {
+  logInfo -n "Stopping Monit";
+  service monit stop > /dev/null 2>&1;
+  local -i _rescode=$?;
+  if isTrue ${_rescode}; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: start_monit
+# api: public
+# txt: Starts monit
+# txt: Returns 0/TRUE if Monit starts.
+# use: if start_monit; then echo "Monit started successfully"; fi
+function start_monit() {
+  logInfo -n "Starting Monit";
+  service monit start > /dev/null 2>&1;
+  local -i _rescode=$?;
+  if isTrue ${_rescode}; then
+    logDebugResult SUCCESS "done";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: is_mariadb_up
+# api: public
+# txt: Checks whether MariaDB is running.
+# txt: Returns 0/TRUE if MariaDB is running; 1/FALSE otherwise.
+# use: is_mariadb_up;
+function is_mariadb_up() {
+
+  netstat -putadon | grep ':3306' > /dev/null;
+  local -i _rescode=$?;
+
+  return ${_rescode};
+}
+
+# fun: wait_until_mariadb_stops sleep rootPassword
+# api: public
+# txt: Waits until mariadb stops.
+# opt: sleep: The amount of seconds to wait between checks.
+# opt: rootPassword: The password of the root user.
+# txt: Returns 0/TRUE if MariaDB is not running; 1/FALSE otherwise.
+# use: wait_until_mariadb_stops 2 secret;
+function wait_until_mariadb_stops() {
+  local _sleep="${1}";
+  checkNotEmpty sleep "${_sleep}" 1;
+
+  local _password="${2}";
+  checkNotEmpty rootPassword "${_password}" 2;
+
+  local -i _rescode;
+
+  while is_mariadb_up; do
+    logInfo -n "Waiting ${_sleep}s for MariaDB to shut down";
+    sleep ${_sleep};
+    logInfoResult SUCCESS "done";
+
+    logInfo -n "Trying to shut MariaDB down";
+    if shutdown_mariadb "${_password}"; then
+      logInfoResult SUCCESS "done";
+    else
+      logInfoResult FAILURE "failed";
+    fi
+  done
+
+  if is_mariadb_up; then
+    _rescode=${FALSE};
+  else
+    _rescode=${TRUE};
+  fi
+
+  if isTrue ${_rescode}; then
+    logInfo "MariaDB is NOT running";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: wait_until_mariadb_starts sleep
+# api: public
+# txt: Waits until MariaDB starts.
+# opt: sleep: The amount of seconds to wait between checks.
+# txt: Returns 0/TRUE if MariaDB is running; 1/FALSE otherwise.
+# use: wait_until_mariadb_starts 2 secret;
+function wait_until_mariadb_starts() {
+  local _sleep="${1}";
+  checkNotEmpty sleep "${_sleep}" 1;
+
+  local -i _rescode=${FALSE};
+
+  while ! is_mariadb_up; do
+    logInfo -n "Waiting ${_sleep}s for MariaDB to boot";
+    sleep ${_sleep};
+    logInfoResult SUCCESS "done";
+  done
+
+  if is_mariadb_up; then
+    logInfo "MariaDB up and running";
+    _rescode=${TRUE};
+  fi
+
+  return ${_rescode};
+}
+
+# fun: process_setup_file file
+# api: public
+# txt: Process given setup file.
+# opt: file: The file to process ([file].tpl must exist).
+# txt: Returns 0/TRUE if the file gets processed successfully; 1/FALSE otherwise.
+# use: if process_setup_file /usr/local/src/setup.sql; then echo "setup file processed successfully"; fi
+function process_setup_file() {
+  local _file="${1}";
+  checkNotEmpty file "${_file}" 1;
+
+  logDebug -n "Finding out own IP";
+  DW.import net;
+  retrieveOwnIp;
+  local -i _rescode=$?;
+  local _ip="${RESULT}";
+
+  if isTrue ${_rescode} && ! isEmpty "${_ip}"; then
+    logDebugResult SUCCESS "${_ip}";
+  else
+    logDebugResult FAILURE "failed";
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Replacing ___LAN___ with ${_ip} in ${_file}.tpl";
+    sed "s ___LAN___ ${_ip} g" ${_file}.tpl > ${_file};
+    _rescode=$?;
+
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+    fi
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Retrieving password from /etc/mysql/debian.cnf";
+    local _password="$(grep password /etc/mysql/debian.cnf | head -n 1 | cut -d' ' -f 3)";
+    _rescode=$?;
+
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "success";
+    else
+      logDebugResult FAILURE "failed";
+    fi
+  fi
+
+  if isTrue ${_rescode}; then
+    logDebug -n "Replacing ___DEBIAN_SYS_MAINT_PASSWORD_HASH___ with ${_password} in ${_file}";
+    sed -i "s ___DEBIAN_SYS_MAINT_PASSWORD_HASH___ ${_password} g" ${_file};
+    _rescode=$?;
+
+    if isTrue ${_rescode}; then
+      logDebugResult SUCCESS "done";
+    else
+      logDebugResult FAILURE "failed";
+    fi
+  fi
+
+  return ${_rescode};
+}
+
+# fun: install_mariadb_db dataDir
+# api: public
+# txt: Installs a fresh MariaDB database.
+# opt: dataDir: The database folder.
+# txt: Returns 0/TRUE if the database is installed successfully; 1/FALSE otherwise.
+# use: if install_mariadb_db /var/lib/mysql; then echo "MySQL db installed successfully"; fi
+function install_mariadb_db() {
+  local _dataDir="${1}";
+  checkNotEmpty dataDir "${_dataDir}" 1;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  logInfo -n "Installing database in ${_dataDir}";
+  mysql_install_db --datadir=${_dataDir} > "${_output}" 2>&1;
+  local -i _rescode=$?;
+
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    logInfoFile "${_output}";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: start_mariadb dataDir user
+# api: public
+# txt: Starts MariaDB.
+# opt: dataDir: The database folder.
+# opt: user: The user to run MariaDB as.
+# txt: Returns 0/TRUE if the process starts; 1/FALSE otherwise.
+# use: if start_mariadb /var/lib/mysql ${SERVICE_USER}; then echo "MySQL started successfully"; fi
+function start_mariadb() {
+  local _dataDir="${1}";
+  checkNotEmpty dataDir "${_dataDir}" 1;
+
+  local _user="${2}";
+  checkNotEmpty user "${_user}" 2;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  logInfo -n "Starting MariaDB";
+  /usr/bin/mysqld_safe --nowatch --no-auto-restart --user=${_user} --datadir=${_dataDir} > "${_output}" 2>&1;
+  local -i _rescode=$?;
+
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    logInfoFile "${_output}";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: sanitize_sql_file file
+# api: public
+# txt: Sanitizes given sql file.
+# opt: file: The sql file.
+# txt: Returns 0/TRUE if the operation suceeds; 1/FALSE otherwise.
+# txt: If the function returns 0/TRUE, the variable RESULT contains the sanitized file.
+# use: if sanitize_sql_file /usr/local/src/setup.sql; then echo "sql file sanitized"; fi
+function sanitize_sql_file() {
+  local _file="${1}";
+  checkNotEmpty file "${_file}" 1;
+
+  local -i _rescode=${FALSE};
+
+  logInfo -n "Sanitizing ${_file}";
+  createTempFile;
+  local _result="${RESULT}";
+  sed 's/@@global.server_uuid/UUID()/g' "${_file}" > "${_tempFile}";
+  _rescode=$?;
+  sed -i "s/@@master_info_repository/'unsupported'/g" "${_tempFile}";
+  local -i _aux=$?;
+  if isTrue ${_rescode}; then
+    _rescode=${_aux};
+  fi
+  sed -i "s/@@relay_log_info_repository/'unsupported'/g" "${_tempFile}";
+  _aux=$?;
+  if isTrue ${_rescode}; then
+    _rescode=${_aux};
+  fi
+  sed -i "s/SET v_has_ps_vars = IF(@@global.show_compatibility_56, 'NO', 'YES');/SET v_has_ps_vars = 'NO';/g" "${_tempFile}";
+  _aux=$?;
+  if isTrue ${_rescode}; then
+    _rescode=${_aux};
+  fi
+
+  sed -i "s|^\(...50001 VIEW .*memory_by_host_by_current_bytes.\).*||g" "${_tempFile}";
+  _aux=$?;
+  if isTrue ${_rescode}; then
+    _rescode=${_aux};
+  fi
+
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+  fi
+
+  if isTrue ${_rescode}; then
+    export RESULT="${_result}";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: run_sql_file file password
+# api: public
+# txt: Runs given sql file.
+# opt: file: The sql file.
+# opt: password: The password of the root user.
+# txt: Returns 0/TRUE if the operation suceeds; 1/FALSE otherwise.
+# use: if run_sql_file /usr/local/src/setup.sql "secret"; then echo "sql file executed"; fi
+function run_sql_file() {
+  local _file="${1}";
+  checkNotEmpty file "${_file}" 1;
+
+  local _password="${2}";
+
+  local -i _rescode=${FALSE};
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  if isEmpty "${_password}"; then
+    logInfo -n "Running ${_file} as root with no password";
+    /usr/bin/mysql -u root -f < "${_file}" > "${_output}" 2>&1;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "done";
+    else
+      logInfoResult FAILURE "failed";
+      logInfoFile "${_output}";
+    fi
+  else
+    logInfo -n "Running ${_file} as root with password";
+    /usr/bin/mysql -u root --password="${_password}" -f < "${_file}" > "${_output}" 2>&1;
+    _rescode=$?;
+    if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "done";
+    else
+      logInfoResult FAILURE "failed";
+      logInfoFile "${_output}";
+    fi
+  fi
+
+  return ${_rescode};
+}
+
+# fun: upgrade_mariadb rootPassword
+# api: public
+# txt: Upgrades MySQL.
+# opt: rootPassword: The root password.
+# txt: Returns 0/TRUE if the database installation is upgraded; 1/FALSE otherwise.
+# use: if upgrade_mariadb "secret"; then echo "MySQL upgraded successfully"; fi
+function upgrade_mariadb() {
+  local _password="${1}";
+  checkNotEmpty rootPassword "${_password}" 1;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  logInfo -n "Upgrading database";
+  mysql_upgrade -u root --password="${_password}" > "${_output}" 2>&1;
+  local -i _rescode=$?;
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: shutdown_mariadb rootPassword
+# api: public
+# txt: Shuts down MySQL.
+# opt: rootPassword: The root password.
+# txt: Returns 0/TRUE if the database shutdown process starts or it's already shut down; 1/FALSE otherwise.
+# use: if shutdown_mariadb "secret"; then echo "mysql shutting down"; fi
+function shutdown_mariadb() {
+  local _password="${1}";
+  checkNotEmpty rootPassword "${_password}" 1;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  local -i _rescode=${FALSE};
+
+  if is_mariadb_up; then
+    logInfo -n "Shutting database down";
+    mysqladmin -u root --password="${_password}" -h127.0.0.1 --protocol=tcp shutdown > "${_output}" 2>&1
+    if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "done";
+    else
+      logInfoResult FAILURE "failed";
+      logInfoFile "${_output}";
+    fi
+  else
+    _rescode=${TRUE};
+  fi
+
+  if is_mariadb_up; then
+    _rescode=${TRUE};
+  fi
+
+  return ${_rescode};
+}
+
+# fun: process_data_folder dataDir user group
+# api: public
+# txt: Post-processes the data folder.
+# opt: dataDir: The database folder.
+# opt: user: The user.
+# opt: group: The group.
+# txt: Returns 0/TRUE if the folder is post-processed successfully; 1/FALSE otherwise.
+# use: if process_data_folder /var/lib/mysql ${SERVICE_USER} ${SERVICE_GROUP}; then echo "db folder processed successfully"; fi
+function process_data_folder() {
+  local _dataDir="${1}";
+  checkNotEmpty dataDir "${_dataDir}" 1;
+
+  local _user="${2}";
+  checkNotEmpty user "${_user}" 2;
+
+  local _group="${3}";
+  checkNotEmpty group "${_group}" 3;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  logInfo -n "Processing ${_dataDir}";
+  chown -R ${_user}:${_group} ${_dataDir} > "${_output}" 2>&1 \
+    && chmod 755 ${_dataDir} >> "${_output}" 2>&1;
+  local -i _rescode=$?;
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    logInfoFile "${_output}";
+  fi
+
+  return ${_rescode};
+}
+
+# fun: mark_db_as_bootstrapped markFile
+# api: public
+# txt: Marks the database installation as bootstrapped.
+# opt: markFile: The mark file.
+# txt: Returns 0/TRUE if the installation is marked as bootstrapped successfully; 1/FALSE otherwise.
+# use: if mark_db_as_bootstrapped /var/lib/mysql/.bootstrapped; then echo "Database installation bootstrapped"; fi
+function mark_db_as_bootstrapped() {
+  local _markFile="${1}";
+  checkNotEmpty markFile "${_markFile}" 1;
+
+  createTempFile;
+  local _output="${RESULT}";
+
+  logInfo -n "Creating bootstrap mark ${_markFile}";
+  touch "${_markFile}" > "${_output}" 2>&1;
+  local -i _rescode=$?;
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "done";
+  else
+    logInfoResult FAILURE "failed";
+    logInfoFile "${_output}";
+  fi
+
+  return ${_rescode};
+}
+
+## Script metadata and CLI settings.
+
+setScriptDescription "Bootstraps a MariaDB server.";
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3";
+setScriptCopyright "Copyleft 2014-today Automated Computing Machinery S.L.";
+
+defineEnvVar SLEEP OPTIONAL "The interval in seconds before checking if mysql is stopped" 10;
+defineEnvVar DATA_DIR OPTIONAL "The folder with the db data" "/backup/${IMAGE}-db";
+defineEnvVar BOOTSTRAP_SUCCESS_MARK_FILE OPTIONAL "The file indicating the server has been already bootstrapped successfully" "/remote/${IMAGE}/.bootstrapped";
+defineEnvVar BOOTSTRAP_FAILURE_MARK_FILE OPTIONAL "The file indicating the server couldn't be bootstrapped" "/remote/${IMAGE}/.bootstrap-failed";
+defineEnvVar BOOTSTRAP_SETUP_FILE OPTIONAL "The file with the initial sql" "/usr/local/src/setup.sql";
+defineEnvVar BOOTSTRAP_SQL_FOLDER OPTIONAL "The folder with the bootstrap SQL files" "/sql";
+defineEnvVar ROOT_PASSWORD OPTIONAL "The password of the root user" "${MARIADB_ROOT_PASSWORD}";
+defineEnvVar MARIADB_USER OPTIONAL "The system user" "${SERVICE_USER}";
+defineEnvVar MARIADB_GROUP OPTIONAL "The system group" "${SERVICE_GROUP}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

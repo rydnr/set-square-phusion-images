@@ -64,7 +64,7 @@ function parseInput() {
   done
  
   if [[ ! -n ${SQL} ]]; then
-    TAG="202004";
+    TAG="202009";
   fi
 
 # Parameters
