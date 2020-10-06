@@ -158,8 +158,10 @@ function tail_log_files() {
   local _oldIFS="${IFS}";
   local _f;
   IFS="${DWIFS}";
-  for _f in "${_folder}"/*.log; do
+  for _f in "${_folder}/mongod.log" "${_folder}/changesets.log"; do
     IFS="${_oldIFS}";
+    touch "${_f}";
+    chown ${SERVICE_USER}:${SERVICE_GROUP} "${_f}";
     tail -f "${_f}" & disown;
   done;
   IFS="${_oldIFS}";
