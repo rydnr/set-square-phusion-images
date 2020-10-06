@@ -1,0 +1,2 @@
+defineEnvVar NEO4J_VERSION MANDATORY "The version of Neo4J" "1:4.1.3";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

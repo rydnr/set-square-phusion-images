@@ -1,0 +1,7 @@
+# v neo4j
+RUN (curl https://debian.neo4j.com/neotechnology.gpg.key | apt-key add -) \
+ && (echo 'deb https://debian.neo4j.com stable latest' | tee -a /etc/apt/sources.list.d/neo4j.list) \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} neo4j=${NEO4J_VERSION} \
+ && ${SYSTEM_CLEANUP}
+# ^ neo4j

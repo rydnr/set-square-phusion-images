@@ -1,0 +1,24 @@
+#!/bin/bash dry-wit
+# mod: neo4j
+# api: public
+# txt: Launches Neo4J.
+
+export DW_DISABLE_ANSI_COLORS=TRUE;
+export NO_COLOR=true;
+export USECOLOR=no;
+
+# fun: main
+# api: public
+# txt: Launches Neo4J.
+# txt: Returns the output of running the Neo4J process.
+# use: main;
+function main() {
+
+  mkdir -p /var/log/${IMAGE};
+  /sbin/setuser ${SERVICE_USER} neo4j | tee -a /var/log/${IMAGE}/${IMAGE}.log;
+}
+
+# script metadata
+setScriptDescription "Launches Neo4J.";
+
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
