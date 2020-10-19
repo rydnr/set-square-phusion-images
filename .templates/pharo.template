@@ -24,7 +24,7 @@ RUN dpkg --add-architecture i386 \
  && chmod +x /etc/profile.d/pharo.sh /etc/profile.d/pharo.csh \
  && cd /opt/pharo/pharo-vm/lib/pharo/${PHAROVM_VERSION} \
  && wget https://files.pharo.org/sources/PharoV60.sources \
- && mkdir -p ${SERVICE_USER}/.config/pharo
+ && mkdir -p ${SERVICE_USER_HOME}/.config/pharo
 
 ENV PHARO_VM=/opt/pharo/pharo
 # ^ pharo
