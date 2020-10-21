@@ -1,4 +1,5 @@
-defineEnvVar PARENT_IMAGE_TAG OPTIONAL "The tag of the parent image";
+defineEnvVar ROOT_IMAGE_VERSION MANDATORY "The root image version" "18.04-1.0.0-amd64";
+defineEnvVar PARENT_IMAGE_TAG OPTIONAL "The tag of the parent image" '${ROOT_IMAGE_VERSION}';
 defineEnvVar NAMESPACE OPTIONAL "The namespace";
 defineEnvVar REGISTRY MANDATORY "The domain name of the Docker registry to use" "cloud.docker.com";
 defineEnvVar REGISTRY_NAMESPACE OPTIONAL "The namespace to use in the remote registry" "${NAMESPACE}";
@@ -16,7 +17,6 @@ defineEnvVar PUSH_TO_DOCKERHUB MANDATORY "Whether to push to Docker HUB" 'false'
 defineEnvVar BUILDER MANDATORY "The builder of the image" '${AUTHOR}';
 defineEnvVar SETSQUARE_FLAVOR MANDATORY "The flavor of set-square" "phusion";
 defineEnvVar INCLUDES_FOLDER MANDATORY "The folder where 'include' files are located" "./.templates";
-defineEnvVar ROOT_IMAGE_VERSION MANDATORY "The root image version" "18.04-1.0.0-amd64";
 defineEnvVar TAG MANDATORY "The image tag" '${ROOT_IMAGE_VERSION}';
 defineEnvVar ROOT_IMAGE MANDATORY "The default root image" "phusion/baseimage";
 defineEnvVar ROOT_IMAGE_64BIT MANDATORY "The default root image for 64 bits" '${ROOT_IMAGE}';
@@ -117,8 +117,10 @@ defineEnvVar DEVELOPMENT_USER_ID MANDATORY "The user id used when developing cod
 defineEnvVar BACKUP_HOST MANDATORY "The name of the backup host" "backup.${DOMAIN}";
 defineEnvVar DOCKER_TAG_OPTS OPTIONAL "Custom options when tagging images";
 defineEnvVar DOCKER_BUILD_OPTS OPTIONAL "Custom options when building images";
-defineEnvVar SERVICE_USER OPTIONAL "The service user";
-defineEnvVar SERVICE_GROUP OPTIONAL "The service group";
-defineEnvVar SERVICE_USER_HOME OPTIONAL "The home of the service user";
-defineEnvVar SERVICE_USER_SHELL OPTIONAL "The shell of the service user";
+defineEnvVar SERVICE_USER OPTIONAL "The service user" '${NAMESPACE}';
+defineEnvVar SERVICE_GROUP OPTIONAL "The service group" "users";
+defineEnvVar SERVICE_USER_HOME OPTIONAL "The home of the service user" '/home/${SERVICE_USER}';
+defineEnvVar SERVICE_USER_SHELL OPTIONAL "The shell of the service user" "/bin/bash";
+defineEnvVar DEFAULT_LOCALE MANDATORY "The default locale" "en_US";
+defineEnvVar DEFAULT_ENCODING MANDATORY "The default encoding" "UTF-8";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
