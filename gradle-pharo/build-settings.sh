@@ -1,7 +1,7 @@
-# env: PARENT_IMAGE_TAG: The tag of the parent image. Defaults to 0.11.
-defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "0.11";
-# env: GRADLE_VERSION: The Gradle version. Defaults to 4.4.
-defineEnvVar GRADLE_VERSION MANDATORY "The Gradle version" '4.4';
+# env: PARENT_IMAGE_TAG: The tag of the parent image. Defaults to 18.04-1.0.0-amd64.
+overrideEnvVar PARENT_IMAGE_TAG "18.04-1.0.0-amd64";
+# env: GRADLE_VERSION: The Gradle version. Defaults to 6.5.
+defineEnvVar GRADLE_VERSION MANDATORY "The Gradle version" '6.5';
 # env: PHARO_VERSION: The Pharo version. Defaults to 8.0.
 defineEnvVar PHARO_VERSION MANDATORY "The Pharo version" "8.0";
 overrideEnvVar TAG '${GRADLE_VERSION}-${PHARO_VERSION}-root';
