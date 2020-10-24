@@ -1,6 +1,6 @@
 # v robo3t
 RUN cd /opt && \
-    wget -O ${ROBO3T_ARTIFACT} ${ROBO3T_DOWNLOAD_URL} && \
+    wget -O ${ROBO3T_ARTIFACT} '${ROBO3T_DOWNLOAD_URL}?submissionGuid=59ee29b8-ba04-406f-a004-98b19ff451a8' && \
     tar xvfz ${ROBO3T_ARTIFACT} && \
     ln -s ${ROBO3T_FOLDER} robo3t && \
     rm -f ${ROBO3T_ARTIFACT} && \
