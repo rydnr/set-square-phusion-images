@@ -1,10 +1,10 @@
-defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "";
-defineEnvVar TAG MANDATORY "The tag" 'latest';
+defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "18.04-1.0.0-amd64";
+overrideEnvVar TAG "$(curl -Ls -o /dev/null -w %{url_effective} https://github.com/feenkcom/gtoolkit/releases/latest | awk -F/ '{print $NF;}')";
 overrideEnvVar ENABLE_LOGSTASH false;
-overrideEnvVar SERVICE_USER MANDATORY "The service user" "pharo";
-overrideEnvVar SERVICE_USER_PASSWORD MANDATORY "The service user password" '${RANDOM_PASSWORD}';
-overrideEnvVar SERVICE_GROUP MANDATORY "The service group" "pharo";
-overrideEnvVar SERVICE_USER_HOME MANDATORY "The home of the service user" "/home/pharo";
+overrideEnvVar SERVICE_USER "pharo";
+overrideEnvVar SERVICE_USER_PASSWORD '${RANDOM_PASSWORD}';
+overrideEnvVar SERVICE_GROUP MANDATORY "pharo";
+overrideEnvVar SERVICE_USER_HOME "/home/pharo";
 defineEnvVar WORKSPACE MANDATORY "The workspace folder" '${SERVICE_USER_HOME}/work';
 overrideEnvVar ENABLE_SSH "false";
 overrideEnvVar ENABLE_MONIT "false";

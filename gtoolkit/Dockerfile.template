@@ -9,13 +9,15 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("libgit2")
 @include("pharo")
 @include("gtoolkit")
+@include("sdkman")
 @include("gradle")
+@include("git")
 
-RUN chmod +x /sbin/my_exec && \
-    gpasswd -a ${SERVICE_USER} root && \
-    mkdir -p ${WORKSPACE} && \
-    chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE} && \
-    su - ${SERVICE_USER} -c 'ln -s ${WORKSPACE} ${SERVICE_USER_HOME}/workspace';
+RUN chmod +x /sbin/my_exec \
+ && gpasswd -a ${SERVICE_USER} root \
+ && mkdir -p ${WORKSPACE} \
+ && chown ${SERVICE_USER}:${SERVICE_GROUP} ${WORKSPACE} \
+ && su - ${SERVICE_USER} -c 'ln -s ${WORKSPACE} ${SERVICE_USER_HOME}/workspace'
 
 @include("copy-metadata")
 @include("symlinks")
