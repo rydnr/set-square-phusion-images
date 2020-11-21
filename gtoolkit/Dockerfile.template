@@ -9,6 +9,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("libgit2")
 @include("pharo")
 @include("gtoolkit")
+@include("openjdk")
 @include("sdkman")
 @include("gradle")
 @include("git")
