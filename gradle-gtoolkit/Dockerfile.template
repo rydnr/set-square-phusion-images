@@ -7,6 +7,7 @@ FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 @include("service_user")
 
 @include("pharo")
+@include("gtoolkit")
 @include("sdkman")
 @include("gradle")
 @include("git")

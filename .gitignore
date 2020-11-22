@@ -65,6 +65,7 @@ ghost/config.js
 gradle-daemon/service
 */gradle-files
 gradle/gradle-files
+gradle-gtoolkit/service
 gradle/my_exec
 gradle-pharo/service
 gradle/service
@@ -72,6 +73,7 @@ grails/my_exec
 grails/service
 grails/setup.sql
 graphite/local_settings.py
+gtoolkit-files
 gtoolkit/gtoolkit-files/*
 */gui-files
 */help
