@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 
 # fun: main
 # api: public

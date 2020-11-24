@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 # mod: bootstrap.sh
 # api: public
 # txt: Bootstraps a local RabbitMQ server.

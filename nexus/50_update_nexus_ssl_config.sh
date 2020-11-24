@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 # Copyright 2015-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 # mod: nexus/50_update_nexus_ssl_config

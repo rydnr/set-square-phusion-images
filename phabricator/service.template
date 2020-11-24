@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 
 # fun: configure_phabricator phabricatorHome dbContainer dbUser dbPassword phabricatorUrl smtpHost?
 # api: public

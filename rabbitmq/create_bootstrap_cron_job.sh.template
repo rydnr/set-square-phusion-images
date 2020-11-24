@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 # Copyright 2016-today Automated Computing Machinery
 # Licensed under GPLv3.
 

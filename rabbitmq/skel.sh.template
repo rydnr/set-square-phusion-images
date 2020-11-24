@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 # Copyright 2016-today OSOCO
 
 # Prints how to use this script.

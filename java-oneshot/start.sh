@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 # Copyright 2016-today OSOCO Software Company.
 # Distributed under the terms of the GNU General Public License v3
 
