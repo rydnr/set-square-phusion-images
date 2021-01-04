@@ -31,6 +31,7 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
 
 COPY rabbitmq-files/check_admin_password.sh /etc/my_init.d/00_check_admin_password.sh
 COPY rabbitmq-files/check_monitoring_password.sh /etc/my_init.d/00_check_monitoring_password.sh
+COPY rabbitmq-files/check_rabbitmq_nodename_prefix.sh /etc/my_init.d/00_check_rabbitmq_nodename_prefix.sh
 COPY rabbitmq-files/bootstrap.sh /usr/local/bin/${IMAGE}-bootstrap.sh
 COPY rabbitmq-files/create_bootstrap_cron.sh /etc/my_init.d/56_create_bootstrap_cron.sh
 COPY rabbitmq-files/rabbitmq.config /etc/rabbitmq/

@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 # Copyright 2017-today OSOCO
 # mod: create_bootstrap_cron.sh
 # api: public
@@ -16,7 +16,7 @@ function main() {
     cat <<EOF > /etc/cron.d/${IMAGE}-bootstrap
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/src/dry-wit/src
-RABBITMQ_NODENAME=${RABBITMQ_NODENAME}
+RABBITMQ_NODENAME=${RABBITMQ_NODENAME_PREFIX}@$(hostname)
 NO_COLOR=true
 USECOLOR=no
 
@@ -26,10 +26,11 @@ EOF
   fi
 }
 
+# Script metadata
 setScriptDescription "Creates a cron job to bootstrap the RabbitMQ instance.";
 
-# env: RABBITMQ_NODENAME: The node name.
-defineEnvVar RABBITMQ_NODENAME MANDATORY "The node name";
+# env: RABBITMQ_NODENAME_PREFIX: The node name.
+defineEnvVar RABBITMQ_NODENAME_PREFIX MANDATORY "The prefix in RabbitMQ node name";
 
 # env: BOOTSTRAP_RETRY_INTERVAL: The number of minutes to wait before attempting the bootstrap.
 defineEnvVar BOOTSTRAP_RETRY_INTERVAL MANDATORY "The number of minutes to wait before attempting the bootstrap." ${BOOTSTRAP_RETRY_INTERVAL};

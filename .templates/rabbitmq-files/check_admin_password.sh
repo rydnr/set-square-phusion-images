@@ -1,6 +1,6 @@
-#!/bin/bash dry-wit
+#!/bin/env dry-wit
 # Copyright 2017-today OSOCO
-# mod: check_input.sh
+# mod: check_admin_password.sh
 # api: public
 # txt: Checks the container is launched with the ADMIN_USER_NAME and ADMIN_USER_PASSWORD set.
 
