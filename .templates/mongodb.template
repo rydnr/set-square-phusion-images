@@ -16,12 +16,18 @@ ENV ADMIN_USER_NAME="${ADMIN_USER_NAME}" \
 # Installation:
 # Import MongoDB public GPG key AND create a MongoDB list file
 #RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/10gen.list
-RUN ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} -np gnupg \
- && wget -qO - https://www.mongodb.org/static/pgp/server-4.2.asc | sudo apt-key add - \
- && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.2 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
+RUN export DEBIAN_FRONTEND=noninteractive \
  && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} mongodb-org jq \
+ && ${PKG_INSTALL} -np gnupg dirmngr \
+ && wget -qO - https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | sudo apt-key add - \
+ && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGODB_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
+ && ${PKG_INSTALL} numactl jq \
+ && if ! command -v ps > /dev/null; then ${PKG_INSTALL} procps; fi \
+ && ${SYSTEM_UPDATE} \
+ && if [ ! -e /usr/local/bin/systemctl ]; then REMOVE_SYSTEMCTL=0; ln -s /bin/true /usr/local/bin/systemctl; else REMOVE_SYSTEMCTL=1; fi \
+ && (${PKG_INSTALL} mongodb-org-server=${MONGODB_FULL_VERSION} || dpkg --configure mongodb-org-server) \
+ && ${PKG_INSTALL} mongodb-org=${MONGODB_FULL_VERSION} \
+ && ${PKG_INSTALL} mongodb-org-shell=${MONGODB_FULL_VERSION} mongodb-org-mongos=${MONGODB_FULL_VERSION} mongodb-org-tools=${MONGODB_FULL_VERSION} \
  && ${SYSTEM_CLEANUP} \
  && chmod +x /usr/local/bin/mongodb-*.sh \
  && echo "mongodb-org hold" | sudo dpkg --set-selections \
@@ -36,7 +42,8 @@ RUN ${SYSTEM_UPDATE} \
  && sed -i 's|^#\?\(\s*\)bind_ip\(\s*\)=\(\s*\).*$|\1bind_ip\2=\30.0.0.0|g' /etc/mongod.conf \
  && ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump \
  && ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps \
- && ln -s /usr/local/sbin/pending_scripts.sh /usr/local/sbin/pending_mongodb_scripts.sh
+ && ln -s /usr/local/sbin/pending_scripts.sh /usr/local/sbin/pending_mongodb_scripts.sh \
+ && if [[ ${REMOVE_SYSTEMCTL} -eq 0 ]]; then rm -f /usr/local/systemctl; fi
 
 #    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
 
