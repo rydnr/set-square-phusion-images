@@ -1,5 +1,5 @@
-# env: PARENT_IMAGE_TAG: The tag of the parent image. Defaults to 18.04-1.0.0-amd64.
-overrideEnvVar PARENT_IMAGE_TAG "18.04-1.0.0-amd64";
+# env: PARENT_IMAGE_TAG: The tag of the parent image. Defaults to master.
+overrideEnvVar PARENT_IMAGE_TAG "master";
 # env: TAG: The tag of the image. Defaults to ${PARENT_IMAGE_TAG}.
 overrideEnvVar TAG "${PARENT_IMAGE_TAG}";
 # env: DISABLE_ANSI_COLORS: Whether to disable ANSI colors. Defaults to true.
