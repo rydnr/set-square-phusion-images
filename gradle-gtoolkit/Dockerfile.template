@@ -6,6 +6,7 @@ FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 
 @include("service_user")
 
+@include("openjdk")
 @include("pharo")
 @include("gtoolkit")
 @include("sdkman")

@@ -16,5 +16,7 @@ RUN chmod +x /etc/my_exec.d/gtoolkit \
  && rm -rf /opt/pharo/libLinux64-v${GTOOLKIT_VERSION} \
  && ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} libcairo2 \
- && ${SYSTEM_CLEANUP}
+ && ${SYSTEM_CLEANUP} \
+ && cp gtoolkit.image blank.image \
+ && cp gtoolkit.changes blank.changes
 # ^ gtoolkit
