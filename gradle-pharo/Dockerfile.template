@@ -13,7 +13,7 @@ FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 
 #COPY git-files/gitconfig ${SERVICE_USER_HOME}/.gitconfig
 
-VOLUME ${SERVICE_USER_HOME}/.gradle
+#VOLUME ${SERVICE_USER_HOME}/.gradle
 
 @include("copy-metadata")
 @include("symlinks")
