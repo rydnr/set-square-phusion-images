@@ -42,7 +42,7 @@ function main() {
         if isNotEmpty "${_error}"; then
             logInfo "${_error}";
         fi
-        exitWithErrorCode CANNOT_DOWNLOAD_CONFIG_FILE "${S3_BUCKET}/${CONFIG_FILE}";
+        exitWithErrorCode CANNOT_DOWNLOAD_CONFIG_FILE_FROM_S3_BUCKET "${S3_BUCKET}/${CONFIG_FILE}";
     fi
 
     local _host;
@@ -135,12 +135,27 @@ function main() {
         local _input="$(echo "${_sqlFileItem}" | base64 --decode | jq -r ".input")";
         local _output="$(echo "${_sqlFileItem}" | base64 --decode | jq -r ".output")";
 
-        if ! fileExists "${_s3Folder}/${_input}"; then
-            exitWithErrorCode INPUT_FILE_DOES_NOT_EXIST "${_input}";
+        local _inputFile="${_s3Folder}/${_input}";
+        local _outputFile="${_s3Folder}/${_output}";
+        
+        logInfo -n "Downloading ${_input} from ${S3_BUCKET} bucket";
+        if downloadFromS3Bucket "${S3_BUCKET}" "${_input}" "${_inputFile}" "${_awsProfile}"; then
+            logInfoResult SUCCESS "done";
+        else
+            _error="${ERROR}";
+            logInfoResult FAILURE "failed";
+            if isNotEmpty "${_error}"; then
+                logInfo "${_error}";
+            fi
+            exitWithErrorCode CANNOT_DOWNLOAD_INPUT_FILE_FROM_S3_BUCKET "${S3_BUCKET}/${_input}";
         fi
-        if process_sql "${_s3Folder}/${_input}" "${_s3Folder}/${_output}" "${_host}" ${_port} "${_user}" "${_password}" "${_database}"; then
+
+        logInfo -n "Processing ${_input}";
+        if process_sql "${_inputFile}" "${_outputFile}" "${_host}" ${_port} "${_user}" "${_password}" "${_database}"; then
+            logInfoResult SUCCESS "done";
+
             logInfo -n "Uploading ${_output} to ${S3_BUCKET} bucket";
-            if uploadToS3Bucket "${_s3Folder}/${_output}" "${S3_BUCKET}" "${_output}" "${_awsProfile}"; then
+            if uploadToS3Bucket "${_outputFile}" "${S3_BUCKET}" "${_output}" "${_awsProfile}"; then
                 logInfoResult SUCCESS "done";
             else
                 _error="${ERROR}";
@@ -148,8 +163,15 @@ function main() {
                 if isNotEmpty "${_error}"; then
                     logInfo "${_error}";
                 fi
-                exitWithErrorCode CANNOT_UPLOAD_FILE_TO_S3_BUCKET "${S3_BUCKET}/${_output}";
+                exitWithErrorCode CANNOT_UPLOAD_OUTPUT_FILE_TO_S3_BUCKET "${S3_BUCKET}/${_output}";
             fi
+        else
+            _error="${ERROR}";
+            logInfoResult FAILURE "failed";
+            if isNotEmpty "${_error}"; then
+                logInfo "${_error}";
+            fi
+            exitWithErrorCode ERROR_PROCESSING_INPUT_FILE "${S3_BUCKET}/${_input}";
         fi
     done;
     IFS="${_oldIFS}";
@@ -319,9 +341,15 @@ function process_sql() {
     checkNotEmpty database "${_database}" 7;
 
     local _result;
-    _result="$(PGPASSWORD="${_password}" psql -h "${_host}" -p ${_port} -U "${_user}" < "${_input}" > "${_output}" 2>&1)";
+    _result="$(PGPASSWORD="${_password}" psql -h "${_host}" -p ${_port} -U "${_user}" -d "${_database}" -f "${_input}" >> "${_output}" 2>&1)";
     local -i _rescode=$?;
 
+    if isTrue ${_rescode}; then
+        export RESULT="${_result}";
+    else
+        export ERROR="${_result}";
+    fi
+    
     return ${_rescode};
 }
 
@@ -339,20 +367,24 @@ defineEnvVar S3_BUCKET MANDATORY "The S3 bucket";
 # env: CONFIG_FILE: The config file in the S3 bucket.
 defineEnvVar CONFIG_FILE MANDATORY "The config file in the S3 bucket";
 
-# requirements
-checkReq jq;
-checkReq base64;
-
 # errors
 addError CANNOT_CONFIGURE_AWS_CLI "Error configuring AWS CLI";
-addError CANNOT_DOWNLOAD_CONFIG_FILE "Error downloading the config file from S3";
+addError CANNOT_DOWNLOAD_CONFIG_FILE_FROM_S3_BUCKET "Error downloading the config file from the S3 bucket";
 addError CANNOT_EXTRACT_HOST_FROM_CONFIG_FILE "Error extracting 'host' value from config file";
 addError CANNOT_EXTRACT_PORT_FROM_CONFIG_FILE "Error extracting 'port' value from config file";
 addError CANNOT_EXTRACT_USER_FROM_CONFIG_FILE "Error extracting 'user' value from config file";
 addError CANNOT_EXTRACT_PASSWORD_FROM_CONFIG_FILE "Error extracting 'password' value from config file";
 addError CANNOT_EXTRACT_DATABASE_FROM_CONFIG_FILE "Error extracting 'database' value from config file";
 addError CANNOT_EXTRACT_SQLFILES_FROM_CONFIG_FILE "Error extracting 'sqlFiles' value from config file";
-addError INPUT_FILE_DOES_NOT_EXIST "Input file does not exist";
-addError CANNOT_UPLOAD_FILE_TO_S3_BUCKET "Error uploading file to the S3 bucket";
+addError CANNOT_DOWNLOAD_INPUT_FILE_FROM_S3_BUCKET "Error downloading the input file from the S3 bucket";
+addError ERROR_PROCESSING_INPUT_FILE "Error processing the input file";
+addError CANNOT_UPLOAD_OUTPUT_FILE_TO_S3_BUCKET "Error uploading file to the S3 bucket";
+addError JQ_NOT_INSTALLED "jq is not installed";
+addError BASE64_NOT_INSTALLED "base64 is not installed";
+
+# requirements
+checkReq jq JQ_NOT_INSTALLED;
+checkReq base64 BASE64_NOT_INSTALLED;
+
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 
