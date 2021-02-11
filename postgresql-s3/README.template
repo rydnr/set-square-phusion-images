@@ -1,0 +1,17 @@
+This image runs SQL scripts in a given PostgreSQL server.
+
+It's useful to create database users, updating user permissions,
+create databases, etc.
+
+The configuration is retrieved from a file in a S3 bucket.
+
+Environment variables:
+- AWS_ACCESS_KEY_ID: The AWS access key id (required to connect to S3).
+- AWS_SECRET_ACCESS_KEY: The AWS secret access key (required to connect to S3).
+- AWS_REGION: The AWS region. Defaults to eu-west-1.
+- S3_BUCKET: The name of the S3 bucket.
+
+Examples:
+
+- Connect to a server to run the SQL scripts located in a certain folder, everything configured in the file "${IMAGE}.config" in a S3 bucket.
+> docker run -it -e AWS_ACCESS_KEY_ID=[awsAccessKeyId] -e AWS_SECRET_ACCESS_KEY=[awsSecretAccessKey] -e AWS_REGION=[awsRegion] -e S3_BUCKET=[s3Bucket] -e CONFIG_FILE="${IMAGE}.config" ${NAMESPACE}/${IMAGE}:${TAG}

@@ -1,0 +1,18 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+@include("awscli")
+
+COPY my_exec /sbin/my_exec
+
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} postgresql-client \
+ && ${SYSTEM_CLEANUP} \
+ && chmod +x /sbin/my_exec
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
+
