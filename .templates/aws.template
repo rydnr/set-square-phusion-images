@@ -1,6 +1,0 @@
-# v aws
-RUN ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} groff  python3-setuptools \
- && ${SYSTEM_CLEANUP} \
- && pip install awscli
-# ^ aws
