@@ -1,4 +1,4 @@
-defineEnvVar ROOT_IMAGE_VERSION MANDATORY "The root image version" "18.04-1.0.0-amd64";
+defineEnvVar ROOT_IMAGE_VERSION MANDATORY "The root image version" "focal-1.0.0alpha1-amd64";
 defineEnvVar PARENT_IMAGE_TAG OPTIONAL "The tag of the parent image" '${ROOT_IMAGE_VERSION}';
 defineEnvVar NAMESPACE OPTIONAL "The namespace";
 defineEnvVar REGISTRY MANDATORY "The domain name of the Docker registry to use" "cloud.docker.com";
