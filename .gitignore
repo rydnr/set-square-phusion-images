@@ -214,7 +214,7 @@ tacotron/service
 .templates/apache
 .templates/apr
 .templates/artifactory
-.templates/aws
+.templates/awscli
 .templates/backup
 .templates/bloomrpc
 .templates/calibre
