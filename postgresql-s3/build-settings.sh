@@ -1,3 +1,6 @@
-defineEnvVar PARENT_IMAGE_TAG MANDATORY "The version of the parent image" "focal-1.0.0alpha1-amd64";
+defineEnvVar SERVICE_USER MANDATORY "The service user" postgresql;
+defineEnvVar SERVICE_GROUP MANDATORY "The group of the service user" users;
+defineEnvVar SERVICE_USER_HOME MANDATORY "The home of the service user" /home/postgresql;
+defineEnvVar SERVICE_USER_SHELL MANDATORY "The service user shell" /bin/bash;
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 

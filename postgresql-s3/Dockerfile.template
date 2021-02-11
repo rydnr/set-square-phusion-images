@@ -4,11 +4,12 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 @include("awscli")
+@include("service_user")
 
-COPY my_exec /sbin/my_exec
+COPY my_exec.sh /sbin/my_exec
 
 RUN ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} postgresql-client \
+ && ${PKG_INSTALL} postgresql-client jq \
  && ${SYSTEM_CLEANUP} \
  && chmod +x /sbin/my_exec
 
