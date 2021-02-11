@@ -5,18 +5,22 @@ RUN chmod +x /etc/my_exec.d/gtoolkit \
  && cd /opt/pharo \
  && wget ${GTOOLKIT_DOWNLOAD_URL} \
  && wget ${GTOOLKIT_LIBS_DOWNLOAD_URL} \
- && unzip ${GTOOLKIT_ARTIFACT} \
- && unzip ${GTOOLKIT_LIBS_ARTIFACT} \
+ && jar xvf ${GTOOLKIT_ARTIFACT} \
+ && jar xvf ${GTOOLKIT_LIBS_ARTIFACT} \
  && rm -f ${GTOOLKIT_ARTIFACT} ${GTOOLKIT_LIBS_ARTIFACT} \
- && mv GToolkit-64*/* ${SERVICE_USER_HOME} \
- && mv libLinux64-v${GTOOLKIT_VERSION}/* ${SERVICE_USER_HOME} \
+ && mv GlamorousToolkit ${SERVICE_USER_HOME} \
+ && mv libLinux64-v${GTOOLKIT_VERSION} ${SERVICE_USER_HOME} \
  && cd ${SERVICE_USER_HOME} \
- && ln -s GToolkit-64*.image gtoolkit.image \
- && ln -s GToolkit-64*.changes gtoolkit.changes \
- && rm -rf /opt/pharo/libLinux64-v${GTOOLKIT_VERSION} \
+ && ln -s GlamorousToolkit/GlamorousToolkit.image GlamorousToolkit.image \
+ && ln -s libLinux64-v${GTOOLKIT_VERSION}/*.so . \
+ && rm -rf /opt/pharo/libLinux64-v${GTOOLKIT_VERSION} /opt/pharo/GlamorousToolkit \
  && ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} libcairo2 \
+ && cp GlamorousToolkit/GlamorousToolkit.image blank.image \
  && ${SYSTEM_CLEANUP} \
- && cp gtoolkit.image blank.image \
- && cp gtoolkit.changes blank.changes
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}
+
+# && /opt/pharo/pharo ${SERVICE_USER_HOME}/GlamorousToolkit.image eval --save "Metacello new baseline: 'GToolkit'; repository: 'github://feenkcom/gtoolkit:v${GTOOLKIT_VERSION}/src'; load" \
+# && mv pharo-local ${SERVICE_USER_HOME} \
+
 # ^ gtoolkit

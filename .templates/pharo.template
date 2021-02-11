@@ -1,13 +1,16 @@
 # v pharo
 RUN dpkg --add-architecture i386 \
  && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} fontconfig wget git git-lfs openssh-client libcurl4-gnutls-dev ca-certificates libgtk2.0-dev libgtk-3-dev mesa-common-dev libgl1-mesa-dev libc6 unzip libx11-6 libgl1-mesa-glx libfontconfig1 libssl1.0.0 \
- && ${PKG_INSTALL} -np libssl-dev libssh2-1-dev libffi-dev zlib1g-dev build-essential cmake gcc pkg-config git libhttp-parser-dev make cmake zip unzip \
- && ${SYSTEM_CLEANUP} \
+ && ${PKG_INSTALL} fontconfig wget git git-lfs openssh-client libcurl4-gnutls-dev ca-certificates libgtk2.0-dev libgtk-3-dev mesa-common-dev libgl1-mesa-dev libc6 libx11-6 libgl1-mesa-glx libfontconfig1 libssl1.0.0 \
+ && ${PKG_INSTALL} -np libssl-dev libssh2-1-dev libffi-dev zlib1g-dev build-essential gcc pkg-config libhttp-parser-dev \
+ && for p in cmake git make zip unzip; do \
+      [[ $(which ${p}) > /dev/null ]] || ${PKG_INSTALL} -np ${p}; \
+    done \
  && ([ -d /opt ] || mkdir /opt) \
  && mkdir /opt/pharo${PHARO_MAJOR_VERSION} \
  && cd /opt/pharo${PHARO_MAJOR_VERSION} \
- && wget https://files.pharo.org/sources/PharoV60.sources \
+ && wget -q https://files.pharo.org/sources/PharoV60.sources \
+ && cd /opt/pharo${PHARO_MAJOR_VERSION} \
  && curl get.pharo.org/64/vmT${PHARO_VERSION_ZEROCONF} | bash \
  && cd /opt && ln -s pharo${PHARO_MAJOR_VERSION} pharo \
  && echo '*      hard    rtprio  2' >  /etc/security/limits.d/pharo.conf \
@@ -16,12 +19,12 @@ RUN dpkg --add-architecture i386 \
  && echo 'setenv PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.csh \
  && chmod +x /etc/profile.d/pharo.sh /etc/profile.d/pharo.csh \
  && cd /opt/pharo/pharo-vm/lib/pharo/${PHAROVM_VERSION} \
- && wget https://files.pharo.org/sources/PharoV60.sources \
  && mv /root/.dry-wit ${SERVICE_USER_HOME} \
  && ln -s ${SERVICE_USER_HOME}/.dry-wit /root/ \
  && mkdir -p ${SERVICE_USER_HOME}/.config \
  && ln -s ${SERVICE_USER_HOME}/.config /root/.config \
- && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/pharo ${SERVICE_USER_HOME} /root/.dry-wit
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/pharo ${SERVICE_USER_HOME} /root/.dry-wit \
+ && ${SYSTEM_CLEANUP} \
 
 ENV PHARO_VM=/opt/pharo/pharo \
     PATH=${PATH}:/opt/pharo
