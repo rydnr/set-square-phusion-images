@@ -147,7 +147,7 @@ function main() {
             if isNotEmpty "${_error}"; then
                 logInfo "${_error}";
             fi
- #           exitWithErrorCode CANNOT_DOWNLOAD_INPUT_FILE_FROM_S3_BUCKET "${S3_BUCKET}/${_input}";
+#            exitWithErrorCode CANNOT_DOWNLOAD_INPUT_FILE_FROM_S3_BUCKET "${S3_BUCKET}/${_input}";
         fi
 
         logInfo -n "Processing ${_input}";
