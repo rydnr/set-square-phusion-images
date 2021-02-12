@@ -147,7 +147,7 @@ function main() {
             if isNotEmpty "${_error}"; then
                 logInfo "${_error}";
             fi
-            exitWithErrorCode CANNOT_DOWNLOAD_INPUT_FILE_FROM_S3_BUCKET "${S3_BUCKET}/${_input}";
+ #           exitWithErrorCode CANNOT_DOWNLOAD_INPUT_FILE_FROM_S3_BUCKET "${S3_BUCKET}/${_input}";
         fi
 
         logInfo -n "Processing ${_input}";
@@ -163,7 +163,7 @@ function main() {
                 if isNotEmpty "${_error}"; then
                     logInfo "${_error}";
                 fi
-                exitWithErrorCode CANNOT_UPLOAD_OUTPUT_FILE_TO_S3_BUCKET "${S3_BUCKET}/${_output}";
+#                exitWithErrorCode CANNOT_UPLOAD_OUTPUT_FILE_TO_S3_BUCKET "${S3_BUCKET}/${_output}";
             fi
         else
             _error="${ERROR}";
@@ -171,7 +171,7 @@ function main() {
             if isNotEmpty "${_error}"; then
                 logInfo "${_error}";
             fi
-            exitWithErrorCode ERROR_PROCESSING_INPUT_FILE "${S3_BUCKET}/${_input}";
+#            exitWithErrorCode ERROR_PROCESSING_INPUT_FILE "${S3_BUCKET}/${_input}";
         fi
     done;
     IFS="${_oldIFS}";
@@ -341,7 +341,7 @@ function process_sql() {
     checkNotEmpty database "${_database}" 7;
 
     local _result;
-    _result="$(PGPASSWORD="${_password}" psql -h "${_host}" -p ${_port} -U "${_user}" -d "${_database}" -f "${_input}" >> "${_output}" 2>&1)";
+    _result="$(PGPASSWORD="${_password}" psql -h "${_host}" -p ${_port} -U "${_user}" -d "${_database}" -f "${_input}"bc >> "${_output}" 2>&1)";
     local -i _rescode=$?;
 
     if isTrue ${_rescode}; then
