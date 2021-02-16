@@ -1,4 +1,3 @@
-defineEnvVar PARENT_IMAGE_TAG MANDATORY "The parent image tag" "0.11";
 defineEnvVar TAG MANDATORY 'the tag' '${PARENT_IMAGE_TAG}';
 overrideEnvVar ENABLE_CRON MANDATORY "false";
 overrideEnvVar ENABLE_MONIT MANDATORY "false";
