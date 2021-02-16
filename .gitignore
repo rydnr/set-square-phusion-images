@@ -258,6 +258,7 @@ tacotron/service
 .templates/mariadb-bootstrap
 .templates/metricbeat
 .templates/microsoft-teams
+.templates/minecraft-client
 .templates/mongodb
 .templates/mongodb2
 .templates/monit-files/31_create_monit_http_conf.inc.sh
