@@ -1,0 +1,11 @@
+# v minecraft-client
+RUN cd /opt \
+ && wget -O ${MINECRAFT_ARTIFACT} '${MINECRAFT_DOWNLOAD_URL}' \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} default-jre \
+ && ${PKG_INSTALL} libgtk-3.0 \
+ && ${PKG_INSTALL} libxss1 \
+ && ${PKG_INSTALL} xdg-utils \
+ && dpkg -i ${MINECRAFT_ARTIFACT} \
+ && ${SYSTEM_CLEANUP}
+# ^ minecraft-client

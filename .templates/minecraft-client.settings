@@ -1,0 +1,3 @@
+defineEnvVar MINECRAFT_ARTIFACT MANDATORY "The minecraft artifact" "Minecraft.deb";
+defineEnvVar MINECRAFT_DOWNLOAD_URL MANDATORY "The minecraft url" "https://launcher.mojang.com/download/${MINECRAFT_ARTIFACT}";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
