@@ -1,6 +1,6 @@
 defineButDoNotOverrideEnvVar MONGODB_MAJOR_VERSION "The mongodb major version" "4";
 defineButDoNotOverrideEnvVar MONGODB_MINOR_VERSION "The mongodb minor version" "4";
-defineButDoNotOverrideEnvVar MONGODB_PATCH_VERSION "The mongodb patch version" "2";
+defineButDoNotOverrideEnvVar MONGODB_PATCH_VERSION "The mongodb patch version" "4";
 defineButDoNotOverrideEnvVar MONGODB_VERSION "The mongodb version" '${MONGODB_MAJOR_VERSION}.${MONGODB_MINOR_VERSION}';
 defineButDoNotOverrideEnvVar MONGODB_FULL_VERSION "The mongodb version" '${MONGODB_VERSION}.${MONGODB_PATCH_VERSION}';
 defineButDoNotOverrideEnvVar REPLICA_SET_NAME "The name of the replica set" '${IMAGE}';
