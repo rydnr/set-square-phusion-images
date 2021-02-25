@@ -556,14 +556,16 @@ function resolve_include_env() {
       echo -n "    " >> "${_output}";
       for ((i = 0; i < ${#_envVars[@]}; i++)); do \
         _envVar="${_envVars[$i]}";
-        if [ "${_envVar#ENABLE_}" == "${_envVar}" ]; then
+        if areEqual "${_envVar#ENABLE_}" "${_envVar}"; then
           if [ $i -ne 0 ]; then
             echo >> "${_output}";
             echo -n "    " >> "${_output}";
           fi
-          echo "${_envVar}" | awk -v dollar="$" -v quote="\"" '{printf("echo -n \"SQ_%s=\\\"%s%s{%s}%s\\\"\"", $0, quote, dollar, $0, quote);}' | sh >> "${_output}"
-          if isLessThan $i $((${#_envVars[@]} - 1)); then
-            echo -n " \\" >> "${_output}";
+          if isNotEmpty "${_envVar}"; then
+            echo "${_envVar}" | awk -v dollar="$" -v quote="\"" '{printf("echo -n \"SQ_%s=\\\"%s%s{%s}%s\\\"\"", $0, quote, dollar, $0, quote);}' | sh >> "${_output}"
+            if isLessThan $i $((${#_envVars[@]} - 1)); then
+              echo -n " \\" >> "${_output}";
+            fi
           fi
         fi
       done
