@@ -277,7 +277,6 @@ function resolve_included_file() {
     if    [[ -f "${d}/${_file}" ]] \
             || [[ -f "${d}/$(basename ${_file} .template).template" ]]; then
       _result="${d}/${_file}";
-      export RESULT="${_result}";
       _rescode=${TRUE};
       break;
     fi
@@ -288,7 +287,14 @@ function resolve_included_file() {
     if [[ $(eval "echo ${_file}") != "${_file}" ]]; then
       resolve_included_file "$(eval "echo ${_file}")" "${_repoFolder}" "${_templatesFolder}";
       _rescode=$?;
+      _result="${RESULT}";
     fi
+  fi
+
+  if isTrue ${_rescode}; then
+    export RESULT="${_result}";
+  else
+    export RESULT="";
   fi
 
   return ${_rescode};
