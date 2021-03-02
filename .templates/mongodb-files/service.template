@@ -1,16 +1,16 @@
-#!/bin/bash dry-wit
+#!/usr/bin/env dry-wit
 # mod: mongodb-service
 # api: public
-# txt: Launches MongoDB
+# txt: Launches MongoDB.
 
-export DW_DISABLE_ANSI_COLORS=TRUE;
-export NO_COLOR=true;
-export USECOLOR=no;
+export DW_DISABLE_ANSI_COLORS=TRUE
+export NO_COLOR=true
+export USECOLOR=no
 
-DW.import mongodb;
-DW.import cron;
+DW.import mongodb
+DW.import cron
 
-setDebugEnabled;
+setDebugEnabled
 
 # fun: main
 # api: public
@@ -18,73 +18,78 @@ setDebugEnabled;
 # txt: Returns 0/TRUE always.
 # use: main;
 function main() {
-  mkdir -p "${DATABASE_FOLDER}";
+	local -i _rescode
 
-  DW.getScriptName;
-  local _scriptName="${RESULT}";
+	mkdir -p "${DATABASE_FOLDER}"
 
-#  exec > >(sudo tee "${MONGODB_LOG_FOLDER}"/"${_scriptName}".log | sudo sh -c "logger -t \"${_scriptName}\" -s 2>/dev/console") 2>&1;
+	#  exec > >(sudo tee "${MONGODB_LOG_FOLDER}"/"${_scriptName}".log | sudo sh -c "logger -t \"${_scriptName}\" -s 2>/dev/console") 2>&1;
 
-  local _oldIFS="${IFS}";
-  local _d;
-  IFS="${DWIFS}";
-  for _d in /var/lib/mongodb "${MONGODB_LOG_FOLDER}" /backup/mongodb; do
-    IFS="${_oldIFS}";
-    if folderExists "${_d}"; then
-      chown -R ${SERVICE_USER}:${SERVICE_GROUP} "${_d}";
-    fi
-  done;
-  IFS="${_oldIFS}";
+	local _oldIFS="${IFS}"
+	local _d
+	IFS="${DWIFS}"
+	for _d in /var/lib/mongodb "${MONGODB_LOG_FOLDER}" /backup/mongodb; do
+		IFS="${_oldIFS}"
+		if folderExists "${_d}"; then
+			chown -R ${SERVICE_USER}:${SERVICE_GROUP} "${_d}"
+		fi
+	done
+	IFS="${_oldIFS}"
 
-  local -i _runMongod=${TRUE};
+	local -i _runMongod=${TRUE}
 
-  local -i _bootstrapNeeded=${FALSE};
+	local -i _bootstrapNeeded=${FALSE}
 
-  if     ! fileExists "${BOOTSTRAP_FILE}" \
-      && fileExists "${BOOTSTRAP_SCRIPT}"; then
-    _bootstrapNeeded=${TRUE};
-  fi
+	if ! fileExists "${BOOTSTRAP_FILE}" &&
+		fileExists "${BOOTSTRAP_SCRIPT}"; then
+		_bootstrapNeeded=${TRUE}
+	fi
 
-  if isTrue ${_bootstrapNeeded}; then
-    rm -f /tmp/$(basename ${BOOTSTRAP_SCRIPT}-*);
-    ${BOOTSTRAP_SCRIPT};
-    local -i _rescode=$?;
-    if isTrue ${_rescode}; then
-      logInfo -n "Bootstrap completed";
-      logInfoResult SUCCESS "done";
-    else
-      logInfo -n "Bootstrap failed";
-      logInfoResult FAILURE "failed";
-      _runMongod=${FALSE};
-    fi
-  fi
+	if isTrue ${_bootstrapNeeded}; then
+		rm -f /tmp/$(basename ${BOOTSTRAP_SCRIPT}-*)
+		${BOOTSTRAP_SCRIPT} -v
+		_rescode=$?
+		if isTrue ${_rescode}; then
+			logInfo -n "Bootstrap completed"
+			logInfoResult SUCCESS "done"
+		else
+			logInfo -n "Bootstrap failed"
+			logInfoResult FAILURE "failed"
+			_runMongod=${FALSE}
+		fi
+	fi
 
-  if isTrue ${_runMongod}; then
-    local _authMechanism="${AUTHENTICATION_MECHANISM:-}";
-    if isEmpty "${_authMechanism}"; then
-      _authMechanism="${SQ_AUTHENTICATION_MECHANISM}";
-    fi
+	if isTrue ${_runMongod}; then
+		local _authMechanism="${AUTHENTICATION_MECHANISM:-}"
+		if isEmpty "${_authMechanism}"; then
+			_authMechanism="${SQ_AUTHENTICATION_MECHANISM}"
+		fi
 
-    if enable_changesets; then
-      restart_cron_daemon;
-    else
-      logInfo "Changeset monitoring NOT enabled";
-    fi
+		if enable_changesets; then
+			restart_cron_daemon
+		else
+			logInfo "Changeset monitoring NOT enabled"
+		fi
 
-    tail_log_files "${MONGODB_LOG_FOLDER}";
+		if enable_backups; then
+			logInfo "Backups enabled"
+		else
+			logError "Backups NOT enabled"
+		fi
 
-    if isEmpty "${_authMechanism}"; then
-      logInfo "Launching MongoDB with no authentication";
-      startMongodWithAuthenticationDisabled ${SERVICE_USER} ${SERVICE_GROUP} "${DATABASE_FOLDER}" "${MONGOD_CONFIG_FILE}";
-    else
-      logInfo "Launching MongoDB with ${_authMechanism} authentication mechanism";
-      startMongodWithAuthenticationEnabled ${SERVICE_USER} ${SERVICE_GROUP} "${DATABASE_FOLDER}" "${MONGOD_CONFIG_FILE}" "${_authMechanism}";
-    fi
+		tail_log_files "${MONGODB_LOG_FOLDER}"
 
-    logInfo "MongoDB NOT running. Restarting!";
-  else
-    logInfo "Cannot run MongoDB since the bootstrap process failed";
-  fi
+		if isEmpty "${_authMechanism}"; then
+			logInfo "Launching MongoDB with no authentication"
+			startMongodWithAuthenticationDisabled ${SERVICE_USER} ${SERVICE_GROUP} "${DATABASE_FOLDER}" "${MONGOD_CONFIG_FILE}"
+		else
+			logInfo "Launching MongoDB with ${_authMechanism} authentication mechanism"
+			startMongodWithAuthenticationEnabled ${SERVICE_USER} ${SERVICE_GROUP} "${DATABASE_FOLDER}" "${MONGOD_CONFIG_FILE}" "${_authMechanism}"
+		fi
+
+		logInfo "MongoDB NOT running. Restarting!"
+	else
+		logInfo "Cannot run MongoDB since the bootstrap process failed"
+	fi
 }
 
 # fun: enable_changesets
@@ -96,11 +101,11 @@ function main() {
 # use: fi
 function enable_changesets() {
 
-  logInfo "Monitoring changesets in ${CHANGESET_MONITORING_FOLDER}";
+	logInfo "Monitoring changesets in ${CHANGESET_MONITORING_FOLDER}"
 
-  rm -f "${CHANGESET_MONITORING_FOLDER}"/*.done;
+	rm -f "${CHANGESET_MONITORING_FOLDER}"/*.done
 
-  cat <<EOF > /etc/cron.d/mongodb-changesets
+	cat <<EOF >/etc/cron.d/mongodb-changesets
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/src/dry-wit/src
 NO_COLOR=true
@@ -112,7 +117,7 @@ AUTHENTICATION_MECHANISM=${AUTHENTICATION_MECHANISM}
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
 EOF
 
-  cat <<EOF >> /usr/local/sbin/pending_mongodb_scripts.inc.sh
+	cat <<EOF >>/usr/local/sbin/pending_mongodb_scripts.inc.sh
 # env: ADMIN_USER_NAME: The name of the admin user.
 defineEnvVar ADMIN_USER_NAME MANDATORY "The name of the admin user" "${ADMIN_USER_NAME}";
 # env: ADMIN_USER_PASSWORD: The password of the admin user.
@@ -129,21 +134,21 @@ EOF
 # use: fi
 function restart_cron_daemon() {
 
-  local -i _rescode=${FALSE};
+	local -i _rescode=${FALSE}
 
-  if isCronRunning; then
-    logDebug -n "Restarting cron to enable changeset monitoring";
-    if sendKillSignalToCronProcess; then
-      logDebugResult SUCCESS "done";
-      _rescode=${TRUE};
-    else
-      logDebugResult FAILURE "failed";
-    fi
-  else
-    logDebug "Cron is NOT running. Monitoring disabled";
-  fi
+	if isCronRunning; then
+		logDebug -n "Restarting cron to enable changeset monitoring"
+		if sendKillSignalToCronProcess; then
+			logDebugResult SUCCESS "done"
+			_rescode=${TRUE}
+		else
+			logDebugResult FAILURE "failed"
+		fi
+	else
+		logDebug "Cron is NOT running. Monitoring disabled"
+	fi
 
-  return ${_rescode};
+	return ${_rescode}
 }
 
 # fun: tail_log_files folder
@@ -152,40 +157,65 @@ function restart_cron_daemon() {
 # txt: Returns 0/TRUE always.
 # use: tail_log_files /var/log/mongodb;
 function tail_log_files() {
-  local _folder="${1}";
-  checkNotEmpty folder "${_folder}" 1;
+	local _folder="${1}"
+	checkNotEmpty folder "${_folder}" 1
 
-  local _oldIFS="${IFS}";
-  local _f;
-  IFS="${DWIFS}";
-  for _f in "${_folder}/mongod.log" "${_folder}/changesets.log"; do
-    IFS="${_oldIFS}";
-    touch "${_f}";
-    chown ${SERVICE_USER}:${SERVICE_GROUP} "${_f}";
-    tail -f "${_f}" & disown;
-  done;
-  IFS="${_oldIFS}";
+	local _oldIFS="${IFS}"
+	local _f
+	IFS="${DWIFS}"
+	for _f in "${_folder}/mongod.log" "${_folder}/changesets.log"; do
+		IFS="${_oldIFS}"
+		touch "${_f}"
+		chown ${SERVICE_USER}:${SERVICE_GROUP} "${_f}"
+		tail -f "${_f}" &
+		disown
+	done
+	IFS="${_oldIFS}"
+}
+
+# fun: enable_backups
+# api: public
+# txt: Enables the backups of dump files.
+# txt: Returns 0/TRUE if the backups could be enabled; 1/FALSE otherwise.
+# use: if enable_backups; then
+# use:   echo "Backups enabled";
+# use: fi
+function enable_backups() {
+	local -i _rescode
+	_rescode=${FALSE}
+
+	local _script
+	_script="${BACKUP_SCRIPT_FOLDER}/enable-backups.sh"
+
+	if fileExists "${_script}"; then
+		"${_script}"
+		_rescode=$?
+	fi
+
+	return ${_rescode}
 }
 
 # Script metadata
-setScriptDescription "Launches MongoDB";
+setScriptDescription "Launches MongoDB"
 
 # These environment variables can be overridden in a .inc.sh file in current folder.
 
 # env: DATABASE_FOLDER: The database folder.
-defineEnvVar DATABASE_FOLDER MANDATORY "The database folder" "/backup/mongodb/db";
+defineEnvVar DATABASE_FOLDER MANDATORY "The database folder" "/backup/mongodb/db"
 # env: BOOTSTRAP_FILE: The bootstrap file.
-defineEnvVar BOOTSTRAP_FILE MANDATORY "The bootstrap file" "${DATABASE_FOLDER}/.bootstrapped";
+defineEnvVar BOOTSTRAP_FILE MANDATORY "The bootstrap file" "${DATABASE_FOLDER}/.bootstrapped"
 # env: MONGOD_CONFIG_FILE: The mongod config file.
-defineEnvVar MONGOD_CONFIG_FILE MANDATORY "The mongod config file" "/etc/mongod.conf";
+defineEnvVar MONGOD_CONFIG_FILE MANDATORY "The mongod config file" "/etc/mongod.conf"
 # env: MONGODB_LOG_FOLDER The MongoDB log folder. Defaults to /var/log/mongodb.
-defineEnvVar MONGODB_LOG_FOLDER MANDATORY "The MongoDB log folder" "/var/log/mongodb";
+defineEnvVar MONGODB_LOG_FOLDER MANDATORY "The MongoDB log folder" "/var/log/mongodb"
 # env: SLEEP: The number of seconds to sleep before checking if mongod is running again.
-defineEnvVar SLEEP MANDATORY "The number of seconds to sleep before checking if mongod is running again" 300;
+defineEnvVar SLEEP MANDATORY "The number of seconds to sleep before checking if mongod is running again" 300
 # env: BOOTSTRAP_SCRIPT: The script in charge of bootstrapping. Defaults to /usr/local/bin/${IMAGE}-bootstrap.sh.
-defineEnvVar BOOTSTRAP_SCRIPT MANDATORY "The script in charge of bootstrapping" "/usr/local/bin/${IMAGE}-bootstrap.sh";
+defineEnvVar BOOTSTRAP_SCRIPT MANDATORY "The script in charge of bootstrapping" "/usr/local/bin/${IMAGE}-bootstrap.sh"
 # env: CHANGESET_MONITORING_INTERVAL: The number of minutes to wait before checking if there're new pending scripts.
-defineEnvVar CHANGESET_MONITORING_INTERVAL MANDATORY "The number of minutes to wait before checking if there're new pending scripts." ${CHANGESET_MONITORING_INTERVAL};
+defineEnvVar CHANGESET_MONITORING_INTERVAL MANDATORY "The number of minutes to wait before checking if there're new pending scripts." ${CHANGESET_MONITORING_INTERVAL}
 # env: CHANGESET_MONITORING_FOLDER: The folder to monitor for changesets.
-defineEnvVar CHANGESET_MONITORING_FOLDER MANDATORY "The folder to monitor for changesets" "/backup/mongodb/changesets";
+defineEnvVar CHANGESET_MONITORING_FOLDER MANDATORY "The folder to monitor for changesets" "/backup/mongodb/changesets"
+# env: BACKUP_SCRIPT_FOLDER: The folder with the backup script.
+defineEnvVar BACKUP_SCRIPT_FOLDER MANDATORY "The folder with the backup script" "/usr/local/sbin"
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet
