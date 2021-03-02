@@ -19,16 +19,20 @@ ENV ADMIN_USER_NAME="${ADMIN_USER_NAME}" \
 #RUN echo 'deb http://downloads-distro.mongodb.org/repo/ubuntu-upstart dist 10gen' | tee /etc/apt/sources.list.d/10gen.list
 RUN export DEBIAN_FRONTEND=noninteractive \
  && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} -np gnupg dirmngr \
+ && ${PKG_INSTALL} -np gnupg \
+ && ${PKG_INSTALL} -np dirmngr \
  && wget -qO - https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | sudo apt-key add - \
  && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGODB_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
- && ${PKG_INSTALL} numactl jq \
+ && ${PKG_INSTALL} numactl \
+ && ${PKG_INSTALL} jq \
  && if ! command -v ps > /dev/null; then ${PKG_INSTALL} procps; fi \
  && ${SYSTEM_UPDATE} \
  && if [ ! -e /usr/local/bin/systemctl ]; then REMOVE_SYSTEMCTL=0; ln -s /bin/true /usr/local/bin/systemctl; else REMOVE_SYSTEMCTL=1; fi \
  && (${PKG_INSTALL} mongodb-org-server=${MONGODB_FULL_VERSION} || dpkg --configure mongodb-org-server) \
  && ${PKG_INSTALL} mongodb-org=${MONGODB_FULL_VERSION} \
- && ${PKG_INSTALL} mongodb-org-shell=${MONGODB_FULL_VERSION} mongodb-org-mongos=${MONGODB_FULL_VERSION} mongodb-org-tools=${MONGODB_FULL_VERSION} \
+ && ${PKG_INSTALL} mongodb-org-shell=${MONGODB_FULL_VERSION} \
+ && ${PKG_INSTALL} mongodb-org-mongos=${MONGODB_FULL_VERSION} \
+ && ${PKG_INSTALL} mongodb-org-tools=${MONGODB_FULL_VERSION} \
  && ${SYSTEM_CLEANUP} \
  && chmod +x /usr/local/bin/mongodb-*.sh \
  && echo "mongodb-org hold" | sudo dpkg --set-selections \
