@@ -3,6 +3,7 @@ COPY mongodb-files/mongodb-dump.sh \
      mongodb-files/mongodb-restore.sh \
      mongodb-files/mongodb-discard-old-dumps.sh \
      /usr/local/bin/
+
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
 #COPY mongodb-files/create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
 
