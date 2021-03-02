@@ -1,5 +1,5 @@
 # v aws
 RUN ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} awscli \
- && ${SYSTEM_CLEANUP} \
+ && ${SYSTEM_CLEANUP}
 # ^ aws
