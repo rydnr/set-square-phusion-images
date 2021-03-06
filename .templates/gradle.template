@@ -14,6 +14,6 @@ RUN cd ${SERVICE_USER_HOME} \
     fi
 
 USER root
-RUN rm -rf ${SERVICE_USER_HOME}/.gradle \
+RUN chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} \
  && chmod +x /usr/local/bin/sq-gradle-wrapper.sh
 # ^ gradle

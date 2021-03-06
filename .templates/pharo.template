@@ -21,10 +21,15 @@ RUN dpkg --add-architecture i386 \
  && cd /opt/pharo/pharo-vm/lib/pharo/${PHAROVM_VERSION} \
  && mv /root/.dry-wit ${SERVICE_USER_HOME} \
  && ln -s ${SERVICE_USER_HOME}/.dry-wit /root/ \
- && mkdir -p ${SERVICE_USER_HOME}/.config \
+ && mkdir -p ${SERVICE_USER_HOME}/.config/pharo \
  && ln -s ${SERVICE_USER_HOME}/.config /root/.config \
  && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/pharo ${SERVICE_USER_HOME} /root/.dry-wit \
  && ${SYSTEM_CLEANUP} \
+
+COPY pharo-files/author.st.sample \
+     pharo-files/credentials-github.st.sample \
+     pharo-files/credentials-gitlab.st.sample \
+     ${SERVICE_USER_HOME}/.config/pharo/
 
 ENV PHARO_VM=/opt/pharo/pharo \
     PATH=${PATH}:/opt/pharo

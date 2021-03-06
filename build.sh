@@ -1,4 +1,4 @@
-#!/bin/env dry-wit
+#!/usr/bin/env dry-wit
 # Copyright 2014-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 

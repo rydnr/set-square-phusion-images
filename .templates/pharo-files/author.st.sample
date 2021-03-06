@@ -1,0 +1,9 @@
+StartupPreferencesLoader default executeAtomicItems: {
+  StartupAction
+    name: 'Author identification'
+    code: [
+      FileStream stdout cr; nextPutAll: 'Setting the Author full name'; cr.
+      Author uniqueInstance fullName: 'JohnDoe'.
+      FileStream stdout cr; nextPutAll: 'Finished'; cr
+    ]
+}

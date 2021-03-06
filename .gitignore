@@ -162,6 +162,7 @@ phabricator/.env
 phabricator/git-files
 phabricator/INSTALL
 phabricator/service
+**/pharo-files
 pharo-launcher/service
 pharo/service
 phppgadmin/apache-files
