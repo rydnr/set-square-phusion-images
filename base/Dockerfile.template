@@ -25,6 +25,7 @@ FROM phusion/baseimage:${PARENT_IMAGE_TAG}
 # @include("monit")
 # @include("rsnapshot")
 # @include("ssh")
+@include("tripwire")
 
 ENV DW_DISABLE_ANSI_COLORS=${DISABLE_ANSI_COLORS}
 
