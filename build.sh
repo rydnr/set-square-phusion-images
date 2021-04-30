@@ -524,10 +524,9 @@ function resolve_include_env() {
   checkNotEmpty namespace "${_namespace}" 5;
   local _backupHostSshPort="${6:-22}";
 
-  local _includedFile;
   local -i _rescode;
   local _envVar;
-  local line;
+  local _line;
   local -a _envVars=();
   local -i i;
   local _oldIFS="${IFS}";
@@ -554,30 +553,25 @@ function resolve_include_env() {
 
   echo -n '' > "${_output}";
 
-  while IFS='' read -r line; do
+  while IFS='' read -r _line; do
     IFS="${_oldIFS}";
-    _includedFile="";
-    if [[ "${line#@include_env}" != "$line" ]]; then
-      echo "ENV DW_DISABLE_ANSI_COLORS=TRUE \\" >> "${_output}";
-      echo -n "    " >> "${_output}";
-      for ((i = 0; i < ${#_envVars[@]}; i++)); do \
-        _envVar="${_envVars[$i]}";
-        if areEqual "${_envVar#ENABLE_}" "${_envVar}"; then
-          if [ $i -ne 0 ]; then
-            echo >> "${_output}";
-            echo -n "    " >> "${_output}";
-          fi
-          if isNotEmpty "${_envVar}"; then
-            echo "${_envVar}" | awk -v dollar="$" -v quote="\"" '{printf("echo -n \"SQ_%s=\\\"%s%s{%s}%s\\\"\"", $0, quote, dollar, $0, quote);}' | sh >> "${_output}"
-            if isLessThan $i $((${#_envVars[@]} - 1)); then
-              echo -n " \\" >> "${_output}";
+    if isNotEmpty "${_line}"; then
+      if startsWith "${_line}" "@include_env"; then
+        echo -n "ENV DW_DISABLE_ANSI_COLORS=TRUE " >> "${_output}";
+        for ((i = 0; i < ${#_envVars[@]}; i++)); do \
+          _envVar="${_envVars[$i]}";
+          if ! startsWith "${_envVar}" "ENABLE_"; then
+            local _varLine="$(echo "${_envVar}" | awk -v dollar="$" -v quote="\"" '{printf("echo -n \"SQ_%s=\\\"%s%s{%s}%s\\\"\"", $0, quote, dollar, $0, quote);}' | sh)";
+            if isNotEmpty "${_varLine}"; then
+              echo "\\" >> "${_output}";
+              echo -n "    ${_varLine}" >> "${_output}";
             fi
           fi
-        fi
-      done
-      echo >> "${_output}";
-    elif [[ "${line# +}" == "${line}" ]]; then
-      echo "$line" >> "${_output}";
+        done
+        echo >> "${_output}";
+      else
+        echo "${_line}" >> "${_output}";
+      fi
     fi
   done < "${_input}";
   _rescode=$?;
