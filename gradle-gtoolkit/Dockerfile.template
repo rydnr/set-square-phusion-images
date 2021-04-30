@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")

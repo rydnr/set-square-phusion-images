@@ -1,6 +1,5 @@
-defineEnvVar GTOOLKIT_VERSION MANDATORY "The version of GToolkit" '0.8.466';
-defineEnvVar GTOOLKIT_ARTIFACT MANDATORY "The gtoolkit zip file" "GT.zip";
-defineEnvVar GTOOLKIT_DOWNLOAD_URL MANDATORY "The url to download gtoolkit" "https://github.com/feenkcom/gtoolkit/releases/download/v${GTOOLKIT_VERSION}/${GTOOLKIT_ARTIFACT}";
-defineEnvVar GTOOLKIT_LIBS_ARTIFACT MANDATORY "The zip file of the linux libs required by gtoolkit" "libLinux64.zip";
-defineEnvVar GTOOLKIT_LIBS_DOWNLOAD_URL MANDATORY "The url to download the gtoolkit dependencies" "https://github.com/feenkcom/gtoolkit/releases/download/v${GTOOLKIT_VERSION}/${GTOOLKIT_LIBS_ARTIFACT}";
+defineEnvVar GTOOLKIT_VERSION MANDATORY "The version of GToolkit" '0.8.529';
+defineEnvVar GTOOLKIT_FOLDER MANDATORY "The GToolkit folder" "GlamorousToolkitLinux64-v${GTOOLKIT_VERSION}";
+defineEnvVar GTOOLKIT_ARTIFACT MANDATORY "The GToolkit artifact" "${GTOOLKIT_FOLDER}.zip";
+defineEnvVar GTOOLKIT_DOWNLOAD_URL MANDATORY "The url to download gtoolkit" "https://dl.feenk.com/gt/${GTOOLKIT_ARTIFACT}";
 #

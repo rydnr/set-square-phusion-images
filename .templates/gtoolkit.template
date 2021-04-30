@@ -2,22 +2,20 @@
 COPY gtoolkit-files/my_exec /etc/my_exec.d/gtoolkit
 
 RUN chmod +x /etc/my_exec.d/gtoolkit \
- && cd /opt/pharo \
- && wget ${GTOOLKIT_DOWNLOAD_URL} \
- && wget ${GTOOLKIT_LIBS_DOWNLOAD_URL} \
- && jar xvf ${GTOOLKIT_ARTIFACT} \
- && jar xvf ${GTOOLKIT_LIBS_ARTIFACT} \
- && rm -f ${GTOOLKIT_ARTIFACT} ${GTOOLKIT_LIBS_ARTIFACT} \
- && mv GlamorousToolkit ${SERVICE_USER_HOME} \
- && mv libLinux64-v${GTOOLKIT_VERSION} ${SERVICE_USER_HOME} \
- && cd ${SERVICE_USER_HOME} \
- && ln -s GlamorousToolkit/GlamorousToolkit.image GlamorousToolkit.image \
- && ln -s libLinux64-v${GTOOLKIT_VERSION}/*.so . \
- && rm -rf /opt/pharo/libLinux64-v${GTOOLKIT_VERSION} /opt/pharo/GlamorousToolkit \
  && ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} libcairo2 \
- && cp GlamorousToolkit/GlamorousToolkit.image blank.image \
+ && ${PKG_INSTALL} unzip \
+ && ${PKG_INSTALL} libgl1-mesa-glx \
+ && ${PKG_INSTALL} libxrandr2 \
+ && ${PKG_INSTALL} libxi6 \
  && ${SYSTEM_CLEANUP} \
+ && cd ${SERVICE_USER_HOME} \
+ && mkdir tmp \
+ && cd tmp \
+ && wget ${GTOOLKIT_DOWNLOAD_URL} \
+ && unzip ${GTOOLKIT_ARTIFACT} \
+ && cd ${SERVICE_USER_HOME} \
+ && mv tmp/${GTOOLKIT_FOLDER}/* . \
  && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}
 
 # && /opt/pharo/pharo ${SERVICE_USER_HOME}/GlamorousToolkit.image eval --save "Metacello new baseline: 'GToolkit'; repository: 'github://feenkcom/gtoolkit:v${GTOOLKIT_VERSION}/src'; load" \
