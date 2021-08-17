@@ -5,7 +5,7 @@ RUN dpkg --add-architecture i386 \
  && ${PKG_INSTALL} -np libssl-dev libssh2-1-dev libffi-dev zlib1g-dev build-essential gcc pkg-config libhttp-parser-dev \
  && for p in cmake git make zip unzip; do \
       [[ $(which ${p}) > /dev/null ]] || ${PKG_INSTALL} -np ${p}; \
-    done \
+    done; \
  && ([ -d /opt ] || mkdir /opt) \
  && mkdir /opt/pharo${PHARO_MAJOR_VERSION} \
  && cd /opt/pharo${PHARO_MAJOR_VERSION} \
@@ -18,7 +18,6 @@ RUN dpkg --add-architecture i386 \
  && echo 'export PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.sh \
  && echo 'setenv PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.csh \
  && chmod +x /etc/profile.d/pharo.sh /etc/profile.d/pharo.csh \
- && cd /opt/pharo/pharo-vm/lib/pharo/${PHAROVM_VERSION} \
  && mv /root/.dry-wit ${SERVICE_USER_HOME} \
  && ln -s ${SERVICE_USER_HOME}/.dry-wit /root/ \
  && mkdir -p ${SERVICE_USER_HOME}/.config/pharo \

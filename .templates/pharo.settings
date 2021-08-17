@@ -1,4 +1,4 @@
-defineEnvVar PHARO_MAJOR_VERSION OPTIONAL "The major version of Pharo" "8";
+defineEnvVar PHARO_MAJOR_VERSION OPTIONAL "The major version of Pharo" "9";
 defineEnvVar PHARO_MINOR_VERSION OPTIONAL "The minor version of Pharo" "0";
 defineEnvVar PHARO_VERSION OPTIONAL "The version of Pharo" "${PHARO_MAJOR_VERSION}.${PHARO_MINOR_VERSION}";
 defineEnvVar PHARO_VERSION_ZEROCONF OPTIONAL "The Pharo version, as expected by the Zeroconf script in get.pharo.org" '$(echo ${PHARO_VERSION} | tr -d '.')';
