@@ -1,5 +1,9 @@
-defineEnvVar GTOOLKIT_VERSION MANDATORY "The version of GToolkit" '0.8.529';
+# env: GTOOLKIT_VERSION: The version of GToolkit.
+defineEnvVar GTOOLKIT_VERSION MANDATORY "The version of GToolkit" '0.8.805';
+# env: GTOOLKIT_FOLDER: The name of the folder where GToolkit is extracted.
 defineEnvVar GTOOLKIT_FOLDER MANDATORY "The GToolkit folder" "GlamorousToolkitLinux64-v${GTOOLKIT_VERSION}";
+# env: GTOOLKIT_ARTIFACT: The GToolkit artifact.
 defineEnvVar GTOOLKIT_ARTIFACT MANDATORY "The GToolkit artifact" "${GTOOLKIT_FOLDER}.zip";
+# env: GTOOLKIT_DOWNLOAD_URL: The url to download GToolkit from.
 defineEnvVar GTOOLKIT_DOWNLOAD_URL MANDATORY "The url to download gtoolkit" "https://dl.feenk.com/gt/${GTOOLKIT_ARTIFACT}";
-#
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
