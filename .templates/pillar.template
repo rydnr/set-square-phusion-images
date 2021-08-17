@@ -1,9 +1,12 @@
 # v pillar
 COPY pillar-files/runme /usr/local/bin/runme
-RUN mkdir -p /opt/pillar \
- && chmod +x /usr/local/bin/runme \
- && cd /opt/pillar \
- && curl https://raw.githubusercontent.com/pillar-markup/pillar/dev-7/download.sh | bash
+RUN chmod +x /usr/local/bin/runme \
+ && cd /opt/ \
+ && git clone https://github.com/pillar-markup/pillar \
+ && cd pillar \
+ && git checkout v8.0.14 \
+ && chmod a+x ./scripts/build.sh \
+ && ./scripts/build.sh
 
 ENV PATH=${PATH}:/opt/pillar \
     PILLAR_IMAGE=/opt/pillar/Pharo.image \
