@@ -17,7 +17,6 @@ DW.import mongodb
 # txt: Returns 0/TRUE always.
 # use: main;
 function main() {
-  echo "in main"
   local _outputFolder="${MONGODB_DUMP_FOLDER}"
   DW.getScriptName
   local _scriptName
