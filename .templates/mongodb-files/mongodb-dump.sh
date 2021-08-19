@@ -1,4 +1,4 @@
-#!/bin/bash dry-wit
+#!/usr/bin/env /usr/local/src/dry-wit/src/dry-wit
 # Copyright 2017-today Automated Computing Machinery
 # Licensed under GPLv3.
 # mod: mongodb/mongodb-dump.sh
@@ -23,7 +23,7 @@ function main() {
   local _scriptName
   _scriptName="$(basename ${RESULT})"
 
-  exec > >(sudo tee "${MONGODB_LOG_FOLDER}"/"${_scriptName}".log | sudo sh -c "logger -t \"${_scriptName}\" -s 2>/dev/console") 2>&1
+  #  exec > >(sudo tee "${MONGODB_LOG_FOLDER}"/"${_scriptName}".log | sudo sh -c "logger -t \"${_scriptName}\" -s 2>/dev/console") 2>&1
 
   mkdir -p "${_outputFolder}" >/dev/null
 
