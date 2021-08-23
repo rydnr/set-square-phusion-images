@@ -2,6 +2,8 @@
 COPY mongodb-files/mongodb-dump.sh \
      mongodb-files/mongodb-restore.sh \
      mongodb-files/mongodb-discard-old-dumps.sh \
+     mongodb-files/compress-mongodb-dumps.sh \
+     mongodb-files/encrypt-mongodb-dumps.sh \
      /usr/local/bin/
 
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
@@ -25,6 +27,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGODB_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
  && ${PKG_INSTALL} numactl \
  && ${PKG_INSTALL} jq \
+ && ${PKG_INSTALL} p7zip-full \
  && if ! command -v ps > /dev/null; then ${PKG_INSTALL} procps; fi \
  && ${SYSTEM_UPDATE} \
  && if [ ! -e /usr/local/bin/systemctl ]; then REMOVE_SYSTEMCTL=0; ln -s /bin/true /usr/local/bin/systemctl; else REMOVE_SYSTEMCTL=1; fi \
@@ -34,7 +37,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && ${PKG_INSTALL} mongodb-org-mongos=${MONGODB_FULL_VERSION} \
  && ${PKG_INSTALL} mongodb-org-tools=${MONGODB_FULL_VERSION} \
  && ${SYSTEM_CLEANUP} \
- && chmod +x /usr/local/bin/mongodb-*.sh \
+ && chmod +x /usr/local/bin/mongodb-*.sh /usr/local/bin/compress-mongodb-dumps.sh /usr/local/bin/encrypt-mongodb-dumps.sh \
  && echo "mongodb-org hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-server hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-shell hold" | sudo dpkg --set-selections \
