@@ -51,6 +51,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump \
  && ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps \
  && ln -s /usr/local/sbin/pending_scripts.sh /usr/local/sbin/pending_mongodb_scripts.sh \
+ && if [[ ! -e /home/mongodb/.dry-wit ]]; then ln -s /usr/local/src/dry-wit /home/mongodb/.dry-wit; fi \
  && if [[ ${REMOVE_SYSTEMCTL} -eq 0 ]]; then rm -f /usr/local/systemctl; fi
 
 #    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
