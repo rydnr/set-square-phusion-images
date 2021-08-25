@@ -17,7 +17,7 @@ DW.import mongodb
 function main() {
   logInfo -n "Restoring from ${FILE}"
 
-  if mongoRestore "${FILE}" "${MONGODB_HOST}" "${MONGODB_USER}" "${MONGODB_PASSWORD}" "${AUTHENTICATION_DATABASE}" "${AUTHENTICATION_MECHANISM}"; then
+  if mongoRestore "${FILE}" "${MONGODB_URL}" "${MONGODB_USER}" "${MONGODB_PASSWORD}" "${AUTHENTICATION_DATABASE}" "${AUTHENTICATION_MECHANISM}"; then
     logInfoResult SUCCESS "done"
   else
     logInfoResult FAILURE "failed"
@@ -42,12 +42,12 @@ function dw_check_file_cli_parameter() {
   fi
 }
 
-# env: MONGODB_HOST: The MongoDB host. Defaults to localhost.
-defineEnvVar MONGODB_HOST OPTIONAL "The MongoDB host" "localhost"
-# env: MONGODB_USER: The MongoDB user. Defaults to ${ADMIN_USER_NAME}.
-defineEnvVar MONGODB_USER OPTIONAL "The MongoDB user" "${ADMIN_USER_NAME}"
-# env: MONGODB_PASSWORD: The password of the MongoDB user. Defaults to ${ADMIN_USER_PASSWORD}.
-defineEnvVar MONGODB_PASSWORD OPTIONAL "The password of the MongoDB user" "${ADMIN_USER_PASSWORD}"
+# env: MONGODB_URL: The MongoDB url. Defaults to localhost.
+defineEnvVar MONGODB_URL OPTIONAL "The MongoDB url" "localhost"
+# env: MONGODB_USER: The MongoDB user.
+defineEnvVar MONGODB_USER OPTIONAL "The MongoDB user"
+# env: MONGODB_PASSWORD: The password of the MongoDB user.
+defineEnvVar MONGODB_PASSWORD OPTIONAL "The password of the MongoDB user"
 # env: AUTHENTICATION_DATABASE: The authentication database. Defaults to admin.
 defineEnvVar AUTHENTICATION_DATABASE OPTIONAL "The authentication database" "admin"
 # env: AUTHENTICATION_MECHANISM: The authentication mechanism. Defaults to SCRAM-SHA-1.
