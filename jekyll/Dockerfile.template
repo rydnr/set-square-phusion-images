@@ -10,7 +10,6 @@ COPY rc.local /etc/rc.local
 RUN ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} ruby-full build-essential zlib1g-dev \
  && ${SYSTEM_CLEANUP} \
- && groupadd ${SERVICE_GROUP} \
  && mkdir -p ${SERVICE_USER_HOME} \
  && /usr/sbin/useradd -m -d ${SERVICE_USER_HOME} -g ${SERVICE_GROUP} -G ${SERVICE_GROUP} -c "Jekyll user" ${SERVICE_USER} \
  && chmod +x /etc/rc.local \
