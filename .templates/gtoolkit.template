@@ -15,7 +15,8 @@ RUN chmod +x /etc/my_exec.d/gtoolkit \
  && wget ${GTOOLKIT_DOWNLOAD_URL} \
  && unzip ${GTOOLKIT_ARTIFACT} \
  && cd ${SERVICE_USER_HOME} \
- && mv tmp/${GTOOLKIT_FOLDER}/* . \
+ && mv tmp/* . \
+ && rm -rf ${GTOOLKIT_ARTIFACT} tmp \
  && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}
 
 # && /opt/pharo/pharo ${SERVICE_USER_HOME}/GlamorousToolkit.image eval --save "Metacello new baseline: 'GToolkit'; repository: 'github://feenkcom/gtoolkit:v${GTOOLKIT_VERSION}/src'; load" \

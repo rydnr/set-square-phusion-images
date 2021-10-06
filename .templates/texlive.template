@@ -1,0 +1,4 @@
+# v texlive
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} texlive-latex-extra texlive-fonts-extra texlive-luatex latexmk
+# ^ texlive

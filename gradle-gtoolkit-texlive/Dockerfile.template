@@ -1,0 +1,28 @@
+@include("preamble")
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+@include("service_user")
+
+@include("openjdk")
+@include("pharo")
+@include("sdkman")
+@include("gradle")
+@include("gtoolkit")
+@include("git")
+@include("texlive")
+
+#COPY git-files/gitconfig ${SERVICE_USER_HOME}/.gitconfig
+
+#VOLUME ${SERVICE_USER_HOME}/.gradle
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
+
+USER ${SERVICE_USER}
+WORKDIR ${SERVICE_USER_HOME}/work
+
+ENTRYPOINT /bin/bash
