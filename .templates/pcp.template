@@ -1,0 +1,5 @@
+# v pcp
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} pcp pcp-gui pcp-conf pcp-doc \
+ && ${SYSTEM_CLEANUP}
+# ^ pcp

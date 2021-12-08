@@ -1,0 +1,27 @@
+#!/bin/bash
+
+chown -R ${SERVICE_USER}:${SERVICE_GROUP} /data /backup
+
+rsync -az /backup/ ${SERVICE_USER_HOME}/backup/
+rsync -az /data/ ${SERVICE_USER_DATA}/data/
+rsync -az ${SERVICE_USER_HOME}/backup/ /backup/
+rsync -az ${SERVICE_USER_HOME}/data/ /data/
+
+echo "NODENAME=${SQ_RABBITMQ_NODENAME}" >> /etc/rabbitmq/rabbitmq-env.conf
+gpasswd -a filebeat ${SERVICE_GROUP}
+
+_exports="$(export)";
+
+cat << EOF > /tmp/runme
+#!/bin/bash
+
+${_exports}
+declare -x HOME="/home/${SERVICE_USER}"
+export PATH=/usr/sbin:${PATH}
+ulimit -n ${RABBITMQ_ULIMIT_N}
+rabbitmq-server \$@
+EOF
+chmod +x /tmp/runme
+
+chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

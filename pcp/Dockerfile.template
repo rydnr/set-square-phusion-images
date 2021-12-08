@@ -1,0 +1,20 @@
+@include("preamble")
+FROM ${CUSTOM_NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+@include("maintainer")
+
+@include("addon-toggles")
+
+ENV DOBACKUP="false" \
+    BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}"
+
+@include("service_user")
+
+COPY service /sbin/my_exec
+
+@include("pcp")
+
+RUN chmod +x /sbin/my_exec
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")
