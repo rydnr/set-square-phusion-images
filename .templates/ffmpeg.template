@@ -1,0 +1,5 @@
+# v ffmpeg
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} ffmpeg \
+ && ${SYSTEM_CLEANUP}
+# ^ ffmpeg

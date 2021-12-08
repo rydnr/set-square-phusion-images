@@ -776,7 +776,7 @@ function build_repo() {
 
   DW.import command;
 
-  runCommandLongOutput "${DOCKER} build ${_buildOpts} -t ${_namespace}/${_repo}:${_tag}-b --rm=true ${_repo}";
+  runCommandLongOutput "${DOCKER}" build ${_buildOpts} -t ${_namespace}/${_repo}:${_tag}-b --rm=true ${_repo};
   _cmdResult=$?
   logInfo -n "${_namespace}/${_repo}:${_tag}-b";
   if isTrue ${_cmdResult}; then

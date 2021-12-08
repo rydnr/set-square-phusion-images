@@ -49,6 +49,7 @@ elasticsearch/service
 filebeat-docker/conf.d/*.yml
 filebeat-docker/filebeat.yml
 */filebeat-files
+firefox/firefox-files
 firefox-sync/rc.local
 firefox-sync/service
 firefox-sync/setup.sql
@@ -66,6 +67,7 @@ gradle-daemon/service
 */gradle-files
 gradle/gradle-files
 gradle-gtoolkit/service
+gradle-gtoolkit-texlive/service
 gradle/my_exec
 gradle-pharo/service
 gradle/service
@@ -153,6 +155,7 @@ padlock-cloud/config.tmpl
 padlock-cloud/git-files
 padlock-cloud/service
 padlock-cloud/ssl
+pcp/service
 phabricator/apache-files
 phabricator/apache-vhost.conf
 phabricator/bootstrap
@@ -232,7 +235,9 @@ tacotron/service
 .templates/elk-common
 .templates/entrypoint
 .templates/exim-files/exim.00_local_macros
+.templates/ffmpeg
 .templates/filebeat
+.templates/firefox
 .templates/firefox52
 .templates/ganache
 .templates/git
@@ -280,6 +285,7 @@ tacotron/service
 .templates/oracle-jdk8
 .templates/oracle-jre
 .templates/packetbeat
+.templates/pcp
 .templates/pencil
 .templates/phabricator
 .templates/pharo
@@ -306,6 +312,7 @@ tacotron/service
 .templates/superset
 .templates/tacotron
 .templates/tensorflow
+.templates/texlive
 .templates/tini
 .templates/tomcat
 .templates/truffle

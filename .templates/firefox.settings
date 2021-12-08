@@ -1,0 +1,3 @@
+defineEnvVar DOWNLOADHELPER_ARTIFACT MANDATORY "The downloadhelper xpi" "video_downloadhelper-7.6.0-fx.xpi";
+defineEnvVar DOWNLOADHELPER_DOWNLOAD_URL MANDATORY "The downloadhelper download url" "https://addons.mozilla.org/firefox/downloads/file/3804074/${DOWNLOADHELPER_ARTIFACT}";
+defineEnvVar XPI MANDATORY "The final xpi file" "{b9db16a4-6edc-47ec-a1f4-b86292ed211d}.xpi";

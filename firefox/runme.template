@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+setuser ${SERVICE_USER} firefox
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

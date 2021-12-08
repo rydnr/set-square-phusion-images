@@ -1,0 +1,10 @@
+# v firefox
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} firefox \
+ && ${SYSTEM_CLEANUP}
+
+COPY firefox-files/profiles.ini ${SERVICE_USER_HOME}/.mozilla/profiles.ini
+
+RUN chown -R ${SERVICE_USER} ${SERVICE_USER_HOME}/.mozilla
+
+# ^ firefox

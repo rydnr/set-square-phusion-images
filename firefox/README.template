@@ -1,0 +1,14 @@
+= Firefox 52 ESR
+
+This image runs Firefox 52 ESR with Java support
+
+= Usage
+
+> XSOCK=/tmp/.X11-unix
+> XAUTH=/tmp/.docker.xauth
+> xauth nlist :0 | sed -e 's/^..../ffff/' | xauth -f $XAUTH nmerge -
+> xhost +$(hostname -s)
+
+Then, 
+
+> docker run -it --rm --name ${IMAGE} -v $XSOCK:$XSOCK -v $XAUTH:$XAUTH -e XAUTHORITY=$XAUTH -e DISPLAY=unix:0 -v /var/run/dbus:/var/run/dbus --ipc=host --net=host -v ${HOME}:${SERVICE_USER_HOME} ${REGISTRY}/${NAMESPACE}/${IMAGE}:${TAG}
