@@ -1,9 +1,9 @@
 # env: PARENT_IMAGE_TAG: The tag of the parent image. Defaults to 18.04-1.0.0-amd64.
-overrideEnvVar PARENT_IMAGE_TAG "focal-1.0.0alpha1-amd64";
+# overrideEnvVar PARENT_IMAGE_TAG "focal-1.0.0alpha1-amd64";
 # env: GRADLE_VERSION: The Gradle version. Defaults to 6.5.
-defineEnvVar GRADLE_VERSION MANDATORY "The Gradle version" '6.8.2';
+defineEnvVar GRADLE_VERSION MANDATORY "The Gradle version" '7.4.1';
 # env: PHARO_VERSION: The Pharo version. Defaults to 8.0.
-defineEnvVar PHARO_VERSION MANDATORY "The Pharo version" "8.0";
+defineEnvVar PHARO_VERSION MANDATORY "The Pharo version" "9.0";
 overrideEnvVar TAG '${GRADLE_VERSION}-${PHARO_VERSION}';
 overrideEnvVar ENABLE_LOGSTASH 'false';
 # env: SERVICE_USER: The service use. Defaults to pharo.

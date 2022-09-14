@@ -1,11 +1,12 @@
 @include("preamble")
-FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
 @include("gui")
 @include("service_user")
 @include("java")
+@include("gui")
 @include("studio3t")
 @include("runme")
 

@@ -1,30 +1,57 @@
-#!/bin/bash
+#!/usr/bin/env dry-wit
+# mod: nexus
+# api: public
+# txt: Launches Nexus.
 
-set -a
-NEXUS_HOME=/opt/sonatype/nexus
-SONATYPE_WORK=/sonatype-work
-KARAF_DATA=${SONATYPE_WORK}
-SONATYPE_USER="${SERVICE_USER}"
+export DW_DISABLE_ANSI_COLORS=TRUE
+export NO_COLOR=true
+export USECOLOR=no
+export NEXUS_HOME=/opt/sonatype/nexus
+export SONATYPE_WORK=/sonatype-work
+export KARAF_DATA=${SONATYPE_WORK}
+export SONATYPE_USER="${SERVICE_USER}"
 
-chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SONATYPE_WORK}
+# fun: main
+# api: public
+# txt: Launches Nexus.
+# txt: Returns the output of running the Nexus process.
+# use: main;
+function main() {
 
-sed -i "s/^-Xms(.*)$/-Xms${NEXUS_MIN_MEMORY:-${SQ_NEXUS_MIN_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
-sed -i "s/^-Xmx(.*)$/-Xms${NEXUS_MAX_MEMORY:-${SQ_NEXUS_MAX_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
-sed -i "s/^#run_as_user=(.*)/run_as_user=${SONATYPE_USER}/g" ${NEXUS_HOME}/bin/nexus.rc
+    logInfo -n "Changing ownership of ${SONATYPE_WORK}"
+    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SONATYPE_WORK} >/dev/null
+    if isTrue $?; then
+        logInfoResult SUCCESS "done"
+    else
+        logInfoResult FAILURE "failed"
+    fi
 
-_folder=${NEXUS_HOME}
-_exports="$(export)";
+    logInfo -n "Tuning memory settings in ${NEXUS_HOME}/bin/nexus.vmoptions"
+    sed -i "s/^-Xms(.*)$/-Xms${NEXUS_MIN_MEMORY:-${SQ_NEXUS_MIN_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
+    if isTrue $?; then
+        sed -i "s/^-Xmx(.*)$/-Xmx${NEXUS_MAX_MEMORY:-${SQ_NEXUS_MAX_MEMORY}}/g" ${NEXUS_HOME}/bin/nexus.vmoptions
+        if isTrue $?; then
+            logInfoResult SUCCESS "done"
+        else
+            logInfoResult FAILURE "failed"
+        fi
+    else
+        logInfoResult FAILURE "failed"
+    fi
 
-cat << EOF > /tmp/runme
-#!/bin/bash
+    logInfo -n "Changing effective user to ${SONATYPE_USER} in ${NEXUS_HOME}/bin/nexus.rc"
+    sed -i "s/^#run_as_user=(.*)/run_as_user=${SONATYPE_USER}/g" ${NEXUS_HOME}/bin/nexus.rc
+    if isTrue $?; then
+        logInfoResult SUCCESS "done"
+    else
+        logInfoResult FAILURE "failed"
+    fi
 
-${_exports}
-declare -x HOME="/home/${SERVICE_USER}"
-cd ${_folder}
-bin/nexus run
-EOF
-chmod +x /tmp/runme
+    logInfo "Launching Nexus"
+    NEXUS_HOME=${NEXUS_HOME} SONATYPE_WORK=${SONATYPE_WORK} KARAF_DATA=${KARAF_DATA} SONATYPE_USER=${SONATYPE_USER} /usr/local/sbin/run-as.sh -vv -U ${SERVICE_USER} -G ${SERVICE_GROUP} ${NEXUS_HOME} bin/nexus run
+    logInfo "Nexus stopped"
+}
 
-chpst -u ${SERVICE_USER}:${SERVICE_GROUP} -U ${SERVICE_USER}:${SERVICE_GROUP} /tmp/runme
-
-# vim: syntax=sh ts=4 sw=4 sts=4 sr noet
+# script metadata
+setScriptDescription "Launches Nexus."
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

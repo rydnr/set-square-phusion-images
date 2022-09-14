@@ -1,10 +1,20 @@
 # v rabbitmq
-RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc | sudo apt-key add - \
- && echo "deb https://packages.erlang-solutions.com/ubuntu bionic contrib" | sudo tee /etc/apt/sources.list.d/rabbitmq.list \
- && curl -fsSL https://github.com/rabbitmq/signing-keys/releases/download/2.0/rabbitmq-release-signing-key.asc | sudo apt-key add - \
- && echo "deb https://dl.bintray.com/rabbitmq-erlang/debian bionic erlang" > /etc/apt/sources.list.d/bintray.rabbitmq.list \
- && echo "deb https://dl.bintray.com/rabbitmq/debian bionic main" >> /etc/apt/sources.list.d/bintray.rabbitmq.list \
- && ${PKG_INSTALL} rabbitmq-server socat logrotate jq rsync \
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} socat logrotate jq rsync \
+ && curl -1sLf "https://keys.openpgp.org/vks/v1/by-fingerprint/0A9AF2115F4687BD29803A206B73A36E6026DFCA" | sudo gpg --dearmor | sudo tee /usr/share/keyrings/com.rabbitmq.team.gpg > /dev/null \
+ && curl -1sLf "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xf77f1eda57ebb1cc" | sudo gpg --dearmor | sudo tee /usr/share/keyrings/net.launchpad.ppa.rabbitmq.erlang.gpg > /dev/null \
+ && curl -1sLf "https://packagecloud.io/rabbitmq/rabbitmq-server/gpgkey" | sudo gpg --dearmor | sudo tee /usr/share/keyrings/io.packagecloud.rabbitmq.gpg > /dev/null \
+ && wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc | sudo apt-key add - \
+ && echo "deb [signed-by=/usr/share/keyrings/net.launchpad.ppa.rabbitmq.erlang.gpg] http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu focal main" >> /etc/apt/sources.list.d/rabbitmq.list \
+ && echo "deb-src [signed-by=/usr/share/keyrings/net.launchpad.ppa.rabbitmq.erlang.gpg] http://ppa.launchpad.net/rabbitmq/rabbitmq-erlang/ubuntu focal main" >> /etc/apt/sources.list.d/rabbitmq.list \
+ && echo "deb [signed-by=/usr/share/keyrings/io.packagecloud.rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ focal main" >> /etc/apt/sources.list.d/rabbitmq.list \
+ && echo "deb-src [signed-by=/usr/share/keyrings/io.packagecloud.rabbitmq.gpg] https://packagecloud.io/rabbitmq/rabbitmq-server/ubuntu/ focal main" >> /etc/apt/sources.list.d/rabbitmq.list
+RUN ${PKG_INSTALL} erlang-base \
+                   erlang-asn1 erlang-crypto erlang-eldap erlang-ftp erlang-inets \
+                   erlang-mnesia erlang-os-mon erlang-parsetools erlang-public-key \
+                   erlang-runtime-tools erlang-snmp erlang-ssl \
+                   erlang-syntax-tools erlang-tftp erlang-tools erlang-xmerl \
+                   rabbitmq-server \
  && ${SYSTEM_CLEANUP} \
  && rabbitmq-plugins enable --offline rabbitmq_management \
  && for p in ${RABBITMQ_PLUGINS}; do \
@@ -31,7 +41,7 @@ RUN wget -O- https://packages.erlang-solutions.com/ubuntu/erlang_solutions.asc |
 
 COPY rabbitmq-files/check_admin_password.sh /etc/my_init.d/00_check_admin_password.sh
 COPY rabbitmq-files/check_monitoring_password.sh /etc/my_init.d/00_check_monitoring_password.sh
-COPY rabbitmq-files/check_rabbitmq_nodename_prefix.sh /etc/my_init.d/00_check_rabbitmq_nodename_prefix.sh
+#COPY rabbitmq-files/check_rabbitmq_nodename_prefix.sh /etc/my_init.d/00_check_rabbitmq_nodename_prefix.sh
 COPY rabbitmq-files/bootstrap.sh /usr/local/bin/${IMAGE}-bootstrap.sh
 COPY rabbitmq-files/create_bootstrap_cron.sh /etc/my_init.d/56_create_bootstrap_cron.sh
 COPY rabbitmq-files/rabbitmq.config /etc/rabbitmq/

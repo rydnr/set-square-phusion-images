@@ -117,10 +117,10 @@ defineEnvVar DEVELOPMENT_USER_ID MANDATORY "The user id used when developing cod
 defineEnvVar BACKUP_HOST MANDATORY "The name of the backup host" "backup.${DOMAIN}"
 defineEnvVar DOCKER_TAG_OPTS OPTIONAL "Custom options when tagging images"
 defineEnvVar DOCKER_BUILD_OPTS OPTIONAL "Custom options when building images"
-defineEnvVar SERVICE_USER OPTIONAL "The service user" '${NAMESPACE}'
-defineEnvVar SERVICE_GROUP OPTIONAL "The service group" "users"
-defineEnvVar SERVICE_USER_HOME OPTIONAL "The home of the service user" '/home/${SERVICE_USER}'
-defineEnvVar SERVICE_USER_SHELL OPTIONAL "The shell of the service user" "/bin/bash"
+#defineEnvVar SERVICE_USER OPTIONAL "The service user" '${NAMESPACE}'
+#defineEnvVar SERVICE_GROUP OPTIONAL "The service group" "users"
+#defineEnvVar SERVICE_USER_HOME OPTIONAL "The home of the service user" '/home/${SERVICE_USER}'
+#defineEnvVar SERVICE_USER_SHELL OPTIONAL "The shell of the service user" "/bin/bash"
 defineEnvVar DEFAULT_LOCALE MANDATORY "The default locale" "en_US"
 defineEnvVar DEFAULT_ENCODING MANDATORY "The default encoding" "UTF-8"
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -1,5 +1,5 @@
 @include("preamble")
-FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
 
 @include("addon-toggles")
@@ -7,7 +7,9 @@ FROM ${NAMESPACE}/base:${PARENT_IMAGE_TAG}
 ENV DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
     VIRTUAL_HOST="${NEXUS_DEFAULT_VIRTUAL_HOST}" \
-    VIRTUAL_PORT="${NEXUS_UI_HTTP_PORT}"
+    VIRTUAL_PORT="${NEXUS_UI_HTTP_PORT}" \
+    SSL_KEY_FOLDER="${SSL_KEY_FOLDER}" \
+    SSL_KEYSTORE_NAME="${SSL_KEYSTORE_NAME}"
 
 @include("service_user")
 
@@ -20,27 +22,28 @@ ENV DOBACKUP="true" \
 
 COPY INSTALL.tmpl /usr/local/share/INSTALL.tmpl
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-COPY 50_update_nexus_ssl_config.sh 50_update_nexus_ssl_config.inc.sh \
-     51_copy_nexus_data.sh \
-     /etc/my_init.d/
+COPY 51_update_nexus_ssl_config.sh 51_update_nexus_ssl_config.inc.sh \
+    52_copy_nexus_data.sh \
+    /etc/my_init.d/
 
-RUN chmod +x /etc/service/${IMAGE}/run && \
-    cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} && \
-    cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} && \
-    mkdir -p /opt/sonatype/sonatype-work/nexus3 && mv /tmp/nexus-* /opt/sonatype/nexus && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype ${NEXUS_WORK_FOLDER} && \
-    rm -rf /tmp/nexus-${NEXUS_VERSION} /var/tmp/${NEXUS_ARTIFACT} && \
-    mkdir -p /backup/${IMAGE}/conf /backup/${IMAGE}/blobs ${NEXUS_WORK_FOLDER} && \
-    ln -s /backup/${IMAGE}/conf ${NEXUS_WORK_FOLDER}/etc && \
-    ln -s /backup/${IMAGE}/blobs ${NEXUS_WORK_FOLDER}/blobs && \
-    sed -i "s/^-Xms.*/-Xms${NEXUS_MIN_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions && \
-    sed -i "s/^-Xmx.*/-Xmx${NEXUS_MAX_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions && \
-    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    /usr/local/bin/create_ssl_certificate_keytool.sh && \
-    chmod +x /etc/my_init.d/50_update_nexus_ssl_config.sh && \
-    mkdir -p /opt/sonatype/nexus/etc/ssl && \
-    ln -s /opt/sonatype/sonatype-work /sonatype-work && \
-    ln -s /etc/ssl/private/${IMAGE}.jks /opt/sonatype/nexus/etc/ssl/keystore.jks
+RUN chmod +x /etc/service/${IMAGE}/run \
+    && rm -rf /etc/service/${IMAGE}/log \
+    && cd /var/tmp && wget ${NEXUS_DOWNLOAD_URL} \
+    && cd /tmp && tar xvfz /var/tmp/${NEXUS_ARTIFACT} \
+    && mkdir -p /opt/sonatype/sonatype-work/nexus3 && mv /tmp/nexus-* /opt/sonatype/nexus \
+    && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype ${NEXUS_WORK_FOLDER} \
+    && rm -rf /tmp/nexus-${NEXUS_VERSION} /var/tmp/${NEXUS_ARTIFACT} \
+    && mkdir -p /backup/${IMAGE}/conf /backup/${IMAGE}/blobs ${NEXUS_WORK_FOLDER} \
+    && cp -r /opt/sonatype/nexus/etc /opt/sonatype/nexus/etc.orig \
+    && sed -i "s/^-Xms.*/-Xms${NEXUS_MIN_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions \
+    && sed -i "s/^-Xmx.*/-Xmx${NEXUS_MAX_MEMORY}/g" /opt/sonatype/nexus/bin/nexus.vmoptions \
+    && /etc/my_init.d/00_regen_ssh_host_keys.sh -f \
+    && /usr/local/bin/create_ssl_certificate_keytool.sh \
+    && chmod +x /etc/my_init.d/51_update_nexus_ssl_config.sh /etc/my_init.d/52_copy_nexus_data.sh \
+    && mkdir -p /opt/sonatype/nexus/etc/ssl \
+    && ln -s /opt/sonatype/sonatype-work /sonatype-work \
+    && ln -s /etc/ssl/private/${IMAGE}.jks /opt/sonatype/nexus/etc/ssl/keystore.jks \
+    && ln -s /opt/sonatype/sonatype-work/nexus3/log /var/log/nexus
 
 VOLUME /backup/${IMAGE}/conf /backup/${IMAGE}/blobs /backup/${IMAGE}/db /backup/rsnapshot
 

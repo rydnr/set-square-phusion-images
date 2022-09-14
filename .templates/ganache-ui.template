@@ -1,0 +1,16 @@
+# v ganache-ui
+RUN mkdir -p /opt/ \
+    && cd /opt/ \
+    && wget -O ${GANACHEUI_ARTIFACT} ${GANACHEUI_DOWNLOAD_URL} \
+    && chmod +x ${GANACHEUI_ARTIFACT} \
+    && ./${GANACHEUI_ARTIFACT} --appimage-extract \
+    && rm -f ${GANACHEUI_ARTIFACT} \
+    && mv squashfs-root ganache-ui-${GANACHEUI_VERSION} \
+    && ln -s ganache-ui-${GANACHEUI_VERSION} ganache-ui \
+    && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/ganache-ui /opt/ganache-ui-${GANACHEUI_VERSION} \
+    && chown root /opt/ganache/chrome-sandbox \
+    && chmod 4755 /opt/ganache/chrome-sandbox
+RUN ${SYSTEM_UPDATE} \
+    && ${PKG_INSTALL} libx11-xcb-dev libxcomposite-dev libxdamage-dev libxi-dev libxtst-dev libnss3 libgdk-pixbuf2.0-dev libgtk-3-dev libxss-dev libasound2-dev \
+    && ${SYSTEM_CLEANUP}
+# ^ ganache-ui

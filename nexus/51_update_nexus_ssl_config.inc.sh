@@ -3,17 +3,17 @@ defineEnvVar PASSWORD_JAR_FILE MANDATORY 'The location of the Jetty jar with the
 defineEnvVar SSL_KEYSTORE_PASSWORD MANDATORY "The keystore password" "${SQ_SSL_KEYSTORE_PASSWORD}";
 defineEnvVar SSL_KEY_PASSWORD MANDATORY "The key password" "${SQ_SSL_KEY_PASSWORD}";
 defineEnvVar SSL_KEYSTORE_PATH MANDATORY "The keystore path" "${SQ_SSL_KEY_FOLDER}/${SQ_SSL_KEYSTORE_NAME}.jks";
-#defineEnvVar NEXUS_CONFIG_FILE MANDATORY "The Nexus config file" "/opt/sonatype/nexus/etc/org.sonatype.nexus.cfg";
-defineEnvVar NEXUS_CONFIG_FILE MANDATORY "The Nexus config file" "/opt/sonatype/sonatype-work/nexus3/etc/nexus.properties";
+defineEnvVar NEXUS_CONFIG_FILE MANDATORY "The Nexus config file" "/opt/sonatype/nexus/etc/org.sonatype.nexus.cfg";
+#defineEnvVar NEXUS_CONFIG_FILE MANDATORY "The Nexus config file" "/opt/sonatype/sonatype-work/nexus3/etc/nexus.properties";
 defineEnvVar NEXUS_DEFAULT_CONFIG_FILE MANDATORY "The Nexus config file" "/opt/sonatype/nexus/etc/nexus-default.properties";
 defineEnvVar NEXUS_PROPERTIES_FILE MANDATORY "The Nexus properties file" "/opt/sonatype/nexus/etc/custom.properties";
-defineEnvVar NEXUS_UI_HTTPS_PORT MANDATORY "The HTTPS port for the Nexus UI" "${NEXUS_UI_HTTPS_PORT}";
-defineEnvVar NEXUS_DOCKER_REGISTRY_PORT MANDATORY "The HTTPS port for the Docker registry" "${NEXUS_DOCKER_REGISTRY_PORT}";
-defineEnvVar NEXUS_DOCKER_GROUP_PORT MANDATORY "The HTTPS port for the Docker group" "${NEXUS_DOCKER_GROUP_PORT}";
+defineEnvVar NEXUS_UI_HTTPS_PORT MANDATORY "The HTTPS port for the Nexus UI" "8083";
+defineEnvVar NEXUS_DOCKER_REGISTRY_PORT MANDATORY "The HTTPS port for the Docker registry" "18443";
+defineEnvVar NEXUS_DOCKER_GROUP_PORT MANDATORY "The HTTPS port for the Docker group" "18444";
 defineEnvVar JETTY_HTTPS_CONFIG_FILE MANDATORY "The Jetty HTTPS configuration file" "/opt/sonatype/nexus/etc/jetty/jetty-https.xml";
 defineEnvVar SSL_KEYSTORE_PATH MANDATORY "The keystore path" "${SQ_SSL_KEYSTORE_PATH}";
 defineEnvVar ADDITIONAL_SETTINGS_PATH MANDATORY "The location of the file with additional settings" "/usr/local/bin/create_ssl_certificate.inc.sh";
 defineEnvVar NEXUS_SYSTEM_PROPERTIES_FILE MANDATORY "The nexus.properties file for Nexus" "/opt/sonatype/nexus/etc/nexus.properties";
-defineEnvVar NEXUS_LOG_CONFIG_DIR MANDATORY "The folder with logging configuration for Nexus" "/backup/nexus-conf/";
+defineEnvVar NEXUS_LOG_CONFIG_DIR MANDATORY "The folder with logging configuration for Nexus" "/backup/nexus/conf/";
 defineEnvVar NEXUS_WORK_DIR MANDATORY "The folder where Nexus stores runtime data" "/opt/sonatype/sonatype-work/nexus3/";
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

@@ -1,0 +1,3 @@
+defineEnvVar GANACHEUI_VERSION MANDATORY "The version of ganache-ui" "2.6.0-beta.3";
+defineEnvVar GANACHEUI_ARTIFACT MANDATORY "The ganache-ui artifact" "ganache-${GANACHEUI_VERSION}-linux-x86_64.AppImage";
+defineEnvVar GANACHEUI_DOWNLOAD_URL MANDATORY "The url to download ganache-ui" "https://github.com/trufflesuite/ganache-ui/releases/download/v${GANACHEUI_VERSION}/${GANACHEUI_ARTIFACT}";

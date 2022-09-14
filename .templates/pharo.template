@@ -12,7 +12,7 @@ RUN dpkg --add-architecture i386 \
  && wget -q https://files.pharo.org/sources/PharoV60.sources \
  && cd /opt/pharo${PHARO_MAJOR_VERSION} \
  && echo -n '' \
- && (curl get.pharo.org/64/vmT${PHARO_VERSION_ZEROCONF} | bash) \
+ && if [[ ${PHARO_VERSION_ZEROCONF} == 100 ]]; then (curl get.pharo.org/64/ | bash); else (curl get.pharo.org/64/vmT${PHARO_VERSION_ZEROCONF} | bash); fi \
  && cd /opt && ln -s pharo${PHARO_MAJOR_VERSION} pharo \
  && echo '*      hard    rtprio  2' >  /etc/security/limits.d/pharo.conf \
  && echo '*      soft    rtprio  2' >> /etc/security/limits.d/pharo.conf \

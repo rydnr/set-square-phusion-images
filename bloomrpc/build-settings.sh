@@ -1,4 +1,4 @@
-defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "0.11";
+defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "latest";
 defineEnvVar BLOOMRPC_VERSION MANDATORY "The BloomRPC version" '1.4.1';
 defineEnvVar TAG MANDATORY "The image tag" '${BLOOMRPC_VERSION}';
 defineEnvVar SERVICE_USER MANDATORY "The service user" 'bloomrpc';

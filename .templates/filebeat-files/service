@@ -1,9 +1,9 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-grep "elasticsearch" /etc/hosts > /dev/null 2>&1
-_elasticSearchEnabled=$?;
-grep "logstash" /etc/hosts > /dev/null 2>&1
-_logstashEnabled=$?;
+grep "elasticsearch" /etc/hosts >/dev/null 2>&1
+_elasticSearchEnabled=$?
+grep "logstash" /etc/hosts >/dev/null 2>&1
+_logstashEnabled=$?
 
 if [ ${_elasticSearchEnabled} -ne 0 ] && [ ${_logstashEnabled} -ne 0 ]; then
   rm -f /etc/service/filebeat/run
@@ -12,33 +12,33 @@ else
     curl -XPUT 'http://${ELASTICSEARCH_HOST}:${ELASTICSEARCH_PORT}/_template/filebeat' -d@/etc/filebeat/filebeat.template.json
   fi
 
-  _templateFolder="/usr/local/share/";
+  _templateFolder="/usr/local/share/"
 
   if [ ${_elasticSearchEnabled} -eq 0 ]; then
-    /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.elasticsearch.yml ${_templateFolder}/filebeat.elasticsearch.yml.tmpl;
+    /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.elasticsearch.yml ${_templateFolder}/filebeat.elasticsearch.yml.tmpl
   else
     touch /etc/filebeat/filebeat.elasticsearch.yml
   fi
 
   if [ ${_logstashEnabled} -eq 0 ]; then
-    /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.logstash.yml ${_templateFolder}/filebeat.logstash.yml.tmpl;
+    /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.logstash.yml ${_templateFolder}/filebeat.logstash.yml.tmpl
   else
     touch /etc/filebeat/filebeat.logstash.yml
   fi
 
-  _shipper=${SHIPPER_NAME};
+  _shipper=${SHIPPER_NAME}
   if [ -z "${_shipper}" ]; then
-    export SHIPPER_NAME="${SQ_IMAGE}";
+    export SHIPPER_NAME="${SQ_IMAGE}"
   fi
 
   for f in common shipper logging; do
-    /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.${f}.yml ${_templateFolder}/filebeat.${f}.yml.tmpl;
+    /usr/local/bin/process-file.sh -o /etc/filebeat/filebeat.${f}.yml ${_templateFolder}/filebeat.${f}.yml.tmpl
   done
 
   rm -f /etc/filebeat/filebeat.yml
 
   for f in elasticsearch logstash shipper logging; do
-    cat /etc/filebeat/filebeat.${f}.yml >> /etc/filebeat/filebeat.yml
+    cat /etc/filebeat/filebeat.${f}.yml >>/etc/filebeat/filebeat.yml
   done
 
   #exec chpst -u filebeat filebeat -c /etc/filebeat/filebeat.yml $@

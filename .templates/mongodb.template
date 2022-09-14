@@ -2,9 +2,9 @@
 COPY mongodb-files/mongodb-dump.sh \
      mongodb-files/mongodb-restore.sh \
      mongodb-files/mongodb-discard-old-dumps.sh \
-     mongodb-files/compress-mongodb-dumps.sh \
-     mongodb-files/encrypt-mongodb-dumps.sh \
      /usr/local/bin/
+#     mongodb-files/compress-mongodb-dumps.sh \
+#     mongodb-files/encrypt-mongodb-dumps.sh \
 
 #COPY mongodb-files/mongod.conf.replication /etc/mongod.conf.replication
 #COPY mongodb-files/create_bootstrap_cron_job.sh /etc/my_init.d/56_create_bootstrap_cron_job.sh
@@ -23,12 +23,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} -np gnupg \
  && ${PKG_INSTALL} -np dirmngr \
- && wget -qO - https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | sudo apt-key add - \
- && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/${MONGODB_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
- && ${PKG_INSTALL} numactl \
- && ${PKG_INSTALL} jq \
- && ${PKG_INSTALL} p7zip-full \
- && if ! command -v ps > /dev/null; then ${PKG_INSTALL} procps; fi \
+ && ${PKG_INSTALL} numactl jq p7zip-full \
+ && if ! command -v ps > /dev/null; then ${PKG_INSTALL} procps; fi
+RUN wget -qO - https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc | sudo apt-key add - \
+ && echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/${MONGODB_VERSION} multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-${MONGODB_VERSION}.list \
  && ${SYSTEM_UPDATE} \
  && if [ ! -e /usr/local/bin/systemctl ]; then REMOVE_SYSTEMCTL=0; ln -s /bin/true /usr/local/bin/systemctl; else REMOVE_SYSTEMCTL=1; fi \
  && (${PKG_INSTALL} mongodb-org-server=${MONGODB_FULL_VERSION} || dpkg --configure mongodb-org-server) \
@@ -37,7 +35,7 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && ${PKG_INSTALL} mongodb-org-mongos=${MONGODB_FULL_VERSION} \
  && ${PKG_INSTALL} mongodb-org-tools=${MONGODB_FULL_VERSION} \
  && ${SYSTEM_CLEANUP} \
- && chmod +x /usr/local/bin/mongodb-*.sh /usr/local/bin/compress-mongodb-dumps.sh /usr/local/bin/encrypt-mongodb-dumps.sh \
+ && chmod +x /usr/local/bin/mongodb-*.sh \
  && echo "mongodb-org hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-server hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-shell hold" | sudo dpkg --set-selections \
@@ -51,9 +49,10 @@ RUN export DEBIAN_FRONTEND=noninteractive \
  && ln -s /usr/local/bin/mongodb-dump.sh /etc/cron.hourly/mongodb-dump \
  && ln -s /usr/local/bin/mongodb-discard-old-dumps.sh /etc/cron.daily/mongodb-discard-old-dumps \
  && ln -s /usr/local/sbin/pending_scripts.sh /usr/local/sbin/pending_mongodb_scripts.sh \
- && if [[ ! -e /home/mongodb/.dry-wit ]]; then ln -s /usr/local/src/dry-wit /home/mongodb/.dry-wit; fi \
+ && if [[ ! -e ${SERVICE_USER_HOME}/.dry-wit ]]; then ln -s /usr/local/src/dry-wit ${SERVICE_USER_HOME}/.dry-wit; fi \
  && if [[ ${REMOVE_SYSTEMCTL} -eq 0 ]]; then rm -f /usr/local/systemctl; fi
 
+# chmod +x /usr/local/bin/mongodb-*.sh /usr/local/bin/compress-mongodb-dumps.sh /usr/local/bin/encrypt-mongodb-dumps.sh \
 #    sed -i "s|sslPEMKeyFile =\(.*\)$|sslPEMKeyFile=/etc/ssl/private/mongodb.pem|g" /etc/mongod.conf
 
 EXPOSE 27017 27018 27019 28017 28018 28019

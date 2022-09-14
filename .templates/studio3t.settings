@@ -1,4 +1,4 @@
-defineButDoNotOverrideEnvVar STUDIO3T_VERSION "The Studio3T version" '2018.5.1';
+defineButDoNotOverrideEnvVar STUDIO3T_VERSION "The Studio3T version" '2022.6.1';
 defineButDoNotOverrideEnvVar STUDIO3T_FOLDER "The Studio3T folder" 'studio-3t-linux-x64'
 defineButDoNotOverrideEnvVar STUDIO3T_ARTIFACT "The Studio3T artifact" '${STUDIO3T_FOLDER}.tar.gz';
 defineButDoNotOverrideEnvVar STUDIO3T_DOWNLOAD_URL "The url to download Studio3T" 'https://download.studio3t.com/studio-3t/linux/${STUDIO3T_VERSION}/${STUDIO3T_ARTIFACT}';
