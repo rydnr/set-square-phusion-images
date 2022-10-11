@@ -5,8 +5,8 @@ defineButDoNotOverrideEnvVar SSL_KEY_FOLDER "The folder storing the SSL key pair
 defineButDoNotOverrideEnvVar SSL_KEY_PASSWORD "The key password" '${RANDOM_PASSWORD}';
 defineButDoNotOverrideEnvVar SSL_KEYSTORE_FOLDER "The folder storing the SSL keystore" '${SSL_KEY_FOLDER}';
 defineButDoNotOverrideEnvVar SSL_KEYSTORE_NAME "The SSL keystore name" '${IMAGE}';
-defineButDoNotOverrideEnvVar SSL_KEYSTORE_TYPE "The type of the keystore" "jks";
-defineButDoNotOverrideEnvVar SSL_KEYSTORE_PATH "The SSL keystore path" '${SSL_KEYSTORE_FOLDER}/${IMAGE}.${SSL_KEYSTORE_TYPE}';
+defineButDoNotOverrideEnvVar SSL_KEYSTORE_TYPE "The type of the keystore" "jks"; # PKCS12";
+defineButDoNotOverrideEnvVar SSL_KEYSTORE_PATH "The SSL keystore path" '${SSL_KEYSTORE_FOLDER}/${IMAGE}.jks';
 defineButDoNotOverrideEnvVar SSL_KEYSTORE_PASSWORD "The keystore password" '${RANDOM_PASSWORD}';
 defineButDoNotOverrideEnvVar SSL_CERTIFICATE_ALIAS "The alias of the SSL certificate" '${IMAGE}';
 defineButDoNotOverrideEnvVar SSL_CERTIFICATE_COMMON_NAME "The common name for the SSL certificate" '${DOMAIN}';
@@ -16,9 +16,9 @@ defineButDoNotOverrideEnvVar SSL_CERTIFICATE_ORGANIZATION "The organization behi
 defineButDoNotOverrideEnvVar SSL_CERTIFICATE_LOCALITY "The locality information in the SSL certificate" "Madrid";
 defineButDoNotOverrideEnvVar SSL_CERTIFICATE_STATE "The state information in the SSL certificate" "Madrid";
 defineButDoNotOverrideEnvVar SSL_CERTIFICATE_COUNTRY "The country information in the SSL certificate" "ES";
-defineButDoNotOverrideEnvVar SSL_CERTIFICATE_SUBJECT "The subject of the SSL certificate" '';
-defineButDoNotOverrideEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" '';
+defineButDoNotOverrideEnvVar SSL_CERTIFICATE_SUBJECT "The subject of the SSL certificate" 'DNS:${SSL_CERTIFICATE_COMMON_NAME}';
+defineButDoNotOverrideEnvVar SSL_CERTIFICATE_DNAME "The DName of the SSL certificate" '${SSL_CERTIFICATE_COMMON_NAME}';
 defineButDoNotOverrideEnvVar SSL_CERTIFICATE_EXPIRATION_DAYS "The number of days until the certificate expires" "3650";
 defineButDoNotOverrideEnvVar SSL_JAVA_SIGN_ALGORITHM "The algorithm used to sign the SSL certificate" "SHA256withRSA";
-defineButDoNotOverrideEnvVar SSL_SAN_EXTENSIONS "The SAN extensions for the SSL certificate" 'dns:${SSL_CERTIFICATE_COMMON_NAME},dns:*.${SSL_CERTIFICATE_COMMON_NAME},dns:*.${_image}.${_domain},dns:*.${_domain}';
+defineButDoNotOverrideEnvVar SSL_SAN_EXTENSIONS "The SAN extensions for the SSL certificate" 'DNS:${SSL_CERTIFICATE_COMMON_NAME}';
 # vim: syntax=sh ts=2 sw=2 sts=4 sr noet

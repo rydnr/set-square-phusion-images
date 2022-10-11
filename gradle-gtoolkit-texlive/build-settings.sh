@@ -9,13 +9,15 @@
 # overrideEnvVar TAG '${GRADLE_VERSION}-${PHARO_VERSION}-${GTOOLKIT_VERSION}'
 overrideEnvVar ENABLE_LOGSTASH 'false'
 # env: SERVICE_USER: The service use. Defaults to pharo.
-overrideEnvVar SERVICE_USER "pharo"
+defineEnvVar SERVICE_USER MANDATORY "The service user" "pharo"
 # env: SERVICE_USER_PASSWORD: The service user password. Defaults to ${RANDOM_PASSWORD}.
-defineEnvVar SERVICE_USER_PASSWORD MANDATORY "The service user password" '${RANDOM_PASSWORD}'
+defineEnvVar SERVICE_USER_PASSWORD MANDATORY "The service user's password" '${RANDOM_PASSWORD}'
 # env: SERVICE_GROUP: The service group. Defaults to pharo.
-overrideEnvVar SERVICE_GROUP "pharo"
+defineEnvVar SERVICE_GROUP MANDATORY "The service group" "pharo"
 # env: SERVICE_USER_HOME: The home of the service user. Defaults to /home/pharo.
-overrideEnvVar SERVICE_USER_HOME "/home/pharo"
+defineEnvVar SERVICE_USER_HOME MANDATORY "The service user's home" "/home/pharo"
+# env: SERVICE_USER_SHELL: The shell of the service user. Defaults to /bin/bash.
+defineEnvVar SERVICE_USER_SHELL MANDATORY "The service user's shell" "/bin/bash"
 # edv: WORKSPACE: The workspace folder. Defaults to ${SERVICE_USER_HOME}/work.
 defineEnvVar WORKSPACE MANDATORY "The workspace folder" '${SERVICE_USER_HOME}/work'
 # env: GIT_USER_NAME: The user.name for git. Defaults to ${SERVICE_USER}.

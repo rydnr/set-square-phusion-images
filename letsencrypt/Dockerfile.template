@@ -6,21 +6,19 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 COPY service /sbin/my_exec
 
-RUN cd /tmp && \
-    wget https://dl.eff.org/certbot-auto -O /usr/sbin/certbot-auto && \
-    chmod a+x /usr/sbin/certbot-auto && \
-    ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} python-dev python3-dev libxml2-dev python-setuptools gcc git libssl-dev libffi-dev python-pip && \
-    ${SYSTEM_CLEANUP} && \
-    pip install --upgrade pip && \
-    pip install acme && \
-    certbot-auto -n --os-packages-only && \
-    git clone https://github.com/EnigmaBridge/certbot-external-auth.git && \
-    cd certbot-external-auth && \
-    git checkout ${CERTBOT_EXTERNAL_AUTH_PLUGIN_TAG} && \
-    python setup.py install && \
-    chmod +x /sbin/my_exec && \
-    /sbin/my_exec example.com me@gmail.com || echo "It's ok"
+RUN cd /tmp \
+    && ${SYSTEM_UPDATE} \
+    && ${PKG_INSTALL} certbot python-dev python3-dev libxml2-dev python-setuptools gcc git libssl-dev libffi-dev python3-pip \
+    && ${SYSTEM_CLEANUP} \
+    && pip install --upgrade pip \
+    && pip install acme \
+    && certbot-auto -n --os-packages-only \
+    && git clone https://github.com/EnigmaBridge/certbot-external-auth.git \
+    && cd certbot-external-auth \
+    && git checkout ${CERTBOT_EXTERNAL_AUTH_PLUGIN_TAG} \
+    && python setup.py install \
+    && chmod +x /sbin/my_exec \
+    && /sbin/my_exec example.com me@gmail.com || echo "It's ok"
 
 VOLUME /etc/letsencrypt/archive
 

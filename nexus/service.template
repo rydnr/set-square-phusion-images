@@ -6,8 +6,8 @@
 export DW_DISABLE_ANSI_COLORS=TRUE
 export NO_COLOR=true
 export USECOLOR=no
-export NEXUS_HOME=/opt/sonatype/nexus
-export SONATYPE_WORK=/sonatype-work
+export NEXUS_HOME=/opt/sonatype/${IMAGE}
+export SONATYPE_WORK=/opt/sonatype/sonatype-work
 export KARAF_DATA=${SONATYPE_WORK}
 export SONATYPE_USER="${SERVICE_USER}"
 

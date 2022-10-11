@@ -1,0 +1,29 @@
+#!/usr/bin/env dry-wit
+# Copyright 2015-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+# mod: nexus/51_copy_nexus_data
+# api: public
+# txt: Copies Nexus data to the correct location.
+
+# fun: main
+# api: public
+# txt: Copies Nexus data to the correct location.
+# txt: Returns 0/TRUE always.
+# use: main
+function main() {
+  [[ -f /opt/sonatype/sonatype-work ]] && rsync -avz /opt/sonatype/sonatype-work/ /backup/${IMAGE}/work/
+  rm -rf /opt/sonatype/${IMAGE}/etc /opt/sonatype/sonatype-work > /dev/null 2>&1
+  ln -sf /backup/${IMAGE}/conf /opt/sonatype/${IMAGE}/etc > /dev/null 2>&1
+  ln -sf /backup/${IMAGE}/work /opt/sonatype/sonatype-work > /dev/null 2>&1
+  mkdir -p /backup/${IMAGE}/work/nexus3 > /dev/null 2>&1
+  [[ -d /backup/${IMAGE}/work/nexus3/etc ]] && mv /backup/${IMAGE}/work/nexus3/etc /backup/${IMAGE}/work/nexus3/etc.orig > /dev/null 2>&1
+  ln -sf /backup/${IMAGE}/conf /backup/${IMAGE}/work/nexus3/etc > /dev/null 2>&1
+  rsync -avz /opt/sonatype/nexus/etc.orig/ /backup/${IMAGE}/conf/ > /dev/null 2>&1
+  /etc/my_init.d/00_chown_volumes.sh
+  chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/sonatype > /dev/null 2>&1
+}
+
+## Script metadata and CLI options
+
+setScriptDescription "Copies Nexus data to the correct location.";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

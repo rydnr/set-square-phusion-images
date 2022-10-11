@@ -135,11 +135,13 @@ mysql/my.cnf
 mysql/service
 mysql/setup.sql
 **/neo4j-files
-nexus/50_update_nexus_ssl_config.inc.sh
+nexus/50_copy_nexus_data.sh
+nexus/51_update_nexus_ssl_config.inc.sh
 nexus/default
 nexus/INSTALL
 nexus/INSTALL.tmpl
 nexus/java-files
+nexus/service
 nexus/ssl
 */nginx-files
 nodejs/my_exec
@@ -240,6 +242,7 @@ tacotron/service
 .templates/firefox
 .templates/firefox52
 .templates/ganache
+.templates/ganache-ui
 .templates/git
 .templates/go
 .templates/gosu
