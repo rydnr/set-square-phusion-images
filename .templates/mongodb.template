@@ -33,6 +33,7 @@ RUN wget -qO - https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc 
  && ${PKG_INSTALL} mongodb-org-shell=${MONGODB_FULL_VERSION} \
  && ${PKG_INSTALL} mongodb-org-mongos=${MONGODB_FULL_VERSION} \
  && ${PKG_INSTALL} mongodb-org-tools=${MONGODB_FULL_VERSION} \
+ && ${PKG_INSTALL} mongodb-mongosh \
  && ${SYSTEM_CLEANUP} \
  && chmod +x /usr/local/bin/mongodb-*.sh \
  && echo "mongodb-org hold" | sudo dpkg --set-selections \
@@ -40,6 +41,7 @@ RUN wget -qO - https://www.mongodb.org/static/pgp/server-${MONGODB_VERSION}.asc 
  && echo "mongodb-org-shell hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-mongos hold" | sudo dpkg --set-selections \
  && echo "mongodb-org-tools hold" | sudo dpkg --set-selections \
+ && echo "mongodb-mongosh hold" | sudo dpkg --set-selections \
  && cp /etc/mongod.conf /etc/mongod.conf.distrib \
  && sed -i "s|^#\?\(\s*\)dbPath\(\s*\):\(\s*\).*$|\1dbPath\2:\3/backup/mongodb/db|g" /etc/mongod.conf \
  && sed -i "s|^#\?\(\s*\)dbpath\(\s*\)=\(\s*\).*$|\1dbpath\2=\3/backup/mongodb/db|g" /etc/mongod.conf \
