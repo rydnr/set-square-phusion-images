@@ -1,5 +1,5 @@
 # env: GTOOLKIT_VERSION: The version of GToolkit.
-defineEnvVar GTOOLKIT_VERSION MANDATORY "The version of GToolkit" '0.8.2066';
+defineEnvVar GTOOLKIT_VERSION MANDATORY "The version of GToolkit" '0.8.2317';
 # env: GTOOLKIT_FOLDER: The name of the folder where GToolkit is extracted.
 defineEnvVar GTOOLKIT_FOLDER MANDATORY "The GToolkit folder" "GlamorousToolkit-Linux-x86_64-v${GTOOLKIT_VERSION}";
 # env: GTOOLKIT_ARTIFACT: The GToolkit artifact.

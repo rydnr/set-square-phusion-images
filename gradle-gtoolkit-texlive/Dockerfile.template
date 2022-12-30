@@ -1,9 +1,18 @@
 @include("preamble")
-FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
+FROM ubuntu:latest
 @include("maintainer")
 
+# Basic stuff. Sets sh to bash, required by addon-toggles
+@include("common")
+@include("dry-wit")
 @include("addon-toggles")
-
+@include("install")
+@include("volumes")
+@include("help")
+@include("locale")
+@include("backup")
+@include("check-version")
+@include("gui")
 @include("service_user")
 
 @include("openjdk")

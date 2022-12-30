@@ -17,9 +17,13 @@ RUN chmod +x /etc/my_exec.d/gtoolkit \
  && cd ${SERVICE_USER_HOME} \
  && mv tmp/* . \
  && rm -rf ${GTOOLKIT_ARTIFACT} tmp \
- && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME}
-
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} \
+ && curl https://dl.feenk.com/scripts/linux.sh | bash
+ && cd ${SERVICE_USER_HOME} \
+ && ln -s libssl.so libssl.so.1.1 \
+ && ln -s libcrypto.so libcrypto.so.1.1
 # && /opt/pharo/pharo ${SERVICE_USER_HOME}/GlamorousToolkit.image eval --save "Metacello new baseline: 'GToolkit'; repository: 'github://feenkcom/gtoolkit:v${GTOOLKIT_VERSION}/src'; load" \
 # && mv pharo-local ${SERVICE_USER_HOME} \
 
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${SERVICE_USER_HOME}/lib
 # ^ gtoolkit
