@@ -1,9 +1,9 @@
 # v gradle
 COPY gradle-files/run-gradle /usr/local/bin/sq-gradle-wrapper.sh
 USER ${SERVICE_USER}
-RUN rm -f ${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash/sdk && touch ${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash/sdk
-# RUN cat ${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash/sdk || echo "${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash/sdk does not exist"
-RUN cd ${SERVICE_USER_HOME} \
+RUN mkdir -p ${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash \
+ && (if [[ -e ${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash/sdk ]]; then rm -f ${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash/sdk && touch ${SERVICE_USER_HOME}/.sdkman/contrib/completion/bash/sdk; fi) \
+ && cd ${SERVICE_USER_HOME} \
  && source ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh \
  && sdk selfupdate force \
  && sdk install gradle ${GRADLE_VERSION} \
