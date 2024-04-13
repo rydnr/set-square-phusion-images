@@ -1,0 +1,10 @@
+@include("preamble")
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("maintainer")
+@include("addon-toggles")
+
+COPY service /sbin/my_exec
+
+@include("copy-metadata")
+@include("symlinks")
+@include("instructions")

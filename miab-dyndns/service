@@ -1,0 +1,60 @@
+#!/usr/bin/env dry-wit
+# Copyright 2024-today Automated Computing Machinery S.L.
+# Distributed under the terms of the GNU General Public License v3
+
+DW.import dyndns
+DW.import miab
+
+# fun: main
+# api: public
+# txt: Updates the IP of a certain entry managed by a mail-in-a-box server, with the current public IP of the machine running this script.
+# use: main;
+function main() {
+  local -i _rescode
+  local _error
+  local _ip
+  logInfo -n "Retrieving the public IP"
+  checkIp
+  _rescode=$?
+  _ip="${RESULT}"
+
+  if isTrue ${_rescode}; then
+    logInfoResult SUCCESS "${_ip}"
+    logInfo -n "Updating the IP of ${DOMAIN} to ${_ip}"
+    updateDnsEntry "${MIAB_SERVER}" "${MIAB_USER}" "${MIAB_PASSWORD}" "${DOMAIN}" "${_ip}"
+    _rescode=$?
+    if isTrue ${_rescode}; then
+      logInfoResult SUCCESS "done"
+    else
+      _error="${ERROR}"
+      logInfoResult FAILURE "failed"
+      logError "Could not update the IP of ${DOMAIN} to ${_ip}"
+      if isNotEmpty "${_error}"; then
+        logDebug "${_error}"
+      fi
+      exitWithErrorCode CANNOT_UPDATE_THE_IP_IN_MIAB
+    fi
+  else
+    _error="${ERROR}"
+    logInfoResult FAILURE "failed"
+    logError "Could not retrieve the public IP"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
+    exitWithErrorCode CANNOT_RETRIEVE_THE_PUBLIC_IP
+  fi
+}
+
+## Script metadata and CLI settings.
+setScriptDescription "Updates the IP of a certain entry managed by a mail-in-a-box server"
+setScriptLicenseSummary "Distributed under the terms of the GNU General Public License v3"
+setScriptCopyright "Copyleft 2024-today Automated Computing Machinery S.L."
+
+addCommandLineFlag "miabServer" "s" "The mail-in-a-box server" MANDATORY EXPECTS_ARGUMENT;
+addCommandLineFlag "miabUser" "u" "The username in the mail-in-a-box server" MANDATORY EXPECTS_ARGUMENT;
+addCommandLineFlag "miabPassword" "p" "The password to log in as the provided username in the mail-in-a-box server" MANDATORY EXPECTS_ARGUMENT;
+addCommandLineFlag "domain" "d" "The domain to with dynamic IP" MANDATORY EXPECTS_ARGUMENT;
+
+addError CANNOT_RETRIEVE_THE_PUBLIC_IP "Cannot retrieve the public IP"
+addError CANNOT_UPDATE_THE_IP_IN_MIAB "Cannot update the IP in the mail-in-a-box server"
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

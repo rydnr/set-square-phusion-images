@@ -1,0 +1,9 @@
+* Mail-in-a-box dynamic DNS update
+
+This image updates the DNS entry of a domain hosted by mail-in-a-box, with the current public IP.
+
+* Example:
+
+- Update the DNS entry of acme.example.com:
+
+  docker run -it ${NAMESPACE}/${IMAGE}:${TAG} -v --miabServer example.com --miabUser me@example.com --miabPassword "S3cr3t!" --domain acme.example.com
