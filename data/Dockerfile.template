@@ -1,35 +1,5 @@
 @include("preamble")
-FROM ${ROOT_IMAGE}
+FROM	${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("maintainer")
-
-ENV DEBIAN_FRONTEND noninteractive
-
-@include("common")
-
-COPY display-dockerfile.sh /usr/local/bin/Dockerfile
-COPY display-file.sh /usr/local/bin/show
-COPY display-help.sh /usr/local/bin/help
-
-@include("addon-toggles")
-
-RUN chmod +x /usr/local/bin/show \
- && mkdir /Dockerfiles \
- && cd /bin && rm -f /bin/sh && ln -s /bin/bash sh \
- && chmod +x -- /usr/local/bin/help /usr/local/bin/Dockerfile /usr/local/bin/show \
- && ln -s -- /usr/local/bin/help /usr/local/bin/-h \
- && ln -s -- /usr/local/bin/help /usr/local/bin/--help \
- && ln -s -- /usr/local/bin/Dockerfile /usr/local/bin/dockerfile
-
 @include("copy-metadata")
 @include("instructions")
-#
-# This image can be used as the basis for data-only containers.
-# Any child image must provide:
-# - /README: to describe the image.
-#
-# Additionaly, every Dockerfile should add its own Dockerfile to the /Dockerfiles
-# folder:
-# COPY Dockerfile /Dockerfiles/Dockerfile
-# COPY Dockerfile /Dockerfiles/${DOLLAR}{NAMESPACE}-${DOLLAR}{IMAGE}.${DOLLAR}{TAG}
-#
-# And last, adding comments on how to run the image is very helpful.

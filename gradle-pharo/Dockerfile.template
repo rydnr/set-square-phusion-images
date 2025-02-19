@@ -6,6 +6,7 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("service_user")
 
+@include("java")
 @include("pharo")
 @include("sdkman")
 @include("gradle")

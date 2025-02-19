@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -a
+JAVA_OPTS="-Djava.awt.headless=true ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX} -XX:+HeapDumpOnOutOfMemoryError ${JAVA_OPTS}"
+LANG="en_US.UTF-8"
+JSSE_HOME="/usr/lib/jvm/java"
+JENKINS_HOME="${SERVICE_USER_HOME}"
+JENKINS_PORT=${JENKINS_PORT:-${DEFAULT_JENKINS_PORT}}
+
+# exec 2>&1
+# exec setuser "${SERVICE_USER}" jenkins
+chown -R "${SERVICE_USER}:${SERVICE_GROUP}" "${SERVICE_USER_HOME}"
+/usr/local/sbin/run-as.sh -U "${SERVICE_USER}" -G "${SERVICE_GROUP}" "${SERVICE_USER_HOME}" /usr/bin/jenkins 2>&1 | tee -a "/var/log/${SERVICE_USER}/jenkins.log"
+
+# vim: syntax=sh ts=4 sw=4 sts=4 sr noet

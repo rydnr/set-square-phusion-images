@@ -1,0 +1,9 @@
+# v python3
+RUN ${SYSTEM_UPDATE} \
+ && add-apt-repository ppa:deadsnakes/ppa -y \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} python3.11 python3.11-venv python3.11-distutils \
+ && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.8 1 \
+ && update-alternatives --install /usr/bin/python3 python3 /usr/bin/python3.11 2 \
+ && ${SYSTEM_CLEANUP}
+# ^ python

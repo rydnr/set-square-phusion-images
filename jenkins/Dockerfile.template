@@ -5,7 +5,6 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 @include("addon-toggles")
 
 COPY logstash.conf /etc/logstash/conf.d/${IMAGE}.conf
-COPY 50-rsync-jenkins-home.sh /etc/my_init.d/50-rsync-jenkins-home.sh
 
 ENV SERVICE_USER="${SERVICE_USER}" \
     SERVICE_GROUP="${SERVICE_GROUP}" \
@@ -17,7 +16,6 @@ ENV SERVICE_USER="${SERVICE_USER}" \
     COPY_REFERENCE_FILE_LOG="${JENKINS_HOME}/copy_reference_file.log" \
     VIRTUAL_HOST="${JENKINS_DEFAULT_VIRTUAL_HOST}" \
     VIRTUAL_PORT=8080 \
-    PATH="${PATH}:/opt/arcanist/bin" \
     JENKINS_MEMORY_MIN="${DEFAULT_JENKINS_MEMORY_MIN}" \
     JENKINS_MEMORY_MAX="${DEFAULT_JENKINS_MEMORY_MAX}" \
     DOBACKUP="true" \
@@ -27,8 +25,6 @@ ENV SERVICE_USER="${SERVICE_USER}" \
 @include("java")
 @include("create_ssl_certificate")
 @include("service_user")
-@include("tomcat")
-@include("apr")
 @include("git")
 @include("elk-common")
 @include("logstash")
@@ -37,13 +33,13 @@ RUN mkdir -p /home/jenkins && \
     chown -R ${SERVICE_USER}:${SERVICE_GROUP} /home/jenkins && \
     ln -s /backup/jenkins-home/.sdkman /home/jenkins/.sdkman
 @include("gradle")
-@include("phabricator")
+@include("maven")
 @include("pharo")
-@include("jenkins")
 @include("nodejs")
+@include("jenkins")
 
 RUN mkdir /etc/service/${IMAGE} && cp -r /etc/service/.template/* /etc/service/${IMAGE}
-COPY tomcat-files/service /etc/service/${IMAGE}/run
+COPY jenkins-files/service /etc/service/${IMAGE}/run
 RUN chmod +x /etc/service/${IMAGE}/run
 
 ADD init.groovy.d/ /home/jenkins/init.groovy.d/
@@ -54,7 +50,7 @@ ADD init.groovy.d/ /home/jenkins/init.groovy.d/
 
 COPY jenkins-files/update-jenkins-service /etc/service/update-jenkins/run
 
-VOLUME [ "/backup/jenkins-home", "/backup/rsnapshot" ]
+VOLUME [ "/backup/jenkins-home/jobs", "/backup/rsnapshot" ]
 
 EXPOSE 8080
 EXPOSE 50000

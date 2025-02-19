@@ -3,11 +3,7 @@ COPY gtoolkit-files/my_exec /etc/my_exec.d/gtoolkit
 
 RUN chmod +x /etc/my_exec.d/gtoolkit \
  && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} libcairo2 \
- && ${PKG_INSTALL} unzip \
- && ${PKG_INSTALL} libgl1-mesa-glx \
- && ${PKG_INSTALL} libxrandr2 \
- && ${PKG_INSTALL} libxi6 \
+ && ${PKG_INSTALL} libcairo2 libxrandr2 libxi6 xdg-utils \
  && ${SYSTEM_CLEANUP} \
  && cd ${SERVICE_USER_HOME} \
  && mkdir tmp \
@@ -18,10 +14,10 @@ RUN chmod +x /etc/my_exec.d/gtoolkit \
  && mv tmp/* . \
  && rm -rf ${GTOOLKIT_ARTIFACT} tmp \
  && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} \
- && curl https://dl.feenk.com/scripts/linux.sh | bash
- && cd ${SERVICE_USER_HOME} \
+ && cd ${SERVICE_USER_HOME}/lib \
  && ln -s libssl.so libssl.so.1.1 \
  && ln -s libcrypto.so libcrypto.so.1.1
+# && curl https://dl.feenk.com/scripts/linux.sh | bash \
 # && /opt/pharo/pharo ${SERVICE_USER_HOME}/GlamorousToolkit.image eval --save "Metacello new baseline: 'GToolkit'; repository: 'github://feenkcom/gtoolkit:v${GTOOLKIT_VERSION}/src'; load" \
 # && mv pharo-local ${SERVICE_USER_HOME} \
 

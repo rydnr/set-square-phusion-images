@@ -24,7 +24,6 @@ defineEnvVar ROOT_IMAGE_32BIT MANDATORY "The default root image for 32 bits" "${
 defineEnvVar CUSTOM_NAMESPACE MANDATORY "The custom namespace" '${NAMESPACE}-${SETSQUARE_FLAVOR}'
 defineEnvVar BASE_IMAGE_64BIT MANDATORY "The base image for 64 bits" '${CUSTOM_NAMESPACE}/base'
 defineEnvVar BASE_IMAGE_32BIT MANDATORY "The base image for 32 bits" '${BASE_IMAGE_64BIT_DEFAULT%%64}32'
-defineEnvVar JAVA_VERSION MANDATORY "The Java version" "8"
 defineEnvVar SYSTEM_UPDATE \
   MANDATORY \
   "The script to update the package catalog" \

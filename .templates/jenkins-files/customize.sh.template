@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+CONTAINER_NAME="$1"
+
+[ -z "${CONTAINER_NAME}" ] && echo "Usage: $0 [container_name]" && exit 1
+echo "This script is meant to be run from the host machine, not from within the container:"
+echo "docker exec -it ${CONTAINER_NAME} cat /usr/local/bin/customize.sh | sh -s [container_name]"
+docker cp ~/.ssh/id_rsa-github-jenkins "${CONTAINER_NAME}":"${JENKINS_HOME}/.ssh/id_rsa-github-jenkins"
+docker cp ~/.ssh/id_rsa-github-jenkins.pub "${CONTAINER_NAME}":"${JENKINS_HOME}/.ssh/id_rsa-github-jenkins.pub"
+docker exec -it "${CONTAINER_NAME}" chown "${SERVICE_USER}":"${SERVICE_GROUP}" "${JENKINS_HOME}/.ssh/id_rsa-github-jenkins"
+docker exec -it "${CONTAINER_NAME}" chown "${SERVICE_USER}":"${SERVICE_GROUP}" "${JENKINS_HOME}/.ssh/id_rsa-github-jenkins.pub"
+docker exec -it "${CONTAINER_NAME}" chmod 0400 "${JENKINS_HOME}/.ssh/id_rsa-github-jenkins"
+docker exec -it -u "${SERVICE_USER}" "${CONTAINER_NAME}" -- ssh-keygen -f "${JENKINS_HOME}/.ssh/known_hosts" -R "github.com"
+docker exec -it -u "${SERVICE_USER}" "${CONTAINER_NAME}" -- ssh -o StrictHostKeyChecking=no github
+docker cp ~/.m2/settings.xml "${CONTAINER_NAME}":"${JENKINS_HOME}/.m2/settings.xml"
+docker cp ~/.m2/settings-security.xml "${CONTAINER_NAME}":"${JENKINS_HOME}/.m2/settings-security.xml"
+docker exec -it "${CONTAINER_NAME}" chown "${SERVICE_USER}":"${SERVICE_GROUP}" "${JENKINS_HOME}/.m2/settings-security.xml" "${JENKINS_HOME}/.m2/settings-security.xml"

@@ -1,11 +1,11 @@
 # v mariadb
-#RUN apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xcbcb082a1bb943db
-#RUN add-apt-repository \'deb http://mirror.stshosting.co.uk/mariadb/repo/10.0/ubuntu trusty main'
-#RUN apt-get install software-properties-common
 RUN ([ ! -d /backup ] && rm -f /backup) \
  && mkdir -p /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump \
  && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} mariadb-server bc \
+ && ${PKG_INSTALL} apt-transport-https curl net-tools bc \
+ && mkdir -p /etc/apt/keyrings \
+ && curl -o /etc/apt/keyrings/mariadb-keyring.pgp 'https://mariadb.org/mariadb_release_signing_key.pgp' \
+ && ${PKG_INSTALL} mariadb-server \
  && ${SYSTEM_CLEANUP} \
  && sed -i -e"s/^bind-address\s*=\s*127.0.0.1/bind-address = 0.0.0.0/" /etc/mysql/mariadb.conf.d/50-server.cnf \
  && sed -i -e"s/^log_error/#log_error/" /etc/mysql/mariadb.conf.d/50-server.cnf \
@@ -13,16 +13,15 @@ RUN ([ ! -d /backup ] && rm -f /backup) \
  && sed -i -e"s/^max_allowed_packet\s*=\s*16M/max_allowed_packet = 33554432/" /etc/mysql/mariadb.conf.d/50-server.cnf \
  && sed -i -e"s|# ssl-cert\s*.*|ssl-cert=/etc/ssl/private/${IMAGE}.crt|" /etc/mysql/mariadb.conf.d/50-server.cnf \
  && sed -i -e"s|# ssl-key\s*.*|ssl-key=/etc/ssl/private/${IMAGE}.key.rsa|" /etc/mysql/mariadb.conf.d/50-server.cnf \
+ && chown -R mysql:mysql /backup/${IMAGE}-db /backup/${IMAGE}-rsnapshot /backup/${IMAGE}-dump \
  && /usr/local/bin/create_ssl_certificate_openssl.sh \
  && rm -rf /var/lib/mysql \
  && ln -s /backup/${IMAGE}-db /var/lib/mysql \
- && update-rc.d mysql disable \
- && rm -f /etc/init.d/mysql \
- && chmod +x /usr/local/bin/bootstrap-db.sh \
+ && if [ -e /etc/init.d/mysql ]; then rm -f /etc/init.d/mysql; fi; \
+    chmod +x /usr/local/bin/bootstrap-db.sh \
  && for p in daily weekly monthly; do \
       ln -s /usr/local/bin/backup-${IMAGE}.sh /usr/local/bin/backup-mysqldump.${p}; \
     done \
  && mv /usr/local/sbin/restart.sh /usr/local/sbin/_restart.sh \
- && ln -s /usr/local/bin/apply-config-changes.sh /usr/local/sbin/restart.sh \
- && /usr/local/bin/create_ssl_certificate_openssl.sh -v
+ && ln -s /usr/local/bin/apply-config-changes.sh /usr/local/sbin/restart.sh
 # ^ mariadb

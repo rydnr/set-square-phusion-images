@@ -1,3 +1,6 @@
 # v sdkman
-RUN su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && (wget -q -O- http://get.sdkman.io | bash || (echo "sdkman zeroconf failed") && chmod +x ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh || echo "chmod failed")'
+RUN ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} unzip zip \
+ && ${SYSTEM_CLEANUP} \
+ && su - ${SERVICE_USER} -c 'cd ${SERVICE_USER_HOME} && (curl -s "https://get.sdkman.io" | bash || (echo "sdkman zeroconf failed") && chmod +x ${SERVICE_USER_HOME}/.sdkman/bin/sdkman-init.sh || echo "chmod failed")'
 # ^ sdkman

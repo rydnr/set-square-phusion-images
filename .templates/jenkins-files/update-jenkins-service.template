@@ -1,14 +1,15 @@
 #!/bin/sh
 
 _aux=1
-_sleep=1s;
+_sleep=1s
 
-echo "Waiting until Jenkins becomes ready";
-while [ ${_aux} -ne 0 ]; do
-  sleep ${_sleep};
-  grep 'Jenkins is fully up and running' ${TOMCAT_HOME}/logs/catalina.$(date '+%Y-%m-%d').log > /dev/null
-  _aux=$?;
-done
+# TODO: No longer using Tomcat
+# echo "Waiting until Jenkins becomes ready";
+# while [ ${_aux} -ne 0 ]; do
+#   sleep ${_sleep};
+#   grep 'Jenkins is fully up and running' ${TOMCAT_HOME}/logs/catalina.$(date '+%Y-%m-%d').log > /dev/null
+#   _aux=$?;
+# done
 
 /usr/local/bin/update-jenkins.sh -v
 

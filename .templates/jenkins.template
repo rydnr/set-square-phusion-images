@@ -1,18 +1,24 @@
 # v jenkins
 COPY jenkins-files/update-jenkins.sh jenkins-files/update-jenkins.inc.sh \
      jenkins-files/generate-jenkins-plugin-configs.sh jenkins-files/generate-jenkins-plugin-configs.inc.sh \
-     jenkins-files/backup-jenkins-configs.sh jenkins-files/backup-jenkins-configs.inc.sh \
+     jenkins-files/backup-jenkins-configs.sh jenkins-files/backup-jenkins-configs.inc.sh jenkins-files/prepare-release.sh \
+     jenkins-files/customize.sh \
      /usr/local/bin/
+COPY jenkins-files/50-rsync-jenkins-home.sh jenkins-files/40-encrypt-maven-master-password.sh /etc/my_init.d/
 
-RUN cp -r /root/.dry-wit ${SERVICE_USER_HOME} && \
-    cd /var && ln -s ${SERVICE_USER_HOME} /var/jenkins_home && \
-    mkdir -p ${JENKINS_HOME} ${SERVICE_USER_HOME}/.m2 /usr/share/jenkins/ref ${SERVICE_USER_HOME}/init.groovy.d && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} /var/lock/tomcat /var/run/tomcat /var/log/tomcat ${TOMCAT_HOME} /opt/${TOMCAT_FOLDER} /usr/share/jenkins/ref /var/jenkins_home && \
-    chmod +x /etc/my_init.d/50-rsync-jenkins-home.sh /usr/local/bin/generate-jenkins-plugin-configs.sh && \
-    /etc/my_init.d/00_regen_ssh_host_keys.sh -f && \
-    ${SYSTEM_UPDATE} && \
-    ${PKG_INSTALL} git graphviz php php-curl php-cli unzip nodejs build-essential && \
-    ${SYSTEM_CLEANUP}
+RUN cp -r /root/.dry-wit ${SERVICE_USER_HOME} \
+ && cd /var && ln -s ${SERVICE_USER_HOME} /var/jenkins_home \
+ && mkdir -p ${JENKINS_HOME} ${SERVICE_USER_HOME}/.m2 /usr/share/jenkins/ref ${SERVICE_USER_HOME}/init.groovy.d \
+ && chmod +x /etc/my_init.d/40-encrypt-maven-master-password.sh /etc/my_init.d/50-rsync-jenkins-home.sh /usr/local/bin/generate-jenkins-plugin-configs.sh /usr/local/bin/prepare-release.sh \
+ && /etc/my_init.d/00_regen_ssh_host_keys.sh -f \
+ && wget -O /usr/share/keyrings/jenkins-keyring.asc https://pkg.jenkins.io/debian/jenkins.io-2023.key \
+ && echo "deb [signed-by=/usr/share/keyrings/jenkins-keyring.asc]" https://pkg.jenkins.io/debian binary/ | sudo tee /etc/apt/sources.list.d/jenkins.list > /dev/null \
+ && ${SYSTEM_UPDATE} \
+ && ${PKG_INSTALL} git graphviz unzip nodejs build-essential jenkins expect xmlstarlet \
+ && ${SYSTEM_CLEANUP} \
+ && /usr/bin/jenkins --version >> ${JENKINS_HOME}/jenkins.install.UpgradeWizard.state \
+ && mkdir ${SERVICE_USER_HOME}/war && cp /usr/share/java/jenkins.war ${SERVICE_USER_HOME}/war \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} /usr/share/jenkins/ref /var/jenkins_home
 
 COPY jenkins-files/ssh-config ${SERVICE_USER_HOME}/.ssh/config
 COPY jenkins-files/known_hosts ${SERVICE_USER_HOME}/.ssh/known_hosts
@@ -21,51 +27,37 @@ COPY jenkins-files/hudson.tasks.Mailer.xml \
      jenkins-files/config.xml \
      jenkins-files/hudson.plugins.emailext.ExtendedEmailPublisher.xml \
      jenkins-files/hudson.plugins.git.GitSCM.xml \
+     jenkins-files/encrypt-maven-master-password.expect \
+     jenkins-files/encrypt-maven-master-password.sh \
      ${SERVICE_USER_HOME}/
-COPY jenkins-files/settings.xml ${SERVICE_USER_HOME}/.m2/
+COPY jenkins-files/settings.xml jenkins-files/settings-security.xml.tmpl ${SERVICE_USER_HOME}/.m2/
 
 USER ${SERVICE_USER}
 ENV PATH=${PATH}:${SERVICE_USER_HOME}/.dry-wit/src
 
-RUN wget -O ${TOMCAT_HOME}/webapps/jenkins.war ${JENKINS_DOWNLOAD_URL} && \
-    mv ${TOMCAT_HOME}/webapps/ROOT ${TOMCAT_HOME}/webapps/welcome && \
-    cd ${TOMCAT_HOME} && ln -s ${SERVICE_USER_HOME}/.m2 .m2 && \
-    mkdir .jenkins && cd .jenkins && /usr/lib/jvm/java/bin/jar -xvf ${TOMCAT_HOME}/webapps/jenkins.war && \
-    sed -i '/<\/tomcat-users>/i \  <role rolename="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
-    sed -i '/<\/tomcat-users>/i \  <user username="jenkins-admin" password="${JENKINS_PASSWORD}" roles="admin"\/>' ${TOMCAT_HOME}/conf/tomcat-users.xml && \
-    [ -e ${TOMCAT_HOME}/conf/server.xml ] && sed -i '/<Connector port="8080" protocol="HTTP\/1.1"/a \       URIEncoding="UTF-8"' ${TOMCAT_HOME}/conf/server.xml && \
-    rm -rf ${TOMCAT_HOME}/webapps/* && \
-    mkdir -p ${SERVICE_USER_HOME}/plugins && \
-    cd ${SERVICE_USER_HOME}/plugins/ && \
-    for m in ${JENKINS_MODULES}; do \
-      echo "Downloading ${m} plugin"; \
-      for e in hpi jpi; do \
-        wget -o /dev/null http://mirrors.jenkins-ci.org/plugins/${m}/latest/${m}.${e} || echo -n ''; \
-      done; \
-    done; \
-    wget -o /dev/null ${SWARM_CLIENT_DOWNLOAD_URL} && \
-    /opt/arcanist/bin/arc set-config default ${JENKINS_PHABRICATOR_URL} && \
-    /usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} && \
-    /usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS} && \
-    /usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS} && \
-    /usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} && \
-    /usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} && \
-    /usr/local/bin/generate-jenkins-plugin-configs.sh nodejs && \
-    /usr/local/bin/generate-jenkins-plugin-configs.sh slack && \
-    /usr/local/sbin/process-file.sh -o ${SERVICE_USER_HOME}/jenkins.model.JenkinsLocationConfiguration.xml /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl && \
-    echo "JAVA_OPTS=\"${JAVA_OPTS} ${JENKINS_MEMORY_MIN} ${JENKINS_MEMORY_MAX}\"" >> ${TOMCAT_HOME}/bin/setenv.sh
+RUN cd ${SERVICE_USER_HOME} \
+ && wget -o /dev/null ${JENKINS_PLUGIN_TOOL_DOWNLOAD_URL} \
+ && mkdir -p ${SERVICE_USER_HOME}/plugins \
+ && for p in ${JENKINS_PLUGINS}; do \
+     java -jar ${SERVICE_USER_HOME}/${JENKINS_PLUGIN_TOOL_ARTIFACT} --war /usr/share/java/jenkins.war --plugin-download-directory ${SERVICE_USER_HOME}/plugins --plugins ${p}; \
+    done \
+ && wget -o /dev/null ${SWARM_CLIENT_DOWNLOAD_URL} \
+ && /usr/local/bin/generate-jenkins-plugin-configs.sh groovy ${GROOVY_VERSIONS} \
+ && /usr/local/bin/generate-jenkins-plugin-configs.sh gradle ${GRADLE_VERSIONS} \
+ && /usr/local/bin/generate-jenkins-plugin-configs.sh grails ${GRAILS_VERSIONS} \
+ && /usr/local/bin/generate-jenkins-plugin-configs.sh maven ${MAVEN_VERSIONS} \
+ && /usr/local/bin/generate-jenkins-plugin-configs.sh ant ${ANT_VERSIONS} \
+ && /usr/local/bin/generate-jenkins-plugin-configs.sh nodejs \
+ && /usr/local/bin/generate-jenkins-plugin-configs.sh slack
+# TODO: Fix me
+# && /usr/local/sbin/process-file.sh -o ${SERVICE_USER_HOME}/jenkins.model.JenkinsLocationConfiguration.xml /var/local/jenkins.model.JenkinsLocationConfiguration.xml.tmpl
 
 USER root
 
-RUN chmod -R g+w ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins && \
-    mkdir ${TOMCAT_HOME}/.ssh  && \
-    chmod 700 ${TOMCAT_HOME}/.ssh && \
-    mkdir -p ${SERVICE_USER_HOME}/updates && \
-    chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${TOMCAT_HOME}/.jenkins ${TOMCAT_HOME}/.m2 ${JENKINS_HOME} /var/jenkins_home && \
-    ln -s /usr/local/bin/backup-jenkins-configs.sh /etc/cron.hourly/backup-jenkins-configs.sh && \
-    ln -s /usr/local/bin/backup-jenkins-configs.inc.sh /etc/cron.hourly/backup-jenkins-configs.inc.sh && \
-    ln -s /usr/local/bin/update-jenkins.sh /etc/cron.hourly/update-jenkins.sh
-
-COPY jenkins-files/context.xml ${TOMCAT_HOME}/conf/Catalina/localhost/ROOT.xml
-COPY jenkins-files/config /etc/default/tomcat
+RUN chmod 700 ${SERVICE_USER_HOME}/.ssh \
+ && mkdir -p ${SERVICE_USER_HOME}/updates \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} ${SERVICE_USER_HOME} ${JENKINS_HOME} /var/jenkins_home \
+ && ln -s /usr/local/bin/backup-jenkins-configs.sh /etc/cron.hourly/backup-jenkins-configs.sh \
+ && ln -s /usr/local/bin/backup-jenkins-configs.inc.sh /etc/cron.hourly/backup-jenkins-configs.inc.sh \
+ && ln -s /usr/local/bin/update-jenkins.sh /etc/cron.hourly/update-jenkins.sh
 # ^ jenkins

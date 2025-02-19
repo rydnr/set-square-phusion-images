@@ -3,11 +3,10 @@ defineButDoNotOverrideEnvVar TOMCAT_USER "The Tomcat user" 'tomcat';
 defineButDoNotOverrideEnvVar TOMCAT_GROUP "The Tomcat group" 'tomcat';
 defineButDoNotOverrideEnvVar TOMCAT_MAJOR_VERSION \
              "The major version of Tomcat" \
-             "9";
+             "10";
 defineButDoNotOverrideEnvVar TOMCAT_VERSION \
              "The version of the Apache Tomcat server" \
-             "9.0.31" \
-             "$(curl -s -k http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/ | grep folder.gif | tail -n 1 | cut -d ">" -f 3 | cut -d "/" -f 1 | sed "s_^v__g")";
+             "10.1.30";
 defineButDoNotOverrideEnvVar TOMCAT_CACHE_MAX_SIZE \
              "The maximum size of the static resource cache in kilobytes" \
              "10000";
@@ -19,5 +18,5 @@ defineButDoNotOverrideEnvVar TOMCAT_FILE \
              '${TOMCAT_FOLDER}.tar.gz';
 defineButDoNotOverrideEnvVar TOMCAT_DOWNLOAD_URL \
              "The url to download Tomcat" \
-             'http://apache.mirrors.pair.com/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/${TOMCAT_FILE}';
-#
+             'https://dlcdn.apache.org/tomcat/tomcat-${TOMCAT_MAJOR_VERSION}/v${TOMCAT_VERSION}/bin/${TOMCAT_FILE}';
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet

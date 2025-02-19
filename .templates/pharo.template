@@ -1,31 +1,41 @@
 # v pharo
 RUN dpkg --add-architecture i386 \
  && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} fontconfig wget git git-lfs openssh-client libcurl4-gnutls-dev ca-certificates libgtk2.0-dev libgtk-3-dev mesa-common-dev libgl1-mesa-dev libc6 libx11-6 libgl1-mesa-glx libfontconfig1 libsdl2-dev libgit2-dev \
+ && echo "apt install fontconfig" \
+ && ${PKG_INSTALL} fontconfig wget git git-lfs openssh-client libcurl4-gnutls-dev ca-certificates libgtk2.0-dev libgtk-3-dev mesa-common-dev libc6 libx11-6 libfontconfig1 libsdl2-dev libgit2-dev \
+ && echo "apt install lbissl-dev" \
  && ${PKG_INSTALL} -np libssl-dev libssh2-1-dev libffi-dev zlib1g-dev build-essential gcc pkg-config libhttp-parser-dev \
  && for p in cmake git make zip unzip; do \
+      echo "apt install ${p}"; \
       [[ $(which ${p}) > /dev/null ]] || ${PKG_INSTALL} -np ${p}; \
     done \
  && ([ -d /opt ] || mkdir /opt) \
  && mkdir /opt/pharo${PHARO_MAJOR_VERSION} \
  && cd /opt/pharo${PHARO_MAJOR_VERSION} \
+ && echo "wget PharoV60.sources" \
  && wget -q https://files.pharo.org/sources/PharoV60.sources \
  && cd /opt/pharo${PHARO_MAJOR_VERSION} \
- && echo -n '' \
- && if [[ ${PHARO_VERSION_ZEROCONF} == 100 ]]; then (curl get.pharo.org/64/ | bash); else (curl get.pharo.org/64/vmT${PHARO_VERSION_ZEROCONF} | bash); fi \
+ && if [[ ${PHARO_VERSION_ZEROCONF} -ge 100 ]]; then \
+      echo "wget http://files.pharo.org/get-files/${PHARO_VERSION_ZEROCONF}/pharo-vm-Linux-x86_64-stable.zip"; \
+         wget -q http://files.pharo.org/get-files/${PHARO_VERSION_ZEROCONF}/pharo-vm-Linux-x86_64-stable.zip \
+      && unzip pharo-vm-Linux-x86_64-stable.zip; \
+    else \
+      echo "curl get.pharo.org"; \
+      (curl get.pharo.org/64/vmT${PHARO_VERSION_ZEROCONF} | bash); \
+    fi \
  && cd /opt && ln -s pharo${PHARO_MAJOR_VERSION} pharo \
+ && echo "config /etc/security/limits.d/pharo.conf" \
  && echo '*      hard    rtprio  2' >  /etc/security/limits.d/pharo.conf \
  && echo '*      soft    rtprio  2' >> /etc/security/limits.d/pharo.conf \
- && echo 'export PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.sh \
- && echo 'setenv PATH=${PATH}:/opt/pharo/pharo-vm' > /etc/profile.d/pharo.csh \
- && echo -n '' \
+ && echo "config /etc/profile.d/pharo.sh" \
+ && echo 'export PATH=${PATH}:/opt/pharo' > /etc/profile.d/pharo.sh \
+ && echo "config /etc/profile.d/pharo.csh" \
+ && echo 'setenv PATH=${PATH}:/opt/pharo' > /etc/profile.d/pharo.csh \
  && chmod +x /etc/profile.d/pharo.sh /etc/profile.d/pharo.csh \
- && mv /root/.dry-wit ${SERVICE_USER_HOME} \
- && ln -s ${SERVICE_USER_HOME}/.dry-wit /root/ \
  && mkdir -p ${SERVICE_USER_HOME}/.config/pharo \
- && echo -n '' \
  && ln -s ${SERVICE_USER_HOME}/.config /root/.config \
- && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/pharo ${SERVICE_USER_HOME} /root/.dry-wit \
+ && chown -R ${SERVICE_USER}:${SERVICE_GROUP} /opt/pharo ${SERVICE_USER_HOME} \
+ && echo "${SYSTEM_CLEANUP}" \
  && ${SYSTEM_CLEANUP}
 
 COPY pharo-files/author.st.sample \
@@ -34,5 +44,6 @@ COPY pharo-files/author.st.sample \
      ${SERVICE_USER_HOME}/.config/pharo/
 
 ENV PHARO_VM=/opt/pharo/pharo \
-    PATH=${PATH}:/opt/pharo
+    PATH=${PATH}:/opt/pharo \
+    DISPLAY=:0.0
 # ^ pharo

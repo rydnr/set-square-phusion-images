@@ -1,0 +1,3 @@
+# v crewai
+RUN pip3 install crewai
+# ^ crewai

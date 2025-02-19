@@ -1,10 +1,276 @@
+# Jenkins
+
 This image runs Jenkins, expecting the configuration
 to be provided in a volume.
 
 Examples:
 - Run Jenkins on port 8080, whose configuration is located in a host folder:
-> docker run -d -p 8080:8080 -v [host-path]:/backup/jenkins-home -e VIRTUAL_HOST=[my-jenkins-vhost] ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p 8080:8080 --name [my-jenkins-vhost] -v [host-path]:/backup/jenkins-home -e VIRTUAL_HOST=[my-jenkins-vhost] ${NAMESPACE}/${IMAGE}:${TAG}
 
 - Same as before, but exposing the websocket port to publish notifications:
-> docker run -d -p 8080:8080 -p 8081:8081 -v [host-path]:/backup/jenkins-home -e VIRTUAL_HOST=[my-jenkins-vhost] ${NAMESPACE}/${IMAGE}:${TAG}
+> docker run -d -p 8080:8080 -p 8081:8081 --name [my-jenkins-vhost] -v [host-path]:/backup/jenkins-home -e VIRTUAL_HOST=[my-jenkins-vhost] ${NAMESPACE}/${IMAGE}:${TAG}
 
+# Credentials
+
+## Setup ssh client configuration
+
+  - `docker cp ~/.ssh/id_rsa-github-jenkins [my-jenkins-vhost]:/home/jenkins/.ssh/id_rsa-github-jenkins`
+  - `docker cp ~/.ssh/id_rsa-github-jenkins.pub [my-jenkins-vhost]:/home/jenkins/.ssh/id_rsa-github-jenkins.pub`
+  - `docker exec -it [my-jenkins-vhost] chown jenkins:jenkins /home/jenkins/.ssh/id_rsa-github-jenkins /home/jenkins/.ssh/id_rsa-github-jenkins.pub`
+  - `docker exec -it [my-jenkins-vhost] chmod 0400 /home/jenkins/.ssh/id_rsa-github-jenkins`
+  - `docker exec -it -u jenkins [my-jenkins-vhost] ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R "github.com"`
+  - `docker exec -it -u jenkins [my-jenkins-vhost] ssh -o StrictHostKeyChecking=no github
+  - `docker exec -it [my-jenkins-vhost] chown jenkins:jenkins /home/jenkins/.m2/settings-security.xml /home/jenkins/.m2/settings-security.xml`
+
+```sh
+cat <<EOF | sh
+docker cp ~/.ssh/id_rsa-github-jenkins jenkins:/home/jenkins/.ssh/id_rsa-github-jenkins
+docker cp ~/.ssh/id_rsa-github-jenkins.pub jenkins:/home/jenkins/.ssh/id_rsa-github-jenkins.pub
+docker exec jenkins chown jenkins:jenkins /home/jenkins/.ssh/id_rsa-github-jenkins /home/jenkins/.ssh/id_rsa-github-jenkins.pub
+docker exec jenkins chmod 0400 /home/jenkins/.ssh/id_rsa-github-jenkins
+docker exec -u jenkins jenkins ssh-keygen -f "/home/jenkins/.ssh/known_hosts" -R "github.com"
+docker exec -u jenkins jenkins ssh -o StrictHostKeyChecking=no github
+docker cp ~/.m2/settings-security.xml jenkins:/home/jenkins/.m2/settings-security.xml
+docker cp ~/.m2/settings.xml jenkins:/home/jenkins/.m2/settings.xml
+docker exec jenkins chown jenkins:jenkins /home/jenkins/.m2/settings-security.xml /home/jenkins/.m2/settings-security.xml
+EOF
+```
+
+## Create credential in Jenkins
+
+  - Make sure "SSH Credentials" plugin is installed
+  - Visit http://localhost:8080/manage/credentials/store/system/domain/_/
+  - Click on "Add Credentials"
+  - Kind: SSH username with private key
+    - ID: github
+    - Description: SSH key for accesing github.
+    - Username: git
+    - Private key:
+      - Enter directly (checked)
+      - Click on "Add"
+      - Paste the private key
+    - Click on "Create"
+
+# get-new-version
+
+## Requirements
+  - Ensure "git" plugin is installed.
+  - Ensure /home/jenkins/.ssh/config contains the following entry:
+```
+Host github
+  Hostname github.com
+  User git
+  IdentityFile ~/.ssh/id_rsa-github-jenkins
+```
+
+Now, create a new job "_get-new-version" of type "Freestyle project" with the following configuration:
+
+## Description:
+
+This job performs the following tasks:
+  - Builds acmsl-pom;
+  - Uses this job's BUILD_NUMBER as the basis for a new tag, using the current values of &lt;version.major&gt; and &lt;version.minor&gt; in acmsl-pom's pom.xml;
+  - Updates the properties for all in-house projects, to their last stable version, according to Maven;
+  - Uses the new version as the value the property associated to the project passed in the "trigger" parameter;
+  - Commits and releases a new version of acmsl-pom with the new tag;
+  - Afterwards, the trigger job will update its own pom.xml to point to this new acmsl-pom tag (so it points to the latest released versions of in-house dependencies), and tag himself.
+
+## This project is parameterized (checked)
+
+  - String parameter:
+    - Name: trigger
+    - Default value: (empty)
+    - Description: The project requesting a new version
+
+## Source Code Management
+  - git:
+    - Repository URL: github:rydnr/acmsl-pom.git
+    - Credentials: git
+    - Branches to build: */master
+    - Repository browser: githubweb
+      - url: https://github.com/rydnr/acmsl-pom.git
+    - Additional behaviours:
+      - Wipe out repository & force clone
+
+## Build Environment
+  - Add timestamps to Console Output
+
+## Build Steps
+
+  - Execute shell:
+
+```sh
+cd "${WORKSPACE}";
+# DO NOT REPLACE THIS WITH A MAVEN JOB!!!
+/home/jenkins/.sdkman/candidates/maven/current/bin/mvn clean deploy
+```
+
+## Conditional Steps (single)
+
+  - Run?
+    - Current build status
+      - Worst status: Success
+      - Best status: Success
+    - Advanced
+      - Steps to run if condition is met
+        - Execute shell:
+
+```sh
+cd "${WORKSPACE}";
+export MAJOR=$(grep -A 5 '<version.major>' pom.xml | head -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1);
+export MINOR=$(grep -A 5 '<version.minor>' pom.xml | head -n 1 | cut -d '>' -f 2 | cut -d '<' -f 1);
+export SEQ="$(printf "%04d\n" ${BUILD_NUMBER})";
+export NEW_VERSION="${MAJOR}.${MINOR}.${SEQ}";
+
+export GROUP="acmsl-pom";
+export ARTIFACT="acmsl-pom";
+export REPO="https://github.com/rydnr/${ARTIFACT}.git";
+
+if [ ! -d target ]; then mkdir "${WORKSPACE}"/target; fi;
+echo "${NEW_VERSION}" > "${WORKSPACE}"/target/.version;
+
+git checkout -b acmsl-pom-${NEW_VERSION};
+
+sed -i "s <version.${trigger}>\(.*\)</version.${trigger}> <version.${trigger}>${NEW_VERSION}</version.${trigger}> g" pom.xml;
+mkdir -p "${WORKSPACE}"/../../${trigger}/workspace/target
+cp "${WORKSPACE}"/target/.version "${WORKSPACE}"/../../${trigger}/workspace/target/
+/home/jenkins/.sdkman/candidates/maven/current/bin/mvn versions:update-properties;
+
+/home/jenkins/.sdkman/candidates/maven/current/bin/mvn versions:set -DnewVersion="${NEW_VERSION}";
+
+git add pom.xml && git commit -m"Releasing $(cat target/.version) for ${trigger}";
+git tag -a "${ARTIFACT}-${NEW_VERSION}" -m"Releasing ${NEW_VERSION}" && git push origin --tags;
+
+/usr/local/bin/prepare-release.sh "${GROUP}" "${ARTIFACT}" "${NEW_VERSION}" "${REPO}";
+
+/home/jenkins/.sdkman/candidates/maven/current/bin/mvn -Prelease release:perform
+```
+
+## Post-build Actions
+
+  - E-mail Notification
+    - Recipients: jenkins@acm-sl.org
+    - Send e-mail for every unstable build (checked)
+
+# Java Commons
+
+Create a new "rydnr.java-commons" job of type Maven project" with the following configuration:
+
+## Description:
+
+```html
+Builds and releases a new version of A.C.M. S.L. Java Commons.
+
+Build-Time Trend:<br/>
+<img usemap="#map0" src="buildTimeGraph/png" lazymap="buildTimeGraph/map" alt="[Build time graph]" height="400" width="500">
+```
+
+## Github project
+
+  - Project url: https://github.com/rydnr/java-commons
+
+## Source Code Management
+
+  - Git:
+    - Repository URL: github-with-jenkins-ssh-key:rydnr/java-commons.git
+    - Credentials: git
+    - Branches to build: */master
+    - Repository browser: githubweb
+      - URL: https://github.com/rydnr/java-commons.git
+    - Additional behaviours:
+      - Wipe out repository & force clone
+      - Create a tag for every build
+
+## Build Triggers
+
+  - Build whenever a SNAPSHOT dependency is built
+  - Github hook trigger for GITScm polling
+  - Poll SCM:
+    - Schedule: H/5 * * * *
+
+## Build Environmen
+
+  - Delete workspace before build starts (checked)
+  - Add timestamps to Console Output (checked)
+  - Terminate a build if it's stuck (checked)
+    - Time-out strategy: Absolute
+      - Timeout minutes: 3
+    - Time-out actions:
+      - Abort the build
+
+## Build
+
+  - Maven version: maven
+  - Root POM: pom.xml
+  - Goals and options: clean deploy
+
+## Post Steps
+
+  - Run only if build succeeds or is unstable (checked)
+  - Trigger/call builds on other projects
+    - Build Triggers:
+      - Projects to build: get-new-version
+      - Block until the triggered projects finish their builds (checked)
+        - Fail this build step if the triggered build is worse than or equal to: FAILURE
+        - Mark this build as failure if the triggered build is worse than or equal to: FAILURE
+        - Mark this build as unstable if the triggered build is worse than or equal to: UNSTABLE
+      - Predefined parameters:
+        - Parameters: trigger=rydnr.java-commons
+
+  - Execute shell
+
+```sh
+cd "${WORKSPACE}";
+cp "${WORKSPACE}"/../../_get-new-version/workspace/target/.version "${WORKSPACE}"/target/.version;
+
+export GROUP="$(command xmlstarlet sel -T -N "x=http://maven.apache.org/POM/4.0.0" -t -v "/x:project/x:groupId" pom.xml)";
+export ARTIFACT="$(command xmlstarlet sel -T -N "x=http://maven.apache.org/POM/4.0.0" -t -v "/x:project/x:artifactId" pom.xml)";
+export NEW_VERSION="$(cat "${WORKSPACE}"/target/.version)";
+export REPO="https://github.com/rydnr/${ARTIFACT}.git";
+export NEW_GIT_TAG="${ARTIFACT}-${NEW_VERSION}";
+
+/home/jenkins/.sdkman/candidates/maven/current/bin/mvn versions:set -DnewVersion="${NEW_VERSION}" && \
+command xmlstarlet ed --inplace \
+  -N x="http://maven.apache.org/POM/4.0.0" \
+  -u "/x:project/x:parent/x:version" \
+  -v "${NEW_VERSION}" \
+  pom.xml \
+&& /usr/local/bin/prepare-release.sh "${GROUP}" "${ARTIFACT}" "${NEW_VERSION}" "${REPO}" \
+&& git add pom.xml && git commit -m"Releasing ${ARTIFACT}: ${NEW_VERSION}" \
+&& git tag -a "${NEW_GIT_TAG}" -m"Releasing ${ARTIFACT}: ${NEW_VERSION}" && git push origin --tags
+```
+
+  - Conditional steps (multiple)
+    - Run: Current build status
+      - Worst status: Unstable
+      - Best status: Success
+      - Advanced:
+        - Steps to run if condition is met:
+          - Invoke top-level Maven targets
+            - Maven Version: maven
+            - Goals: -Prelease release:perform
+          - Execute shell
+
+```sh
+cd "${WORKSPACE}";
+export TAG_NAME="$(command cat "${WORKSPACE}"/target/.version)";
+export ARTIFACT="$(command xmlstarlet sel -T -N "x=http://maven.apache.org/POM/4.0.0" -t -v "/x:project/x:artifactId" pom.xml)";
+/home/jenkins/.sdkman/candidates/maven/current/bin/mvn versions:set -DnewVersion="latest-SNAPSHOT" \
+&& command xmlstarlet ed --inplace \
+  -N x="http://maven.apache.org/POM/4.0.0" \
+  -u "/x:project/x:parent/x:version" \
+  -v "latest-SNAPSHOT" \
+  pom.xml \
+&& git add pom.xml && git commit -m"Pointing ${ARTIFACT}-${TAG_NAME} to latest-SNAPSHOT again";
+```
+
+## E-mail notification
+
+  - Recipients: jenkins@acm-sl.org
+  - Send e-mail for every unstable build (checked)
+  - Send e-mail for each failed module (checked)
+
+## Post-build Actions
+
+  - Record fingerprints of files to track usage:
+    - Files to fingerprint: target/*.jar

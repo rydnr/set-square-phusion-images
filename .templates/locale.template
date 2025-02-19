@@ -10,21 +10,30 @@ COPY locale-files/install-locale.sh \
      locale-files/install-locale.inc.sh \
      /usr/local/bin/
 
-RUN cd /usr/local/bin && ${PKG_INSTALL} localepurge apt-utils && \
-    chmod +x /usr/local/bin/install-locale.sh /etc/my_init.d/02_change_default_locale.sh && \
-    echo 'source /etc/bash.locale' >> /etc/bash.bashrc && \
-    if [ -n "${LOCALES}" ]; then \
-      rm -f /var/lib/locales/supported.d/* && \
-      pushd /usr/local/bin > /dev/null && \
-      for _locale in ${LOCALES}; do \
-        for _encoding in ${ENCODINGS}; do \
-          /usr/local/bin/install-locale.sh -l ${_locale} -e ${_encoding}; \
-        done; \
-      done; \
-      popd > /dev/null; \
-    fi && \
-    /etc/my_init.d/02_change_default_locale.sh -l ${DEFAULT_LOCALE} -e ${DEFAULT_ENCODING} && \
-    ${SYSTEM_CLEANUP} && \
-    rm -f /etc/localtime && \
-    ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime
-# ^ locale
+RUN chmod +x /usr/local/bin/install-locale.sh /etc/my_init.d/02_change_default_locale.sh \
+ && if [ -n "${LOCALES}" ]; then \
+      ${SYSTEM_UPDATE} \
+ &&   ${PKG_INSTALL} locales-all tzdata \
+ &&   ${SYSTEM_CLEANUP}; \
+    fi; \
+    if [ -e /usr/share/zoneinfo/${TIMEZONE} ]; then \
+      [ -e /etc/localtime ] && rm -f /etc/localtime; \
+      [ -e /usr/share/zoneinfo/${TIMEZONE} ] && ln -s /usr/share/zoneinfo/${TIMEZONE} /etc/localtime; \
+    fi; \
+    [ -e /etc/bash.locale ] && echo 'source /etc/bash.locale' >> /etc/bash.bashrc; \
+    /etc/my_init.d/02_change_default_locale.sh -v -l "${DEFAULT_LOCALE}" -e "${DEFAULT_ENCODING}" || echo "Cannot change locale to ${DEFAULT_LOCALE}.${DEFAULT_ENCODING}"
+
+# &&   rm -rf /usr/lib/locale/*;
+#      for _locale in ${LOCALES}; do
+#        if [ -n "${ENCODINGS}" ]; then
+#          for _encoding in ${ENCODINGS}; do
+#            /usr/local/bin/install-locale.sh -v -l "${_locale}" -e "${_encoding}";
+#          done;
+#        else
+#          /usr/local/bin/install-locale.sh -v -l "${_locale}";
+#        fi;
+#      done;
+#      locale-gen
+# &&   dpkg-reconfigure locales
+
+ # ^ locale

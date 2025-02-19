@@ -4,9 +4,9 @@ FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
 
 @include("addon-toggles")
 
-ENV SERVICE_PACKAGE="mariadb-server" \
-    SERVICE_USER="mysql" \
+ENV SERVICE_USER="mysql" \
     SERVICE_GROUP="mysql" \
+    SERVICE_PACKAGE="mariadb-server" \
     DOBACKUP="true" \
     BACKUP_HOST_SSH_PORT="${BACKUP_HOST_SSH_PORT}" \
     INNODB_POOL_SIZE_FACTOR="0.4"
@@ -38,7 +38,7 @@ COPY setup.sql /usr/local/src/setup.sql.tpl
 
 EXPOSE 3306
 
-VOLUME [ "/backup/${IMAGE}-db", "/backup/rsnapshot", "/backup/${IMAGE}-dump", "/var/local/mysql/conf.d", "/remote/mysql" ]
+VOLUME [ "/backup/${IMAGE}-db", "/backup/${IMAGE}-rsnapshot", "/backup/${IMAGE}-dump", "/var/local/mysql/conf.d", "/remote/mysql" ]
 
 @include("copy-metadata")
 @include("symlinks")

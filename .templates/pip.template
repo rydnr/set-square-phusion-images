@@ -1,7 +1,8 @@
 # v pip
 RUN ${SYSTEM_UPDATE} \
  && ${PKG_INSTALL} python3.pip \
+ && python3 -m ensurepip --upgrade \
  && pip3 install --upgrade pip \
+ && update-alternatives --install /usr/bin/pip3 pip3 /usr/local/bin/pip3.11 1 \
  && ${SYSTEM_CLEANUP}
 # ^ pip
-#

@@ -3,7 +3,7 @@
 _SLEEP=3
 if [[ ! -e /var/lib/postgresql/.bootstrapped ]]; then
   /usr/local/bin/bootstrap-db.sh
-  chown -R postgres:postgres /var/lib/postgresql /var/lib/postgresql/*
+  chown -R ${SERVICE_USER}:${SERVICE_GROUP} /var/lib/postgresql /var/lib/postgresql/*
   while [ ! -e /var/lib/postgresql/.bootstrapped ]; do
     echo "Waiting ${_SLEEP}s for db bootstrap"
     sleep ${_SLEEP}
@@ -11,8 +11,7 @@ if [[ ! -e /var/lib/postgresql/.bootstrapped ]]; then
 fi
 
 exec 2>&1
-exec su - ${SERVICE_USER} -c "\
-     /usr/lib/postgresql/${POSTGRESQL_VERSION}/bin/postgres \
-     -D /var/lib/postgresql/${POSTGRESQL_VERSION}/main \
-     -c config_file=/etc/postgresql/${POSTGRESQL_VERSION}/main/postgresql.conf 2>&1"
-
+/usr/local/sbin/run-as.sh -U "${SERVICE_USER}" -G "${SERVICE_GROUP}" /etc/service/postgresql -- \
+  /usr/lib/postgresql/${POSTGRESQL_VERSION}/bin/postgres \
+  -D /var/lib/postgresql/${POSTGRESQL_VERSION}/main \
+  -c config_file=/etc/postgresql/${POSTGRESQL_VERSION}/main/postgresql.conf 2>&1

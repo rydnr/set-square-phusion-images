@@ -1,5 +1,5 @@
 defineButDoNotOverrideEnvVar DEFAULT_LOCALE "The default locale" "en_US";
-defineButDoNotOverrideEnvVar LOCALES "The supported locales" '${DEFAULT_LOCALE} es_ES es_ES@euro';
+defineButDoNotOverrideEnvVar LOCALES "The supported locales" 'en_GB ${DEFAULT_LOCALE} es_ES es_ES@euro';
 defineButDoNotOverrideEnvVar DEFAULT_ENCODING "The default encoding" "UTF-8";
 defineButDoNotOverrideEnvVar ENCODINGS "The supported encodings" '${DEFAULT_ENCODING} ISO-8859-1 ISO-8859-15';
 defineButDoNotOverrideEnvVar TIMEZONE "The timezone" "Etc/UTC";

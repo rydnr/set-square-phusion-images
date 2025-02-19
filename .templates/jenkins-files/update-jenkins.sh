@@ -2,10 +2,10 @@
 # Copyright 2016-today Automated Computing Machinery S.L.
 # Distributed under the terms of the GNU General Public License v3
 
-setScriptDescription "Updates Jenkins plugins.";
+setScriptDescription "Updates Jenkins plugins."
 
-addError CANNOT_UPDATE_JENKINS "Could not update Jenkins";
-addError CANNOT_RETRIEVE_UPDATE_CENTER_JSON "Could not retrieve update-center.json file from ${JENKINS_UPDATE_CENTER_JSON}";
+addError CANNOT_UPDATE_JENKINS "Could not update Jenkins"
+addError CANNOT_RETRIEVE_UPDATE_CENTER_JSON "Could not retrieve update-center.json file from ${JENKINS_UPDATE_CENTER_JSON}"
 
 # fun: retrieve_update_center_json
 # api: public
@@ -14,22 +14,22 @@ addError CANNOT_RETRIEVE_UPDATE_CENTER_JSON "Could not retrieve update-center.js
 # txt: If the function returns 0/TRUE, the variable RESULT contains the path of the json file.
 # use: if retrieve_update_center_json; then echo "update-center.json is located in ${RESULT}"; fi
 function retrieve_update_center_json() {
-  local -i _rescode;
+  local -i _rescode
 
-  createTempFile;
-  local _result="${RESULT}";
+  createTempFile
+  local _result="${RESULT}"
 
-  logDebug -n "Retrieving update-center.json from updates.jenkins-ci.org";
-  wget -q -O "${_result}" ${JENKINS_UPDATE_CENTER_JSON};
-  _rescode=$?;
+  logDebug -n "Retrieving update-center.json from updates.jenkins-ci.org"
+  wget -q -O "${_result}" ${JENKINS_UPDATE_CENTER_JSON}
+  _rescode=$?
   if isTrue ${_rescode}; then
-    logDebugResult SUCCESS "done";
-    export RESULT="${_result}";
+    logDebugResult SUCCESS "done"
+    export RESULT="${_result}"
   else
-    logDebugResult FAILURE "failed";
+    logDebugResult FAILURE "failed"
   fi
 
-  return ${_rescode};
+  return ${_rescode}
 }
 
 # fun: process_update_center_json
@@ -40,25 +40,25 @@ function retrieve_update_center_json() {
 # txt: If the function returns 0/TRUE, the variable RESULT contains the processed file.
 # use: if process_update_center_json /tmp/my.json; then echo "Processed update-center.json: ${RESULT}"; fi
 function process_update_center_json() {
-  local _source="${1}";
-  checkNotEmpty "source" "${_source}" 1;
+  local _source="${1}"
+  checkNotEmpty "source" "${_source}" 1
 
-  local -i _rescode;
+  local -i _rescode
 
-  createTempFile;
-  local _result="${RESULT}";
+  createTempFile
+  local _result="${RESULT}"
 
-  logDebug -n "Processing update-center.json";
-  sed '1d;$d' "${_source}" > "${_result}";
-  _rescode=$?;
+  logDebug -n "Processing update-center.json"
+  sed '1d;$d' "${_source}" >"${_result}"
+  _rescode=$?
   if isTrue ${_rescode}; then
-    logDebugResult SUCCESS "done";
-    export RESULT="${_result}";
+    logDebugResult SUCCESS "done"
+    export RESULT="${_result}"
   else
-    logDebugResult FAILURE "failed";
+    logDebugResult FAILURE "failed"
   fi
 
-  return ${_rescode};
+  return ${_rescode}
 }
 
 # fun: update_jenkins
@@ -69,31 +69,34 @@ function process_update_center_json() {
 # txt: If the function returns 0/TRUE, the variable RESULT contains the processed file.
 # use: if process_update_center_json /tmp/my.json; then echo "Processed update-center.json: ${RESULT}"; fi
 function update_jenkins() {
-  local _source="${1}";
-  checkNotEmpty source "${_source}" 1;
+  local _source="${1}"
+  checkNotEmpty source "${_source}" 1
 
-  local -i _rescode;
+  local -i _rescode
 
-  logDebug -n "Posting update-center.json";
-  local _aux="$(curl -X POST -H "Accept: application/json" -d @"${_source}" http://localhost:${VIRTUAL_PORT}/updateCenter/byId/default/postBack)";
-  _rescode=$?;
-  if isTrue ${_rescode} && ! contains "${_aux}" "HTTP Status 404"; then
-    logDebugResult SUCCESS "done";
+  logDebug -n "Posting update-center.json"
+  local _aux
+  _aux="$(curl -X POST -H "Accept: application/json" -d @"${_source}" http://localhost:${VIRTUAL_PORT}/updateCenter/byId/default/postBack)"
+  _rescode=$?
+  if isTrue ${_rescode} && ! contains "${_aux:empty}" "HTTP Status 404"; then
+    logDebugResult SUCCESS "done"
 
-    logDebug -n "Overwritting Jenkins update configuration";
+    logDebug -n "Overwritting Jenkins update configuration"
     mv "${_source}" ${JENKINS_HOME}/updates/default.json
-    _rescode=$?;
+    _rescode=$?
     if isTrue ${_rescode}; then
-      logDebugResult SUCCESS "done";
+      logDebugResult SUCCESS "done"
     else
-      logDebugResult FAILURE "failed";
+      logDebugResult FAILURE "failed"
     fi
   else
-    logDebugResult FAILURE "failed";
-    logDebug "${_aux}";
+    logDebugResult FAILURE "failed"
+    if isNotEmpty "${_aux}"; then
+      logDebug "${_aux}"
+    fi
   fi
 
-  return ${_rescode};
+  return ${_rescode}
 }
 
 # fun: main
@@ -102,13 +105,13 @@ function update_jenkins() {
 # txt: Returns 0/TRUE always, but may exit with an error.
 # use: main
 function main() {
-  local _jsonFile;
+  local _jsonFile
   if retrieve_update_center_json; then
-    _jsonFile="${RESULT}";
-    process_update_center_json "${_jsonFile}";
-    update_jenkins "${_jsonFile}";
+    _jsonFile="${RESULT}"
+    process_update_center_json "${_jsonFile}"
+    update_jenkins "${_jsonFile}"
   else
-    exitWithErrorCode CANNOT_RETRIEVE_UPDATE_CENTER_JSON "${JENKINS_UPDATE_CENTER_JSON}";
+    exitWithErrorCode CANNOT_RETRIEVE_UPDATE_CENTER_JSON "${JENKINS_UPDATE_CENTER_JSON}"
   fi
 }
 #

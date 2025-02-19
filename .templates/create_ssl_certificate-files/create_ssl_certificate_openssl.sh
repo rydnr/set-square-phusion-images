@@ -15,13 +15,19 @@ DW.import ssl
 function main() {
   local _key
   local _csr
+  local _crt
+  local _error
 
   logInfo -n "Generating a new SSL key pair"
   if generateKeyPair "${SSL_KEY_FOLDER}" "${SSL_CERTIFICATE_ALIAS}" "${SSL_KEY_PASSWORD}" "${SSL_KEY_ENCRYPTION}"; then
     _key="${RESULT}"
     logInfoResult SUCCESS "done"
   else
+    _error="${ERROR}"
     logInfoResult FAILURE "failed"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
     exitWithErrorCode CANNOT_GENERATE_SSL_KEY
   fi
 
@@ -30,23 +36,48 @@ function main() {
     _csr="${RESULT}"
     logInfoResult SUCCESS "done"
   else
+    _error="${ERROR}"
     logInfoResult FAILURE "failed"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
     exitWithErrorCode CANNOT_GENERATE_SSL_CERTIFICATE
   fi
 
   logInfo -n "Generating a new SSL certificate"
   if generateCertificate "${SSL_KEY_FOLDER}" "${SSL_CERTIFICATE_ALIAS}" "${_csr}" "${_key}" "${SSL_KEY_PASSWORD}" "${SSL_CERTIFICATE_EXPIRATION_DAYS}"; then
+    _crt="${RESULT}"
     logInfoResult SUCCESS "done"
   else
+    _error="${ERROR}"
     logInfoResult FAILURE "failed"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
     exitWithErrorCode CANNOT_GENERATE_SSL_CERTIFICATE
+  fi
+
+  logInfo -n "Generating a PKCS12 file combining ${_key} and ${_crt}"
+  if generatePKCS12 "${SSL_KEY_FOLDER}" "${SSL_CERTIFICATE_ALIAS}" "${_key}" "${_crt}" "${SSL_KEY_PASSWORD}"; then
+    logInfoResult SUCCESS "done"
+  else
+    _error="${ERROR}"
+    logInfoResult FAILURE "failed"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
+    exitWithErrorCode CANNOT_GENERATE_PKCS12_FILE
   fi
 
   logInfo -n "Fixing permissions of ${SSL_KEY_FOLDER}"
   if changeOwnerOfFolderRecursively "${SSL_KEY_FOLDER}" "${SERVICE_USER}" "${SERVICE_GROUP}"; then
     logInfoResult SUCCESS "done"
   else
+    _error="${ERROR}"
     logInfoResult FAILURE "failed"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
     exitWithErrorCode CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS
   fi
 
@@ -54,7 +85,11 @@ function main() {
   if changeSslKeyPermissions "${_key}"; then
     logInfoResult SUCCESS "done"
   else
+    _error="${ERROR}"
     logInfoResult FAILURE "failed"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
     exitWithErrorCode CANNOT_UPDATE_SSL_KEY_PERMISSIONS "${_key}"
   fi
 
@@ -62,7 +97,11 @@ function main() {
   if changeSslKeyOwnership "${_key}" "${SERVICE_USER}" "${SERVICE_GROUP}"; then
     logInfoResult SUCCESS "done"
   else
+    _error="${ERROR}"
     logInfoResult FAILURE "failed"
+    if isNotEmpty "${_error}"; then
+      logDebug "${_error}"
+    fi
     exitWithErrorCode CANNOT_UPDATE_SSL_KEY_OWNERSHIP "${_key}"
   fi
 }
@@ -76,6 +115,7 @@ checkReq openssl
 addError CANNOT_GENERATE_SSL_KEY "Cannot generate the SSL key pair"
 addError CANNOT_GENERATE_SSL_CERTIFICATE "Cannot generate the SSL certificate"
 addError CANNOT_SIGN_SSL_CERTIFICATE "Cannot sign the SSL certificate"
+addError CANNOT_GENERATE_PKCS12_FILE "Cannot generate the PKCS12 file"
 addError CANNOT_UPDATE_SSL_KEY_FOLDER_PERMISSIONS "Cannot update the permissions of ${SSL_KEY_FOLDER}"
 addError CANNOT_UPDATE_SSL_KEY_PERMISSIONS "Cannot update the permissions of the generated key file"
 addError CANNOT_UPDATE_SSL_KEY_OWNERSHIP "Cannot update the ownership of the generated key file"

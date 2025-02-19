@@ -98,6 +98,12 @@ Follow the instructions to reset the admin password. Then, go to Components (the
 - Add 'Docker-${NAMESPACE}-images' to the group.
 - Add 'Docker-Hub-proxy' to the group.
 
+## Self-signed certificate
+
+For the Docker-${NAMESPACE}-images repository to work, Nexus must be listening SSL traffic on port ${NEXUS_DOCKER_REGISTRY_PORT}. We'll add a self-signed certificate as follows:
+
+> keytool -genkeypair -keystore '${NEXUS_SSL_CERTIFICATE_STORE_PATH}' -storepass '${NEXUS_SSL_CERTIFICATE_STORE_PASSWORD}' -keypass '${NEXUS_SSL_CERTIFICATE_KEY_PASSWORD}' -alias '${NEXUS_SSL_CERTIFICATE_ALIAS}' -keyalg ${NEXUS_SSL_CERTIFICATE_ALGORITHM} -keysize ${NEXUS_SSL_CERTIFICATE_KEY_SIZE} -validity ${NEXUS_SSL_CERTIFICATE_VALIDITY} -dname "CN=*.${NEXUS_DOMAIN}, OU=${NEXUS_SSL_CERTIFICATE_ORGANIZATION_UNIT}, O=${NEXUS_SSL_CERTIFICATE_ORGANIZATION}, L=${NEXUS_SSL_CERTIFICATE_LOCALITY}, ST=${NEXUS_SSL_CERTIFICATE_STATE}, C=${NEXUS_SSL_CERTIFICATE_COUNTRY}" -ext "SAN=DNS:${NEXUS_DOMAIN},IP:${NEXUS_IP_ADDRESS}" -ext "BC=ca:true"
+
 ## Recovery
 
 The recovery process, once the original Nexus instance is shutdown, consists of:

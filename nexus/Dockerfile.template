@@ -14,7 +14,7 @@ ENV DOBACKUP="true" \
 @include("service_user")
 
 @include("create_ssl_certificate")
-ENV SSL_KEYSTORE_PASSWORD "${SSL_KEY_PASSWORD}"
+ENV NETWORK_ADDRESS "internal"
 @include("java")
 @include("elk-common")
 @include("logstash")

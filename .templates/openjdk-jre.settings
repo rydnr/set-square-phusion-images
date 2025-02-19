@@ -1,7 +1,7 @@
-defineButDoNotOverrideEnvVar JAVA_VERSION "The version of the Java VM" "17";
+defineButDoNotOverrideEnvVar JAVA_VERSION "The version of the Java VM" "21";
 defineButDoNotOverrideEnvVar JAVA_HEAP_MIN "The minimum Java heap" "512m";
 defineButDoNotOverrideEnvVar JAVA_HEAP_MAX "The maximum Java heap" "1024m";
 defineButDoNotOverrideEnvVar JAVA_OPTS "Additional Java opts" "";
-defineButDoNotOverrideEnvVar LOGSTASH_VERSION "The logstash version" "1:5.1.2-1";
+defineButDoNotOverrideEnvVar LOGSTASH_VERSION "The logstash version"  "1:8.15.1-1";
 overrideEnvVar ENABLE_LOGSTASH true;
-#
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
