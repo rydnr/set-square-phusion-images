@@ -330,3 +330,16 @@ tt-rss/create-ttrss-database.sql
 tt-rss/create-ttrss-user.sql
 tt-rss/setup.sql
 */volumes-files/*
+*.tar.gz
+*.tar
+*.sources
+*.changes
+*.image
+mariadb/mariadb-files
+**/dry-wit-files
+**/help-files
+**/install-files
+**/maven
+**/python3
+.templates/jenkins-files/40-encrypt-maven-master-password.sh
+**/notes.org

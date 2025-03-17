@@ -43,15 +43,15 @@ EOF
   - Click on "Add Credentials"
   - Kind: SSH username with private key
     - ID: github
-    - Description: SSH key for accesing github.
+    - Description: SSH key for accessing github.
     - Username: git
     - Private key:
       - Enter directly (checked)
       - Click on "Add"
-      - Paste the private key
+      - Paste the private key (the contents of ~/.ssh/id_rsa-github-jenkins.pub)
     - Click on "Create"
 
-# get-new-version
+# _get-new-version
 
 ## Requirements
   - Ensure "git" plugin is installed.
@@ -87,13 +87,8 @@ This job performs the following tasks:
     - Repository URL: github:rydnr/acmsl-pom.git
     - Credentials: git
     - Branches to build: */master
-    - Repository browser: githubweb
-      - url: https://github.com/rydnr/acmsl-pom.git
     - Additional behaviours:
       - Wipe out repository & force clone
-
-## Build Environment
-  - Add timestamps to Console Output
 
 ## Build Steps
 
@@ -141,16 +136,10 @@ cp "${WORKSPACE}"/target/.version "${WORKSPACE}"/../../${trigger}/workspace/targ
 git add pom.xml && git commit -m"Releasing $(cat target/.version) for ${trigger}";
 git tag -a "${ARTIFACT}-${NEW_VERSION}" -m"Releasing ${NEW_VERSION}" && git push origin --tags;
 
-/usr/local/bin/prepare-release.sh "${GROUP}" "${ARTIFACT}" "${NEW_VERSION}" "${REPO}";
+/usr/local/bin/prepare-release.sh "${GROUP}" "${ARTIFACT}" "${NEW_VERSION}" "\${REPO}";
 
 /home/jenkins/.sdkman/candidates/maven/current/bin/mvn -Prelease release:perform
 ```
-
-## Post-build Actions
-
-  - E-mail Notification
-    - Recipients: jenkins@acm-sl.org
-    - Send e-mail for every unstable build (checked)
 
 # Java Commons
 
@@ -158,25 +147,16 @@ Create a new "rydnr.java-commons" job of type Maven project" with the following 
 
 ## Description:
 
-```html
-Builds and releases a new version of A.C.M. S.L. Java Commons.
-
-Build-Time Trend:<br/>
-<img usemap="#map0" src="buildTimeGraph/png" lazymap="buildTimeGraph/map" alt="[Build time graph]" height="400" width="500">
 ```
-
-## Github project
-
-  - Project url: https://github.com/rydnr/java-commons
+Builds and releases a new version of A.C.M. S.L. Java Commons.
+```
 
 ## Source Code Management
 
   - Git:
-    - Repository URL: github-with-jenkins-ssh-key:rydnr/java-commons.git
+    - Repository URL: github:rydnr/java-commons.git
     - Credentials: git
     - Branches to build: */master
-    - Repository browser: githubweb
-      - URL: https://github.com/rydnr/java-commons.git
     - Additional behaviours:
       - Wipe out repository & force clone
       - Create a tag for every build
@@ -184,19 +164,8 @@ Build-Time Trend:<br/>
 ## Build Triggers
 
   - Build whenever a SNAPSHOT dependency is built
-  - Github hook trigger for GITScm polling
   - Poll SCM:
     - Schedule: H/5 * * * *
-
-## Build Environmen
-
-  - Delete workspace before build starts (checked)
-  - Add timestamps to Console Output (checked)
-  - Terminate a build if it's stuck (checked)
-    - Time-out strategy: Absolute
-      - Timeout minutes: 3
-    - Time-out actions:
-      - Abort the build
 
 ## Build
 
@@ -209,7 +178,7 @@ Build-Time Trend:<br/>
   - Run only if build succeeds or is unstable (checked)
   - Trigger/call builds on other projects
     - Build Triggers:
-      - Projects to build: get-new-version
+      - Projects to build: _get-new-version
       - Block until the triggered projects finish their builds (checked)
         - Fail this build step if the triggered build is worse than or equal to: FAILURE
         - Mark this build as failure if the triggered build is worse than or equal to: FAILURE
@@ -235,7 +204,7 @@ command xmlstarlet ed --inplace \
   -u "/x:project/x:parent/x:version" \
   -v "${NEW_VERSION}" \
   pom.xml \
-&& /usr/local/bin/prepare-release.sh "${GROUP}" "${ARTIFACT}" "${NEW_VERSION}" "${REPO}" \
+&& /usr/local/bin/prepare-release.sh "${GROUP}" "${ARTIFACT}" "${NEW_VERSION}" "\${REPO}" \
 && git add pom.xml && git commit -m"Releasing ${ARTIFACT}: ${NEW_VERSION}" \
 && git tag -a "${NEW_GIT_TAG}" -m"Releasing ${ARTIFACT}: ${NEW_VERSION}" && git push origin --tags
 ```
@@ -247,7 +216,7 @@ command xmlstarlet ed --inplace \
       - Advanced:
         - Steps to run if condition is met:
           - Invoke top-level Maven targets
-            - Maven Version: maven
+            - Maven Version: (Default)
             - Goals: -Prelease release:perform
           - Execute shell
 
@@ -263,12 +232,6 @@ export ARTIFACT="$(command xmlstarlet sel -T -N "x=http://maven.apache.org/POM/4
   pom.xml \
 && git add pom.xml && git commit -m"Pointing ${ARTIFACT}-${TAG_NAME} to latest-SNAPSHOT again";
 ```
-
-## E-mail notification
-
-  - Recipients: jenkins@acm-sl.org
-  - Send e-mail for every unstable build (checked)
-  - Send e-mail for each failed module (checked)
 
 ## Post-build Actions
 

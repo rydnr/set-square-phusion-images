@@ -1,5 +1,5 @@
-defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "0.11";
-defineEnvVar PHARO_VERSION MANDATORY "The Pharo version" "8.0";
+defineEnvVar PARENT_IMAGE_TAG MANDATORY "The tag of the parent image" "latest";
+defineEnvVar PHARO_VERSION MANDATORY "The Pharo version" "11.0";
 overrideEnvVar TAG '${PHARO_VERSION}';
 defineEnvVar SERVICE_USER MANDATORY "The service user" "pharo";
 defineEnvVar SERVICE_GROUP MANDATORY "The service group" "pharo";

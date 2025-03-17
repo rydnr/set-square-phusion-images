@@ -1,0 +1,2 @@
+defineButDoNotOverrideEnvVar TOMCAT_HOME "The home directory of Tomcat" "/opt/tomcat";
+# vim: syntax=sh ts=2 sw=2 sts=4 sr noet
