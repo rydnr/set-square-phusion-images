@@ -1,16 +1,13 @@
 @include("preamble")
-FROM ${NAMESPACE}/base-gui:${PARENT_IMAGE_TAG}
-@include("maintainer")
-
-@include("addon-toggles")
-
+FROM ${BASE_IMAGE}:${PARENT_IMAGE_TAG}
+@include("gui")
 @include("service_user")
 
 @include("openjdk")
 @include("pharo")
-@include("gtoolkit")
 @include("sdkman")
 @include("gradle")
+@include("gtoolkit")
 @include("git")
 
 #COPY git-files/gitconfig ${SERVICE_USER_HOME}/.gitconfig

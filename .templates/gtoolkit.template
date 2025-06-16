@@ -3,7 +3,7 @@ COPY gtoolkit-files/my_exec /etc/my_exec.d/gtoolkit
 
 RUN chmod +x /etc/my_exec.d/gtoolkit \
  && ${SYSTEM_UPDATE} \
- && ${PKG_INSTALL} libcairo2 libxrandr2 libxi6 xdg-utils \
+ && ${PKG_INSTALL} libcairo2 libxrandr2 libxi6 xdg-utils libxkbcommon-x11 \
  && ${SYSTEM_CLEANUP} \
  && cd ${SERVICE_USER_HOME} \
  && mkdir tmp \
